@@ -61,7 +61,7 @@ Machine::_GetDMIDecodeData()
 
 	std::string string;
 	while (std::getline(iStream, string) > 0) {
-		std::cout << "*** " << string << " ***" << std::endl;
+		//std::cout << "*** " << string << " ***" << std::endl;
 		if (string.find("BIOS Information") != std::string::npos)
 			_GetBIOSInfo(iStream);
 		else if (string.find("System Information") != std::string::npos) {
@@ -81,7 +81,7 @@ Machine::_GetBIOSInfo(std::istream& stream)
 	std::string versionString = "Version: ";
 	std::string dateString = "Release Date: ";
 	while (std::getline(stream, string) > 0) {
-		//std::cout << "**" << string << "**" << std::endl;
+		std::cout << "**" << string << "**" << std::endl;
 		if (string == "")
 			break;
 
@@ -109,6 +109,7 @@ Machine::_GetBIOSInfo(std::istream& stream)
 void
 Machine::_GetSystemInfo(std::istream& stream)
 {
+	std::cout << "GetSystemInfo()" << std::endl;
 	std::map<std::string, std::string> stringMap;
 
 	std::string string;
@@ -117,14 +118,15 @@ Machine::_GetSystemInfo(std::istream& stream)
 	std::string ssnString = "Serial Number: ";
 	std::string productString = "Product Name: ";
 	while (std::getline(stream, string) > 0) {
+		std::cout << "sys ** " << string << "*** " << std::endl;
 		if (string == "")
 			break;
 
 		pos = string.find(":");
-		if (pos != std::string::npos)
+		if (pos == std::string::npos)
 			continue;
 
-		stringMap[string.substr(0, pos)] = string.substr(pos + 1, std::string::npos);
+		stringMap[string.substr(0, pos)] = string.substr(pos + 2, std::string::npos);
 	}
 
 	std::map<std::string, std::string>::const_iterator i;
