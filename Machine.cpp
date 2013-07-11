@@ -74,35 +74,29 @@ Machine::_GetDMIDecodeData()
 void
 Machine::_GetBIOSInfo(std::istream& stream)
 {
+	std::cout << "GetBIOSInfo()" << std::endl;
 	std::map<std::string, std::string> stringMap;
+
 	std::string string;
 	size_t pos = 0;
-	std::string vendorString = "Vendor: ";
-	std::string versionString = "Version: ";
-	std::string dateString = "Release Date: ";
 	while (std::getline(stream, string) > 0) {
-		std::cout << "**" << string << "**" << std::endl;
+		std::cout << "bios ** " << string << "*** " << std::endl;
 		if (string == "")
 			break;
 
-		pos = string.find(vendorString);
-		if (pos != std::string::npos) {
-			fBiosManufacturer = string.substr(pos + vendorString.length(), std::string::npos);
+		pos = string.find(":");
+		if (pos == std::string::npos)
 			continue;
-		}
 
-		pos = string.find(versionString);
-		if (pos != std::string::npos) {
-			fBiosVersion = string.substr(pos + versionString.length(), std::string::npos);
-			continue;
-		}
+		std::string name = string.substr(0, pos);
+		std::string value = string.substr(pos + 2, std::string::npos);
 
-		pos = string.find(dateString);
-		if (pos != std::string::npos) {
-			fBiosDate = string.substr(pos + dateString.length(), std::string::npos);
-			continue;
-		}
+		stringMap[trim(name)] = trim(value);
 	}
+
+	fBiosManufacturer = stringMap["Vendor"];
+	fBiosDate = stringMap["Release Date"];
+	fBiosVersion = stringMap["Version"];
 }
 
 
@@ -114,9 +108,6 @@ Machine::_GetSystemInfo(std::istream& stream)
 
 	std::string string;
 	size_t pos = 0;
-	std::string manufacturerString = "Manufacturer: ";
-	std::string ssnString = "Serial Number: ";
-	std::string productString = "Product Name: ";
 	while (std::getline(stream, string) > 0) {
 		std::cout << "sys ** " << string << "*** " << std::endl;
 		if (string == "")
@@ -126,11 +117,14 @@ Machine::_GetSystemInfo(std::istream& stream)
 		if (pos == std::string::npos)
 			continue;
 
-		stringMap[string.substr(0, pos)] = string.substr(pos + 2, std::string::npos);
+		std::string name = string.substr(0, pos);
+		std::string value = string.substr(pos + 2, std::string::npos);
+
+		stringMap[trim(name)] = trim(value);
 	}
 
-	std::map<std::string, std::string>::const_iterator i;
+	/*std::map<std::string, std::string>::const_iterator i;
 	for (i = stringMap.begin(); i != stringMap.end(); i++) {
 		std::cout << "name: " << (*i).first << " value: " << (*i).second << std::endl;
-	}
+	}*/
 }
