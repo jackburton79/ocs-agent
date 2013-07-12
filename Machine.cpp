@@ -27,28 +27,43 @@ Machine::~Machine()
 std::string
 Machine::BIOSVersion() const
 {
-	return fBiosVersion;
+	return _GetBIOSValue("Version");
 }
 
 
 std::string
 Machine::BIOSManufacturer() const
 {
-	return fBiosManufacturer;
+	return _GetBIOSValue("Vendor");
 }
 
 
 std::string
 Machine::BIOSDate() const
 {
-	return fBiosDate;
+	return _GetBIOSValue("Release Date");
 }
 
 
 std::string
 Machine::MachineManufacturer() const
 {
-	return fMachineManufacturer;
+	return _GetSystemValue("Manufacturer");
+
+}
+
+
+std::string
+Machine::SystemModel() const
+{
+	return _GetSystemValue("Product Name");
+}
+
+
+std::string
+Machine::SystemSerialNumber() const
+{
+	return _GetSystemValue("Serial Number");
 }
 
 
@@ -75,7 +90,6 @@ void
 Machine::_GetBIOSInfo(std::istream& stream)
 {
 	std::cout << "GetBIOSInfo()" << std::endl;
-	std::map<std::string, std::string> stringMap;
 
 	std::string string;
 	size_t pos = 0;
@@ -88,15 +102,15 @@ Machine::_GetBIOSInfo(std::istream& stream)
 		if (pos == std::string::npos)
 			continue;
 
-		std::string name = string.substr(0, pos);
-		std::string value = string.substr(pos + 2, std::string::npos);
+		try {
+			std::string name = string.substr(0, pos);
+			std::string value = string.substr(pos + 2, std::string::npos);
 
-		stringMap[trim(name)] = trim(value);
+			fBIOSInfo[trim(name)] = trim(value);
+		} catch (...) {
+			// TODO: Handle exceptions better (i.e. out_of_range)
+		}
 	}
-
-	fBiosManufacturer = stringMap["Vendor"];
-	fBiosDate = stringMap["Release Date"];
-	fBiosVersion = stringMap["Version"];
 }
 
 
@@ -104,7 +118,6 @@ void
 Machine::_GetSystemInfo(std::istream& stream)
 {
 	std::cout << "GetSystemInfo()" << std::endl;
-	std::map<std::string, std::string> stringMap;
 
 	std::string string;
 	size_t pos = 0;
@@ -117,14 +130,38 @@ Machine::_GetSystemInfo(std::istream& stream)
 		if (pos == std::string::npos)
 			continue;
 
-		std::string name = string.substr(0, pos);
-		std::string value = string.substr(pos + 2, std::string::npos);
+		try {
+			std::string name = string.substr(0, pos);
+			std::string value = string.substr(pos + 2, std::string::npos);
 
-		stringMap[trim(name)] = trim(value);
+			fSystemInfo[trim(name)] = trim(value);
+
+		} catch (...) {
+
+		}
 	}
+}
 
-	/*std::map<std::string, std::string>::const_iterator i;
-	for (i = stringMap.begin(); i != stringMap.end(); i++) {
-		std::cout << "name: " << (*i).first << " value: " << (*i).second << std::endl;
-	}*/
+
+std::string
+Machine::_GetBIOSValue(std::string string) const
+{
+	std::map<std::string, std::string>::const_iterator i;
+	i = fBIOSInfo.find(string);
+	if (i != fBIOSInfo.end())
+		return i->second;
+
+	return "";
+}
+
+
+std::string
+Machine::_GetSystemValue(std::string string) const
+{
+	std::map<std::string, std::string>::const_iterator i;
+	i = fSystemInfo.find(string);
+	if (i != fSystemInfo.end())
+		return i->second;
+
+	return "";
 }

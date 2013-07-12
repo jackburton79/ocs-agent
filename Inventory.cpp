@@ -26,8 +26,7 @@ void
 Inventory::Build()
 {
 	Machine machine;
-	// TODO: For the moment, we just create a fixed XML document.
-	// Also move this elsewhere.
+	// TODO: Finish this, cleanup.
 
 	TiXmlDocument document;
 	TiXmlDeclaration* declaration = new TiXmlDeclaration("1.0", "UTF-8", "");
@@ -47,6 +46,8 @@ Inventory::Build()
 	TiXmlElement* bmanufacturer = new TiXmlElement("BMANUFACTURER");
 	TiXmlElement* bversion = new TiXmlElement("BVERSION");
 	TiXmlElement* mmanufacturer = new TiXmlElement("MMANUFACTURER");
+	TiXmlElement* systemModel = new TiXmlElement("SMODEL");
+	TiXmlElement* ssn = new TiXmlElement("SSN");
 
 	bmanufacturer->LinkEndChild(new TiXmlText(machine.BIOSManufacturer().c_str()));
 	bversion->LinkEndChild(new TiXmlText(machine.BIOSVersion().c_str()));
@@ -54,16 +55,27 @@ Inventory::Build()
 
 	mmanufacturer->LinkEndChild(new TiXmlText(machine.MachineManufacturer().c_str()));
 
+	systemModel->LinkEndChild(new TiXmlText(machine.SystemModel().c_str()));
+	ssn->LinkEndChild(new TiXmlText(machine.SystemSerialNumber().c_str()));
 
 	bios->LinkEndChild(assettag);
 	bios->LinkEndChild(bdate);
 	bios->LinkEndChild(bmanufacturer);
 	bios->LinkEndChild(bversion);
 	bios->LinkEndChild(mmanufacturer);
+	bios->LinkEndChild(systemModel);
+	bios->LinkEndChild(ssn);
 
 	content->LinkEndChild(bios);
 
-	document.SaveFile("test.xml");
+	TiXmlElement* deviceId = new TiXmlElement("DEVICEID");
+	request->LinkEndChild(deviceId);
+
+	TiXmlElement* query = new TiXmlElement("QUERY");
+	request->LinkEndChild(query);
+
+	if (!document.SaveFile("test.xml"))
+		std::cerr << "Cannot create output file." << std::endl;
 }
 
 

@@ -8,6 +8,7 @@
 #ifndef MACHINE_H_
 #define MACHINE_H_
 
+#include <map>
 #include <string>
 
 class Machine {
@@ -18,22 +19,20 @@ public:
 	std::string BIOSManufacturer() const;
 	std::string BIOSDate() const;
 	std::string BIOSVersion() const;
-	std::string MachineModel() const;
+	std::string SystemModel() const;
 	std::string MachineManufacturer() const;
-	std::string SerialNumber() const;
+	std::string SystemSerialNumber() const;
 
 private:
 	void _GetDMIDecodeData();
 	void _GetBIOSInfo(std::istream& stream);
 	void _GetSystemInfo(std::istream& stream);
 
-	std::string fBiosDate;
-	std::string fBiosManufacturer;
-	std::string fBiosVersion;
+	std::string _GetBIOSValue(std::string string) const;
+	std::string _GetSystemValue(std::string string) const;
 
-	std::string fMachineModel;
-	std::string fMachineManufacturer;
-	std::string fSerialNumber;
+	std::map<std::string, std::string> fBIOSInfo;
+	std::map<std::string, std::string> fSystemInfo;
 };
 
 #endif /* MACHINE_H_ */
