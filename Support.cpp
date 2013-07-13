@@ -19,6 +19,17 @@ popen_streambuf::popen_streambuf()
 }
 
 
+popen_streambuf::popen_streambuf(const char* fileName, const char* mode)
+	:
+	fFile(NULL),
+	fBuffer(NULL)
+{
+	popen_streambuf* buf = open(fileName, mode);
+	if (buf == NULL)
+		throw -1;
+}
+
+
 popen_streambuf::~popen_streambuf()
 {
 	close();

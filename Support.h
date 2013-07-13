@@ -16,6 +16,7 @@
 class popen_streambuf : public std::streambuf {
 public:
 	popen_streambuf();
+	popen_streambuf(const char* fileName, const char* mode);
 	virtual ~popen_streambuf();
 
 	popen_streambuf* open(const char* command, const char* mode);
