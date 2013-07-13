@@ -75,6 +75,17 @@ Inventory::Build(const char* deviceID)
 
 	content->LinkEndChild(bios);
 
+	// TODO: Check if the fields name and structure are correct.
+	for (int i = 0; i < machine.CountProcessors(); i++) {
+		TiXmlElement* cpu = new TiXmlElement("CPU");
+		TiXmlElement* model = new TiXmlElement("CPUMODEL");
+
+		cpu->LinkEndChild(model);
+		model->LinkEndChild(
+				new TiXmlText(machine.ProcessorInfo("model name", i).c_str()));
+		content->LinkEndChild(cpu);
+	}
+
 	TiXmlElement* deviceId = new TiXmlElement("DEVICEID");
 	deviceId->LinkEndChild(new TiXmlText(deviceID));
 
