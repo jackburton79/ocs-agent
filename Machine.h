@@ -28,12 +28,11 @@ public:
 private:
 	void _GetDMIDecodeData();
 	void _GetBIOSInfo(std::istream& stream);
-	void _GetSystemInfo(std::istream& stream);
+	void _GetSystemInfo(std::istream& stream, std::string header);
 
-	std::string _GetBIOSValue(std::string string) const;
-	std::string _GetSystemValue(std::string string) const;
+	std::string _GetValue(std::string string, std::string header) const;
 
-	std::map<std::string, std::string> fBIOSInfo;
+	//std::map<std::string, std::string> fBIOSInfo;
 	std::map<std::string, std::string> fSystemInfo;
 };
 

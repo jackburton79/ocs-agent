@@ -36,28 +36,28 @@ Machine::RetrieveData()
 std::string
 Machine::BIOSVersion() const
 {
-	return _GetBIOSValue("Version");
+	return _GetValue("Version", "BIOS Information");
 }
 
 
 std::string
 Machine::BIOSManufacturer() const
 {
-	return _GetBIOSValue("Vendor");
+	return _GetValue("Vendor", "BIOS Information");
 }
 
 
 std::string
 Machine::BIOSDate() const
 {
-	return _GetBIOSValue("Release Date");
+	return _GetValue("Release Date", "BIOS Information");
 }
 
 
 std::string
 Machine::MachineManufacturer() const
 {
-	return _GetSystemValue("Manufacturer");
+	return _GetValue("Manufacturer", "System Information");
 
 }
 
@@ -65,14 +65,14 @@ Machine::MachineManufacturer() const
 std::string
 Machine::SystemModel() const
 {
-	return _GetSystemValue("Product Name");
+	return _GetValue("Product Name", "System Information");
 }
 
 
 std::string
 Machine::SystemSerialNumber() const
 {
-	return _GetSystemValue("Serial Number");
+	return _GetValue("Serial Number", "System Information");
 }
 
 
@@ -84,25 +84,25 @@ Machine::_GetDMIDecodeData()
 
 	std::string string;
 	while (std::getline(iStream, string) > 0) {
-		//std::cout << "*** " << string << " ***" << std::endl;
-		if (string.find("BIOS Information") != std::string::npos)
-			_GetBIOSInfo(iStream);
-		else if (string.find("System Information") != std::string::npos) {
-			_GetSystemInfo(iStream);
+		// Skip the line with "Handle" in it.
+		if (string.find("Handle") == std::string::npos) {
+			std::string header = string;
+			header = trim(header);
+
+			_GetSystemInfo(iStream, header);
 		}
 	}
 }
 
 
 void
-Machine::_GetBIOSInfo(std::istream& stream)
+Machine::_GetSystemInfo(std::istream& stream, std::string header)
 {
-	std::cout << "GetBIOSInfo()" << std::endl;
-
+	//std::cout << header << std::endl;
 	std::string string;
 	size_t pos = 0;
 	while (std::getline(stream, string) > 0) {
-		std::cout << "bios ** " << string << "*** " << std::endl;
+		//std::cout << "*** " << string << "*** " << std::endl;
 		if (string == "")
 			break;
 
@@ -112,34 +112,9 @@ Machine::_GetBIOSInfo(std::istream& stream)
 
 		try {
 			std::string name = string.substr(0, pos);
-			std::string value = string.substr(pos + 2, std::string::npos);
-
-			fBIOSInfo[trim(name)] = trim(value);
-		} catch (...) {
-			// TODO: Handle exceptions better (i.e. out_of_range)
-		}
-	}
-}
-
-
-void
-Machine::_GetSystemInfo(std::istream& stream)
-{
-	std::cout << "GetSystemInfo()" << std::endl;
-
-	std::string string;
-	size_t pos = 0;
-	while (std::getline(stream, string) > 0) {
-		std::cout << "sys ** " << string << "*** " << std::endl;
-		if (string == "")
-			break;
-
-		pos = string.find(":");
-		if (pos == std::string::npos)
-			continue;
-
-		try {
-			std::string name = string.substr(0, pos);
+			trim(name);
+			// TODO: We should prepend the header, actually
+			name.append(header);
 			std::string value = string.substr(pos + 2, std::string::npos);
 
 			fSystemInfo[trim(name)] = trim(value);
@@ -151,23 +126,12 @@ Machine::_GetSystemInfo(std::istream& stream)
 }
 
 
-std::string
-Machine::_GetBIOSValue(std::string string) const
-{
-	std::map<std::string, std::string>::const_iterator i;
-	i = fBIOSInfo.find(string);
-	if (i != fBIOSInfo.end())
-		return i->second;
-
-	return "";
-}
-
 
 std::string
-Machine::_GetSystemValue(std::string string) const
+Machine::_GetValue(std::string string, std::string header) const
 {
 	std::map<std::string, std::string>::const_iterator i;
-	i = fSystemInfo.find(string);
+	i = fSystemInfo.find(string.append(header));
 	if (i != fSystemInfo.end())
 		return i->second;
 
