@@ -11,6 +11,7 @@
 #include <map>
 #include <string>
 
+
 class Machine {
 public:
 	Machine();

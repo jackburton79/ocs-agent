@@ -17,6 +17,9 @@
 #include <string>
 #include <vector>
 
+const char* kBIOSInfo = "BIOS Information";
+const char* kSystemInfo = "System Information";
+
 Machine::Machine()
 	:
 	fNumCPUs(0)
@@ -46,28 +49,28 @@ Machine::RetrieveData()
 std::string
 Machine::BIOSVersion() const
 {
-	return _GetValue("Version", "BIOS Information");
+	return _GetValue("Version", kBIOSInfo);
 }
 
 
 std::string
 Machine::BIOSManufacturer() const
 {
-	return _GetValue("Vendor", "BIOS Information");
+	return _GetValue("Vendor", kBIOSInfo);
 }
 
 
 std::string
 Machine::BIOSDate() const
 {
-	return _GetValue("Release Date", "BIOS Information");
+	return _GetValue("Release Date", kBIOSInfo);
 }
 
 
 std::string
 Machine::MachineManufacturer() const
 {
-	return _GetValue("Manufacturer", "System Information");
+	return _GetValue("Manufacturer", kSystemInfo);
 
 }
 
@@ -75,14 +78,14 @@ Machine::MachineManufacturer() const
 std::string
 Machine::SystemModel() const
 {
-	return _GetValue("Product Name", "System Information");
+	return _GetValue("Product Name", kSystemInfo);
 }
 
 
 std::string
 Machine::SystemSerialNumber() const
 {
-	return _GetValue("Serial Number", "System Information");
+	return _GetValue("Serial Number", kSystemInfo);
 }
 
 
@@ -137,6 +140,7 @@ Machine::_GetCPUInfo()
 	while (std::getline(iStream, string) > 0) {
 		if (string.find("processor") != std::string::npos) {
 			fNumCPUs++;
+
 			// Get the processor number
 			size_t pos = string.find(":");
 			if (pos == std::string::npos)
@@ -145,8 +149,6 @@ Machine::_GetCPUInfo()
 			std::string valueString = string.substr(pos + 2, std::string::npos);
 			trim(valueString);
 			processorNum = ::strtol(valueString.c_str(), NULL, 10);
-			std::cout << "Processor number " << valueString << std::endl;
-
 		} else {
 			size_t pos = string.find(":");
 			if (pos == std::string::npos)
