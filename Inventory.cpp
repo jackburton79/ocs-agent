@@ -25,7 +25,7 @@ Inventory::~Inventory()
 
 
 bool
-Inventory::Build()
+Inventory::Build(const char* deviceID)
 {
 	Machine machine;
 	// TODO: Finish this, cleanup.
@@ -76,7 +76,7 @@ Inventory::Build()
 	content->LinkEndChild(bios);
 
 	TiXmlElement* deviceId = new TiXmlElement("DEVICEID");
-	deviceId->LinkEndChild(new TiXmlText(machine.ID()));
+	deviceId->LinkEndChild(new TiXmlText(deviceID));
 
 	request->LinkEndChild(deviceId);
 

@@ -15,6 +15,7 @@ public:
 	Configuration();
 	~Configuration();
 
+	std::string DeviceID() const;
 	std::string ServerURL() const;
 	bool LocalInventory() const;
 };

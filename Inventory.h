@@ -14,7 +14,7 @@ public:
 	Inventory();
 	~Inventory();
 
-	bool Build();
+	bool Build(const char* deviceID);
 	bool Save(const char* name);
 	void Send(const char* serverUrl);
 

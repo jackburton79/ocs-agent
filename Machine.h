@@ -18,8 +18,6 @@ public:
 
 	void RetrieveData();
 
-	std::string ID() const;
-
 	std::string BIOSManufacturer() const;
 	std::string BIOSDate() const;
 	std::string BIOSVersion() const;

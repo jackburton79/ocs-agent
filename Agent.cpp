@@ -15,7 +15,7 @@
 Agent::Agent()
 {
 	if (geteuid() != 0) {
-		std::cerr << "This app needs to be run as root" << std::endl;
+		std::cerr << "This program needs to be run as root" << std::endl;
 		throw "error";
 	}
 }
@@ -33,7 +33,7 @@ Agent::Run()
 
 	Inventory inventory;
 
-	if (inventory.Build()) {
+	if (inventory.Build(config.DeviceID().c_str())) {
 		if (!inventory.Save("test")) {
 			std::cerr << "Cannot save output file." << std::endl;
 			if (!config.LocalInventory())
