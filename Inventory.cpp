@@ -76,6 +76,8 @@ Inventory::Build()
 	content->LinkEndChild(bios);
 
 	TiXmlElement* deviceId = new TiXmlElement("DEVICEID");
+	deviceId->LinkEndChild(new TiXmlText(machine.ID()));
+
 	request->LinkEndChild(deviceId);
 
 	TiXmlElement* query = new TiXmlElement("QUERY");

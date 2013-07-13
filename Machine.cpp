@@ -8,10 +8,14 @@
 #include "Machine.h"
 #include "Support.h"
 
+#include <errno.h>
 #include <stdio.h>
+#include <unistd.h>
+
 #include <iostream>
 #include <fstream>
 #include <map>
+#include <string>
 
 Machine::Machine()
 {
@@ -28,6 +32,21 @@ Machine::RetrieveData()
 {
 	// TODO: If dmidecode isn't installed, read from /proc ?
 	_GetDMIDecodeData();
+}
+
+
+std::string
+Machine::ID() const
+{
+	std::string hostName;
+	char buffer[64];
+	if (gethostname(buffer, sizeof(buffer)) != 0)
+		throw errno;
+
+	hostName.append(buffer);
+	// TODO:
+	hostName.append("-2013-05-10");
+	return hostName;
 }
 
 
