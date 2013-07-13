@@ -98,7 +98,7 @@ Inventory::Save(const char* name)
 
 
 void
-Inventory::Send()
+Inventory::Send(const char* serverUrl)
 {
-
+	// TODO: Send the inventory
 }

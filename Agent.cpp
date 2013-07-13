@@ -6,6 +6,7 @@
  */
 
 #include "Agent.h"
+#include "Configuration.h"
 #include "Inventory.h"
 
 #include <iostream>
@@ -28,13 +29,15 @@ Agent::~Agent()
 void
 Agent::Run()
 {
+	Configuration config;
+
 	Inventory inventory;
 
 	if (inventory.Build()) {
 		if (!inventory.Save("test")) {
 			std::cerr << "Cannot save output file." << std::endl;
-			if (false)
-				inventory.Send();
+			if (!config.LocalInventory())
+				inventory.Send(config.ServerURL().c_str());
 		}
 	}
 }

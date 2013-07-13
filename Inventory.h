@@ -16,7 +16,7 @@ public:
 
 	bool Build();
 	bool Save(const char* name);
-	void Send();
+	void Send(const char* serverUrl);
 
 private:
 	TiXmlDocument* fDocument;
