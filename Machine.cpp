@@ -15,12 +15,19 @@
 
 Machine::Machine()
 {
-	_GetDMIDecodeData();
 }
 
 
 Machine::~Machine()
 {
+}
+
+
+void
+Machine::RetrieveData()
+{
+	// TODO: If dmidecode isn't installed, read from /proc ?
+	_GetDMIDecodeData();
 }
 
 

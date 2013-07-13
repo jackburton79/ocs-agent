@@ -11,28 +11,35 @@
 #include <tinyxml.h>
 
 Inventory::Inventory()
+	:
+	fDocument(NULL)
 {
-	// TODO Auto-generated constructor stub
-
+	fDocument = new TiXmlDocument;
 }
+
 
 Inventory::~Inventory()
 {
-	// TODO Auto-generated destructor stub
+	delete fDocument;
 }
 
 
-void
+bool
 Inventory::Build()
 {
 	Machine machine;
 	// TODO: Finish this, cleanup.
+	try {
+		machine.RetrieveData();
+	} catch (...) {
+		std::cerr << "Cannot retrieve machine data." << std::endl;
+		return false;
+	}
 
-	TiXmlDocument document;
 	TiXmlDeclaration* declaration = new TiXmlDeclaration("1.0", "UTF-8", "");
 	TiXmlElement* request = new TiXmlElement("REQUEST");
-	document.LinkEndChild(declaration);
-	document.LinkEndChild(request);
+	fDocument->LinkEndChild(declaration);
+	fDocument->LinkEndChild(request);
 
 	TiXmlElement* content = new TiXmlElement("CONTENT");
 	TiXmlElement* accountInfo = new TiXmlElement("ACCOUNTINFO");
@@ -74,15 +81,17 @@ Inventory::Build()
 	TiXmlElement* query = new TiXmlElement("QUERY");
 	request->LinkEndChild(query);
 
-	if (!document.SaveFile("test.xml"))
-		std::cerr << "Cannot create output file." << std::endl;
+	return true;
 }
 
 
-void
-Inventory::Print()
+bool
+Inventory::Save(const char* name)
 {
+	std::string fullName;
+	fullName.append(name).append(".xml");
 
+	return fDocument->SaveFile(fullName.c_str());
 }
 
 

@@ -8,14 +8,19 @@
 #ifndef INVENTORY_H_
 #define INVENTORY_H_
 
+class TiXmlDocument;
 class Inventory {
 public:
 	Inventory();
 	~Inventory();
 
-	void Build();
-	void Print();
+	bool Build();
+	bool Save(const char* name);
 	void Send();
+
+private:
+	TiXmlDocument* fDocument;
+
 };
 
 #endif /* INVENTORY_H_ */

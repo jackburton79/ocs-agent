@@ -16,6 +16,8 @@ public:
 	Machine();
 	~Machine();
 
+	void RetrieveData();
+
 	std::string BIOSManufacturer() const;
 	std::string BIOSDate() const;
 	std::string BIOSVersion() const;

@@ -22,7 +22,6 @@ Agent::Agent()
 
 Agent::~Agent()
 {
-	// TODO Auto-generated destructor stub
 }
 
 
@@ -30,10 +29,15 @@ void
 Agent::Run()
 {
 	Inventory* inventory = new Inventory();
-	inventory->Build();
-	inventory->Print();
 
-	if (false)
-		inventory->Send();
+	if (inventory->Build()) {
+		if (!inventory->Save("test")) {
+			std::cerr << "Cannot save output file." << std::endl;
+			if (false)
+				inventory->Send();
+		}
+	}
+
+	delete inventory;
 }
 
