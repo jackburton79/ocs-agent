@@ -9,13 +9,17 @@
 #include "Support.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include <iostream>
 #include <fstream>
 #include <map>
 #include <string>
+#include <vector>
 
 Machine::Machine()
+	:
+	fNumCPUs(0)
 {
 }
 
@@ -28,8 +32,14 @@ Machine::~Machine()
 void
 Machine::RetrieveData()
 {
-	// TODO: If dmidecode isn't installed, read from /proc ?
-	_GetDMIDecodeData();
+	try {
+		// TODO: If dmidecode isn't installed, read from /proc ?
+		_GetDMIDecodeData();
+	} catch (...) {
+		std::cerr << "Can't find dmidecode. Is it installed?" << std::endl;
+	}
+
+	_GetCPUInfo();
 }
 
 
@@ -76,6 +86,27 @@ Machine::SystemSerialNumber() const
 }
 
 
+int
+Machine::CountProcessors() const
+{
+	return fNumCPUs;
+}
+
+
+std::string
+Machine::ProcessorInfo(const char* info, int num) const
+{
+	if (num < 0 || num >= fNumCPUs)
+		return "";
+
+	std::map<std::string, std::string>::const_iterator i;
+	i = fCPUInfo[num].find(info);
+	if (i != fCPUInfo[num].end())
+		return i->second;
+	return "";
+}
+
+
 void
 Machine::_GetDMIDecodeData()
 {
@@ -90,6 +121,45 @@ Machine::_GetDMIDecodeData()
 			header = trim(header);
 
 			_GetSystemInfo(iStream, header);
+		}
+	}
+}
+
+
+void
+Machine::_GetCPUInfo()
+{
+	popen_streambuf cpu("cat /proc/cpuinfo", "r");
+	std::istream iStream(&cpu);
+
+	std::string string;
+	int processorNum = 0;
+	while (std::getline(iStream, string) > 0) {
+		if (string.find("processor") != std::string::npos) {
+			fNumCPUs++;
+			// Get the processor number
+			size_t pos = string.find(":");
+			if (pos == std::string::npos)
+				continue;
+
+			std::string valueString = string.substr(pos + 2, std::string::npos);
+			trim(valueString);
+			processorNum = ::strtol(valueString.c_str(), NULL, 10);
+			std::cout << "Processor number " << valueString << std::endl;
+
+		} else {
+			size_t pos = string.find(":");
+			if (pos == std::string::npos)
+				continue;
+
+			try {
+				std::string name = string.substr(0, pos);
+				std::string value = string.substr(pos + 1, std::string::npos);
+
+				fCPUInfo[processorNum][trim(name)] = trim(value);
+
+			} catch (...) {
+			}
 		}
 	}
 }
@@ -124,7 +194,6 @@ Machine::_GetSystemInfo(std::istream& stream, std::string header)
 		}
 	}
 }
-
 
 
 std::string

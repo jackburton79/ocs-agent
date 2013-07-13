@@ -25,14 +25,19 @@ public:
 	std::string MachineManufacturer() const;
 	std::string SystemSerialNumber() const;
 
+	int CountProcessors() const;
+	std::string ProcessorInfo(const char* info, int num) const;
+
 private:
 	void _GetDMIDecodeData();
-	void _GetBIOSInfo(std::istream& stream);
+	void _GetCPUInfo();
 	void _GetSystemInfo(std::istream& stream, std::string header);
 
 	std::string _GetValue(std::string string, std::string header) const;
 
-	//std::map<std::string, std::string> fBIOSInfo;
+	// TODO: Use a std::vector, more than 16 cpu aren't uncommon nowadays
+	int fNumCPUs;
+	std::map<std::string, std::string> fCPUInfo[16];
 	std::map<std::string, std::string> fSystemInfo;
 };
 
