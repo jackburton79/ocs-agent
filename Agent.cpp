@@ -28,16 +28,14 @@ Agent::~Agent()
 void
 Agent::Run()
 {
-	Inventory* inventory = new Inventory();
+	Inventory inventory;
 
-	if (inventory->Build()) {
-		if (!inventory->Save("test")) {
+	if (inventory.Build()) {
+		if (!inventory.Save("test")) {
 			std::cerr << "Cannot save output file." << std::endl;
 			if (false)
-				inventory->Send();
+				inventory.Send();
 		}
 	}
-
-	delete inventory;
 }
 
