@@ -96,8 +96,7 @@ Machine::SystemSerialNumber() const
 void
 Machine::_GetDMIDecodeData()
 {
-	popen_streambuf dmi;
-	dmi.open("dmidecode", "r");
+	popen_streambuf dmi("dmidecode", "r");
 	std::istream iStream(&dmi);
 
 	std::string string;
