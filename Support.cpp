@@ -55,7 +55,7 @@ popen_streambuf::open(const char* fileName, const char* mode)
 void
 popen_streambuf::close()
 {
-	if (fFile == NULL) {
+	if (fFile != NULL) {
 		pclose(fFile);
 		fFile = NULL;
 	}
