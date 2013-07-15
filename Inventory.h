@@ -8,7 +8,9 @@
 #ifndef INVENTORY_H_
 #define INVENTORY_H_
 
+class Machine;
 class TiXmlDocument;
+class TiXmlElement;
 class Inventory {
 public:
 	Inventory();
@@ -19,8 +21,16 @@ public:
 	void Send(const char* serverUrl);
 
 private:
-	TiXmlDocument* fDocument;
+	void _AddBIOSInfo(TiXmlElement* parent);
+	void _AddCPUsInfo(TiXmlElement* parent);
+	void _AddDrivesInfo(TiXmlElement* parent);
+	void _AddHardwareInfo(TiXmlElement* parent);
+	void _AddNetworksInfo(TiXmlElement* parent);
+	void _AddProcessesInfo(TiXmlElement* parent);
+	void _AddUsersInfo(TiXmlElement* parent);
 
+	TiXmlDocument* fDocument;
+	Machine* fMachine;
 };
 
 #endif /* INVENTORY_H_ */
