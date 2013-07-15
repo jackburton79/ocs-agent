@@ -63,9 +63,11 @@ Inventory::Build(const char* deviceID)
 
 	_AddBIOSInfo(content);
 	_AddCPUsInfo(content);
+	_AddDrivesInfo(content);
 	_AddHardwareInfo(content);
 	_AddNetworksInfo(content);
 	_AddProcessesInfo(content);
+	_AddSoftwaresInfo(content);
 	_AddUsersInfo(content);
 
 	TiXmlElement* deviceId = new TiXmlElement("DEVICEID");
@@ -179,7 +181,91 @@ Inventory::_AddDrivesInfo(TiXmlElement* parent)
 void
 Inventory::_AddHardwareInfo(TiXmlElement* parent)
 {
+	TiXmlElement* hardware = new TiXmlElement("HARDWARE");
 
+	TiXmlElement* checksum = new TiXmlElement("CHECKSUM");
+    //<CHECKSUM>262143</CHECKSUM>
+
+    TiXmlElement* dateLastLoggedUser = new TiXmlElement("DATELASTLOGGEDUSER");
+    //<DATELASTLOGGEDUSER>Thu Jul 11 13:24</DATELASTLOGGEDUSER>
+
+    TiXmlElement* defaultGW = new TiXmlElement("DEFAULTGATEWAY");
+    //<DEFAULTGATEWAY>192.168.22.9</DEFAULTGATEWAY>
+
+    TiXmlElement* description = new TiXmlElement("DESCRIPTION");
+   // <DESCRIPTION>i686/00-01-23 22:09:06</DESCRIPTION>
+
+    TiXmlElement* dns = new TiXmlElement("DNS");
+    //<DNS>192.168.22.23/192.168.22.24</DNS>
+
+    TiXmlElement* ipAddress = new TiXmlElement("IPADDR");
+    //<IPADDR>192.168.22.33</IPADDR>
+
+    TiXmlElement* lastLoggedUser = new TiXmlElement("LASTLOGGEDUSER");
+   // <LASTLOGGEDUSER>root</LASTLOGGEDUSER>
+
+    TiXmlElement* memory = new TiXmlElement("MEMORY");
+    //<MEMORY>521</MEMORY>
+
+    TiXmlElement* name = new TiXmlElement("NAME");
+    name->LinkEndChild(new TiXmlText(fMachine->KernelInfo().hostname.c_str()));
+
+    TiXmlElement* osComments = new TiXmlElement("OSCOMMENTS");
+    osComments->LinkEndChild(new TiXmlText(fMachine->KernelInfo().comments.c_str()));
+    //<OSCOMMENTS>#1 SMP Mon Feb 25 10:32:50 UTC 2013 (f0b13a3)</OSCOMMENTS>
+
+    TiXmlElement* osName = new TiXmlElement("OSNAME");
+    //<OSNAME>openSUSE 12.1 (i586)</OSNAME>
+
+    TiXmlElement* osVersion = new TiXmlElement("OSVERSION");
+   // <OSVERSION>3.1.10-1.19-xen</OSVERSION>
+
+    TiXmlElement* processorN = new TiXmlElement("PROCESSORN");
+    //<PROCESSORN>1</PROCESSORN>
+
+    TiXmlElement* processorS = new TiXmlElement("PROCESSORS");
+    //<PROCESSORS>2660</PROCESSORS>
+
+    TiXmlElement* processorT = new TiXmlElement("PROCESSORT");
+    //<PROCESSORT>Intel(R) Xeon(R) CPU           E5430  @ 2.66GHz</PROCESSORT>
+
+    TiXmlElement* swap = new TiXmlElement("SWAP");
+    //<SWAP>1669</SWAP>
+
+    TiXmlElement* userID = new TiXmlElement("USERID");
+    //<USERID>root</USERID>
+
+    TiXmlElement* uuid = new TiXmlElement("UUID");
+    //<UUID></UUID>
+
+    TiXmlElement* vmSystem = new TiXmlElement("VMSYSTEM");
+   // <VMSYSTEM>Xen</VMSYSTEM>
+
+    TiXmlElement* workGroup = new TiXmlElement("WORKGROUP");
+    workGroup->LinkEndChild(new TiXmlText(fMachine->KernelInfo().domain_name.c_str()));
+
+
+    hardware->LinkEndChild(checksum);
+    hardware->LinkEndChild(dateLastLoggedUser);
+    hardware->LinkEndChild(defaultGW);
+    hardware->LinkEndChild(description);
+    hardware->LinkEndChild(dns);
+    hardware->LinkEndChild(ipAddress);
+    hardware->LinkEndChild(lastLoggedUser);
+    hardware->LinkEndChild(memory);
+    hardware->LinkEndChild(name);
+    hardware->LinkEndChild(osComments);
+    hardware->LinkEndChild(osName);
+    hardware->LinkEndChild(osVersion);
+    hardware->LinkEndChild(processorN);
+    hardware->LinkEndChild(processorS);
+    hardware->LinkEndChild(processorT);
+    hardware->LinkEndChild(swap);
+    hardware->LinkEndChild(userID);
+    hardware->LinkEndChild(uuid);
+    hardware->LinkEndChild(vmSystem);
+    hardware->LinkEndChild(workGroup);
+    parent->LinkEndChild(hardware);
 }
 
 
@@ -217,6 +303,13 @@ Inventory::_AddProcessesInfo(TiXmlElement* parent)
 
 		parent->LinkEndChild(process);
 	}
+}
+
+
+void
+Inventory::_AddSoftwaresInfo(TiXmlElement* parent)
+{
+
 }
 
 

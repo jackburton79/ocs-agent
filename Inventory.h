@@ -27,6 +27,7 @@ private:
 	void _AddHardwareInfo(TiXmlElement* parent);
 	void _AddNetworksInfo(TiXmlElement* parent);
 	void _AddProcessesInfo(TiXmlElement* parent);
+	void _AddSoftwaresInfo(TiXmlElement* parent);
 	void _AddUsersInfo(TiXmlElement* parent);
 
 	TiXmlDocument* fDocument;
