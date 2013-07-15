@@ -212,33 +212,39 @@ Inventory::_AddHardwareInfo(TiXmlElement* parent)
 
     TiXmlElement* osComments = new TiXmlElement("OSCOMMENTS");
     osComments->LinkEndChild(new TiXmlText(fMachine->KernelInfo().comments.c_str()));
-    //<OSCOMMENTS>#1 SMP Mon Feb 25 10:32:50 UTC 2013 (f0b13a3)</OSCOMMENTS>
 
     TiXmlElement* osName = new TiXmlElement("OSNAME");
+
     //<OSNAME>openSUSE 12.1 (i586)</OSNAME>
 
     TiXmlElement* osVersion = new TiXmlElement("OSVERSION");
-   // <OSVERSION>3.1.10-1.19-xen</OSVERSION>
+    osVersion->LinkEndChild(new TiXmlText(fMachine->KernelInfo().os_release.c_str()));
 
     TiXmlElement* processorN = new TiXmlElement("PROCESSORN");
-    //<PROCESSORN>1</PROCESSORN>
+    std::ostringstream numProcessorsString;
+    numProcessorsString << fMachine->CountProcessors();
+    processorN->LinkEndChild(new TiXmlText(numProcessorsString.str().c_str()));
 
     TiXmlElement* processorS = new TiXmlElement("PROCESSORS");
-    //<PROCESSORS>2660</PROCESSORS>
+    processorS->LinkEndChild(new TiXmlText(fMachine->ProcessorSpeed(0).c_str()));
 
     TiXmlElement* processorT = new TiXmlElement("PROCESSORT");
-    //<PROCESSORT>Intel(R) Xeon(R) CPU           E5430  @ 2.66GHz</PROCESSORT>
+    processorT->LinkEndChild(new TiXmlText(fMachine->ProcessorType(0).c_str()));
 
     TiXmlElement* swap = new TiXmlElement("SWAP");
+    swap->LinkEndChild(new TiXmlText(""));
     //<SWAP>1669</SWAP>
 
     TiXmlElement* userID = new TiXmlElement("USERID");
+    userID->LinkEndChild(new TiXmlText(""));
     //<USERID>root</USERID>
 
     TiXmlElement* uuid = new TiXmlElement("UUID");
+    uuid->LinkEndChild(new TiXmlText(""));
     //<UUID></UUID>
 
     TiXmlElement* vmSystem = new TiXmlElement("VMSYSTEM");
+    vmSystem->LinkEndChild(new TiXmlText(""));
    // <VMSYSTEM>Xen</VMSYSTEM>
 
     TiXmlElement* workGroup = new TiXmlElement("WORKGROUP");
