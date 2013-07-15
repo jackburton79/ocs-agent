@@ -12,6 +12,13 @@
 #include <string>
 
 
+struct kernel_info {
+	std::string comments;
+	std::string hostname;
+	std::string domain_name;
+};
+
+
 class Machine {
 public:
 	Machine();
@@ -33,12 +40,17 @@ public:
 	std::string ProcessorSerialNumber(int numCpu) const;
 	std::string ProcessorType(int numCpu) const;
 
+	kernel_info KernelInfo() const;
+
 	int CountProcesses() const;
 
 
 private:
 	void _GetDMIDecodeData();
 	void _GetCPUInfo();
+	void _GetKernelInfo();
+
+
 	void _GetSystemInfo(std::istream& stream, std::string header);
 
 	std::string _GetValue(std::string string, std::string header) const;
@@ -48,6 +60,7 @@ private:
 	int fNumCPUs;
 	std::map<std::string, std::string> fCPUInfo[16];
 	std::map<std::string, std::string> fSystemInfo;
+	kernel_info fKernelInfo;
 };
 
 #endif /* MACHINE_H_ */

@@ -5,7 +5,10 @@
  *      Author: stefano
  */
 
+// TODO: Reorganize code.
+
 #include "Machine.h"
+#include "ProcReader.h"
 #include "Support.h"
 
 #include <stdio.h>
@@ -19,6 +22,7 @@
 
 const char* kBIOSInfo = "BIOS Information";
 const char* kSystemInfo = "System Information";
+const char* kProcessorInfo = "Processor Info";
 
 Machine::Machine()
 	:
@@ -43,6 +47,7 @@ Machine::RetrieveData()
 	}
 
 	_GetCPUInfo();
+	_GetKernelInfo();
 }
 
 
@@ -136,13 +141,15 @@ std::string
 Machine::ProcessorType(int numCpu) const
 {
 	std::string model = _ProcessorInfo("model name", numCpu);
-	size_t pos = model.find("@");
-	if (pos != std::string::npos) {
-		model = model.substr(0, pos);
-	}
-
 	trim(model);
 	return model;
+}
+
+
+kernel_info
+Machine::KernelInfo() const
+{
+	return fKernelInfo;
 }
 
 
@@ -209,6 +216,15 @@ Machine::_GetCPUInfo()
 			}
 		}
 	}
+}
+
+
+void
+Machine::_GetKernelInfo()
+{
+	fKernelInfo.comments = ProcReader("sys/kernel/version").ReadLine();
+	fKernelInfo.hostname = ProcReader("sys/kernel/hostname").ReadLine();
+	fKernelInfo.domain_name = ProcReader("sys/kernel/domainname").ReadLine();
 }
 
 
