@@ -33,6 +33,8 @@ public:
 	std::string ProcessorSerialNumber(int numCpu) const;
 	std::string ProcessorType(int numCpu) const;
 
+	int CountProcesses() const;
+
 
 private:
 	void _GetDMIDecodeData();

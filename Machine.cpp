@@ -146,6 +146,15 @@ Machine::ProcessorType(int numCpu) const
 }
 
 
+int
+Machine::CountProcesses() const
+{
+	// TODO:
+	return 1;
+}
+
+
+// private
 void
 Machine::_GetDMIDecodeData()
 {
