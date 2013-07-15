@@ -11,8 +11,10 @@
 #include "ProcReader.h"
 #include "Support.h"
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/utsname.h>
 
 #include <iostream>
 #include <fstream>
@@ -47,7 +49,12 @@ Machine::RetrieveData()
 	}
 
 	_GetCPUInfo();
-	_GetKernelInfo();
+
+	try {
+		_GetKernelInfo();
+	} catch (...) {
+		std::cerr << "Failed to get kernel info." << std::endl;
+	}
 }
 
 
@@ -184,6 +191,7 @@ Machine::_GetDMIDecodeData()
 void
 Machine::_GetCPUInfo()
 {
+	// TODO: Use ProcReader when it's ready for this
 	popen_streambuf cpu("cat /proc/cpuinfo", "r");
 	std::istream iStream(&cpu);
 
@@ -222,9 +230,16 @@ Machine::_GetCPUInfo()
 void
 Machine::_GetKernelInfo()
 {
-	fKernelInfo.comments = ProcReader("sys/kernel/version").ReadLine();
-	fKernelInfo.hostname = ProcReader("sys/kernel/hostname").ReadLine();
-	fKernelInfo.domain_name = ProcReader("sys/kernel/domainname").ReadLine();
+	struct utsname uName;
+	if (::uname(&uName) != 0)
+		throw errno;
+
+	//std::cout << uName.sysname << std::endl;
+	fKernelInfo.hostname = uName.nodename;
+	fKernelInfo.comments = uName.version;
+	fKernelInfo.os_release = uName.release;
+	//std::cout << uName.machine << std::endl;
+	fKernelInfo.domain_name = uName.domainname;
 }
 
 
