@@ -66,7 +66,7 @@ Inventory::Build(const char* deviceID)
 	_AddDrivesInfo(content);
 	_AddHardwareInfo(content);
 	_AddNetworksInfo(content);
-	_AddProcessesInfo(content);
+	//_AddProcessesInfo(content);
 	_AddSoftwaresInfo(content);
 	_AddUsersInfo(content);
 
@@ -205,6 +205,7 @@ Inventory::_AddHardwareInfo(TiXmlElement* parent)
    // <LASTLOGGEDUSER>root</LASTLOGGEDUSER>
 
     TiXmlElement* memory = new TiXmlElement("MEMORY");
+    memory->LinkEndChild(new TiXmlText(fMachine->KernelInfo().memory.c_str()));
     //<MEMORY>521</MEMORY>
 
     TiXmlElement* name = new TiXmlElement("NAME");
@@ -232,7 +233,7 @@ Inventory::_AddHardwareInfo(TiXmlElement* parent)
     processorT->LinkEndChild(new TiXmlText(fMachine->ProcessorType(0).c_str()));
 
     TiXmlElement* swap = new TiXmlElement("SWAP");
-    swap->LinkEndChild(new TiXmlText(""));
+    swap->LinkEndChild(new TiXmlText(fMachine->KernelInfo().swap.c_str()));
     //<SWAP>1669</SWAP>
 
     TiXmlElement* userID = new TiXmlElement("USERID");
@@ -244,7 +245,7 @@ Inventory::_AddHardwareInfo(TiXmlElement* parent)
     //<UUID></UUID>
 
     TiXmlElement* vmSystem = new TiXmlElement("VMSYSTEM");
-    vmSystem->LinkEndChild(new TiXmlText(""));
+    vmSystem->LinkEndChild(new TiXmlText("Physical"));
    // <VMSYSTEM>Xen</VMSYSTEM>
 
     TiXmlElement* workGroup = new TiXmlElement("WORKGROUP");
@@ -322,5 +323,12 @@ Inventory::_AddSoftwaresInfo(TiXmlElement* parent)
 void
 Inventory::_AddUsersInfo(TiXmlElement* parent)
 {
+	TiXmlElement* users = new TiXmlElement("USERS");
 
+	for (int i = 0; i < fMachine->Users().Count(); i++) {
+		TiXmlElement* login = new TiXmlElement("LOGIN");
+		login->LinkEndChild(new TiXmlText(fMachine->Users().UserAt(i).c_str()));
+		users->LinkEndChild(login);
+	}
+	parent->LinkEndChild(users);
 }

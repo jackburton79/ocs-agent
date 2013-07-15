@@ -11,13 +11,17 @@
 #include <map>
 #include <string>
 
+#include "LoggedUsers.h"
 
 struct kernel_info {
 	std::string comments;
 	std::string hostname;
 	std::string domain_name;
 	std::string os_release;
+	std::string memory;
+	std::string swap;
 };
+
 
 
 class Machine {
@@ -45,6 +49,7 @@ public:
 
 	int CountProcesses() const;
 
+	LoggedUsers& Users() const;
 
 private:
 	void _GetDMIDecodeData();
@@ -62,6 +67,7 @@ private:
 	std::map<std::string, std::string> fCPUInfo[16];
 	std::map<std::string, std::string> fSystemInfo;
 	kernel_info fKernelInfo;
+	LoggedUsers* fUsers;
 };
 
 #endif /* MACHINE_H_ */

@@ -7,6 +7,7 @@
 
 // TODO: Reorganize code.
 
+#include "LoggedUsers.h"
 #include "Machine.h"
 #include "ProcReader.h"
 #include "Support.h"
@@ -20,6 +21,7 @@
 #include <fstream>
 #include <map>
 #include <string>
+#include <sstream>
 #include <vector>
 
 const char* kBIOSInfo = "BIOS Information";
@@ -28,13 +30,15 @@ const char* kProcessorInfo = "Processor Info";
 
 Machine::Machine()
 	:
-	fNumCPUs(0)
+	fNumCPUs(0),
+	fUsers(NULL)
 {
 }
 
 
 Machine::~Machine()
 {
+	delete fUsers;
 }
 
 
@@ -55,6 +59,8 @@ Machine::RetrieveData()
 	} catch (...) {
 		std::cerr << "Failed to get kernel info." << std::endl;
 	}
+
+	fUsers = new LoggedUsers;
 }
 
 
@@ -168,6 +174,13 @@ Machine::CountProcesses() const
 }
 
 
+LoggedUsers&
+Machine::Users() const
+{
+	return *fUsers;
+}
+
+
 // private
 void
 Machine::_GetDMIDecodeData()
@@ -240,6 +253,31 @@ Machine::_GetKernelInfo()
 	fKernelInfo.os_release = uName.release;
 	//std::cout << uName.machine << std::endl;
 	fKernelInfo.domain_name = uName.domainname;
+
+	ProcReader proc("meminfo");
+	std::istream stream(&proc);
+
+	std::string string;
+	size_t pos;
+	while (std::getline(stream, string) > 0) {
+		if ((pos = string.find("SwapTotal:")) != std::string::npos) {
+			pos = string.find(":");
+			std::string swapString = string.substr(pos + 1, std::string::npos);
+
+			int swapInt = ::strtol(trim(swapString).c_str(), NULL, 10) / 1024;
+			std::ostringstream stringStream;
+			stringStream << swapInt;
+			fKernelInfo.swap = stringStream.str();
+		} else if ((pos = string.find("MemTotal:")) != std::string::npos) {
+			pos = string.find(":");
+			std::string memString = string.substr(pos + 1, std::string::npos);
+			int memInt = ::strtol(trim(memString).c_str(), NULL, 10) / 1024;
+			std::ostringstream stringStream;
+			stringStream << memInt;
+			fKernelInfo.memory = stringStream.str();
+		}
+	}
+	//fKernelInfo.memory =
 }
 
 
