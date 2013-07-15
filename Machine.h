@@ -19,6 +19,7 @@ public:
 
 	void RetrieveData();
 
+	std::string AssetTag() const;
 	std::string BIOSManufacturer() const;
 	std::string BIOSDate() const;
 	std::string BIOSVersion() const;
@@ -27,7 +28,11 @@ public:
 	std::string SystemSerialNumber() const;
 
 	int CountProcessors() const;
-	std::string ProcessorInfo(const char* info, int num) const;
+	std::string ProcessorSpeed(int numCpu) const;
+	std::string ProcessorManufacturer(int numCpu) const;
+	std::string ProcessorSerialNumber(int numCpu) const;
+	std::string ProcessorType(int numCpu) const;
+
 
 private:
 	void _GetDMIDecodeData();
@@ -35,6 +40,7 @@ private:
 	void _GetSystemInfo(std::istream& stream, std::string header);
 
 	std::string _GetValue(std::string string, std::string header) const;
+	std::string _ProcessorInfo(const char* info, int num) const;
 
 	// TODO: Use a std::vector, more than 16 cpu aren't uncommon nowadays
 	int fNumCPUs;

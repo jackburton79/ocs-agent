@@ -47,6 +47,13 @@ Machine::RetrieveData()
 
 
 std::string
+Machine::AssetTag() const
+{
+	return "";
+}
+
+
+std::string
 Machine::BIOSVersion() const
 {
 	return _GetValue("Version", kBIOSInfo);
@@ -97,16 +104,45 @@ Machine::CountProcessors() const
 
 
 std::string
-Machine::ProcessorInfo(const char* info, int num) const
+Machine::ProcessorManufacturer(int numCpu) const
 {
-	if (num < 0 || num >= fNumCPUs)
-		return "";
+	return _ProcessorInfo("vendor_id", numCpu);
+}
 
-	std::map<std::string, std::string>::const_iterator i;
-	i = fCPUInfo[num].find(info);
-	if (i != fCPUInfo[num].end())
-		return i->second;
+
+std::string
+Machine::ProcessorSpeed(int numCpu) const
+{
+	std::string mhz = _ProcessorInfo("cpu MHz", numCpu);
+
+	size_t pos = mhz.find(".");
+	if (pos != std::string::npos) {
+		mhz = mhz.substr(0, pos);
+	}
+
+	return mhz;
+}
+
+
+std::string
+Machine::ProcessorSerialNumber(int numCpu) const
+{
+	//std::string mhz = _GetValue("Serial Number", numCpu);
 	return "";
+}
+
+
+std::string
+Machine::ProcessorType(int numCpu) const
+{
+	std::string model = _ProcessorInfo("model name", numCpu);
+	size_t pos = model.find("@");
+	if (pos != std::string::npos) {
+		model = model.substr(0, pos);
+	}
+
+	trim(model);
+	return model;
 }
 
 
@@ -206,5 +242,20 @@ Machine::_GetValue(std::string string, std::string header) const
 	if (i != fSystemInfo.end())
 		return i->second;
 
+	return "";
+}
+
+
+
+std::string
+Machine::_ProcessorInfo(const char* info, int num) const
+{
+	if (num < 0 || num >= fNumCPUs)
+		return "";
+
+	std::map<std::string, std::string>::const_iterator i;
+	i = fCPUInfo[num].find(info);
+	if (i != fCPUInfo[num].end())
+		return i->second;
 	return "";
 }

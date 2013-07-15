@@ -43,26 +43,43 @@ Inventory::Build(const char* deviceID)
 
 	TiXmlElement* content = new TiXmlElement("CONTENT");
 	TiXmlElement* accountInfo = new TiXmlElement("ACCOUNTINFO");
+
+	// TODO: ??? We can't store anything
+	for (int a = 0; a < 1; a++) {
+		TiXmlElement* keyName = new TiXmlElement("KEYNAME");
+		keyName->LinkEndChild(new TiXmlText("TAG"));
+
+		TiXmlElement* keyValue = new TiXmlElement("KEYVALUE");
+		keyValue->LinkEndChild(new TiXmlText("NA"));
+
+		accountInfo->LinkEndChild(keyName);
+		accountInfo->LinkEndChild(keyValue);
+	}
+
 	content->LinkEndChild(accountInfo);
 	request->LinkEndChild(content);
 
 	TiXmlElement* bios = new TiXmlElement("BIOS");
 
 	TiXmlElement* assettag = new TiXmlElement("ASSETTAG");
-	TiXmlElement* bdate = new TiXmlElement("BDATE");
-	TiXmlElement* bmanufacturer = new TiXmlElement("BMANUFACTURER");
-	TiXmlElement* bversion = new TiXmlElement("BVERSION");
-	TiXmlElement* mmanufacturer = new TiXmlElement("MMANUFACTURER");
-	TiXmlElement* systemModel = new TiXmlElement("SMODEL");
-	TiXmlElement* ssn = new TiXmlElement("SSN");
+	assettag->LinkEndChild(new TiXmlText(machine.AssetTag().c_str()));
 
-	bmanufacturer->LinkEndChild(new TiXmlText(machine.BIOSManufacturer().c_str()));
-	bversion->LinkEndChild(new TiXmlText(machine.BIOSVersion().c_str()));
+	TiXmlElement* bdate = new TiXmlElement("BDATE");
 	bdate->LinkEndChild(new TiXmlText(machine.BIOSDate().c_str()));
 
+	TiXmlElement* bmanufacturer = new TiXmlElement("BMANUFACTURER");
+	bmanufacturer->LinkEndChild(new TiXmlText(machine.BIOSManufacturer().c_str()));
+
+	TiXmlElement* bversion = new TiXmlElement("BVERSION");
+	bversion->LinkEndChild(new TiXmlText(machine.BIOSVersion().c_str()));
+
+	TiXmlElement* mmanufacturer = new TiXmlElement("MMANUFACTURER");
 	mmanufacturer->LinkEndChild(new TiXmlText(machine.MachineManufacturer().c_str()));
 
+	TiXmlElement* systemModel = new TiXmlElement("SMODEL");
 	systemModel->LinkEndChild(new TiXmlText(machine.SystemModel().c_str()));
+
+	TiXmlElement* ssn = new TiXmlElement("SSN");
 	ssn->LinkEndChild(new TiXmlText(machine.SystemSerialNumber().c_str()));
 
 	bios->LinkEndChild(assettag);
@@ -77,12 +94,27 @@ Inventory::Build(const char* deviceID)
 
 	// TODO: Check if the fields name and structure are correct.
 	for (int i = 0; i < machine.CountProcessors(); i++) {
-		TiXmlElement* cpu = new TiXmlElement("CPU");
-		TiXmlElement* model = new TiXmlElement("CPUMODEL");
+		TiXmlElement* cpu = new TiXmlElement("CPUS");
+		TiXmlElement* manufacturer = new TiXmlElement("MANUFACTURER");
+		TiXmlElement* serial = new TiXmlElement("SERIAL");
+		TiXmlElement* speed = new TiXmlElement("SPEED");
+		TiXmlElement* model = new TiXmlElement("TYPE");
+
+		// TODO: Seems like we should interpred the vendor_id
+		manufacturer->LinkEndChild(
+				new TiXmlText(machine.ProcessorManufacturer(i).c_str()));
+		serial->LinkEndChild(
+				new TiXmlText(machine.ProcessorSerialNumber(i).c_str()));
+		speed->LinkEndChild(
+				new TiXmlText(machine.ProcessorSpeed(i).c_str()));
+		model->LinkEndChild(
+				new TiXmlText(machine.ProcessorType(i).c_str()));
 
 		cpu->LinkEndChild(model);
-		model->LinkEndChild(
-				new TiXmlText(machine.ProcessorInfo("model name", i).c_str()));
+		cpu->LinkEndChild(manufacturer);
+		cpu->LinkEndChild(serial);
+		cpu->LinkEndChild(speed);
+
 		content->LinkEndChild(cpu);
 	}
 
@@ -92,6 +124,9 @@ Inventory::Build(const char* deviceID)
 	request->LinkEndChild(deviceId);
 
 	TiXmlElement* query = new TiXmlElement("QUERY");
+
+	// TODO: We only do Inventory for now
+	query->LinkEndChild(new TiXmlText("INVENTORY"));
 	request->LinkEndChild(query);
 
 	return true;
