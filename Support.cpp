@@ -3,6 +3,8 @@
  *
  *  Created on: 11/lug/2013
  *      Author: stefano
+ *      Code for popen_streambuf found here:
+ *      http://stackoverflow.com/questions/1683051/file-and-istream-connect-the-two
  */
 
 
