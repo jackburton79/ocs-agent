@@ -315,6 +315,8 @@ Inventory::_AddProcessesInfo(TiXmlElement* parent)
 		cmd->LinkEndChild(new TiXmlText(processInfo.cmdline));
 
 		TiXmlElement* cpuUsage = new TiXmlElement("CPUUSAGE");
+		cpuUsage->LinkEndChild(new TiXmlText(""));
+
 		TiXmlElement* mem = new TiXmlElement("MEM");
 		mem->LinkEndChild(new TiXmlText(int_to_string(processInfo.memory)));
 
@@ -322,8 +324,14 @@ Inventory::_AddProcessesInfo(TiXmlElement* parent)
 		pid->LinkEndChild(new TiXmlText(int_to_string(processInfo.pid)));
 
 		TiXmlElement* started = new TiXmlElement("STARTED");
+		started->LinkEndChild(new TiXmlText(""));
+
 		TiXmlElement* tty = new TiXmlElement("TTY");
+		tty->LinkEndChild(new TiXmlText(""));
+
 		TiXmlElement* user = new TiXmlElement("USER");
+		user->LinkEndChild(new TiXmlText(processInfo.user));
+
 		TiXmlElement* virtualMem = new TiXmlElement("VIRTUALMEMORY");
 		virtualMem->LinkEndChild(new TiXmlText(int_to_string(processInfo.virtualmem)));
 
