@@ -9,6 +9,7 @@
 #define SUPPORT_H_
 
 #include <algorithm>
+#include <sstream>
 #include <stdio.h>
 #include <streambuf>
 #include <string>
@@ -42,6 +43,12 @@ static inline std::string& rtrim(std::string& s) {
 
 static inline std::string& trim(std::string& s) {
 	return ltrim(rtrim(s));
+}
+
+static inline std::string int_to_string(int i) {
+	std::ostringstream stream;
+	stream << i;
+	return stream.str();
 }
 
 #endif /* SUPPORT_H_ */
