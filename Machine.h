@@ -47,8 +47,6 @@ public:
 
 	kernel_info KernelInfo() const;
 
-	int CountProcesses() const;
-
 	LoggedUsers& Users() const;
 
 private:

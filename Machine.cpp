@@ -166,14 +166,6 @@ Machine::KernelInfo() const
 }
 
 
-int
-Machine::CountProcesses() const
-{
-	// TODO:
-	return 1;
-}
-
-
 LoggedUsers&
 Machine::Users() const
 {
