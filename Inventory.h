@@ -21,6 +21,7 @@ public:
 	void Send(const char* serverUrl);
 
 private:
+	void _AddAccountInfo(TiXmlElement* parent);
 	void _AddBIOSInfo(TiXmlElement* parent);
 	void _AddCPUsInfo(TiXmlElement* parent);
 	void _AddDrivesInfo(TiXmlElement* parent);

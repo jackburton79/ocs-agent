@@ -44,21 +44,9 @@ Inventory::Build(const char* deviceID)
 	fDocument->LinkEndChild(request);
 
 	TiXmlElement* content = new TiXmlElement("CONTENT");
-	TiXmlElement* accountInfo = new TiXmlElement("ACCOUNTINFO");
 
-	// TODO: ??? We can't store anything
-	for (int a = 0; a < 1; a++) {
-		TiXmlElement* keyName = new TiXmlElement("KEYNAME");
-		keyName->LinkEndChild(new TiXmlText("TAG"));
+	_AddAccountInfo(content);
 
-		TiXmlElement* keyValue = new TiXmlElement("KEYVALUE");
-		keyValue->LinkEndChild(new TiXmlText("NA"));
-
-		accountInfo->LinkEndChild(keyName);
-		accountInfo->LinkEndChild(keyValue);
-	}
-
-	content->LinkEndChild(accountInfo);
 	request->LinkEndChild(content);
 
 	_AddBIOSInfo(content);
@@ -99,6 +87,28 @@ void
 Inventory::Send(const char* serverUrl)
 {
 	// TODO: Send the inventory
+}
+
+
+// Private
+void
+Inventory::_AddAccountInfo(TiXmlElement* parent)
+{
+	TiXmlElement* accountInfo = new TiXmlElement("ACCOUNTINFO");
+
+	// TODO: ??? We can't store anything
+	for (int a = 0; a < 1; a++) {
+		TiXmlElement* keyName = new TiXmlElement("KEYNAME");
+		keyName->LinkEndChild(new TiXmlText("TAG"));
+
+		TiXmlElement* keyValue = new TiXmlElement("KEYVALUE");
+		keyValue->LinkEndChild(new TiXmlText("NA"));
+
+		accountInfo->LinkEndChild(keyName);
+		accountInfo->LinkEndChild(keyValue);
+	}
+
+	parent->LinkEndChild(accountInfo);
 }
 
 
