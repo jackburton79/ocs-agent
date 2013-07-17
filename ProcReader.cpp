@@ -66,6 +66,7 @@ ProcReader::close()
 	}
 
 	delete[] fBuffer;
+	fBuffer = NULL;
 }
 
 
