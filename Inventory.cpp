@@ -7,6 +7,8 @@
 
 #include "Inventory.h"
 #include "Machine.h"
+#include "RunningProcessesList.h"
+#include "Support.h"
 
 #include <tinyxml.h>
 
@@ -54,7 +56,7 @@ Inventory::Build(const char* deviceID)
 	_AddDrivesInfo(content);
 	_AddHardwareInfo(content);
 	_AddNetworksInfo(content);
-	//_AddProcessesInfo(content);
+	_AddProcessesInfo(content);
 	_AddSoftwaresInfo(content);
 	_AddUsersInfo(content);
 
@@ -305,14 +307,20 @@ Inventory::_AddNetworksInfo(TiXmlElement* parent)
 void
 Inventory::_AddProcessesInfo(TiXmlElement* parent)
 {
-	// TODO: Get processes from /proc ?
-	for (int i = 0; i < fMachine->CountProcesses(); i++) {
+	RunningProcessesList processList;
+	process_info processInfo;
+	while (processList.GetNext(processInfo)) {
 		TiXmlElement* process = new TiXmlElement("PROCESSES");
 
 		TiXmlElement* cmd = new TiXmlElement("CMD");
+		cmd->LinkEndChild(new TiXmlText(processInfo.cmdline));
+
 		TiXmlElement* cpuUsage = new TiXmlElement("CPUUSAGE");
 		TiXmlElement* mem = new TiXmlElement("MEM");
+
 		TiXmlElement* pid = new TiXmlElement("PID");
+		pid->LinkEndChild(new TiXmlText(int_to_string(processInfo.pid)));
+
 		TiXmlElement* started = new TiXmlElement("STARTED");
 		TiXmlElement* tty = new TiXmlElement("TTY");
 		TiXmlElement* user = new TiXmlElement("USER");
