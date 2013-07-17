@@ -120,25 +120,25 @@ Inventory::_AddBIOSInfo(TiXmlElement* parent)
 	TiXmlElement* bios = new TiXmlElement("BIOS");
 
 	TiXmlElement* assettag = new TiXmlElement("ASSETTAG");
-	assettag->LinkEndChild(new TiXmlText(fMachine->AssetTag().c_str()));
+	assettag->LinkEndChild(new TiXmlText(fMachine->AssetTag()));
 
 	TiXmlElement* bdate = new TiXmlElement("BDATE");
-	bdate->LinkEndChild(new TiXmlText(fMachine->BIOSDate().c_str()));
+	bdate->LinkEndChild(new TiXmlText(fMachine->BIOSDate()));
 
 	TiXmlElement* bmanufacturer = new TiXmlElement("BMANUFACTURER");
-	bmanufacturer->LinkEndChild(new TiXmlText(fMachine->BIOSManufacturer().c_str()));
+	bmanufacturer->LinkEndChild(new TiXmlText(fMachine->BIOSManufacturer()));
 
 	TiXmlElement* bversion = new TiXmlElement("BVERSION");
-	bversion->LinkEndChild(new TiXmlText(fMachine->BIOSVersion().c_str()));
+	bversion->LinkEndChild(new TiXmlText(fMachine->BIOSVersion()));
 
 	TiXmlElement* mmanufacturer = new TiXmlElement("MMANUFACTURER");
-	mmanufacturer->LinkEndChild(new TiXmlText(fMachine->MachineManufacturer().c_str()));
+	mmanufacturer->LinkEndChild(new TiXmlText(fMachine->MachineManufacturer()));
 
 	TiXmlElement* systemModel = new TiXmlElement("SMODEL");
-	systemModel->LinkEndChild(new TiXmlText(fMachine->SystemModel().c_str()));
+	systemModel->LinkEndChild(new TiXmlText(fMachine->SystemModel()));
 
 	TiXmlElement* ssn = new TiXmlElement("SSN");
-	ssn->LinkEndChild(new TiXmlText(fMachine->SystemSerialNumber().c_str()));
+	ssn->LinkEndChild(new TiXmlText(fMachine->SystemSerialNumber()));
 
 	bios->LinkEndChild(assettag);
 	bios->LinkEndChild(bdate);
@@ -165,13 +165,13 @@ Inventory::_AddCPUsInfo(TiXmlElement* parent)
 
 		// TODO: Seems like we should interpred the vendor_id
 		manufacturer->LinkEndChild(
-				new TiXmlText(fMachine->ProcessorManufacturer(i).c_str()));
+				new TiXmlText(fMachine->ProcessorManufacturer(i)));
 		serial->LinkEndChild(
-				new TiXmlText(fMachine->ProcessorSerialNumber(i).c_str()));
+				new TiXmlText(fMachine->ProcessorSerialNumber(i)));
 		speed->LinkEndChild(
-				new TiXmlText(fMachine->ProcessorSpeed(i).c_str()));
+				new TiXmlText(fMachine->ProcessorSpeed(i)));
 		model->LinkEndChild(
-				new TiXmlText(fMachine->ProcessorType(i).c_str()));
+				new TiXmlText(fMachine->ProcessorType(i)));
 
 		cpu->LinkEndChild(model);
 		cpu->LinkEndChild(manufacturer);
@@ -225,35 +225,34 @@ Inventory::_AddHardwareInfo(TiXmlElement* parent)
    // <LASTLOGGEDUSER>root</LASTLOGGEDUSER>
 
     TiXmlElement* memory = new TiXmlElement("MEMORY");
-    memory->LinkEndChild(new TiXmlText(fMachine->KernelInfo().memory.c_str()));
+    memory->LinkEndChild(new TiXmlText(fMachine->KernelInfo().memory));
     //<MEMORY>521</MEMORY>
 
     TiXmlElement* name = new TiXmlElement("NAME");
-    name->LinkEndChild(new TiXmlText(fMachine->KernelInfo().hostname.c_str()));
+    name->LinkEndChild(new TiXmlText(fMachine->KernelInfo().hostname));
 
     TiXmlElement* osComments = new TiXmlElement("OSCOMMENTS");
-    osComments->LinkEndChild(new TiXmlText(fMachine->KernelInfo().comments.c_str()));
+    osComments->LinkEndChild(new TiXmlText(fMachine->KernelInfo().comments));
 
     TiXmlElement* osName = new TiXmlElement("OSNAME");
     // TODO: Fix this
     osName->LinkEndChild(new TiXmlText("openSUSE 12.1 (i586)"));
 
     TiXmlElement* osVersion = new TiXmlElement("OSVERSION");
-    osVersion->LinkEndChild(new TiXmlText(fMachine->KernelInfo().os_release.c_str()));
+    osVersion->LinkEndChild(new TiXmlText(fMachine->KernelInfo().os_release));
 
     TiXmlElement* processorN = new TiXmlElement("PROCESSORN");
-    std::ostringstream numProcessorsString;
-    numProcessorsString << fMachine->CountProcessors();
-    processorN->LinkEndChild(new TiXmlText(numProcessorsString.str().c_str()));
+
+    processorN->LinkEndChild(new TiXmlText(int_to_string(fMachine->CountProcessors())));
 
     TiXmlElement* processorS = new TiXmlElement("PROCESSORS");
-    processorS->LinkEndChild(new TiXmlText(fMachine->ProcessorSpeed(0).c_str()));
+    processorS->LinkEndChild(new TiXmlText(fMachine->ProcessorSpeed(0)));
 
     TiXmlElement* processorT = new TiXmlElement("PROCESSORT");
-    processorT->LinkEndChild(new TiXmlText(fMachine->ProcessorType(0).c_str()));
+    processorT->LinkEndChild(new TiXmlText(fMachine->ProcessorType(0)));
 
     TiXmlElement* swap = new TiXmlElement("SWAP");
-    swap->LinkEndChild(new TiXmlText(fMachine->KernelInfo().swap.c_str()));
+    swap->LinkEndChild(new TiXmlText(fMachine->KernelInfo().swap));
     //<SWAP>1669</SWAP>
 
     TiXmlElement* userID = new TiXmlElement("USERID");
@@ -270,7 +269,7 @@ Inventory::_AddHardwareInfo(TiXmlElement* parent)
    // <VMSYSTEM>Xen</VMSYSTEM>
 
     TiXmlElement* workGroup = new TiXmlElement("WORKGROUP");
-    workGroup->LinkEndChild(new TiXmlText(fMachine->KernelInfo().domain_name.c_str()));
+    workGroup->LinkEndChild(new TiXmlText(fMachine->KernelInfo().domain_name));
 
 
     hardware->LinkEndChild(checksum);
