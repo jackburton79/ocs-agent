@@ -17,7 +17,8 @@
 
 ProcReader::ProcReader(const char* sub)
 {
-	open(sub, "r");
+	if (open(sub, "r") == NULL)
+		throw "File not found";
 }
 
 
