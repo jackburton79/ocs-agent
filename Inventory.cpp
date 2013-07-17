@@ -184,24 +184,32 @@ Inventory::_AddHardwareInfo(TiXmlElement* parent)
 	TiXmlElement* hardware = new TiXmlElement("HARDWARE");
 
 	TiXmlElement* checksum = new TiXmlElement("CHECKSUM");
+	checksum->LinkEndChild(new TiXmlText("262143"));
+	// TODO: Calculate and add checksum
     //<CHECKSUM>262143</CHECKSUM>
 
     TiXmlElement* dateLastLoggedUser = new TiXmlElement("DATELASTLOGGEDUSER");
+    dateLastLoggedUser->LinkEndChild(new TiXmlText("Thu Jul 11 13:24"));
     //<DATELASTLOGGEDUSER>Thu Jul 11 13:24</DATELASTLOGGEDUSER>
 
     TiXmlElement* defaultGW = new TiXmlElement("DEFAULTGATEWAY");
+    defaultGW->LinkEndChild(new TiXmlText("192.168.0.1"));
     //<DEFAULTGATEWAY>192.168.22.9</DEFAULTGATEWAY>
 
     TiXmlElement* description = new TiXmlElement("DESCRIPTION");
+    description->LinkEndChild(new TiXmlText("i686/00-01-23 22:09:06"));
    // <DESCRIPTION>i686/00-01-23 22:09:06</DESCRIPTION>
 
     TiXmlElement* dns = new TiXmlElement("DNS");
+    dns->LinkEndChild(new TiXmlText("192.168.0.1"));
     //<DNS>192.168.22.23/192.168.22.24</DNS>
 
     TiXmlElement* ipAddress = new TiXmlElement("IPADDR");
+    ipAddress->LinkEndChild(new TiXmlText("192.168.0.1"));
     //<IPADDR>192.168.22.33</IPADDR>
 
     TiXmlElement* lastLoggedUser = new TiXmlElement("LASTLOGGEDUSER");
+    lastLoggedUser->LinkEndChild(new TiXmlText("root"));
    // <LASTLOGGEDUSER>root</LASTLOGGEDUSER>
 
     TiXmlElement* memory = new TiXmlElement("MEMORY");
@@ -215,8 +223,8 @@ Inventory::_AddHardwareInfo(TiXmlElement* parent)
     osComments->LinkEndChild(new TiXmlText(fMachine->KernelInfo().comments.c_str()));
 
     TiXmlElement* osName = new TiXmlElement("OSNAME");
-
-    //<OSNAME>openSUSE 12.1 (i586)</OSNAME>
+    // TODO: Fix this
+    osName->LinkEndChild(new TiXmlText("openSUSE 12.1 (i586)"));
 
     TiXmlElement* osVersion = new TiXmlElement("OSVERSION");
     osVersion->LinkEndChild(new TiXmlText(fMachine->KernelInfo().os_release.c_str()));
@@ -237,7 +245,8 @@ Inventory::_AddHardwareInfo(TiXmlElement* parent)
     //<SWAP>1669</SWAP>
 
     TiXmlElement* userID = new TiXmlElement("USERID");
-    userID->LinkEndChild(new TiXmlText(""));
+    // TODO: Fix this
+    userID->LinkEndChild(new TiXmlText("root"));
     //<USERID>root</USERID>
 
     TiXmlElement* uuid = new TiXmlElement("UUID");
