@@ -12,7 +12,7 @@
 
 IfConfigReader::IfConfigReader()
 {
-	popen_streambuf ifc("ifconfig -a", "r");
+	popen_streambuf ifc("export LC_ALL=C; ifconfig -a", "r");
 	std::istream stream(&ifc);
 
 	try {
@@ -103,7 +103,6 @@ IfConfigReader::_ReadNetworkInfo(network_info& info, std::istream& stream)
 		info.status = "Up";
 	} else
 		info.status = "Down";
-
 
 	while (std::getline(stream, line) > 0) {
 		if (line == "")
