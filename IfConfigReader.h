@@ -18,7 +18,7 @@ struct network_info {
 	std::string type;
 	int speed;
 	std::string mac_address;
-	int status;
+	std::string status;
 	std::string ip_address;
 	std::string netmask;
 	std::string gateway;

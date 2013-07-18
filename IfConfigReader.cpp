@@ -12,7 +12,7 @@
 
 IfConfigReader::IfConfigReader()
 {
-	popen_streambuf ifc("ifconfig", "r");
+	popen_streambuf ifc("ifconfig -a", "r");
 	std::istream stream(&ifc);
 
 	try {
@@ -73,32 +73,36 @@ IfConfigReader::_ReadNetworkInfo(network_info& info, std::istream& stream)
 		info.mac_address = "";
 	}
 
-	while (std::getline(stream, line) > 0) {
-		if (line.find("inet addr:") != std::string::npos)
-			break;
+
+	std::getline(stream, line);
+	if (line.find("inet addr:") != std::string::npos) {
+		size_t mask;
+		size_t bcast;
+		try {
+			mask = line.find("Mask");
+			bcast = line.find("Bcast");
+			info.netmask = line.substr(line.find(':', mask) + 1, bcast - 1);
+
+		} catch (...) {
+			// no netmask or broadcast
+			info.netmask = "";
+		}
+		try {
+			size_t colon = line.find(":");
+			info.ip_address = line.substr(colon + 1, std::min(mask, bcast) - colon - 3);
+			//info.ip_address = info.ip_address.substr(line.find(":") + 1, std::string::npos);
+
+		} catch (...) {
+			info.ip_address = "";
+		}
+
+		std::getline(stream, line);
 	}
 
-	std::cout << line << std::endl;
-
-	size_t mask;
-	size_t bcast;
-	try {
-		mask = line.find("Mask");
-		bcast = line.find("Bcast");
-		info.netmask = line.substr(line.find(':', mask) + 1, bcast - 1);
-
-	} catch (...) {
-		// no netmask or broadcast
-		info.netmask = "";
-	}
-	try {
-		size_t colon = line.find(":");
-		info.ip_address = line.substr(colon + 1, std::min(mask, bcast) - colon - 3);
-		//info.ip_address = info.ip_address.substr(line.find(":") + 1, std::string::npos);
-
-	} catch (...) {
-		info.ip_address = "";
-	}
+	if (line.find("UP") != std::string::npos) {
+		info.status = "Up";
+	} else
+		info.status = "Down";
 
 
 	while (std::getline(stream, line) > 0) {
