@@ -312,7 +312,7 @@ Inventory::_AddProcessesInfo(TiXmlElement* parent)
 		TiXmlElement* process = new TiXmlElement("PROCESSES");
 
 		TiXmlElement* cmd = new TiXmlElement("CMD");
-		cmd->LinkEndChild(new TiXmlText(processInfo.cmdline));
+		cmd->LinkEndChild(new TiXmlText(processInfo.cmdline.c_str()));
 
 		TiXmlElement* cpuUsage = new TiXmlElement("CPUUSAGE");
 		cpuUsage->LinkEndChild(new TiXmlText(""));
