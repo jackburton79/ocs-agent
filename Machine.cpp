@@ -88,7 +88,7 @@ Machine::BIOSDate() const
 
 
 std::string
-Machine::MachineManufacturer() const
+Machine::SystemManufacturer() const
 {
 	return _GetValue("Manufacturer", kSystemInfo);
 
@@ -106,6 +106,27 @@ std::string
 Machine::SystemSerialNumber() const
 {
 	return _GetValue("Serial Number", kSystemInfo);
+}
+
+
+std::string
+Machine::SystemUUID() const
+{
+	return _GetValue("UUID", kSystemInfo);
+}
+
+
+std::string
+Machine::MachineSerialNumber() const
+{
+	return _GetValue("Serial Number", "Base Board Information");
+}
+
+
+std::string
+Machine::MachineManufacturer() const
+{
+	return _GetValue("Manufacturer", "Base Board Information");
 }
 
 
@@ -228,11 +249,9 @@ Machine::_GetKernelInfo()
 	if (::uname(&uName) != 0)
 		throw errno;
 
-	//std::cout << uName.sysname << std::endl;
 	fKernelInfo.hostname = uName.nodename;
 	fKernelInfo.comments = uName.version;
 	fKernelInfo.os_release = uName.release;
-	//std::cout << uName.machine << std::endl;
 	fKernelInfo.domain_name = uName.domainname;
 
 	ProcReader proc("meminfo");

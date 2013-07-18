@@ -33,9 +33,14 @@ public:
 	std::string BIOSManufacturer() const;
 	std::string BIOSDate() const;
 	std::string BIOSVersion() const;
-	std::string SystemModel() const;
 	std::string MachineManufacturer() const;
+	std::string MachineSerialNumber() const;
+	std::string SystemModel() const;
 	std::string SystemSerialNumber() const;
+	std::string SystemUUID() const;
+	std::string SystemManufacturer() const;
+
+
 
 	int CountProcessors() const;
 	std::string ProcessorSpeed(int numCpu) const;

@@ -136,6 +136,12 @@ Inventory::_AddBIOSInfo(TiXmlElement* parent)
 	TiXmlElement* mmanufacturer = new TiXmlElement("MMANUFACTURER");
 	mmanufacturer->LinkEndChild(new TiXmlText(fMachine->MachineManufacturer()));
 
+	TiXmlElement* mSerial = new TiXmlElement("MSN");
+	mSerial->LinkEndChild(new TiXmlText(fMachine->MachineSerialNumber()));
+
+	TiXmlElement* sManufacturer = new TiXmlElement("SMANUFACTURER");
+	sManufacturer->LinkEndChild(new TiXmlText(fMachine->SystemManufacturer()));
+
 	TiXmlElement* systemModel = new TiXmlElement("SMODEL");
 	systemModel->LinkEndChild(new TiXmlText(fMachine->SystemModel()));
 
@@ -147,6 +153,8 @@ Inventory::_AddBIOSInfo(TiXmlElement* parent)
 	bios->LinkEndChild(bmanufacturer);
 	bios->LinkEndChild(bversion);
 	bios->LinkEndChild(mmanufacturer);
+	bios->LinkEndChild(mSerial);
+	bios->LinkEndChild(sManufacturer);
 	bios->LinkEndChild(systemModel);
 	bios->LinkEndChild(ssn);
 
@@ -263,8 +271,8 @@ Inventory::_AddHardwareInfo(TiXmlElement* parent)
     //<USERID>root</USERID>
 
     TiXmlElement* uuid = new TiXmlElement("UUID");
-    uuid->LinkEndChild(new TiXmlText(""));
-    //<UUID></UUID>
+    uuid->LinkEndChild(new TiXmlText(fMachine->SystemUUID()));
+
 
     TiXmlElement* vmSystem = new TiXmlElement("VMSYSTEM");
     vmSystem->LinkEndChild(new TiXmlText("Physical"));
