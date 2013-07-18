@@ -34,6 +34,8 @@ Inventory::~Inventory()
 bool
 Inventory::Build(const char* deviceID)
 {
+	fDocument->Clear();
+
 	// TODO: Finish this, cleanup.
 	try {
 		fMachine->RetrieveData();
@@ -173,7 +175,7 @@ Inventory::_AddCPUsInfo(TiXmlElement* parent)
 		TiXmlElement* speed = new TiXmlElement("SPEED");
 		TiXmlElement* model = new TiXmlElement("TYPE");
 
-		// TODO: Seems like we should interpred the vendor_id
+		// TODO: Seems like we should interpretate the vendor_id
 		manufacturer->LinkEndChild(
 				new TiXmlText(fMachine->ProcessorManufacturer(i)));
 		serial->LinkEndChild(
@@ -252,7 +254,6 @@ Inventory::_AddHardwareInfo(TiXmlElement* parent)
     osVersion->LinkEndChild(new TiXmlText(fMachine->KernelInfo().os_release));
 
     TiXmlElement* processorN = new TiXmlElement("PROCESSORN");
-
     processorN->LinkEndChild(new TiXmlText(int_to_string(fMachine->CountProcessors())));
 
     TiXmlElement* processorS = new TiXmlElement("PROCESSORS");
@@ -263,7 +264,6 @@ Inventory::_AddHardwareInfo(TiXmlElement* parent)
 
     TiXmlElement* swap = new TiXmlElement("SWAP");
     swap->LinkEndChild(new TiXmlText(fMachine->KernelInfo().swap));
-    //<SWAP>1669</SWAP>
 
     TiXmlElement* userID = new TiXmlElement("USERID");
     // TODO: Fix this
@@ -280,7 +280,6 @@ Inventory::_AddHardwareInfo(TiXmlElement* parent)
 
     TiXmlElement* workGroup = new TiXmlElement("WORKGROUP");
     workGroup->LinkEndChild(new TiXmlText(fMachine->KernelInfo().domain_name));
-
 
     hardware->LinkEndChild(checksum);
     hardware->LinkEndChild(dateLastLoggedUser);
@@ -403,7 +402,6 @@ Inventory::_AddProcessesInfo(TiXmlElement* parent)
 
 		TiXmlElement* virtualMem = new TiXmlElement("VIRTUALMEMORY");
 		virtualMem->LinkEndChild(new TiXmlText(int_to_string(processInfo.virtualmem)));
-
 
 		process->LinkEndChild(cmd);
 		process->LinkEndChild(cpuUsage);
