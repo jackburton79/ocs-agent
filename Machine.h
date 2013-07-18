@@ -11,8 +11,6 @@
 #include <map>
 #include <string>
 
-#include "LoggedUsers.h"
-
 struct kernel_info {
 	std::string comments;
 	std::string hostname;
@@ -47,8 +45,6 @@ public:
 
 	kernel_info KernelInfo() const;
 
-	LoggedUsers& Users() const;
-
 private:
 	void _GetDMIDecodeData();
 	void _GetCPUInfo();
@@ -65,7 +61,6 @@ private:
 	std::map<std::string, std::string> fCPUInfo[16];
 	std::map<std::string, std::string> fSystemInfo;
 	kernel_info fKernelInfo;
-	LoggedUsers* fUsers;
 };
 
 #endif /* MACHINE_H_ */

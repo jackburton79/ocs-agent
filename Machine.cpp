@@ -7,7 +7,6 @@
 
 // TODO: Reorganize code.
 
-#include "LoggedUsers.h"
 #include "Machine.h"
 #include "ProcReader.h"
 #include "Support.h"
@@ -30,15 +29,13 @@ const char* kProcessorInfo = "Processor Info";
 
 Machine::Machine()
 	:
-	fNumCPUs(0),
-	fUsers(NULL)
+	fNumCPUs(0)
 {
 }
 
 
 Machine::~Machine()
 {
-	delete fUsers;
 }
 
 
@@ -59,8 +56,6 @@ Machine::RetrieveData()
 	} catch (...) {
 		std::cerr << "Failed to get kernel info." << std::endl;
 	}
-
-	fUsers = new LoggedUsers;
 }
 
 
@@ -165,12 +160,6 @@ Machine::KernelInfo() const
 	return fKernelInfo;
 }
 
-
-LoggedUsers&
-Machine::Users() const
-{
-	return *fUsers;
-}
 
 
 // private

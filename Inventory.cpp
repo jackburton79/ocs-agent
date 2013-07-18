@@ -7,6 +7,7 @@
 
 #include "IfConfigReader.h"
 #include "Inventory.h"
+#include "LoggedUsers.h"
 #include "Machine.h"
 #include "RunningProcessesList.h"
 #include "Support.h"
@@ -346,7 +347,7 @@ Inventory::_AddNetworksInfo(TiXmlElement* parent)
 		networks->LinkEndChild(pciSlot);
 
 		TiXmlElement* status = new TiXmlElement("STATUS");
-		status->LinkEndChild(new TiXmlText("Up"));
+		status->LinkEndChild(new TiXmlText(info.status));
 		networks->LinkEndChild(status);
 
 		TiXmlElement* type = new TiXmlElement("TYPE");
@@ -422,9 +423,10 @@ Inventory::_AddUsersInfo(TiXmlElement* parent)
 {
 	TiXmlElement* users = new TiXmlElement("USERS");
 
-	for (int i = 0; i < fMachine->Users().Count(); i++) {
+	LoggedUsers usersInfo;
+	for (int i = 0; i < usersInfo.Count(); i++) {
 		TiXmlElement* login = new TiXmlElement("LOGIN");
-		login->LinkEndChild(new TiXmlText(fMachine->Users().UserAt(i).c_str()));
+		login->LinkEndChild(new TiXmlText(usersInfo.UserAt(i).c_str()));
 		users->LinkEndChild(login);
 	}
 	parent->LinkEndChild(users);
