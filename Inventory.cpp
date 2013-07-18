@@ -5,6 +5,7 @@
  *      Author: stefano
  */
 
+#include "IfConfigReader.h"
 #include "Inventory.h"
 #include "Machine.h"
 #include "RunningProcessesList.h"
@@ -196,7 +197,7 @@ Inventory::_AddHardwareInfo(TiXmlElement* parent)
 	TiXmlElement* hardware = new TiXmlElement("HARDWARE");
 
 	TiXmlElement* checksum = new TiXmlElement("CHECKSUM");
-	checksum->LinkEndChild(new TiXmlText("262143"));
+	checksum->LinkEndChild(new TiXmlText("2"));
 	// TODO: Calculate and add checksum
     //<CHECKSUM>262143</CHECKSUM>
 
@@ -299,7 +300,66 @@ Inventory::_AddHardwareInfo(TiXmlElement* parent)
 void
 Inventory::_AddNetworksInfo(TiXmlElement* parent)
 {
+	IfConfigReader ifCfgReader;
 
+	network_info info;
+	while (ifCfgReader.GetNext(info)) {
+		if (info.description == "lo")
+			continue;
+
+		TiXmlElement* networks = new TiXmlElement("NETWORKS");
+
+		TiXmlElement* description = new TiXmlElement("DESCRIPTION");
+		description->LinkEndChild(new TiXmlText(info.description));
+		networks->LinkEndChild(description);
+
+		TiXmlElement* driver = new TiXmlElement("DRIVER");
+		driver->LinkEndChild(new TiXmlText("pif"));
+		networks->LinkEndChild(driver);
+
+		TiXmlElement* ipAddress = new TiXmlElement("IPADDRESS");
+		ipAddress->LinkEndChild(new TiXmlText(info.ip_address));
+		networks->LinkEndChild(ipAddress);
+
+		TiXmlElement* ipDHCP = new TiXmlElement("IPDHCP");
+		ipDHCP->LinkEndChild(new TiXmlText(info.dhcp_ip));
+		networks->LinkEndChild(ipDHCP);
+
+		TiXmlElement* gateway = new TiXmlElement("IPGATEWAY");
+		gateway->LinkEndChild(new TiXmlText(info.gateway));
+		networks->LinkEndChild(gateway);
+
+		TiXmlElement* ipMask = new TiXmlElement("IPMASK");
+		ipMask->LinkEndChild(new TiXmlText(info.netmask));
+		networks->LinkEndChild(ipMask);
+
+		TiXmlElement* ipSubnet = new TiXmlElement("IPSUBNET");
+		ipSubnet->LinkEndChild(new TiXmlText(info.network));
+		networks->LinkEndChild(ipSubnet);
+
+		TiXmlElement* mac = new TiXmlElement("MACADDR");
+		mac->LinkEndChild(new TiXmlText(info.mac_address));
+		networks->LinkEndChild(mac);
+
+		TiXmlElement* pciSlot = new TiXmlElement("PCISLOT");
+		pciSlot->LinkEndChild(new TiXmlText(""));
+		networks->LinkEndChild(pciSlot);
+
+		TiXmlElement* status = new TiXmlElement("STATUS");
+		status->LinkEndChild(new TiXmlText("Up"));
+		networks->LinkEndChild(status);
+
+		TiXmlElement* type = new TiXmlElement("TYPE");
+		type->LinkEndChild(new TiXmlText(""));
+		networks->LinkEndChild(type);
+
+		TiXmlElement* virtualDevice = new TiXmlElement("VIRTUALDEV");
+		virtualDevice->LinkEndChild(new TiXmlText(""));
+		networks->LinkEndChild(virtualDevice);
+
+
+		parent->LinkEndChild(networks);
+	}
 }
 
 
