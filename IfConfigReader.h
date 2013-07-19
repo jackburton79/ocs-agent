@@ -12,6 +12,7 @@
 #include <sstream>
 #include <string>
 
+#include "ItemsList.h"
 
 struct network_info {
 	std::string description;
@@ -27,20 +28,15 @@ struct network_info {
 };
 
 
-class IfConfigReader {
+class IfConfigReader : public ItemsList<network_info>{
 public:
 	IfConfigReader();
 	~IfConfigReader();
-
-	void Rewind();
-	bool GetNext(network_info& info);
 
 private:
 
 	bool _ReadNetworkInfo(network_info& info, std::istream& stream);
 
-	std::list<network_info> fNetworks;
-	std::list<network_info>::iterator fIterator;
 };
 
 #endif /* IFCONFIGREADER_H_ */

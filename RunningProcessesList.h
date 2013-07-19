@@ -11,6 +11,8 @@
 #include <list>
 #include <string>
 
+#include "ItemsList.h"
+
 struct process_info {
 	std::string cmdline;
 	int cpu_usage;
@@ -23,13 +25,11 @@ struct process_info {
 };
 
 
-class RunningProcessesList {
+class RunningProcessesList : public ItemsList<process_info>{
 public:
 	RunningProcessesList();
 	~RunningProcessesList();
 
-	void Rewind();
-	bool GetNext(process_info& info);
 
 private:
 

@@ -34,7 +34,7 @@ RunningProcessesList::RunningProcessesList()
 				fullName.append(procPid);
 				process_info info;
 				_ReadProcessInfo(info, procPid.c_str());
-				fProcesses.push_back(info);
+				fItems.push_back(info);
 			}
 		}
 		::closedir(dir);
@@ -48,24 +48,6 @@ RunningProcessesList::~RunningProcessesList()
 {
 }
 
-
-void
-RunningProcessesList::Rewind()
-{
-	fIterator = fProcesses.begin();
-}
-
-
-bool
-RunningProcessesList::GetNext(process_info &info)
-{
-	if (fIterator == fProcesses.end())
-		return false;
-
-	info = *fIterator;
-	fIterator++;
-	return true;
-}
 
 
 void

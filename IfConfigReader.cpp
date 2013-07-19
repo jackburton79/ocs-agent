@@ -18,7 +18,7 @@ IfConfigReader::IfConfigReader()
 	try {
 		network_info networkInfo;
 		while (_ReadNetworkInfo(networkInfo, stream)) {
-			fNetworks.push_back(networkInfo);
+			fItems.push_back(networkInfo);
 		}
 	} catch (...) {
 
@@ -30,25 +30,6 @@ IfConfigReader::IfConfigReader()
 
 IfConfigReader::~IfConfigReader()
 {
-}
-
-
-void
-IfConfigReader::Rewind()
-{
-	fIterator = fNetworks.begin();
-}
-
-
-bool
-IfConfigReader::GetNext(network_info &info)
-{
-	if (fIterator == fNetworks.end())
-		return false;
-
-	info = *fIterator;
-	fIterator++;
-	return true;
 }
 
 
