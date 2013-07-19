@@ -13,7 +13,10 @@
 #include "Support.h"
 #include "VolumeReader.h"
 
+#include "http/http_lib.h"
+
 #include <tinyxml.h>
+
 
 Inventory::Inventory()
 	:
@@ -90,10 +93,21 @@ Inventory::Save(const char* name)
 }
 
 
-void
+bool
 Inventory::Send(const char* serverUrl)
 {
-	// TODO: Send the inventory
+	// TODO: Wrap the http library with a C++ class
+	char* fileName = NULL;
+	http_retcode status = http_parse_url((char*)serverUrl, &fileName);
+	if (status < 0) {
+		return false;
+	}
+
+	std::cout << "http_server: " << http_server << std::endl;
+	free(fileName);
+	free(http_server);
+
+	return false;
 }
 
 

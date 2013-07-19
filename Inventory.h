@@ -18,7 +18,7 @@ public:
 
 	bool Build(const char* deviceID);
 	bool Save(const char* name);
-	void Send(const char* serverUrl);
+	bool Send(const char* serverUrl);
 
 private:
 	void _AddAccountInfo(TiXmlElement* parent);
