@@ -196,7 +196,7 @@ static http_retcode http_query(command, url, additional_header, mode,
   setsockopt(s, SOL_SOCKET, SO_KEEPALIVE, 0, 0);
 
   /* connect to server */
-  if (connect(s, &server, sizeof(server)) < 0)
+  if (connect(s, (const struct sockaddr*)&server, sizeof(server)) < 0)
     ret=ERRCONN;
   else {
     if (pfd) *pfd=s;
