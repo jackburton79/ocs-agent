@@ -34,12 +34,14 @@ VolumeReader::VolumeReader()
 
 		volume_info info;
 		std::string dummy;
-		iss >> info.filesystem; // TODO: NO: should be ext4, etc
+		iss >> info.name;
 		iss >> info.total;
 		iss >> dummy;
 		iss >> info.free;
 		iss >> dummy;
-		iss >> info.label;
+		iss >> info.type;
+
+		// TODO: filesystem, other
 		fItems.push_back(info);
 	}
 
