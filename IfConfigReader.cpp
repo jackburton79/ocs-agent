@@ -27,11 +27,10 @@ IfConfigReader::IfConfigReader()
 	Rewind();
 }
 
+
 IfConfigReader::~IfConfigReader()
 {
-	// TODO Auto-generated destructor stub
 }
-
 
 
 void
@@ -98,6 +97,9 @@ IfConfigReader::_ReadNetworkInfo(network_info& info, std::istream& stream)
 
 		std::getline(stream, line);
 	}
+
+	if (line.find("inet_addr6") != std::string::npos)
+		std::getline(stream, line);
 
 	if (line.find("UP") != std::string::npos) {
 		info.status = "Up";
