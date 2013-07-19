@@ -11,6 +11,9 @@
 
  /* declarations */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 extern char *http_server;
 
@@ -20,6 +23,9 @@ extern char *http_proxy_server;
 
 extern int http_proxy_port;
 
+#ifdef __cplusplus
+}
+#endif
 
 /* return type */
 typedef enum {
@@ -58,6 +64,10 @@ typedef enum {
 
 /* prototypes */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef OSK
 http_retcode http_put(char *filename, char *data, int length, 
 	     int overwrite, char *type) ;
@@ -69,4 +79,8 @@ http_retcode http_delete(char *filename) ;
 
 http_retcode http_head(char *filename, int *plength, char *typebuf);
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif
