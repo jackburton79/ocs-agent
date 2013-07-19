@@ -11,6 +11,7 @@
 #include "Machine.h"
 #include "RunningProcessesList.h"
 #include "Support.h"
+#include "VolumeReader.h"
 
 #include <tinyxml.h>
 
@@ -198,7 +199,45 @@ Inventory::_AddCPUsInfo(TiXmlElement* parent)
 void
 Inventory::_AddDrivesInfo(TiXmlElement* parent)
 {
+	VolumeReader reader;
+	volume_info info;
+	while (reader.GetNext(info)) {
+		TiXmlElement* drive = new TiXmlElement("DRIVES");
 
+		TiXmlElement* createDate = new TiXmlElement("CREATEDATE");
+		createDate->LinkEndChild(new TiXmlText(info.create_date));
+
+		TiXmlElement* fileSystem = new TiXmlElement("FILESYSTEM");
+		fileSystem->LinkEndChild(new TiXmlText(info.filesystem));
+
+		TiXmlElement* freeSpace = new TiXmlElement("FREE");
+		freeSpace->LinkEndChild(new TiXmlText(int_to_string(info.free)));
+
+		TiXmlElement* label = new TiXmlElement("LABEL");
+		label->LinkEndChild(new TiXmlText(info.label));
+
+		TiXmlElement* serial = new TiXmlElement("SERIAL");
+		serial->LinkEndChild(new TiXmlText(info.serial));
+
+		TiXmlElement* total = new TiXmlElement("TOTAL");
+		total->LinkEndChild(new TiXmlText(int_to_string(info.total)));
+
+		TiXmlElement* type = new TiXmlElement("TYPE");
+		type->LinkEndChild(new TiXmlText(info.type));
+
+		TiXmlElement* volumeName = new TiXmlElement("VOLUMN");
+		volumeName->LinkEndChild(new TiXmlText(info.name));
+
+		drive->LinkEndChild(createDate);
+		drive->LinkEndChild(fileSystem);
+		drive->LinkEndChild(freeSpace);
+		drive->LinkEndChild(label);
+		drive->LinkEndChild(serial);
+		drive->LinkEndChild(total);
+		drive->LinkEndChild(type);
+		drive->LinkEndChild(volumeName);
+		parent->LinkEndChild(drive);
+	}
 }
 
 
