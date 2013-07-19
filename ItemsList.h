@@ -14,7 +14,7 @@
 template<typename T>
 class ItemsList {
 public:
-	ItemsList() {};
+	ItemsList() { Rewind(); };
 	virtual ~ItemsList() {};
 
 	void Rewind() { fIterator = fItems.begin(); };
