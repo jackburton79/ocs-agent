@@ -79,7 +79,7 @@ IfConfigReader::_ReadNetworkInfo(network_info& info, std::istream& stream)
 		std::getline(stream, line);
 	}
 
-	if (line.find("inet_addr6") != std::string::npos)
+	if (line.find("inet6 addr") != std::string::npos)
 		std::getline(stream, line);
 
 	if (line.find("UP") != std::string::npos) {
