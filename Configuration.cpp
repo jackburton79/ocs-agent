@@ -48,6 +48,6 @@ Configuration::ServerURL() const
 bool
 Configuration::LocalInventory() const
 {
-	return true;
+	return false;
 }
 
