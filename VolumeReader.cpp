@@ -11,9 +11,12 @@
 #include <iostream>
 #include <sstream>
 
-VolumeReader::VolumeReader()
+VolumeReader::VolumeReader(const char* options)
 {
-	popen_streambuf df("export LC_ALL=C; df", "r");
+	// TODO:
+	std::string string("export LC_ALL=C; ");
+	string.append("df ").append(options);
+	popen_streambuf df(string.c_str(), "r");
 	std::istream stream(&df);
 
 	std::string line;

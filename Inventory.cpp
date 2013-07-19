@@ -199,7 +199,7 @@ Inventory::_AddCPUsInfo(TiXmlElement* parent)
 void
 Inventory::_AddDrivesInfo(TiXmlElement* parent)
 {
-	VolumeReader reader;
+	VolumeReader reader("-x tmpfs");
 	volume_info info;
 	while (reader.GetNext(info)) {
 		TiXmlElement* drive = new TiXmlElement("DRIVES");

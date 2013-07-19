@@ -27,7 +27,7 @@ struct volume_info {
 
 class VolumeReader : public ItemsList<volume_info> {
 public:
-	VolumeReader();
+	VolumeReader(const char* options);
 	~VolumeReader();
 };
 
