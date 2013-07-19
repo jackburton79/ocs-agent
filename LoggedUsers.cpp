@@ -13,7 +13,7 @@
 
 LoggedUsers::LoggedUsers()
 {
-	popen_streambuf who("who", "r");
+	popen_streambuf who("export LC_ALL=C; who", "r");
 	std::istream iStream(&who);
 
 	std::string string;
