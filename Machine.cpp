@@ -96,6 +96,18 @@ Machine::SystemManufacturer() const
 
 
 std::string
+Machine::HostName() const
+{
+	popen_streambuf p("hostname -s", "r");
+	std::istream stream(&p);
+	std::string line;
+	std::getline(stream, line);
+
+	return line;
+}
+
+
+std::string
 Machine::SystemModel() const
 {
 	return _GetValue("Product Name", kSystemInfo);

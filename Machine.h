@@ -40,7 +40,7 @@ public:
 	std::string SystemUUID() const;
 	std::string SystemManufacturer() const;
 
-
+	std::string HostName() const;
 
 	int CountProcessors() const;
 	std::string ProcessorSpeed(int numCpu) const;

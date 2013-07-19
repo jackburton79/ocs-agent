@@ -280,7 +280,7 @@ Inventory::_AddHardwareInfo(TiXmlElement* parent)
     //<MEMORY>521</MEMORY>
 
     TiXmlElement* name = new TiXmlElement("NAME");
-    name->LinkEndChild(new TiXmlText(fMachine->KernelInfo().hostname));
+    name->LinkEndChild(new TiXmlText(fMachine->HostName()));
 
     TiXmlElement* osComments = new TiXmlElement("OSCOMMENTS");
     osComments->LinkEndChild(new TiXmlText(fMachine->KernelInfo().comments));
