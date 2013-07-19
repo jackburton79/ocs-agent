@@ -36,8 +36,10 @@ Agent::Run()
 	if (inventory.Build(config.DeviceID().c_str())) {
 		if (!inventory.Save("test")) {
 			std::cerr << "Cannot save output file." << std::endl;
-			if (!config.LocalInventory())
-				inventory.Send(config.ServerURL().c_str());
+			if (!config.LocalInventory()) {
+				if (!inventory.Send(config.ServerURL().c_str()))
+					std::cerr << "Cannot send inventory." << std::endl;
+			}
 		}
 	}
 }
