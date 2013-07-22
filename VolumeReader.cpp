@@ -24,17 +24,6 @@ VolumeReader::VolumeReader(const char* options)
 	while (std::getline(stream, line) > 0) {
 		std::istringstream iss(line);
 
-		/*try {
-			while (iss) {
-				std::string s;
-				iss >> s;
-				std::cout << s << std::endl;
-			}
-		} catch (...) {
-
-		}*/
-
-
 		volume_info info;
 		std::string dummy;
 		iss >> info.name;
