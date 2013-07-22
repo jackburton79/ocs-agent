@@ -9,6 +9,7 @@
 #include "Support.h"
 
 #include <iostream>
+#include <sstream>
 
 IfConfigReader::IfConfigReader()
 {
@@ -23,6 +24,12 @@ IfConfigReader::IfConfigReader()
 	} catch (...) {
 
 	}
+
+	popen_streambuf routeBuf("export LC_ALL=C; route -n", "r");
+	std::istream routeStream(&routeBuf);
+	network_info info;
+
+	_ReadRouteInfo(info, routeStream);
 
 	Rewind();
 }
@@ -53,7 +60,6 @@ IfConfigReader::_ReadNetworkInfo(network_info& info, std::istream& stream)
 		info.mac_address = "";
 	}
 
-
 	std::getline(stream, line);
 	if (line.find("inet addr:") != std::string::npos) {
 		size_t mask;
@@ -70,8 +76,6 @@ IfConfigReader::_ReadNetworkInfo(network_info& info, std::istream& stream)
 		try {
 			size_t colon = line.find(":");
 			info.ip_address = line.substr(colon + 1, std::min(mask, bcast) - colon - 3);
-			//info.ip_address = info.ip_address.substr(line.find(":") + 1, std::string::npos);
-
 		} catch (...) {
 			info.ip_address = "";
 		}
@@ -95,4 +99,36 @@ IfConfigReader::_ReadNetworkInfo(network_info& info, std::istream& stream)
 
 	return false;
 
+}
+
+
+bool
+IfConfigReader::_ReadRouteInfo(network_info& info, std::istream& stream)
+{
+	// TODO: Highly inefficient. Improve
+	try {
+		std::string line;
+		std::getline(stream, line); // Skip Title
+		std::getline(stream, line); // Skip header
+		while (std::getline(stream, line) > 0) {
+			Rewind();
+			network_info networkInfo;
+			while (GetNext(networkInfo)) {
+				std::cout << line << "(" << networkInfo.description << ")" << std::endl;
+				if (line.find(networkInfo.description) == std::string::npos)
+					continue;
+				std::istringstream iss(line);
+				std::string string;
+				iss >> string;
+				std::cout << string << std::endl;
+				if (string == "0.0.0.0") {
+					iss >> networkInfo.gateway;
+					break;
+				}
+			}
+		}
+	} catch (...) {
+
+	}
+	return true;
 }

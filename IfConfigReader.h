@@ -36,6 +36,7 @@ public:
 private:
 
 	bool _ReadNetworkInfo(network_info& info, std::istream& stream);
+	bool _ReadRouteInfo(network_info& info, std::istream& stream);
 
 };
 
