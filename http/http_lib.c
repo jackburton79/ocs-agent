@@ -204,19 +204,21 @@ static http_retcode http_query(command, url, additional_header, mode,
     /* create header */
     if (proxy) {
       sprintf(header,
-"%s http://%.128s:%d/%.256s HTTP/1.0\015\012User-Agent: %s\015\012%s\015\012",
+"%s http://%.128s:%d/%.256s HTTP/1.0\015\012Host:%s\015\012User-Agent: %s\015\012%s\015\012",
 	      command,
 	      http_server,
 	      http_port,
 	      url,
+	      http_server,
 	      http_user_agent,
 	      additional_header
 	      );
     } else {
       sprintf(header,
-"%s /%.256s HTTP/1.0\015\012User-Agent: %s\015\012%s\015\012",
+"%s /%.256s HTTP/1.0\015\012Host: %s\015\012User-Agent: %s\015\012%s\015\012",
 	      command,
 	      url,
+	      http_server,
 	      http_user_agent,
 	      additional_header
 	      );
