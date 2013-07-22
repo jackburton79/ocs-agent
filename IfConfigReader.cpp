@@ -115,13 +115,11 @@ IfConfigReader::_ReadRouteInfo(network_info& info, std::istream& stream)
 			network_info networkInfo;
 			std::list<network_info>::iterator i;
 			for (i = fItems.begin(); i != fItems.end(); i++) {
-				//std::cout << line << "(" << networkInfo.description << ")" << std::endl;
 				if (line.find((*i).description) == std::string::npos)
 					continue;
 				std::istringstream iss(line);
 				std::string string;
 				iss >> string;
-				//std::cout << string << std::endl;
 				if (string == "0.0.0.0") {
 					iss >> (*i).gateway;
 					break;
