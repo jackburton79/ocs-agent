@@ -78,8 +78,7 @@ HTTP::Error() const
 std::string
 HTTP::ErrorString() const
 {
-	// TODO:
-	return "";
+	return strerror(fLastError);;
 }
 
 
@@ -113,10 +112,6 @@ HTTP::Post(const std::string path, char* data)
 int
 HTTP::Connect(const std::string string, int port)
 {
-	std::string hostName = _HostFromConnectionString(string);
-
-	std::cout << "HTTP::Connect()" << std::endl;
-
 	// TODO: Return an "already connected" error, or close and open a new
 	// connection
 	if (fFD >= 0) {
@@ -124,34 +119,45 @@ HTTP::Connect(const std::string string, int port)
 		return -1;
 	}
 
+	std::cout << "HTTP::Connect()" << std::endl;
+	std::string hostName = _HostFromConnectionString(string);
+
 	fHost = hostName;
 	fPort = port;
 
 	// TODO: improve error checking
-	if (fFD < 0) {
-		std::cout << "Will connect to server " << hostName << std::endl;
 
-		struct hostent* hostEnt = ::gethostbyname(fHost.c_str());
-		struct sockaddr_in serverAddr;
+	std::cout << "Will connect to server " << hostName << std::endl;
 
-		std::cout << "Resolved hostname: " << hostEnt->h_name << std::endl;
-
-		::memset((char*)&serverAddr,0, sizeof(serverAddr));
-		::memcpy((char*)&serverAddr.sin_addr, hostEnt->h_addr, hostEnt->h_length);
-		serverAddr.sin_family = hostEnt->h_addrtype;
-		serverAddr.sin_port = (unsigned short)htons(fPort);
-
-		if ((fFD = ::socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-			std::cerr << "HTTP::Connect: socket() failed: " << strerror(errno) << std::endl;
-			return -1;
-		}
-
-		::setsockopt(fFD, SOL_SOCKET, SO_KEEPALIVE, 0, 0);
-
-		if (::connect(fFD, (const struct sockaddr*)&serverAddr, sizeof(serverAddr)) < 0)
-			return -1;
+	struct sockaddr_in serverAddr;
+	struct hostent* hostEnt = ::gethostbyname(fHost.c_str());
+	if (hostEnt == NULL) {
+		fLastError = errno;
+		return fLastError;
 	}
 
+	std::cout << "Resolved hostname: " << hostEnt->h_name << std::endl;
+
+	::memset((char*)&serverAddr,0, sizeof(serverAddr));
+	::memcpy((char*)&serverAddr.sin_addr, hostEnt->h_addr, hostEnt->h_length);
+	serverAddr.sin_family = hostEnt->h_addrtype;
+	serverAddr.sin_port = (unsigned short)htons(fPort);
+
+	if ((fFD = ::socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+		std::cerr << "HTTP::Connect: socket() failed: " << strerror(errno) << std::endl;
+		fLastError = errno;
+		return fLastError;
+	}
+
+	::setsockopt(fFD, SOL_SOCKET, SO_KEEPALIVE, 0, 0);
+
+	if (::connect(fFD, (const struct sockaddr*)&serverAddr,
+			sizeof(serverAddr)) < 0) {
+		fLastError = errno;
+		return fLastError;
+	}
+
+	fLastError = 0;
 	return fFD;
 }
 
