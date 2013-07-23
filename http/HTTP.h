@@ -30,6 +30,13 @@ public:
 
 	int SetHost(const std::string hostName, int port = 80);
 
+private:
+	int _ConnectIfNeeded();
+
+	std::string fHost;
+	int fPort;
+	int fFD;
+	int fLastError;
 };
 
 #endif /* HTTP_H_ */
