@@ -14,12 +14,11 @@
 #include "Support.h"
 #include "VolumeReader.h"
 
-#include "http/http_lib.h"
+#include "http/HTTP.h"
 
 #include <memory>
 
 #include <tinyxml.h>
-#include <zlib.h>
 
 
 Inventory::Inventory()
@@ -100,34 +99,19 @@ Inventory::Save(const char* name)
 bool
 Inventory::Send(const char* serverUrl)
 {
-	// TODO: Wrap the http library with a C++ class
-	char* fileName = NULL;
-	http_retcode status = http_parse_url((char*)serverUrl, &fileName);
-	if (status < 0)
-		return false;
-
-	char* data = NULL;
-	int dataLength = 0;
-	status = http_get(fileName, &data, &dataLength, NULL);
-	if (status < 0) {
-		free(fileName);
-		free(http_server);
+	HTTP httpObject;
+	if (httpObject.SetHost(serverUrl) < 0) {
+		std::cerr << "Error opening HTTP connection: " << httpObject.ErrorString() << std::endl;
 		return false;
 	}
 
-	free(data);
-
-	free(fileName);
-	free(http_server);
-
-	http_server = NULL;
+	if (httpObject.Get("/") != 0) {
+		std::cerr << "Send: " << httpObject.ErrorString() << std::endl;
+		return false;
+	}
 
 	std::string inventoryUrl(serverUrl);
 	inventoryUrl.append("/ocsinventory");
-	fileName = NULL;
-	status = http_parse_url((char*)inventoryUrl.c_str(), &fileName);
-	if (status < 0)
-		return false;
 
 	// Send Prolog
 	TiXmlDocument prolog;
@@ -137,51 +121,33 @@ Inventory::Send(const char* serverUrl)
 	size_t prologLength = 0;
 	if (!CompressXml(prolog, prologData, prologLength)) {
 		std::cerr << "Error compressing prolog XML" << std::endl;
-		free(fileName);
-		free(http_server);
-		http_server = NULL;
 		return false;
 	}
 
-
-	status = http_post(fileName, (char*)prologData,
-			prologLength, 0, (char*)"application/x-compress");
+	// content_type: "application/x-compress"
+	// content_length: prologLength
+	if (httpObject.Post("/ocsinventory", prologData) != 0) {
+		delete[] prologData;
+		std::cerr << "Send: " << httpObject.ErrorString() << std::endl;
+		return false;
+	}
 
 	delete[] prologData;
-	if (status < 0) {
-		free(fileName);
-		free(http_server);
-		http_server = NULL;
-		return false;
-	}
 
-	// Get the XML response
+	// TODO: Get the XML response
+
+
+	// TODO: Send the inventory
 
 	char* compressedData = NULL;
 	size_t compressedSize;
 	if (!_PrepareData("./test.xml", compressedData, compressedSize)) {
-		free(fileName);
-		free(http_server);
-		return false;
-	}
-//std::cout << "Siamo qui!" << std::endl;
 
-	std::cout << "Sending inventory" << std::endl;
-	status = http_post(fileName, (char*)compressedData,
-			compressedSize, 0, (char*)"application/x-compress");
-	if (status < 0) {
-		free(fileName);
-		free(http_server);
-		free(compressedData);
 		return false;
 	}
 
-	free(compressedData);
 
-	free(fileName);
-	free(http_server);
-
-	return true;
+	return false;
 }
 
 
