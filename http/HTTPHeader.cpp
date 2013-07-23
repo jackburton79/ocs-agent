@@ -13,16 +13,20 @@
 
 HTTPHeader::HTTPHeader()
 {
+	_Init();
 }
 
 
 HTTPHeader::HTTPHeader(const std::string string)
 {
+	_Init();
 }
 
 
 HTTPHeader::HTTPHeader(const HTTPHeader& header)
 {
+	_Init();
+	*this = header;
 }
 
 
@@ -57,6 +61,18 @@ HTTPHeader::ContentType() const
 	i = fValues.find(HTTPContentType);
 	if (i == fValues.end())
 		return ""; // TODO: Assume html/text ?
+
+	return i->second;
+}
+
+
+std::string
+HTTPHeader::UserAgent() const
+{
+	std::map<std::string, std::string>::const_iterator i;
+	i = fValues.find(HTTPUserAgent);
+	if (i == fValues.end())
+		return "";
 
 	return i->second;
 }
@@ -106,6 +122,13 @@ HTTPHeader::SetContentType(const std::string type)
 
 
 void
+HTTPHeader::SetUserAgent(const std::string agent)
+{
+	fValues[HTTPUserAgent] = agent;
+}
+
+
+void
 HTTPHeader::SetValue(const std::string key, const std::string value)
 {
 	// TODO: ATM works like AddValue().
@@ -145,4 +168,11 @@ HTTPHeader::operator =(const HTTPHeader& header)
 {
 	fValues = header.fValues;
 	return *this;
+}
+
+
+void
+HTTPHeader::_Init()
+{
+	fValues[HTTPUserAgent] = "Borked HTTP Library";
 }

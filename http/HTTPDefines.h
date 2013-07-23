@@ -15,6 +15,8 @@
 extern std::string HTTPProtocolPrefix;
 extern std::string HTTPContentType;
 extern std::string HTTPContentLength;
+extern std::string HTTPUserAgent;
+
 
 
 #endif /* HTTPDEFINES_H_ */

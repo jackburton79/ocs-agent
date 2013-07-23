@@ -21,6 +21,7 @@ public:
 	void AddValue(const std::string key, const std::string value);
 	int ContentLength() const;
 	std::string ContentType() const;
+	std::string UserAgent() const;
 
 	bool HasContentLength() const;
 	bool HasContentType() const;
@@ -28,6 +29,7 @@ public:
 
 	void SetContentLength(int len);
 	void SetContentType(const std::string type);
+	void SetUserAgent(const std::string agent);
 	void SetValue(const std::string key, const std::string value);
 
 	virtual std::string ToString() const;
@@ -38,6 +40,8 @@ public:
 protected:
 	std::map<std::string, std::string> fValues;
 
+private:
+	void _Init();
 };
 
 #endif /* HTTPHEADER_H_ */

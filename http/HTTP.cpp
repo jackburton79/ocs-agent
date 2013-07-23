@@ -119,23 +119,16 @@ HTTP::Connect(const std::string string, int port)
 		return -1;
 	}
 
-	std::cout << "HTTP::Connect()" << std::endl;
 	std::string hostName = _HostFromConnectionString(string);
 
 	fHost = hostName;
 	fPort = port;
-
-	// TODO: improve error checking
-
-	std::cout << "Will connect to server " << hostName << std::endl;
 
 	struct hostent* hostEnt = ::gethostbyname(fHost.c_str());
 	if (hostEnt == NULL) {
 		fLastError = h_errno;
 		return fLastError;
 	}
-
-	std::cout << "Resolved hostname: " << hostEnt->h_name << std::endl;
 
 	if ((fFD = ::socket(AF_INET, SOCK_STREAM, 0)) < 0) {
 		fLastError = errno;
