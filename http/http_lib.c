@@ -289,7 +289,7 @@ http_retcode http_put(filename, data, length, overwrite, type)
 
 
 /*
- * Put data on the server
+ * Post data to the server
  *
  * This function sends data to the http data server.
  * The data will be stored under the ressource name filename.
@@ -395,8 +395,8 @@ http_retcode http_get(filename, pdata, plength, typebuf)
 /*
  * Request the header
  *
- * This function outputs the header of thehttp data server.
- * The header is from the ressource named filename.
+ * This function outputs the header of the http data server.
+ * The header is from the resource named filename.
  * The length and type of data is eventually returned (like for http_get(3))
  *
  * returns a negative error code or a positive code from the server
