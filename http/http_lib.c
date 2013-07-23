@@ -80,8 +80,8 @@ char *http_proxy_server=NULL;
 /* proxy server port number or 0 */
 int http_proxy_port=0;
 /* user agent id string */
-static char *http_user_agent="adlib/3 ($Date: 1998/09/23 06:19:15 $)";
-
+//static char *http_user_agent="adlib/3 ($Date: 1998/09/23 06:19:15 $)";
+static char *http_user_agent="OCS-NG_unified_unix_agent_v2.0";
 /*
  * read a line from file descriptor
  * returns the number of bytes read. negative if a read error occured
@@ -204,7 +204,7 @@ static http_retcode http_query(command, url, additional_header, mode,
     /* create header */
     if (proxy) {
       sprintf(header,
-"%s http://%.128s:%d/%.256s HTTP/1.0\015\012Host:%s\015\012User-Agent: %s\015\012%s\015\012",
+"%s http://%.128s:%d/%.256s HTTP/1.1\015\012Host:%s\015\012User-Agent: %s\015\012%s\015\012",
 	      command,
 	      http_server,
 	      http_port,
@@ -215,7 +215,7 @@ static http_retcode http_query(command, url, additional_header, mode,
 	      );
     } else {
       sprintf(header,
-"%s /%.256s HTTP/1.0\015\012Host: %s\015\012User-Agent: %s\015\012%s\015\012",
+"%s /%.256s HTTP/1.1\015\012Host: %s\015\012User-Agent: %s\015\012%s\015\012",
 	      command,
 	      url,
 	      http_server,
@@ -285,6 +285,39 @@ http_retcode http_put(filename, data, length, overwrite, type)
 	    overwrite ? "Control: overwrite=1\015\012" : ""
 	    );
   return http_query("PUT",filename,header,CLOSE, data, length, NULL);
+}
+
+
+/*
+ * Put data on the server
+ *
+ * This function sends data to the http data server.
+ * The data will be stored under the ressource name filename.
+ * returns a negative error code or a positive code from the server
+ *
+ * limitations: filename is truncated to first 256 characters
+ *              and type to 64.
+ */
+http_retcode http_post(filename, data, length, overwrite, type)
+     char *filename;  /* name of the ressource to create */
+     char *data;      /* pointer to the data to send   */
+     int length;      /* length of the data to send  */
+     int overwrite;   /* flag to request to overwrite the ressource if it
+			 was already existing */
+     char *type;      /* type of the data, if NULL default type is used */
+{
+  char header[MAXBUF];
+  if (type)
+    sprintf(header,"Content-length: %d\015\012Content-type: %.64s\015\012%s",
+	    length,
+	    type  ,
+	    overwrite ? "Control: overwrite=1\015\012" : ""
+	    );
+  else
+    sprintf(header,"Content-length: %d\015\012%s",length,
+	    overwrite ? "Control: overwrite=1\015\012" : ""
+	    );
+  return http_query("POST",filename,header,KEEP_OPEN, data, length, NULL);
 }
 
 
