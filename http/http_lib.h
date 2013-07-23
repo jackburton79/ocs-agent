@@ -68,6 +68,8 @@ typedef enum {
 http_retcode http_put(char *filename, char *data, int length, 
 	     int overwrite, char *type) ;
 http_retcode http_get(char *filename, char **pdata,int *plength, char *typebuf);
+http_retcode http_post(char *filename, char *data, int length,
+	     int overwrite, char *type) ;
 
 http_retcode http_parse_url(char *url, char **pfilename);
 
