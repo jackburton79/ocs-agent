@@ -132,7 +132,7 @@ HTTP::Connect(const std::string string, int port)
 	struct sockaddr_in serverAddr;
 	struct hostent* hostEnt = ::gethostbyname(fHost.c_str());
 	if (hostEnt == NULL) {
-		fLastError = errno;
+		fLastError = h_errno;
 		return fLastError;
 	}
 
@@ -144,7 +144,6 @@ HTTP::Connect(const std::string string, int port)
 	serverAddr.sin_port = (unsigned short)htons(fPort);
 
 	if ((fFD = ::socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-		std::cerr << "HTTP::Connect: socket() failed: " << strerror(errno) << std::endl;
 		fLastError = errno;
 		return fLastError;
 	}
