@@ -12,6 +12,7 @@
 
 HTTPRequestHeader::HTTPRequestHeader()
 {
+	_Init();
 }
 
 
@@ -24,12 +25,27 @@ HTTPRequestHeader::HTTPRequestHeader(const HTTPRequestHeader& header)
 HTTPRequestHeader::HTTPRequestHeader(const std::string method,
 		const std::string path, int majorVer, int minorVer)
 {
+	_Init();
 	SetRequest(method, path);
 }
 
 
 HTTPRequestHeader::~HTTPRequestHeader()
 {
+}
+
+
+std::string
+HTTPRequestHeader::UserAgent() const
+{
+	return fUserAgent;
+}
+
+
+void
+HTTPRequestHeader::SetUserAgent(const std::string string)
+{
+	fUserAgent = string;
 }
 
 
@@ -51,15 +67,19 @@ std::string
 HTTPRequestHeader::ToString() const
 {
 	std::string host = fPath;
+	std::string resource = "/";
 	size_t pos = fPath.find("/");
-	if (pos != std::string::npos)
+	if (pos != std::string::npos) {
 		host = fPath.substr(0, pos);
+		resource = fPath.substr(pos, std::string::npos);
+	}
 	std::string string;
-	string.append(fMethod).append(" /");
-	string.append(fPath).append(" ");
+	string.append(fMethod).append(" ");
+	string.append(resource).append(" ");
 	string.append("HTTP/1.1").append(CRLF);
 	string.append("Host: ").append(host);
 	string.append(CRLF);
+	string.append(fUserAgent).append(CRLF);
 
 	string.append(HTTPHeader::ToString());
 
@@ -71,8 +91,6 @@ void
 HTTPRequestHeader::SetRequest(const std::string method,
 		const std::string path, int majorVer, int minorVer)
 {
-	std::cout << "HTTPRequestHeader::SetRequest: " << path << std::endl;
-
 	fMethod = method;
 	fPath = path;
 }
@@ -82,5 +100,13 @@ HTTPRequestHeader&
 HTTPRequestHeader::operator=(const HTTPRequestHeader& header)
 {
 	SetRequest(header.fMethod, header.fPath);
+	fUserAgent = header.fUserAgent;
 	return *this;
+}
+
+
+void
+HTTPRequestHeader::_Init()
+{
+	fUserAgent = "Borked HTTP Library";
 }

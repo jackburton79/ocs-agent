@@ -11,6 +11,6 @@
 
 std::string HTTPContentType = "Content-type";
 std::string HTTPContentLength = "Content-length";
-std::string HTTPUserAgent = "User agent";
+std::string HTTPUserAgent = "User-Agent";
 std::string HTTPProtocolPrefix = "http://";
 

@@ -66,18 +66,6 @@ HTTPHeader::ContentType() const
 }
 
 
-std::string
-HTTPHeader::UserAgent() const
-{
-	std::map<std::string, std::string>::const_iterator i;
-	i = fValues.find(HTTPUserAgent);
-	if (i == fValues.end())
-		return "";
-
-	return i->second;
-}
-
-
 bool
 HTTPHeader::HasContentLength() const
 {
@@ -122,13 +110,6 @@ HTTPHeader::SetContentType(const std::string type)
 
 
 void
-HTTPHeader::SetUserAgent(const std::string agent)
-{
-	fValues[HTTPUserAgent] = agent;
-}
-
-
-void
 HTTPHeader::SetValue(const std::string key, const std::string value)
 {
 	// TODO: ATM works like AddValue().
@@ -147,6 +128,8 @@ HTTPHeader::ToString() const
 		string.append(i->second);
 		string.append(CRLF);
 	}
+
+	string.append(CRLF);
 
 	return string;
 }
@@ -174,5 +157,4 @@ HTTPHeader::operator =(const HTTPHeader& header)
 void
 HTTPHeader::_Init()
 {
-	fValues[HTTPUserAgent] = "Borked HTTP Library";
 }
