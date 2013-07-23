@@ -10,8 +10,9 @@
 
 #include <string>
 
-class HTTPRequestHeader;
-class HTTPResponseHeader;
+#include "HTTPRequestHeader.h"
+#include "HTTPResponseHeader.h"
+
 class HTTP {
 public:
 	HTTP();
@@ -37,6 +38,9 @@ private:
 	int fPort;
 	int fFD;
 	int fLastError;
+
+	HTTPRequestHeader fCurrentRequest;
+	HTTPResponseHeader fLastResponse;
 };
 
 #endif /* HTTP_H_ */

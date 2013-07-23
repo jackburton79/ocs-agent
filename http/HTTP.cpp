@@ -19,6 +19,7 @@
 #include <unistd.h>
 
 #include <iostream>
+#include <sstream>
 
 HTTP::HTTP()
 	:
@@ -90,14 +91,38 @@ HTTP::Get(const std::string path)
 
 	std::string fullPath = fHost + path;
 	HTTPRequestHeader requestHeader("GET", fullPath);
+	fCurrentRequest = requestHeader;
 	std::string string = requestHeader.ToString();
 
+#if 1
 	std::cout << "HTTP::GET: header:" << std::endl << string << std::endl;
-	if (::write(fFD, string.c_str(), string.length()) != (int)string.length()) {
-		std::cerr << "GET failed: " << std::endl;
+#endif
+	if (::write(fFD, string.c_str(), string.length())
+			!= (int)string.length()) {
 		fLastError = -1;
 		return -1;
 	}
+
+	std::ostringstream stream;
+	char buffer[256];
+	size_t sizeRead = 0;
+	while ((sizeRead = ::read(fFD, buffer, sizeof(buffer))) > 0)
+		stream.write(buffer, sizeRead);
+
+	// Read back status
+	size_t pos = stream.str().find('\012');
+	if (pos == std::string::npos) {
+		fLastError = -1;
+		return -1;
+	}
+
+	std::string statusLine = stream.str().substr(0, pos);
+	int code;
+	::sscanf(statusLine.c_str(), "HTTP/1.%*d %03d", (int*)&code);
+
+	fLastResponse.SetStatusLine(code, statusLine.c_str());
+
+	// TODO: Read actual data from the ostringstream object
 
 	return 0;
 }
@@ -106,8 +131,7 @@ HTTP::Get(const std::string path)
 HTTPResponseHeader
 HTTP::LastResponse() const
 {
-	// TODO:
-	return HTTPResponseHeader();
+	return fLastResponse;
 }
 
 
