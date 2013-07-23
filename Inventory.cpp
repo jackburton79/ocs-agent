@@ -5,6 +5,7 @@
  *      Author: stefano
  */
 
+#include "Configuration.h"
 #include "IfConfigReader.h"
 #include "Inventory.h"
 #include "LoggedUsers.h"
@@ -15,7 +16,10 @@
 
 #include "http/http_lib.h"
 
+#include <memory>
+
 #include <tinyxml.h>
+#include <zlib.h>
 
 
 Inventory::Inventory()
@@ -102,12 +106,82 @@ Inventory::Send(const char* serverUrl)
 	if (status < 0)
 		return false;
 
-	std::cout << "http_server: " << http_server << std::endl;
+	char* data = NULL;
+	int dataLength = 0;
+	status = http_get(fileName, &data, &dataLength, NULL);
+	if (status < 0) {
+		free(fileName);
+		free(http_server);
+		return false;
+	}
+
+	free(data);
+
 	free(fileName);
 	free(http_server);
 
+	http_server = NULL;
 
-	return false;
+	std::string inventoryUrl(serverUrl);
+	inventoryUrl.append("/ocsinventory");
+	fileName = NULL;
+	status = http_parse_url((char*)inventoryUrl.c_str(), &fileName);
+	if (status < 0)
+		return false;
+
+	// Send Prolog
+	TiXmlDocument prolog;
+	_WriteProlog(prolog);
+
+	char* prologData = NULL;
+	size_t prologLength = 0;
+	if (!CompressXml(prolog, prologData, prologLength)) {
+		std::cerr << "Error compressing prolog XML" << std::endl;
+		free(fileName);
+		free(http_server);
+		http_server = NULL;
+		return false;
+	}
+
+
+	status = http_post(fileName, (char*)prologData,
+			prologLength, 0, (char*)"application/x-compress");
+
+	delete[] prologData;
+	if (status < 0) {
+		free(fileName);
+		free(http_server);
+		http_server = NULL;
+		return false;
+	}
+
+	// Get the XML response
+
+	char* compressedData = NULL;
+	size_t compressedSize;
+	if (!_PrepareData("./test.xml", compressedData, compressedSize)) {
+		free(fileName);
+		free(http_server);
+		return false;
+	}
+//std::cout << "Siamo qui!" << std::endl;
+
+	std::cout << "Sending inventory" << std::endl;
+	status = http_post(fileName, (char*)compressedData,
+			compressedSize, 0, (char*)"application/x-compress");
+	if (status < 0) {
+		free(fileName);
+		free(http_server);
+		free(compressedData);
+		return false;
+	}
+
+	free(compressedData);
+
+	free(fileName);
+	free(http_server);
+
+	return true;
 }
 
 
@@ -489,4 +563,35 @@ Inventory::_AddUsersInfo(TiXmlElement* parent)
 		users->LinkEndChild(login);
 	}
 	parent->LinkEndChild(users);
+}
+
+
+bool
+Inventory::_PrepareData(const char* fileName, char*& outData, size_t& outSize)
+{
+	return CompressXml(*fDocument, outData, outSize);
+}
+
+
+bool
+Inventory::_WriteProlog(TiXmlDocument& document) const
+{
+	Configuration config;
+
+	TiXmlDeclaration* declaration = new TiXmlDeclaration("1.0", "UTF-8", "");
+	document.LinkEndChild(declaration);
+
+	TiXmlElement* request = new TiXmlElement("REQUEST");
+	document.LinkEndChild(request);
+
+	TiXmlElement* deviceID = new TiXmlElement("DEVICEID");
+	deviceID->LinkEndChild(new TiXmlText(config.DeviceID().c_str()));
+	request->LinkEndChild(deviceID);
+
+	TiXmlElement* query = new TiXmlElement("QUERY");
+	query->LinkEndChild(new TiXmlText("PROLOG"));
+
+	request->LinkEndChild(query);
+
+	return true;
 }

@@ -31,6 +31,9 @@ private:
 	void _AddSoftwaresInfo(TiXmlElement* parent);
 	void _AddUsersInfo(TiXmlElement* parent);
 
+	bool _PrepareData(const char* fileName, char*& outData, size_t& outSize);
+	bool _WriteProlog(TiXmlDocument& document) const;
+
 	TiXmlDocument* fDocument;
 	Machine* fMachine;
 };
