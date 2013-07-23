@@ -78,7 +78,7 @@ HTTP::Error() const
 std::string
 HTTP::ErrorString() const
 {
-	return strerror(fLastError);;
+	return strerror(fLastError);
 }
 
 
