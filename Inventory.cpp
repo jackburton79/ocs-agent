@@ -15,6 +15,7 @@
 #include "VolumeReader.h"
 
 #include "http/HTTP.h"
+#include "http/HTTPResponseHeader.h"
 
 #include <memory>
 
@@ -105,10 +106,12 @@ Inventory::Send(const char* serverUrl)
 		return false;
 	}
 
-	if (httpObject.Get("/") != 0) {
+	if (httpObject.Get("") != 0) {
 		std::cerr << "Send: " << httpObject.ErrorString() << std::endl;
 		return false;
 	}
+
+	std::cout << httpObject.LastResponse().ToString() << std::endl;
 
 	std::string inventoryUrl(serverUrl);
 	inventoryUrl.append("/ocsinventory");
