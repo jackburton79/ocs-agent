@@ -12,7 +12,9 @@
 
 #define CRLF "\015\012"
 
+extern std::string HTTPProtocolPrefix;
 extern std::string HTTPContentType;
 extern std::string HTTPContentLength;
+
 
 #endif /* HTTPDEFINES_H_ */

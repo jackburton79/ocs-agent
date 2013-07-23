@@ -18,7 +18,9 @@ public:
 	HTTP(const std::string hostName, int port = 80);
 	~HTTP();
 
+	int Connect(const std::string hostName, int port = 80);
 	void Close();
+
 	void ClearPendingRequests();
 	HTTPRequestHeader CurrentRequest() const;
 	int Error() const;
@@ -28,10 +30,8 @@ public:
 	HTTPResponseHeader LastResponse() const;
 	int Post(const std::string path, char* data);
 
-	int SetHost(const std::string hostName, int port = 80);
-
 private:
-	int _ConnectIfNeeded();
+	std::string _HostFromConnectionString(std::string string) const;
 
 	std::string fHost;
 	int fPort;

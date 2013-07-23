@@ -11,3 +11,4 @@
 
 std::string HTTPContentType = "Content-type";
 std::string HTTPContentLength = "Content-length";
+std::string HTTPProtocolPrefix = "http://";

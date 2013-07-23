@@ -6,15 +6,19 @@
  */
 
 #include "HTTP.h"
+#include "HTTPDefines.h"
 #include "HTTPRequestHeader.h"
 #include "HTTPResponseHeader.h"
 
 #include <sys/socket.h>
 
+#include <errno.h>
 #include <netdb.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+
+#include <iostream>
 
 HTTP::HTTP()
 	:
@@ -26,8 +30,12 @@ HTTP::HTTP()
 
 
 HTTP::HTTP(const std::string hostName, int port)
+	:
+	fPort(-1),
+	fFD(-1),
+	fLastError(0)
 {
-	SetHost(hostName, port);
+	Connect(hostName, port);
 }
 
 
@@ -78,7 +86,7 @@ HTTP::ErrorString() const
 int
 HTTP::Get(const std::string path)
 {
-	if (!_ConnectIfNeeded())
+	if (fFD < 0)
 		return -1;
 
 	return -1;
@@ -96,37 +104,47 @@ HTTP::LastResponse() const
 int
 HTTP::Post(const std::string path, char* data)
 {
-	if (!_ConnectIfNeeded())
+	if (fFD < 0)
 		return -1;
 	return -1;
 }
 
 
 int
-HTTP::SetHost(const std::string hostName, int port)
+HTTP::Connect(const std::string string, int port)
 {
+	std::string hostName = _HostFromConnectionString(string);
+
+	std::cout << "HTTP::Connect()" << std::endl;
+
+	// TODO: Return an "already connected" error, or close and open a new
+	// connection
+	if (fFD >= 0) {
+		std::cerr << "HTTP::Connect: already connected" << std::endl;
+		return -1;
+	}
+
 	fHost = hostName;
 	fPort = port;
 
-	return 0;
-}
-
-
-int
-HTTP::_ConnectIfNeeded()
-{
 	// TODO: improve error checking
 	if (fFD < 0) {
+		std::cout << "Will connect to server " << hostName << std::endl;
+
 		struct hostent* hostEnt = ::gethostbyname(fHost.c_str());
 		struct sockaddr_in serverAddr;
+
+		std::cout << "Resolved hostname: " << hostEnt->h_name << std::endl;
 
 		::memset((char*)&serverAddr,0, sizeof(serverAddr));
 		::memcpy((char*)&serverAddr.sin_addr, hostEnt->h_addr, hostEnt->h_length);
 		serverAddr.sin_family = hostEnt->h_addrtype;
 		serverAddr.sin_port = (unsigned short)htons(fPort);
 
-		if ((fFD = ::socket(AF_INET, SOCK_STREAM, 0)) < 0)
+		if ((fFD = ::socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+			std::cerr << "HTTP::Connect: socket() failed: " << strerror(errno) << std::endl;
 			return -1;
+		}
 
 		::setsockopt(fFD, SOL_SOCKET, SO_KEEPALIVE, 0, 0);
 
@@ -135,4 +153,16 @@ HTTP::_ConnectIfNeeded()
 	}
 
 	return fFD;
+}
+
+
+std::string
+HTTP::_HostFromConnectionString(std::string string) const
+{
+	// TODO: Remove port if specified
+	size_t prefixPos = string.find(HTTPProtocolPrefix);
+	if (prefixPos == std::string::npos)
+		return string;
+
+	return string.substr(HTTPProtocolPrefix.length(), std::string::npos);
 }

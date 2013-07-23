@@ -100,7 +100,7 @@ bool
 Inventory::Send(const char* serverUrl)
 {
 	HTTP httpObject;
-	if (httpObject.SetHost(serverUrl) < 0) {
+	if (httpObject.Connect(serverUrl) < 0) {
 		std::cerr << "Error opening HTTP connection: " << httpObject.ErrorString() << std::endl;
 		return false;
 	}
