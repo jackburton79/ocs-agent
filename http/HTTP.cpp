@@ -129,7 +129,6 @@ HTTP::Connect(const std::string string, int port)
 
 	std::cout << "Will connect to server " << hostName << std::endl;
 
-	struct sockaddr_in serverAddr;
 	struct hostent* hostEnt = ::gethostbyname(fHost.c_str());
 	if (hostEnt == NULL) {
 		fLastError = h_errno;
@@ -138,11 +137,6 @@ HTTP::Connect(const std::string string, int port)
 
 	std::cout << "Resolved hostname: " << hostEnt->h_name << std::endl;
 
-	::memset((char*)&serverAddr,0, sizeof(serverAddr));
-	::memcpy((char*)&serverAddr.sin_addr, hostEnt->h_addr, hostEnt->h_length);
-	serverAddr.sin_family = hostEnt->h_addrtype;
-	serverAddr.sin_port = (unsigned short)htons(fPort);
-
 	if ((fFD = ::socket(AF_INET, SOCK_STREAM, 0)) < 0) {
 		fLastError = errno;
 		return fLastError;
@@ -150,6 +144,11 @@ HTTP::Connect(const std::string string, int port)
 
 	::setsockopt(fFD, SOL_SOCKET, SO_KEEPALIVE, 0, 0);
 
+	struct sockaddr_in serverAddr;
+	::memset((char*)&serverAddr,0, sizeof(serverAddr));
+	::memcpy((char*)&serverAddr.sin_addr, hostEnt->h_addr, hostEnt->h_length);
+	serverAddr.sin_family = hostEnt->h_addrtype;
+	serverAddr.sin_port = (unsigned short)htons(fPort);
 	if (::connect(fFD, (const struct sockaddr*)&serverAddr,
 			sizeof(serverAddr)) < 0) {
 		fLastError = errno;
