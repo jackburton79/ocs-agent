@@ -13,6 +13,73 @@
 #include <streambuf>
 #include <string.h>
 
+#include <tinyxml.h>
+#include <zlib.h>
+
+bool
+CompressXml(const TiXmlDocument& document, char*& destination, size_t& destLength)
+{
+	//std::cout << "temp name: " << name << std::endl;
+	FILE* temp = tmpfile();
+	if (temp == NULL) {
+		std::cerr << "CompressXml: cannot create temporary file" << std::endl;
+		return false;
+	}
+
+	if (!document.SaveFile(temp)) {
+		std::cerr << "CompressXml: cannot save XML document" << std::endl;
+		fclose(temp);
+		return false;
+
+	}
+	fseek(temp, 0, SEEK_END);
+	size_t fileSize = ftell(temp);
+	fseek(temp, 0, SEEK_SET);
+
+	char* data = new char[fileSize];
+	fread(data, 1, fileSize, temp);
+
+	fclose(temp);
+
+	destLength = compressBound(fileSize);
+	destination = new char[destLength];
+
+	if (int compressStatus = compress((Bytef*)destination, (uLongf*)&destLength,
+			(const Bytef*)data, (uLong)fileSize) != Z_OK) {
+		std::cerr << "Compress returned error: " << zError(compressStatus) << std::endl;
+		delete[] destination;
+		return false;
+	}
+
+	return true;
+}
+
+
+bool
+UncompressXml(const char* source, size_t sourceLen, TiXmlDocument& document)
+{
+	FILE* temp = tmpfile();
+	if (temp == NULL) {
+		return false;
+	}
+
+	// TODO: improve this
+	char* destination = new char[32768];
+	size_t destLength = 0;
+
+	uncompress((Bytef*)destination, (uLongf*)&destLength,
+			(const Bytef*)source, (uLong)sourceLen);
+
+	fwrite(destination, 1, destLength, temp);
+
+	document.LoadFile(temp);
+
+	fclose(temp);
+
+	return true;
+}
+
+
 popen_streambuf::popen_streambuf()
 	:
 	fFile(NULL),
