@@ -88,7 +88,18 @@ HTTP::Get(const std::string path)
 	if (fFD < 0)
 		return -1;
 
-	return -1;
+	std::string fullPath = fHost + path;
+	HTTPRequestHeader requestHeader("GET", fullPath);
+	std::string string = requestHeader.ToString();
+
+	std::cout << "HTTP::GET: header:" << std::endl << string << std::endl;
+	if (::write(fFD, string.c_str(), string.length()) != (int)string.length()) {
+		std::cerr << "GET failed: " << std::endl;
+		fLastError = -1;
+		return -1;
+	}
+
+	return 0;
 }
 
 

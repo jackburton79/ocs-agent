@@ -23,9 +23,15 @@ public:
 	std::string Method() const;
 	std::string Path() const;
 
+	virtual std::string ToString() const;
+
 	void SetRequest(const std::string method, const std::string path,
 			int majorVer = 1, int minorVer = 1);
 	HTTPRequestHeader& operator=(const HTTPRequestHeader& header);
+
+private:
+	std::string fMethod;
+	std::string fPath;
 };
 
 #endif /* HTTPREQUESTHEADER_H_ */
