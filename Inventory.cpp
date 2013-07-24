@@ -15,9 +15,9 @@
 #include "VolumeReader.h"
 
 #include "http/HTTP.h"
-#include "http/HTTPResponseHeader.h"
 
 #include <memory>
+#include <stdlib.h>
 
 #include <tinyxml.h>
 
@@ -103,8 +103,8 @@ Inventory::Send(const char* serverUrl)
 	HTTP httpObject;
 	httpObject.SetHost(serverUrl);
 
-	/*if (httpObject.Get("") != 0) {
-		std::cerr << "Send: " << httpObject.ErrorString() << std::endl;
+	if (httpObject.Get("") != 0) {
+		std::cerr << "Inventory::Send: " << httpObject.ErrorString() << std::endl;
 		return false;
 	}
 
@@ -113,8 +113,8 @@ Inventory::Send(const char* serverUrl)
 		return false;
 	}
 
-	std::cout << "Success!" << std::endl;
-*/
+	std::cout << httpObject.LastResponse().ToString() << std::endl;
+
 	std::string inventoryUrl(serverUrl);
 	inventoryUrl.append("/ocsinventory");
 
@@ -144,17 +144,45 @@ Inventory::Send(const char* serverUrl)
 
 	delete[] prologData;
 
-	// TODO: Get the XML response
+	const HTTPResponseHeader& responseHeader = httpObject.LastResponse();
+	if (responseHeader.StatusCode() == 200
+			&& responseHeader.HasContentLength()) {
+		size_t contentLength =
+				::strtol(responseHeader.Value(HTTPContentLength).c_str(),
+						NULL, 10);
+		char* resultData = new char[contentLength];
+		if (httpObject.Read(resultData, contentLength) < (int)contentLength) {
+			delete[] resultData;
+			std::cerr << "Failed to read XML response!" << std::endl;
+			return false;
+		}
 
+		// TODO: Do something with the XML response
+
+		delete[] resultData;
+	}
 
 	// TODO: Send the inventory
 
 	char* compressedData = NULL;
 	size_t compressedSize;
-	if (!_PrepareData("./test.xml", compressedData, compressedSize)) {
-
+	if (!CompressXml(*fDocument, compressedData, compressedSize)) {
+		std::cerr << "Error compressing inventory XML" << std::endl;
 		return false;
 	}
+
+	requestHeader = HTTPRequestHeader();
+	requestHeader.SetRequest("POST", fullString);
+	requestHeader.SetContentType("application/x-compress");
+	requestHeader.SetContentLength(compressedSize);
+	requestHeader.SetUserAgent("OCS-NG_unified_unix_agent_v");
+	if (httpObject.Request(requestHeader, compressedData) != 0) {
+		delete[] compressedData;
+		std::cerr << "Send: " << httpObject.ErrorString() << std::endl;
+		return false;
+	}
+
+	delete[] compressedData;
 
 	return true;
 }
@@ -538,13 +566,6 @@ Inventory::_AddUsersInfo(TiXmlElement* parent)
 		users->LinkEndChild(login);
 	}
 	parent->LinkEndChild(users);
-}
-
-
-bool
-Inventory::_PrepareData(const char* fileName, char*& outData, size_t& outSize)
-{
-	return CompressXml(*fDocument, outData, outSize);
 }
 
 
