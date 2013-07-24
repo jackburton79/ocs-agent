@@ -5,6 +5,7 @@
  *      Author: stefano
  */
 
+#include "HTTPDefines.h"
 #include "HTTPResponseHeader.h"
 
 #include <iostream>
@@ -60,10 +61,10 @@ HTTPResponseHeader::StatusCode() const
 std::string
 HTTPResponseHeader::ToString() const
 {
-	// TODO:
 	std::string string;
+	string.append(fText).append(CRLF);
 	string.append(HTTPHeader::ToString());
-	string.append(fText);
+
 	return string;
 }
 
