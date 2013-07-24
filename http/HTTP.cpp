@@ -151,18 +151,10 @@ HTTP::Request(HTTPRequestHeader& header, const void* data, size_t length)
 			return errno;
 		}
 	}
-
-	std::ostringstream reply;
-	char byte;
-	size_t sizeRead = 0;
-	while ((sizeRead = ::read(fFD, &byte, 1)) > 0) {
-		reply.write(&byte, sizeRead);
-		if (byte == '\012')
-			break;
-	}
-
 	std::cout << "Read reply" << std::endl;
-	std::string replyString = reply.str();
+	std::string replyString;// = reply.str();
+	_ReadLineFromSocket(replyString, fFD);
+
 	// Read back status
 	size_t pos = replyString.find('\012');
 	if (pos == std::string::npos) {
@@ -240,6 +232,25 @@ HTTP::_HandleConnectionIfNeeded(const std::string string, const int port)
 	}
 
 	fLastError = 0;
+
+	return true;
+}
+
+
+/* static */
+bool
+HTTP::_ReadLineFromSocket(std::string& string, int socket)
+{
+	std::ostringstream s;
+	char byte;
+	size_t sizeRead = 0;
+	while ((sizeRead = ::read(socket, &byte, 1)) > 0) {
+		s.write(&byte, sizeRead);
+		if (byte == '\012')
+			break;
+	}
+
+	string = s.str();
 
 	return true;
 }
