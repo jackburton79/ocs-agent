@@ -101,17 +101,17 @@ bool
 Inventory::Send(const char* serverUrl)
 {
 	HTTP httpObject;
-	if (httpObject.Connect(serverUrl) < 0) {
-		std::cerr << "Error opening HTTP connection: " << httpObject.ErrorString() << std::endl;
-		return false;
-	}
+	httpObject.SetHost(serverUrl);
 
 	if (httpObject.Get("") != 0) {
 		std::cerr << "Send: " << httpObject.ErrorString() << std::endl;
 		return false;
 	}
 
-	std::cout << httpObject.LastResponse().ToString() << std::endl;
+	if (httpObject.LastResponse().StatusCode() != 200) {
+		std::cout << httpObject.LastResponse().ToString() << std::endl;
+		return false;
+	}
 
 	std::string inventoryUrl(serverUrl);
 	inventoryUrl.append("/ocsinventory");
@@ -127,9 +127,13 @@ Inventory::Send(const char* serverUrl)
 		return false;
 	}
 
-	// content_type: "application/x-compress"
-	// content_length: prologLength
-	if (httpObject.Post("/ocsinventory", prologData) != 0) {
+	std::string fullString = serverUrl;
+	fullString.append("/ocsinventory");
+	HTTPRequestHeader requestHeader;
+	requestHeader.SetRequest("POST", fullString);
+	requestHeader.SetContentLength(prologLength);
+	requestHeader.SetContentType("application/x-compress");
+	if (httpObject.Request(requestHeader, prologData) != 0) {
 		delete[] prologData;
 		std::cerr << "Send: " << httpObject.ErrorString() << std::endl;
 		return false;
@@ -148,7 +152,6 @@ Inventory::Send(const char* serverUrl)
 
 		return false;
 	}
-
 
 	return false;
 }

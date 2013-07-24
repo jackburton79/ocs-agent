@@ -10,6 +10,7 @@
 
 
 std::string HTTPContentType = "Content-type";
+std::string HTTPHost = "Host";
 std::string HTTPContentLength = "Content-length";
 std::string HTTPUserAgent = "User-Agent";
 std::string HTTPProtocolPrefix = "http://";

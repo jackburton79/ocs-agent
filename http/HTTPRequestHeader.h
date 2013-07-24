@@ -30,6 +30,8 @@ public:
 
 	void SetRequest(const std::string method, const std::string path,
 			int majorVer = 1, int minorVer = 1);
+	void SetHost(const std::string host, const int port = 80);
+
 	HTTPRequestHeader& operator=(const HTTPRequestHeader& header);
 
 private:

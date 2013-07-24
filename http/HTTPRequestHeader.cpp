@@ -77,9 +77,8 @@ HTTPRequestHeader::ToString() const
 	string.append(fMethod).append(" ");
 	string.append(resource).append(" ");
 	string.append("HTTP/1.1").append(CRLF);
-	string.append("Host: ").append(host);
-	string.append(CRLF);
-	string.append(fUserAgent).append(CRLF);
+	string.append("Host: ").append(host).append(CRLF);
+	string.append(HTTPUserAgent).append(": ").append(fUserAgent).append(CRLF);
 
 	string.append(HTTPHeader::ToString());
 
@@ -93,6 +92,13 @@ HTTPRequestHeader::SetRequest(const std::string method,
 {
 	fMethod = method;
 	fPath = path;
+}
+
+
+void
+HTTPRequestHeader::SetHost(const std::string host, const int port)
+{
+	fValues["Host"] = host;
 }
 
 

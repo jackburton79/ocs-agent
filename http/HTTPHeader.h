@@ -33,6 +33,7 @@ public:
 	virtual std::string ToString() const;
 	std::string Value(const std::string key) const;
 
+
 	HTTPHeader& operator=(const HTTPHeader&);
 
 protected:

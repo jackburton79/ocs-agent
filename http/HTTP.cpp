@@ -30,13 +30,15 @@ HTTP::HTTP()
 }
 
 
-HTTP::HTTP(const std::string hostName, int port)
+HTTP::HTTP(const std::string string, int port)
 	:
 	fPort(-1),
 	fFD(-1),
 	fLastError(0)
 {
-	Connect(hostName, port);
+	std::string hostName = _HostFromConnectionString(string);
+	fHost = hostName;
+	fPort = port;
 }
 
 
@@ -86,7 +88,7 @@ HTTP::ErrorString() const
 int
 HTTP::Get(const std::string path)
 {
-	if (fFD < 0)
+	if (!_HandleConnectionIfNeeded(path))
 		return -1;
 
 	std::string fullPath = fHost + path;
@@ -99,26 +101,37 @@ HTTP::Get(const std::string path)
 #endif
 	if (::write(fFD, string.c_str(), string.length())
 			!= (int)string.length()) {
-		fLastError = -1;
-		return -1;
+		fLastError = errno;
+		return errno;
 	}
 
-	std::ostringstream stream;
+	std::ostringstream reply;
 	char buffer[256];
 	size_t sizeRead = 0;
-	while ((sizeRead = ::read(fFD, buffer, sizeof(buffer))) > 0)
-		stream.write(buffer, sizeRead);
+	while ((sizeRead = ::read(fFD, buffer, sizeof(buffer))) > 0) {
+		reply.write(buffer, sizeRead);
+	}
 
+	std::string replyString = reply.str();
 	// Read back status
-	size_t pos = stream.str().find('\012');
+	size_t pos = replyString.find('\012');
 	if (pos == std::string::npos) {
 		fLastError = -1;
 		return -1;
 	}
 
-	std::string statusLine = stream.str().substr(0, pos);
+
+	std::string statusLine = replyString.substr(0, pos);
 	int code;
 	::sscanf(statusLine.c_str(), "HTTP/1.%*d %03d", (int*)&code);
+
+	pos = replyString.find(HTTPContentLength);
+	if (pos != std::string::npos) {
+		size_t endPos = replyString.find('\012', pos);
+		std::string contentLengthString = replyString.substr(pos, endPos);
+		std::cout << "Content length: " << contentLengthString << std::endl;
+	}
+
 
 	fLastResponse.SetStatusLine(code, statusLine.c_str());
 
@@ -135,56 +148,93 @@ HTTP::LastResponse() const
 }
 
 
+
+int
+HTTP::SetHost(const std::string hostName, int port)
+{
+	fHost = _HostFromConnectionString(hostName);
+	fPort = port;
+	fLastError = 0;
+
+	std::cout << "Host set to " << fHost << std::endl;
+	return 0;
+}
+
+
 int
 HTTP::Post(const std::string path, char* data)
 {
 	if (fFD < 0)
 		return -1;
+
+	std::string fullPath = fHost + path;
+	HTTPRequestHeader requestHeader("POST", fullPath);
+	fCurrentRequest = requestHeader;
+	std::string string = requestHeader.ToString();
+
+#if 1
+	std::cout << "HTTP::POST: header:" << std::endl << string << std::endl;
+#endif
+	if (::write(fFD, string.c_str(), string.length())
+			!= (int)string.length()) {
+		fLastError = -1;
+		return -1;
+	}
+
+	std::ostringstream reply;
+	char buffer[256];
+	size_t sizeRead = 0;
+	while ((sizeRead = ::read(fFD, buffer, sizeof(buffer))) > 0) {
+		reply.write(buffer, sizeRead);
+	}
+
+	std::string replyString = reply.str();
+	// Read back status
+	size_t pos = replyString.find('\012');
+	if (pos == std::string::npos) {
+		fLastError = -1;
+		return -1;
+	}
+
+
+	std::string statusLine = replyString.substr(0, pos);
+	int code;
+	::sscanf(statusLine.c_str(), "HTTP/1.%*d %03d", (int*)&code);
+
+	pos = replyString.find(HTTPContentLength);
+	if (pos != std::string::npos) {
+		size_t endPos = replyString.find('\012', pos);
+		std::string contentLengthString = replyString.substr(pos, endPos);
+		std::cout << "Content length: " << contentLengthString << std::endl;
+	}
+
+
+	fLastResponse.SetStatusLine(code, statusLine.c_str());
+
+	// TODO: Read actual data from the ostringstream object
 	return -1;
 }
 
 
 int
-HTTP::Connect(const std::string string, int port)
+HTTP::Request(HTTPRequestHeader& header, const void* data)
 {
-	// TODO: Return an "already connected" error, or close and open a new
-	// connection
-	if (fFD >= 0) {
-		std::cerr << "HTTP::Connect: already connected" << std::endl;
+	if (!_HandleConnectionIfNeeded(header.Value(HTTPHost)))
+		return -1;
+
+	fCurrentRequest = header;
+	std::string string = header.ToString();
+
+#if 1
+	std::cout << "HTTP::POST: header:" << std::endl << string << std::endl;
+#endif
+	if (::write(fFD, string.c_str(), string.length())
+			!= (int)string.length()) {
+		fLastError = -1;
 		return -1;
 	}
 
-	std::string hostName = _HostFromConnectionString(string);
-
-	fHost = hostName;
-	fPort = port;
-
-	struct hostent* hostEnt = ::gethostbyname(fHost.c_str());
-	if (hostEnt == NULL) {
-		fLastError = h_errno;
-		return fLastError;
-	}
-
-	if ((fFD = ::socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-		fLastError = errno;
-		return fLastError;
-	}
-
-	::setsockopt(fFD, SOL_SOCKET, SO_KEEPALIVE, 0, 0);
-
-	struct sockaddr_in serverAddr;
-	::memset((char*)&serverAddr,0, sizeof(serverAddr));
-	::memcpy((char*)&serverAddr.sin_addr, hostEnt->h_addr, hostEnt->h_length);
-	serverAddr.sin_family = hostEnt->h_addrtype;
-	serverAddr.sin_port = (unsigned short)htons(fPort);
-	if (::connect(fFD, (const struct sockaddr*)&serverAddr,
-			sizeof(serverAddr)) < 0) {
-		fLastError = errno;
-		return fLastError;
-	}
-
-	fLastError = 0;
-	return fFD;
+	return -1;
 }
 
 
@@ -197,4 +247,58 @@ HTTP::_HostFromConnectionString(std::string string) const
 		return string;
 
 	return string.substr(HTTPProtocolPrefix.length(), std::string::npos);
+}
+
+
+bool
+HTTP::_HandleConnectionIfNeeded(const std::string string, const int port)
+{
+	std::string hostName = _HostFromConnectionString(string);
+
+	if (fFD >= 0) {
+		if (hostName == "" || (hostName == fHost && port == fPort)) {
+			// TODO: Return an "already connected" error, or close and open a new
+			// connection
+			std::cerr << "HTTP::Connect: already connected" << std::endl;
+			return true;
+		}
+		close(fFD);
+		fFD = -1;
+	}
+
+	if (hostName != "") {
+		fHost = hostName;
+		fPort = port;
+	}
+	std::cout << "_HandleConnectionIfNeeded: connect to ";
+	std::cout << fHost << std::endl;
+
+	struct hostent* hostEnt = ::gethostbyname(fHost.c_str());
+	if (hostEnt == NULL) {
+		fLastError = h_errno;
+		return false;
+	}
+
+	if ((fFD = ::socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+		fLastError = errno;
+		return false;
+	}
+
+	::setsockopt(fFD, SOL_SOCKET, SO_KEEPALIVE, 0, 0);
+
+	struct sockaddr_in serverAddr;
+	::memset((char*)&serverAddr,0, sizeof(serverAddr));
+	::memcpy((char*)&serverAddr.sin_addr, hostEnt->h_addr, hostEnt->h_length);
+	serverAddr.sin_family = hostEnt->h_addrtype;
+	serverAddr.sin_port = (unsigned short)htons(fPort);
+
+	if (::connect(fFD, (const struct sockaddr*)&serverAddr,
+			sizeof(serverAddr)) < 0) {
+		fLastError = errno;
+		return false;
+	}
+
+	fLastError = 0;
+
+	return true;
 }
