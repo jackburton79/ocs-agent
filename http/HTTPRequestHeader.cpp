@@ -108,7 +108,7 @@ HTTPRequestHeader::SetRequest(const std::string method,
 HTTPRequestHeader&
 HTTPRequestHeader::operator=(const HTTPRequestHeader& header)
 {
-	fValues = header.fValues;
+	HTTPHeader::operator=(header);
 
 	SetRequest(header.fMethod, header.fPath);
 	fUserAgent = header.fUserAgent;
