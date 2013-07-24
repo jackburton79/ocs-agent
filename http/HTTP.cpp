@@ -36,7 +36,7 @@ HTTP::HTTP(const std::string string, int port)
 	fFD(-1),
 	fLastError(0)
 {
-	std::string hostName = _HostFromConnectionString(string);
+	std::string hostName = HostFromConnectionString(string);
 	fHost = hostName;
 	fPort = port;
 }
@@ -67,7 +67,7 @@ HTTP::ClearPendingRequests()
 HTTPRequestHeader
 HTTP::CurrentRequest() const
 {
-	return HTTPRequestHeader();
+	return fCurrentRequest;
 }
 
 
@@ -88,56 +88,9 @@ HTTP::ErrorString() const
 int
 HTTP::Get(const std::string path)
 {
-	if (!_HandleConnectionIfNeeded(path))
-		return -1;
+	HTTPRequestHeader requestHeader("GET", path);
 
-	std::string fullPath = fHost + path;
-	HTTPRequestHeader requestHeader("GET", fullPath);
-	fCurrentRequest = requestHeader;
-	std::string string = requestHeader.ToString();
-
-#if 1
-	std::cout << "HTTP::GET: header:" << std::endl << string << std::endl;
-#endif
-	if (::write(fFD, string.c_str(), string.length())
-			!= (int)string.length()) {
-		fLastError = errno;
-		return errno;
-	}
-
-	std::ostringstream reply;
-	char buffer[256];
-	size_t sizeRead = 0;
-	while ((sizeRead = ::read(fFD, buffer, sizeof(buffer))) > 0) {
-		reply.write(buffer, sizeRead);
-	}
-
-	std::string replyString = reply.str();
-	// Read back status
-	size_t pos = replyString.find('\012');
-	if (pos == std::string::npos) {
-		fLastError = -1;
-		return -1;
-	}
-
-
-	std::string statusLine = replyString.substr(0, pos);
-	int code;
-	::sscanf(statusLine.c_str(), "HTTP/1.%*d %03d", (int*)&code);
-
-	pos = replyString.find(HTTPContentLength);
-	if (pos != std::string::npos) {
-		size_t endPos = replyString.find('\012', pos);
-		std::string contentLengthString = replyString.substr(pos, endPos);
-		std::cout << "Content length: " << contentLengthString << std::endl;
-	}
-
-
-	fLastResponse.SetStatusLine(code, statusLine.c_str());
-
-	// TODO: Read actual data from the ostringstream object
-
-	return 0;
+	return Request(requestHeader);
 }
 
 
@@ -152,7 +105,7 @@ HTTP::LastResponse() const
 int
 HTTP::SetHost(const std::string hostName, int port)
 {
-	fHost = _HostFromConnectionString(hostName);
+	fHost = HostFromConnectionString(hostName);
 	fPort = port;
 	fLastError = 0;
 
@@ -167,20 +120,33 @@ HTTP::Post(const std::string path, char* data)
 	if (fFD < 0)
 		return -1;
 
-	std::string fullPath = fHost + path;
-	HTTPRequestHeader requestHeader("POST", fullPath);
-	fCurrentRequest = requestHeader;
-	std::string string = requestHeader.ToString();
+	HTTPRequestHeader requestHeader("POST", path);
+
+	// TODO: Read actual data from the ostringstream object
+	return Request(requestHeader, data);
+}
+
+
+int
+HTTP::Request(HTTPRequestHeader& header, const void* data)
+{
+	if (!_HandleConnectionIfNeeded(header.Path()))
+		return -1;
+
+	fCurrentRequest = header;
+	if (fCurrentRequest.Path() == "")
+		fCurrentRequest.SetValue(HTTPHost, fHost);
+
+	std::string string = fCurrentRequest.ToString();
 
 #if 1
-	std::cout << "HTTP::POST: header:" << std::endl << string << std::endl;
+	std::cout << "HTTP::Request: header:" << std::endl << string << std::endl;
 #endif
 	if (::write(fFD, string.c_str(), string.length())
 			!= (int)string.length()) {
 		fLastError = -1;
 		return -1;
 	}
-
 	std::ostringstream reply;
 	char buffer[256];
 	size_t sizeRead = 0;
@@ -195,7 +161,6 @@ HTTP::Post(const std::string path, char* data)
 		fLastError = -1;
 		return -1;
 	}
-
 
 	std::string statusLine = replyString.substr(0, pos);
 	int code;
@@ -212,48 +177,15 @@ HTTP::Post(const std::string path, char* data)
 	fLastResponse.SetStatusLine(code, statusLine.c_str());
 
 	// TODO: Read actual data from the ostringstream object
-	return -1;
-}
 
-
-int
-HTTP::Request(HTTPRequestHeader& header, const void* data)
-{
-	if (!_HandleConnectionIfNeeded(header.Value(HTTPHost)))
-		return -1;
-
-	fCurrentRequest = header;
-	std::string string = header.ToString();
-
-#if 1
-	std::cout << "HTTP::POST: header:" << std::endl << string << std::endl;
-#endif
-	if (::write(fFD, string.c_str(), string.length())
-			!= (int)string.length()) {
-		fLastError = -1;
-		return -1;
-	}
-
-	return -1;
-}
-
-
-std::string
-HTTP::_HostFromConnectionString(std::string string) const
-{
-	// TODO: Remove port if specified
-	size_t prefixPos = string.find(HTTPProtocolPrefix);
-	if (prefixPos == std::string::npos)
-		return string;
-
-	return string.substr(HTTPProtocolPrefix.length(), std::string::npos);
+	return 0;
 }
 
 
 bool
 HTTP::_HandleConnectionIfNeeded(const std::string string, const int port)
 {
-	std::string hostName = _HostFromConnectionString(string);
+	std::string hostName = HostFromConnectionString(string);
 
 	if (fFD >= 0) {
 		if (hostName == "" || (hostName == fHost && port == fPort)) {
@@ -270,6 +202,7 @@ HTTP::_HandleConnectionIfNeeded(const std::string string, const int port)
 		fHost = hostName;
 		fPort = port;
 	}
+
 	std::cout << "_HandleConnectionIfNeeded: connect to ";
 	std::cout << fHost << std::endl;
 

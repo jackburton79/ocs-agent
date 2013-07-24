@@ -18,6 +18,6 @@ extern std::string HTTPContentType;
 extern std::string HTTPContentLength;
 extern std::string HTTPUserAgent;
 
-
+extern std::string HostFromConnectionString(std::string string);
 
 #endif /* HTTPDEFINES_H_ */
