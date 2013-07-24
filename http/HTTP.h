@@ -10,6 +10,7 @@
 
 #include <string>
 
+#include "HTTPDefines.h"
 #include "HTTPRequestHeader.h"
 #include "HTTPResponseHeader.h"
 
@@ -20,8 +21,8 @@ public:
 	~HTTP();
 
 	void Close();
-
 	void ClearPendingRequests();
+
 	HTTPRequestHeader CurrentRequest() const;
 	int Error() const;
 	std::string ErrorString() const;
@@ -33,6 +34,8 @@ public:
 
 	int Request(HTTPRequestHeader& header, const void* data = NULL,
 			size_t dataLength = 0);
+
+	int Read(void* data, const size_t& length);
 
 private:
 	bool _HandleConnectionIfNeeded(const std::string host, const int port = 80);

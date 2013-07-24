@@ -123,6 +123,16 @@ HTTP::Post(const std::string path, char* data)
 
 
 int
+HTTP::Read(void* data,  const size_t& length)
+{
+	if (::read(fFD, data, length) != (int)length)
+		return errno;
+
+	return length;
+}
+
+
+int
 HTTP::Request(HTTPRequestHeader& header, const void* data, size_t length)
 {
 	if (!_HandleConnectionIfNeeded(header.Path()))
