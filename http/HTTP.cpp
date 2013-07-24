@@ -157,21 +157,16 @@ HTTP::Request(HTTPRequestHeader& header, const void* data, size_t length)
 	int code;
 	::sscanf(statusLine.c_str(), "HTTP/1.%*d %03d", (int*)&code);
 
-	while (_ReadLineFromSocket(replyString, fFD)) {
-		std::cout << replyString << std::endl;
-	}
-
-	size_t pos = replyString.find(HTTPContentLength);
-	if (pos != std::string::npos) {
-		size_t endPos = replyString.find('\012', pos);
-		std::string contentLengthString = replyString.substr(pos, endPos);
-		std::cout << "Content length: " << contentLengthString << std::endl;
-	}
-
-
+	// TODO: Add a Clear() method
+	fLastResponse = HTTPResponseHeader();
 	fLastResponse.SetStatusLine(code, statusLine.c_str());
+	while (_ReadLineFromSocket(replyString, fFD)) {
+		size_t pos = replyString.find(":");
+		fLastResponse.SetValue(replyString.substr(0, pos),
+				replyString.substr(pos + 1, std::string::npos));
+	}
 
-	// TODO: Read actual data from the ostringstream object
+	// TODO: Read content data and make it available in some way
 
 	return 0;
 }
