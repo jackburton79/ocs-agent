@@ -67,21 +67,25 @@ std::string
 HTTPRequestHeader::ToString() const
 {
 	std::cout << "HTTPRequestHeader: " << fPath << std::endl;
+
+	std::string string = CRLF;
 	std::string host = fPath;
 	std::string resource = "/";
-	size_t pos = fPath.find("/");
+	size_t pos = fPath.find("//");
+	pos = fPath.find("/", pos + 2);
 	if (pos != std::string::npos) {
 		host = fPath.substr(0, pos);
 		resource = fPath.substr(pos, std::string::npos);
 	}
-	std::string string;
 	string.append(fMethod).append(" ");
 	string.append(resource).append(" ");
 	string.append("HTTP/1.1").append(CRLF);
-	//string.append("Host: ").append(host).append(CRLF);
-	string.append(HTTPUserAgent).append(": ").append(fUserAgent).append(CRLF);
 
 	string.append(HTTPHeader::ToString());
+
+	string.append(HTTPUserAgent).append(": ").append(fUserAgent).append(CRLF);
+
+
 
 	return string;
 }
@@ -105,6 +109,8 @@ HTTPRequestHeader::SetRequest(const std::string method,
 HTTPRequestHeader&
 HTTPRequestHeader::operator=(const HTTPRequestHeader& header)
 {
+	fValues = header.fValues;
+
 	SetRequest(header.fMethod, header.fPath);
 	fUserAgent = header.fUserAgent;
 	return *this;

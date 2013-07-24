@@ -24,7 +24,7 @@ public:
 
 	bool HasContentLength() const;
 	bool HasContentType() const;
-	bool HasKey(const std::string key);
+	bool HasKey(const std::string key) const;
 
 	void SetContentLength(int len);
 	void SetContentType(const std::string type);

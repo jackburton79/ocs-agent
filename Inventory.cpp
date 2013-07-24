@@ -103,16 +103,18 @@ Inventory::Send(const char* serverUrl)
 	HTTP httpObject;
 	httpObject.SetHost(serverUrl);
 
-	if (httpObject.Get("") != 0) {
+	/*if (httpObject.Get("") != 0) {
 		std::cerr << "Send: " << httpObject.ErrorString() << std::endl;
 		return false;
 	}
 
 	if (httpObject.LastResponse().StatusCode() != 200) {
-		std::cout << httpObject.LastResponse().ToString() << std::endl;
+		std::cerr << httpObject.LastResponse().ToString() << std::endl;
 		return false;
 	}
 
+	std::cout << "Success!" << std::endl;
+*/
 	std::string inventoryUrl(serverUrl);
 	inventoryUrl.append("/ocsinventory");
 
@@ -133,7 +135,9 @@ Inventory::Send(const char* serverUrl)
 	requestHeader.SetRequest("POST", fullString);
 	requestHeader.SetContentLength(prologLength);
 	requestHeader.SetContentType("application/x-compress");
-	if (httpObject.Request(requestHeader, prologData) != 0) {
+	requestHeader.SetUserAgent("OCS-NG_unified_unix_agent_v");
+	//if (httpObject.Request(requestHeader, prologData) != 0) {
+	if (httpObject.Request(requestHeader, NULL)) {
 		delete[] prologData;
 		std::cerr << "Send: " << httpObject.ErrorString() << std::endl;
 		return false;
@@ -153,7 +157,7 @@ Inventory::Send(const char* serverUrl)
 		return false;
 	}
 
-	return false;
+	return true;
 }
 
 

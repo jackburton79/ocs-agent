@@ -109,7 +109,6 @@ HTTP::SetHost(const std::string hostName, int port)
 	fPort = port;
 	fLastError = 0;
 
-	std::cout << "Host set to " << fHost << std::endl;
 	return 0;
 }
 
@@ -117,9 +116,6 @@ HTTP::SetHost(const std::string hostName, int port)
 int
 HTTP::Post(const std::string path, char* data)
 {
-	if (fFD < 0)
-		return -1;
-
 	HTTPRequestHeader requestHeader("POST", path);
 
 	// TODO: Read actual data from the ostringstream object
@@ -137,23 +133,25 @@ HTTP::Request(HTTPRequestHeader& header, const void* data)
 	if (fCurrentRequest.Path() == "")
 		fCurrentRequest.SetValue(HTTPHost, fHost);
 
-	std::string string = fCurrentRequest.ToString();
+	std::string string = fCurrentRequest.ToString().append(CRLF);
 
 #if 1
 	std::cout << "HTTP::Request: header:" << std::endl << string << std::endl;
 #endif
 	if (::write(fFD, string.c_str(), string.length())
 			!= (int)string.length()) {
-		fLastError = -1;
-		return -1;
+		fLastError = errno;
+		return errno;
 	}
+
 	std::ostringstream reply;
 	char buffer[256];
 	size_t sizeRead = 0;
-	while ((sizeRead = ::read(fFD, buffer, sizeof(buffer))) > 0) {
+	while ((sizeRead = ::read(fFD, buffer, 1)) > 0) {
 		reply.write(buffer, sizeRead);
 	}
 
+	std::cout << "Read reply" << std::endl;
 	std::string replyString = reply.str();
 	// Read back status
 	size_t pos = replyString.find('\012');

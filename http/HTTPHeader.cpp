@@ -85,7 +85,7 @@ HTTPHeader::HasContentType() const
 
 
 bool
-HTTPHeader::HasKey(const std::string key)
+HTTPHeader::HasKey(const std::string key) const
 {
 	std::map<std::string, std::string>::const_iterator i;
 	i = fValues.find(key);
@@ -121,15 +121,19 @@ std::string
 HTTPHeader::ToString() const
 {
 	std::string string;
+	if (HasKey(HTTPHost)) {
+		//std::cout << "Has host" << std::endl;
+		string.append(HTTPHost).append(": ").append(Value(HTTPHost)).append(CRLF);
+	}
 	std::map<std::string, std::string>::const_iterator i;
 	for (i = fValues.begin(); i != fValues.end(); i++) {
+		if (i->first == HTTPHost)
+			continue;
 		string.append(i->first);
 		string.append(": ");
 		string.append(i->second);
 		string.append(CRLF);
 	}
-
-	string.append(CRLF);
 
 	return string;
 }
@@ -147,7 +151,7 @@ HTTPHeader::Value(const std::string key) const
 
 
 HTTPHeader&
-HTTPHeader::operator =(const HTTPHeader& header)
+HTTPHeader::operator=(const HTTPHeader& header)
 {
 	fValues = header.fValues;
 	return *this;
