@@ -101,7 +101,6 @@ HTTP::LastResponse() const
 }
 
 
-
 int
 HTTP::SetHost(const std::string hostName, int port)
 {
@@ -144,29 +143,25 @@ HTTP::Request(HTTPRequestHeader& header, const void* data, size_t length)
 		return errno;
 	}
 
-	std::cout << "Written " << std::endl;
 	if (data != NULL && length != 0) {
 		if (::write(fFD, data, length) != (int)length) {
 			fLastError = errno;
 			return errno;
 		}
 	}
-	std::cout << "Read reply" << std::endl;
-	std::string replyString;// = reply.str();
+
+	std::string replyString;
 	_ReadLineFromSocket(replyString, fFD);
 
-	// Read back status
-	size_t pos = replyString.find('\012');
-	if (pos == std::string::npos) {
-		fLastError = -1;
-		return -1;
-	}
-
-	std::string statusLine = replyString.substr(0, pos);
+	std::string statusLine = replyString;
 	int code;
 	::sscanf(statusLine.c_str(), "HTTP/1.%*d %03d", (int*)&code);
 
-	pos = replyString.find(HTTPContentLength);
+	while (_ReadLineFromSocket(replyString, fFD)) {
+		std::cout << replyString << std::endl;
+	}
+
+	size_t pos = replyString.find(HTTPContentLength);
 	if (pos != std::string::npos) {
 		size_t endPos = replyString.find('\012', pos);
 		std::string contentLengthString = replyString.substr(pos, endPos);
@@ -242,12 +237,16 @@ HTTP::_ReadLineFromSocket(std::string& string, int socket)
 	char byte;
 	size_t sizeRead = 0;
 	while ((sizeRead = ::read(socket, &byte, 1)) > 0) {
-		s.write(&byte, sizeRead);
 		if (byte == '\012')
 			break;
+		if (byte != '\015')
+			s.write(&byte, sizeRead);
 	}
 
 	string = s.str();
+
+	if (string == "")
+		return false;
 
 	return true;
 }
