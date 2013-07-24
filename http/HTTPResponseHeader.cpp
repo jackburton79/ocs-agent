@@ -71,7 +71,10 @@ HTTPResponseHeader::ToString() const
 HTTPResponseHeader&
 HTTPResponseHeader::operator=(const HTTPResponseHeader& header)
 {
+	fValues = header.fValues;
+
 	fText = header.fText;
 	fCode = header.fCode;
+
 	return *this;
 }
