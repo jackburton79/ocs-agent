@@ -203,9 +203,6 @@ HTTP::_HandleConnectionIfNeeded(const std::string string, const int port)
 		fPort = port;
 	}
 
-	std::cout << "_HandleConnectionIfNeeded: connect to ";
-	std::cout << fHost << std::endl;
-
 	struct hostent* hostEnt = ::gethostbyname(fHost.c_str());
 	if (hostEnt == NULL) {
 		fLastError = h_errno;

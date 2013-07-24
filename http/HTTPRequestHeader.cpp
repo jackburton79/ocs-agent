@@ -68,7 +68,7 @@ HTTPRequestHeader::ToString() const
 {
 	std::cout << "HTTPRequestHeader: " << fPath << std::endl;
 
-	std::string string = CRLF;
+	std::string string;
 	std::string host = fPath;
 	std::string resource = "/";
 	size_t pos = fPath.find("//");
@@ -82,7 +82,6 @@ HTTPRequestHeader::ToString() const
 	string.append("HTTP/1.1").append(CRLF);
 
 	if (HasKey(HTTPHost)) {
-		//std::cout << "Has host" << std::endl;
 		string.append(HTTPHost).append(": ").append(Value(HTTPHost)).append(CRLF);
 	}
 	string.append(HTTPUserAgent).append(": ").append(fUserAgent).append(CRLF);
@@ -98,7 +97,6 @@ void
 HTTPRequestHeader::SetRequest(const std::string method,
 		const std::string path, int majorVer, int minorVer)
 {
-	std::cout << "HTTPRequestHeader::SetRequest:Path: " << path << std::endl;
 	fMethod = method;
 	fPath = path;
 

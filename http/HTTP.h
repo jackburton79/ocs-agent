@@ -37,6 +37,8 @@ public:
 private:
 	bool _HandleConnectionIfNeeded(const std::string host, const int port = 80);
 
+	static bool _ReadLineFromSocket(std::string& string, int socket);
+
 	std::string fHost;
 	int fPort;
 	int fFD;
