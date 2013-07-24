@@ -66,8 +66,6 @@ HTTPRequestHeader::Path() const
 std::string
 HTTPRequestHeader::ToString() const
 {
-	std::cout << "HTTPRequestHeader: " << fPath << std::endl;
-
 	std::string string;
 	std::string host = fPath;
 	std::string resource = "/";

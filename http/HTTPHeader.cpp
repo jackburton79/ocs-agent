@@ -158,5 +158,4 @@ HTTPHeader::operator=(const HTTPHeader& header)
 void
 HTTPHeader::_Init()
 {
-	fValues["Keep-Alive"] = "300";
 }
