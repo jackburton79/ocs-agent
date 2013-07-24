@@ -81,10 +81,13 @@ HTTPRequestHeader::ToString() const
 	string.append(resource).append(" ");
 	string.append("HTTP/1.1").append(CRLF);
 
-	string.append(HTTPHeader::ToString());
-
+	if (HasKey(HTTPHost)) {
+		//std::cout << "Has host" << std::endl;
+		string.append(HTTPHost).append(": ").append(Value(HTTPHost)).append(CRLF);
+	}
 	string.append(HTTPUserAgent).append(": ").append(fUserAgent).append(CRLF);
 
+	string.append(HTTPHeader::ToString());
 
 
 	return string;

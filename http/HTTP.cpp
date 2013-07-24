@@ -124,7 +124,7 @@ HTTP::Post(const std::string path, char* data)
 
 
 int
-HTTP::Request(HTTPRequestHeader& header, const void* data)
+HTTP::Request(HTTPRequestHeader& header, const void* data, size_t length)
 {
 	if (!_HandleConnectionIfNeeded(header.Path()))
 		return -1;
@@ -142,6 +142,13 @@ HTTP::Request(HTTPRequestHeader& header, const void* data)
 			!= (int)string.length()) {
 		fLastError = errno;
 		return errno;
+	}
+
+	if (data != NULL && length != 0) {
+		if (::write(fFD, data, length) != (int)length) {
+			fLastError = errno;
+			return errno;
+		}
 	}
 
 	std::ostringstream reply;
@@ -218,7 +225,7 @@ HTTP::_HandleConnectionIfNeeded(const std::string string, const int port)
 	::setsockopt(fFD, SOL_SOCKET, SO_KEEPALIVE, 0, 0);
 
 	struct sockaddr_in serverAddr;
-	::memset((char*)&serverAddr,0, sizeof(serverAddr));
+	::memset((char*)&serverAddr, 0, sizeof(serverAddr));
 	::memcpy((char*)&serverAddr.sin_addr, hostEnt->h_addr, hostEnt->h_length);
 	serverAddr.sin_family = hostEnt->h_addrtype;
 	serverAddr.sin_port = (unsigned short)htons(fPort);

@@ -133,11 +133,10 @@ Inventory::Send(const char* serverUrl)
 	fullString.append("/ocsinventory");
 	HTTPRequestHeader requestHeader;
 	requestHeader.SetRequest("POST", fullString);
-	requestHeader.SetContentLength(prologLength);
 	requestHeader.SetContentType("application/x-compress");
+	requestHeader.SetContentLength(prologLength);
 	requestHeader.SetUserAgent("OCS-NG_unified_unix_agent_v");
-	//if (httpObject.Request(requestHeader, prologData) != 0) {
-	if (httpObject.Request(requestHeader, NULL)) {
+	if (httpObject.Request(requestHeader, prologData) != 0) {
 		delete[] prologData;
 		std::cerr << "Send: " << httpObject.ErrorString() << std::endl;
 		return false;

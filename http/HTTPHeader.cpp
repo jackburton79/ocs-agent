@@ -121,10 +121,7 @@ std::string
 HTTPHeader::ToString() const
 {
 	std::string string;
-	if (HasKey(HTTPHost)) {
-		//std::cout << "Has host" << std::endl;
-		string.append(HTTPHost).append(": ").append(Value(HTTPHost)).append(CRLF);
-	}
+
 	std::map<std::string, std::string>::const_iterator i;
 	for (i = fValues.begin(); i != fValues.end(); i++) {
 		if (i->first == HTTPHost)
@@ -161,4 +158,5 @@ HTTPHeader::operator=(const HTTPHeader& header)
 void
 HTTPHeader::_Init()
 {
+	fValues["Keep-Alive"] = "300";
 }

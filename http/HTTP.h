@@ -31,7 +31,8 @@ public:
 	int Get(const std::string path);
 	int Post(const std::string path, char* data);
 
-	int Request(HTTPRequestHeader& header, const void* data = NULL);
+	int Request(HTTPRequestHeader& header, const void* data = NULL,
+			size_t dataLength = 0);
 
 private:
 	bool _HandleConnectionIfNeeded(const std::string host, const int port = 80);
