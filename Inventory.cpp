@@ -136,7 +136,7 @@ Inventory::Send(const char* serverUrl)
 	requestHeader.SetContentType("application/x-compress");
 	requestHeader.SetContentLength(prologLength);
 	requestHeader.SetUserAgent("OCS-NG_unified_unix_agent_v");
-	if (httpObject.Request(requestHeader, prologData) != 0) {
+	if (httpObject.Request(requestHeader, prologData, prologLength) != 0) {
 		delete[] prologData;
 		std::cerr << "Send: " << httpObject.ErrorString() << std::endl;
 		return false;
@@ -176,7 +176,7 @@ Inventory::Send(const char* serverUrl)
 	requestHeader.SetContentType("application/x-compress");
 	requestHeader.SetContentLength(compressedSize);
 	requestHeader.SetUserAgent("OCS-NG_unified_unix_agent_v");
-	if (httpObject.Request(requestHeader, compressedData) != 0) {
+	if (httpObject.Request(requestHeader, compressedData, compressedSize) != 0) {
 		delete[] compressedData;
 		std::cerr << "Send: " << httpObject.ErrorString() << std::endl;
 		return false;
