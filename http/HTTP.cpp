@@ -124,8 +124,10 @@ HTTP::Post(const std::string path, char* data)
 int
 HTTP::Read(void* data,  const size_t& length)
 {
-	if (::read(fFD, data, length) != (int)length)
+	if (::read(fFD, data, length) != (int)length) {
+		fLastError = errno;
 		return errno;
+	}
 
 	return length;
 }
