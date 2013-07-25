@@ -146,7 +146,7 @@ HTTP::Request(HTTPRequestHeader& header, const void* data, size_t length)
 	std::string string = fCurrentRequest.ToString().append(CRLF);
 
 #if 1
-	std::cout << "HTTP::Request: header:" << std::endl << string << std::endl;
+	std::cout << string << std::endl;
 #endif
 	if (::write(fFD, string.c_str(), string.length())
 			!= (int)string.length()) {
@@ -188,9 +188,7 @@ HTTP::_HandleConnectionIfNeeded(const std::string string, const int port)
 
 	if (fFD >= 0) {
 		if (hostName == "" || (hostName == fHost && port == fPort)) {
-			// TODO: Return an "already connected" error, or close and open a new
-			// connection
-			std::cerr << "HTTP::Connect: already connected" << std::endl;
+			// We are already connected to this host
 			return true;
 		}
 		close(fFD);
