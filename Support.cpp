@@ -58,25 +58,33 @@ CompressXml(const TiXmlDocument& document, char*& destination, size_t& destLengt
 bool
 UncompressXml(const char* source, size_t sourceLen, TiXmlDocument& document)
 {
+	std::cout << "UncompressXml: SourceLength: " << sourceLen << std::endl;
 	FILE* temp = tmpfile();
 	if (temp == NULL) {
+		std::cerr << "UncompressXml: cannot create temporary file" << std::endl;
 		return false;
 	}
 
-	// TODO: improve this
 	char* destination = new char[32768];
-	size_t destLength = 0;
+	size_t destLength = 32768;
 
-	uncompress((Bytef*)destination, (uLongf*)&destLength,
-			(const Bytef*)source, (uLong)sourceLen);
+	if (int status = uncompress((Bytef*)destination, (uLongf*)&destLength,
+			(const Bytef*)source, (uLong)sourceLen) != Z_OK) {
+		std::cerr << "UncompressXml: Failed to decompress XML: ";
+		std::cerr << zError(status) << std::endl;
+		delete[] destination;
+		fclose(temp);
+		return false;
+	}
 
 	fwrite(destination, 1, destLength, temp);
+	delete[] destination;
 
-	document.LoadFile(temp);
+	bool result = document.LoadFile(temp);
 
 	fclose(temp);
 
-	return true;
+	return result;
 }
 
 
