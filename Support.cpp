@@ -13,7 +13,8 @@
 #include <streambuf>
 #include <string.h>
 
-#include <tinyxml.h>
+#include "tinyxml/tinyxml.h"
+
 #include <zlib.h>
 
 bool

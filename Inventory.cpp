@@ -16,10 +16,12 @@
 
 #include "http/HTTP.h"
 
+#include <cstdlib>
+#include <iostream>
 #include <memory>
-#include <stdlib.h>
 
-#include <tinyxml.h>
+
+#include "tinyxml/tinyxml.h"
 
 
 Inventory::Inventory()
@@ -387,7 +389,7 @@ Inventory::_AddHardwareInfo(TiXmlElement* parent)
 
     TiXmlElement* osName = new TiXmlElement("OSNAME");
     // TODO: Fix this
-    osName->LinkEndChild(new TiXmlText("openSUSE 12.1 (i586)"));
+    osName->LinkEndChild(new TiXmlText("Thinstation (i586)"));
 
     TiXmlElement* osVersion = new TiXmlElement("OSVERSION");
     osVersion->LinkEndChild(new TiXmlText(fMachine->KernelInfo().os_release));
