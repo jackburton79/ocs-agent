@@ -117,7 +117,6 @@ HTTP::Post(const std::string path, char* data)
 {
 	HTTPRequestHeader requestHeader("POST", path);
 
-	// TODO: Read actual data from the ostringstream object
 	return Request(requestHeader, data);
 }
 
@@ -175,8 +174,6 @@ HTTP::Request(HTTPRequestHeader& header, const void* data, size_t length)
 		fLastResponse.SetValue(replyString.substr(0, pos),
 				replyString.substr(pos + 1, std::string::npos));
 	}
-
-	// TODO: Read content data and make it available in some way
 
 	return 0;
 }
