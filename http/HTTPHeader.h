@@ -11,6 +11,11 @@
 #include <map>
 #include <string>
 
+class ICompareString {
+public:
+	bool operator()(const std::string a, const std::string b) const;
+};
+
 class HTTPHeader {
 public:
 	HTTPHeader();
@@ -37,7 +42,7 @@ public:
 	HTTPHeader& operator=(const HTTPHeader&);
 
 protected:
-	std::map<std::string, std::string> fValues;
+	std::map<std::string, std::string, ICompareString> fValues;
 
 private:
 	void _Init();

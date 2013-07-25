@@ -9,6 +9,8 @@
 #include "HTTPHeader.h"
 
 #include <cstdlib>
+#include <cstring>
+#include <iostream>
 #include <sstream>
 
 HTTPHeader::HTTPHeader()
@@ -158,4 +160,13 @@ HTTPHeader::operator=(const HTTPHeader& header)
 void
 HTTPHeader::_Init()
 {
+}
+
+
+// ICompareString
+bool
+ICompareString::operator()(const std::string a, const std::string b) const
+{
+	//std::cout << a << "<" << b << std::endl;
+	return ::strcasecmp(a.c_str(), b.c_str()) < 0;
 }
