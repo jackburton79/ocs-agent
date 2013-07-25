@@ -10,5 +10,5 @@ can't be put into the Thinstation images without getting performance hits on boo
 work on a system with a read only filesystem (actually, the filesystem is read-write, but changes are thrown out
 when the terminal is powered off).
 So I decided to write a small agent in C++ to be able to inventory also those machines which I'm not able to do, yet.
-The agent is not complete yet, but it can already produce an incomplete inventory of the machine, which can be imported
-into OCSInventory.
+The agent is not complete yet, but it can already produce an incomplete inventory of the machine and send it to the 
+OCSInventory server, or save it locally.
