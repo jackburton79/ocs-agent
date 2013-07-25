@@ -58,7 +58,6 @@ CompressXml(const TiXmlDocument& document, char*& destination, size_t& destLengt
 bool
 UncompressXml(const char* source, size_t sourceLen, TiXmlDocument& document)
 {
-	std::cout << "UncompressXml: SourceLength: " << sourceLen << std::endl;
 	FILE* temp = tmpfile();
 	if (temp == NULL) {
 		std::cerr << "UncompressXml: cannot create temporary file" << std::endl;
