@@ -103,7 +103,7 @@ Inventory::Send(const char* serverUrl)
 	HTTP httpObject;
 	httpObject.SetHost(serverUrl);
 
-	if (httpObject.Get("") != 0) {
+	/*if (httpObject.Get("") != 0) {
 		std::cerr << "Inventory::Send: " << httpObject.ErrorString() << std::endl;
 		return false;
 	}
@@ -114,7 +114,7 @@ Inventory::Send(const char* serverUrl)
 	}
 
 	std::cout << httpObject.LastResponse().ToString() << std::endl;
-
+*/
 	std::string inventoryUrl(serverUrl);
 	inventoryUrl.append("/ocsinventory");
 
@@ -145,6 +145,7 @@ Inventory::Send(const char* serverUrl)
 	delete[] prologData;
 
 	const HTTPResponseHeader& responseHeader = httpObject.LastResponse();
+	std::cout << responseHeader.ToString() << std::endl;
 	if (responseHeader.StatusCode() == 200
 			&& responseHeader.HasContentLength()) {
 		size_t contentLength =
@@ -153,13 +154,21 @@ Inventory::Send(const char* serverUrl)
 		char* resultData = new char[contentLength];
 		if (httpObject.Read(resultData, contentLength) < (int)contentLength) {
 			delete[] resultData;
-			std::cerr << "Failed to read XML response!" << std::endl;
+			std::cerr << "Failed to read XML response: " << httpObject.ErrorString() << std::endl;
 			return false;
 		}
 
-		// TODO: Do something with the XML response
-
+		TiXmlDocument document;
+		bool uncompress = UncompressXml(resultData, contentLength, document);
 		delete[] resultData;
+
+		if (!uncompress) {
+			std::cerr << "Inventory::Send(): Failed to decompress XML response" << std::endl;
+			return false;
+		}
+
+		document.Print();
+
 	}
 
 	// TODO: Send the inventory
