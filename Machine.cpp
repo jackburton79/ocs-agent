@@ -232,7 +232,7 @@ void
 Machine::_GetCPUInfo()
 {
 	// TODO: Use ProcReader when it's ready for this
-	popen_streambuf cpu("cat /proc/cpuinfo", "r");
+	ProcReader cpu("/cpuinfo");
 	std::istream iStream(&cpu);
 
 	std::string string;
