@@ -364,21 +364,21 @@ Inventory::_AddHardwareInfo(TiXmlElement* parent)
    // <LASTLOGGEDUSER>root</LASTLOGGEDUSER>
 
     TiXmlElement* memory = new TiXmlElement("MEMORY");
-    memory->LinkEndChild(new TiXmlText(fMachine->KernelInfo().memory));
+    memory->LinkEndChild(new TiXmlText(fMachine->OSInfo().memory));
     //<MEMORY>521</MEMORY>
 
     TiXmlElement* name = new TiXmlElement("NAME");
     name->LinkEndChild(new TiXmlText(fMachine->HostName()));
 
     TiXmlElement* osComments = new TiXmlElement("OSCOMMENTS");
-    osComments->LinkEndChild(new TiXmlText(fMachine->KernelInfo().comments));
+    osComments->LinkEndChild(new TiXmlText(fMachine->OSInfo().comments));
 
     TiXmlElement* osName = new TiXmlElement("OSNAME");
     // TODO: Fix this
     osName->LinkEndChild(new TiXmlText("Thinstation (i586)"));
 
     TiXmlElement* osVersion = new TiXmlElement("OSVERSION");
-    osVersion->LinkEndChild(new TiXmlText(fMachine->KernelInfo().os_release));
+    osVersion->LinkEndChild(new TiXmlText(fMachine->OSInfo().os_release));
 
     TiXmlElement* processorN = new TiXmlElement("PROCESSORN");
     processorN->LinkEndChild(new TiXmlText(int_to_string(fMachine->CountProcessors())));
@@ -390,7 +390,7 @@ Inventory::_AddHardwareInfo(TiXmlElement* parent)
     processorT->LinkEndChild(new TiXmlText(fMachine->ProcessorType(0)));
 
     TiXmlElement* swap = new TiXmlElement("SWAP");
-    swap->LinkEndChild(new TiXmlText(fMachine->KernelInfo().swap));
+    swap->LinkEndChild(new TiXmlText(fMachine->OSInfo().swap));
 
     TiXmlElement* userID = new TiXmlElement("USERID");
     // TODO: Fix this
@@ -406,7 +406,7 @@ Inventory::_AddHardwareInfo(TiXmlElement* parent)
    // <VMSYSTEM>Xen</VMSYSTEM>
 
     TiXmlElement* workGroup = new TiXmlElement("WORKGROUP");
-    workGroup->LinkEndChild(new TiXmlText(fMachine->KernelInfo().domain_name));
+    workGroup->LinkEndChild(new TiXmlText(fMachine->OSInfo().domain_name));
 
     hardware->LinkEndChild(checksum);
     hardware->LinkEndChild(dateLastLoggedUser);

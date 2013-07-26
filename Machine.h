@@ -11,7 +11,7 @@
 #include <map>
 #include <string>
 
-struct kernel_info {
+struct os_info {
 	std::string comments;
 	std::string hostname;
 	std::string domain_name;
@@ -48,12 +48,13 @@ public:
 	std::string ProcessorSerialNumber(int numCpu) const;
 	std::string ProcessorType(int numCpu) const;
 
-	kernel_info KernelInfo() const;
+	os_info OSInfo() const;
 
 private:
 	bool _GetDMIDecodeData();
+	bool _GetLSHWData();
 	void _GetCPUInfo();
-	void _GetKernelInfo();
+	void _GetOSInfo();
 
 
 	void _GetSystemInfo(std::istream& stream, std::string header);
@@ -65,7 +66,7 @@ private:
 	int fNumCPUs;
 	std::map<std::string, std::string> fCPUInfo[16];
 	std::map<std::string, std::string> fSystemInfo;
-	kernel_info fKernelInfo;
+	os_info fKernelInfo;
 };
 
 #endif /* MACHINE_H_ */

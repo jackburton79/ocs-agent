@@ -44,13 +44,13 @@ Machine::RetrieveData()
 {
 	if (!_GetDMIDecodeData()) {
 		std::cerr << "Can't find dmidecode. Is it installed?" << std::endl;
-
+		_GetLSHWData();
 	}
 
 	_GetCPUInfo();
 
 	try {
-		_GetKernelInfo();
+		_GetOSInfo();
 	} catch (...) {
 		std::cerr << "Failed to get kernel info." << std::endl;
 	}
@@ -185,8 +185,8 @@ Machine::ProcessorType(int numCpu) const
 }
 
 
-kernel_info
-Machine::KernelInfo() const
+os_info
+Machine::OSInfo() const
 {
 	return fKernelInfo;
 }
@@ -216,6 +216,14 @@ Machine::_GetDMIDecodeData()
 	}
 
 	return true;
+}
+
+
+bool
+Machine::_GetLSHWData()
+{
+	// TODO: Parse the output of lshw.
+	return false;
 }
 
 
@@ -259,7 +267,7 @@ Machine::_GetCPUInfo()
 
 
 void
-Machine::_GetKernelInfo()
+Machine::_GetOSInfo()
 {
 	struct utsname uName;
 	if (::uname(&uName) != 0)
