@@ -14,6 +14,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <sys/utsname.h>
 
 #include <iostream>
@@ -301,7 +302,39 @@ Machine::_GetOSInfo()
 			fKernelInfo.memory = stringStream.str();
 		}
 	}
-	//fKernelInfo.memory =
+
+	_IdentifyOS();
+}
+
+
+void
+Machine::_IdentifyOS()
+{
+	popen_streambuf lsb;
+	try {
+		lsb.open("lsb_release -a", "r");
+	} catch (...) {
+		// there is no lsb_release command.
+		// try to identify the system in another way
+		if (::access("/etc/thinstation.global", F_OK) != -1)
+			fKernelInfo.os_description = "Thinstation";
+		else
+			fKernelInfo.os_description = "Unknown";
+		return;
+	}
+
+	std::istream lsbStream(&lsb);
+	std::string line;
+	while (std::getline(lsbStream, line) > 0) {
+		size_t pos = line.find(':');
+		if (pos != std::string::npos) {
+			std::string key = line.substr(0, pos);
+			if (key == "Description") {
+				std::string value = line.substr(pos + 1, std::string::npos);
+				fKernelInfo.os_description = trim(value);
+			}
+		}
+	}
 }
 
 

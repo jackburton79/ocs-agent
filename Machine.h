@@ -16,6 +16,7 @@ struct os_info {
 	std::string hostname;
 	std::string domain_name;
 	std::string os_release;
+	std::string os_description;
 	std::string memory;
 	std::string swap;
 };
@@ -55,8 +56,7 @@ private:
 	bool _GetLSHWData();
 	void _GetCPUInfo();
 	void _GetOSInfo();
-
-
+	void _IdentifyOS();
 	void _GetSystemInfo(std::istream& stream, std::string header);
 
 	std::string _GetValue(std::string string, std::string header) const;

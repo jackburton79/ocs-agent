@@ -374,8 +374,7 @@ Inventory::_AddHardwareInfo(TiXmlElement* parent)
     osComments->LinkEndChild(new TiXmlText(fMachine->OSInfo().comments));
 
     TiXmlElement* osName = new TiXmlElement("OSNAME");
-    // TODO: Fix this
-    osName->LinkEndChild(new TiXmlText("Thinstation (i586)"));
+    osName->LinkEndChild(new TiXmlText(fMachine->OSInfo().os_description));
 
     TiXmlElement* osVersion = new TiXmlElement("OSVERSION");
     osVersion->LinkEndChild(new TiXmlText(fMachine->OSInfo().os_release));
