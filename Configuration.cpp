@@ -53,6 +53,14 @@ Configuration::Load(const char* fileName)
 }
 
 
+bool
+Configuration::SetServer(const char* serverUrl)
+{
+	fValues["server"] = serverUrl;
+	return true;
+}
+
+
 std::string
 Configuration::DeviceID() const
 {
@@ -77,13 +85,15 @@ Configuration::ServerURL() const
 	if (i != fValues.end())
 		return i->second;
 
-	return "http://ocsinventory-ng/ocsinventory";
+	return "";
 }
 
 
 bool
 Configuration::LocalInventory() const
 {
-	return false;
+	std::map<std::string, std::string>::const_iterator i;
+	i = fValues.find("server");
+	return i == fValues.end();
 }
 

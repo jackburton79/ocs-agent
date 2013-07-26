@@ -16,6 +16,7 @@ public:
 	static Configuration* Get();
 
 	bool Load(const char* fileName);
+	bool SetServer(const char* fileName);
 
 	std::string DeviceID() const;
 	std::string ServerURL() const;

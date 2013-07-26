@@ -34,7 +34,7 @@ Agent::Run()
 
 	if (inventory.Build(config->DeviceID().c_str())) {
 		if (config->LocalInventory()) {
-			if (!inventory.Save("test"))
+			if (!inventory.Save(config->DeviceID().c_str()))
 				std::cerr << "Cannot save output file." << std::endl;
 		} else {
 			if (!inventory.Send(config->ServerURL().c_str()))
