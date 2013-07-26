@@ -23,7 +23,7 @@
 
 #include "tinyxml/tinyxml.h"
 
-#define USER_AGENT "OCS-NG_embedded_agent_v0.9"
+#define USER_AGENT "OCS-NG_unified_unix_agent_v"
 
 Inventory::Inventory()
 	:
@@ -352,7 +352,6 @@ Inventory::_AddHardwareInfo(TiXmlElement* parent)
     std::string descriptionString;
     descriptionString.append(fMachine->OSInfo().machine).append("/");
     description->LinkEndChild(new TiXmlText(descriptionString));
-   // <DESCRIPTION>i686/00-01-23 22:09:06</DESCRIPTION>
 
     TiXmlElement* dns = new TiXmlElement("DNS");
     dns->LinkEndChild(new TiXmlText("192.168.0.1"));
@@ -368,7 +367,6 @@ Inventory::_AddHardwareInfo(TiXmlElement* parent)
 
     TiXmlElement* memory = new TiXmlElement("MEMORY");
     memory->LinkEndChild(new TiXmlText(fMachine->OSInfo().memory));
-    //<MEMORY>521</MEMORY>
 
     TiXmlElement* name = new TiXmlElement("NAME");
     name->LinkEndChild(new TiXmlText(fMachine->HostName()));
