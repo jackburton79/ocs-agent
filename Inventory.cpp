@@ -106,7 +106,6 @@ Inventory::Send(const char* serverUrl)
 	HTTP httpObject;
 	httpObject.SetHost(serverUrl);
 
-	std::string inventoryUrl(serverUrl);
 
 	// Send Prolog
 	TiXmlDocument prolog;
@@ -119,9 +118,10 @@ Inventory::Send(const char* serverUrl)
 		return false;
 	}
 
-	std::string fullString = serverUrl;
+	std::string inventoryUrl(serverUrl);
+
 	HTTPRequestHeader requestHeader;
-	requestHeader.SetRequest("POST", fullString);
+	requestHeader.SetRequest("POST", inventoryUrl);
 	requestHeader.SetContentType("application/x-compress");
 	requestHeader.SetContentLength(prologLength);
 	requestHeader.SetUserAgent(USER_AGENT);
@@ -156,11 +156,8 @@ Inventory::Send(const char* serverUrl)
 			return false;
 		}
 
-		document.Print();
-
+		// TODO: Do something with the reply
 	}
-
-	// TODO: Send the inventory
 
 	char* compressedData = NULL;
 	size_t compressedSize;
@@ -170,7 +167,7 @@ Inventory::Send(const char* serverUrl)
 	}
 
 	requestHeader = HTTPRequestHeader();
-	requestHeader.SetRequest("POST", fullString);
+	requestHeader.SetRequest("POST", inventoryUrl);
 	requestHeader.SetContentType("application/x-compress");
 	requestHeader.SetContentLength(compressedSize);
 	requestHeader.SetUserAgent(USER_AGENT);
