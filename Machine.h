@@ -14,6 +14,7 @@
 struct os_info {
 	std::string comments;
 	std::string hostname;
+	std::string machine;
 	std::string domain_name;
 	std::string os_release;
 	std::string os_description;
