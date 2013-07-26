@@ -311,17 +311,7 @@ void
 Machine::_IdentifyOS()
 {
 	popen_streambuf lsb;
-	try {
-		lsb.open("lsb_release -a", "r");
-	} catch (...) {
-		// there is no lsb_release command.
-		// try to identify the system in another way
-		if (::access("/etc/thinstation.global", F_OK) != -1)
-			fKernelInfo.os_description = "Thinstation";
-		else
-			fKernelInfo.os_description = "Unknown";
-		return;
-	}
+	lsb.open("lsb_release -a", "r");
 
 	std::istream lsbStream(&lsb);
 	std::string line;
@@ -335,6 +325,16 @@ Machine::_IdentifyOS()
 			}
 		}
 	}
+
+	if (fKernelInfo.os_description == "") {
+		// there is no lsb_release command.
+		// try to identify the system in another way
+		if (::access("/etc/thinstation.global", F_OK) != -1)
+			fKernelInfo.os_description = "Thinstation";
+		else
+			fKernelInfo.os_description = "Unknown";
+	}
+
 }
 
 
