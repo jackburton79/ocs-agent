@@ -279,6 +279,9 @@ Machine::_GetOSInfo()
 	fKernelInfo.os_release = uName.release;
 	fKernelInfo.domain_name = uName.domainname;
 
+	fKernelInfo.machine = uName.machine;
+
+
 	ProcReader proc("meminfo");
 	std::istream stream(&proc);
 
@@ -312,7 +315,6 @@ Machine::_IdentifyOS()
 {
 	popen_streambuf lsb;
 	lsb.open("lsb_release -a", "r");
-
 	std::istream lsbStream(&lsb);
 	std::string line;
 	while (std::getline(lsbStream, line) > 0) {

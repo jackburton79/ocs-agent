@@ -349,7 +349,9 @@ Inventory::_AddHardwareInfo(TiXmlElement* parent)
     //<DEFAULTGATEWAY>192.168.22.9</DEFAULTGATEWAY>
 
     TiXmlElement* description = new TiXmlElement("DESCRIPTION");
-    description->LinkEndChild(new TiXmlText("i686/00-01-23 22:09:06"));
+    std::string descriptionString;
+    descriptionString.append(fMachine->OSInfo().machine).append("/");
+    description->LinkEndChild(new TiXmlText(descriptionString));
    // <DESCRIPTION>i686/00-01-23 22:09:06</DESCRIPTION>
 
     TiXmlElement* dns = new TiXmlElement("DNS");
