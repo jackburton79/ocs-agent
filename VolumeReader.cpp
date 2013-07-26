@@ -40,7 +40,7 @@ VolumeReader::VolumeReader(const char* options)
 	Rewind();
 }
 
+
 VolumeReader::~VolumeReader()
 {
 }
-
