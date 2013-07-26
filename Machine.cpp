@@ -223,15 +223,42 @@ Machine::_GetDMIDecodeData()
 bool
 Machine::_GetLSHWData()
 {
-	// TODO: Parse the output of lshw.
-	return false;
+	popen_streambuf lshw("lshw -short", "r");
+	std::istream iStream(&lshw);
+
+	try {
+		std::string line;
+		std::getline(iStream, line);
+		std::getline(iStream, line);
+
+		while (std::getline(iStream, line) > 0) {
+			std::string device = line.substr(22, 22);
+			std::string context = line.substr(33, 11);
+			std::string value = line.substr(45, std::string::npos);
+			trim(context);
+			if (context == "system") {
+				std::string sysCtx = "Product Name";
+				sysCtx.append(kSystemInfo);
+				if (fSystemInfo.find(sysCtx) == fSystemInfo.end()) {
+					std::cout << "System" << ": " << value << std::endl;
+					fSystemInfo[sysCtx] = trim(value);
+				}
+			}
+
+			//std::cout << "device:" << device << "**";
+			//std::cout << context << "** : **" << value << "**" << std::endl;
+		}
+	} catch (...) {
+
+	}
+
+	return true;
 }
 
 
 void
 Machine::_GetCPUInfo()
 {
-	// TODO: Use ProcReader when it's ready for this
 	ProcReader cpu("/cpuinfo");
 	std::istream iStream(&cpu);
 
@@ -280,7 +307,6 @@ Machine::_GetOSInfo()
 	fKernelInfo.domain_name = uName.domainname;
 
 	fKernelInfo.machine = uName.machine;
-
 
 	ProcReader proc("meminfo");
 	std::istream stream(&proc);
