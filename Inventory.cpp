@@ -105,20 +105,7 @@ Inventory::Send(const char* serverUrl)
 	HTTP httpObject;
 	httpObject.SetHost(serverUrl);
 
-	/*if (httpObject.Get("") != 0) {
-		std::cerr << "Inventory::Send: " << httpObject.ErrorString() << std::endl;
-		return false;
-	}
-
-	if (httpObject.LastResponse().StatusCode() != 200) {
-		std::cerr << httpObject.LastResponse().ToString() << std::endl;
-		return false;
-	}
-
-	std::cout << httpObject.LastResponse().ToString() << std::endl;
-*/
 	std::string inventoryUrl(serverUrl);
-	inventoryUrl.append("/ocsinventory");
 
 	// Send Prolog
 	TiXmlDocument prolog;
@@ -132,7 +119,6 @@ Inventory::Send(const char* serverUrl)
 	}
 
 	std::string fullString = serverUrl;
-	fullString.append("/ocsinventory");
 	HTTPRequestHeader requestHeader;
 	requestHeader.SetRequest("POST", fullString);
 	requestHeader.SetContentType("application/x-compress");

@@ -8,6 +8,7 @@
 #ifndef CONFIGURATION_H_
 #define CONFIGURATION_H_
 
+#include <map>
 #include <string>
 
 class Configuration {
@@ -23,6 +24,8 @@ public:
 private:
 	Configuration();
 	~Configuration();
+
+	std::map<std::string, std::string> fValues;
 
 };
 

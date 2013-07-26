@@ -7,7 +7,9 @@
 
 #include "Configuration.h"
 
-#include <errno.h>
+#include <cerrno>
+#include <fstream>
+
 #include <unistd.h>
 
 
@@ -36,7 +38,18 @@ Configuration::Get()
 bool
 Configuration::Load(const char* fileName)
 {
-	return false;
+	try {
+		std::ifstream configFile(fileName);
+		std::string line;
+		while (std::getline(configFile, line) > 0) {
+			size_t pos = line.find("=");
+			if (pos != std::string::npos) {
+				fValues[line.substr(0, pos)] = line.substr(pos + 1, std::string::npos);
+			}
+		}
+	} catch (...) {
+	}
+	return true;
 }
 
 
@@ -59,8 +72,12 @@ Configuration::DeviceID() const
 std::string
 Configuration::ServerURL() const
 {
-	// TODO: Make this non-fixed.
-	return "http://ocsinventory-ng";
+	std::map<std::string, std::string>::const_iterator i;
+	i = fValues.find("server");
+	if (i != fValues.end())
+		return i->second;
+
+	return "http://ocsinventory-ng/ocsinventory";
 }
 
 
