@@ -583,7 +583,7 @@ Inventory::_AddUsersInfo(TiXmlElement* parent)
 bool
 Inventory::_WriteProlog(TiXmlDocument& document) const
 {
-	Configuration config;
+	Configuration* config = Configuration::Get();
 
 	TiXmlDeclaration* declaration = new TiXmlDeclaration("1.0", "UTF-8", "");
 	document.LinkEndChild(declaration);
@@ -592,7 +592,7 @@ Inventory::_WriteProlog(TiXmlDocument& document) const
 	document.LinkEndChild(request);
 
 	TiXmlElement* deviceID = new TiXmlElement("DEVICEID");
-	deviceID->LinkEndChild(new TiXmlText(config.DeviceID().c_str()));
+	deviceID->LinkEndChild(new TiXmlText(config->DeviceID().c_str()));
 	request->LinkEndChild(deviceID);
 
 	TiXmlElement* query = new TiXmlElement("QUERY");

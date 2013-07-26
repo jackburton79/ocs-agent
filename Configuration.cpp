@@ -11,6 +11,8 @@
 #include <unistd.h>
 
 
+static Configuration* sConfiguration;
+
 Configuration::Configuration()
 {
 }
@@ -18,6 +20,23 @@ Configuration::Configuration()
 
 Configuration::~Configuration()
 {
+}
+
+
+/* static */
+Configuration*
+Configuration::Get()
+{
+	if (sConfiguration == NULL)
+		sConfiguration = new Configuration;
+	return sConfiguration;
+}
+
+
+bool
+Configuration::Load(const char* fileName)
+{
+	return false;
 }
 
 

@@ -12,12 +12,18 @@
 
 class Configuration {
 public:
-	Configuration();
-	~Configuration();
+	static Configuration* Get();
+
+	bool Load(const char* fileName);
 
 	std::string DeviceID() const;
 	std::string ServerURL() const;
 	bool LocalInventory() const;
+
+private:
+	Configuration();
+	~Configuration();
+
 };
 
 #endif /* CONFIGURATION_H_ */
