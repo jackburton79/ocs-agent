@@ -10,6 +10,7 @@
 
 #include <map>
 #include <string>
+#include <vector>
 
 struct os_info {
 	std::string comments;
@@ -22,6 +23,13 @@ struct os_info {
 	std::string swap;
 };
 
+
+struct video_info {
+	std::string chipset;
+	std::string memory;
+	std::string name;
+	std::string resolution;
+};
 
 
 class Machine {
@@ -52,6 +60,9 @@ public:
 
 	os_info OSInfo() const;
 
+	int CountVideos() const;
+	video_info VideoInfoFor(int numVideo) const;
+
 private:
 	bool _GetDMIDecodeData();
 	bool _GetLSHWData();
@@ -68,6 +79,8 @@ private:
 	std::map<std::string, std::string> fCPUInfo[16];
 	std::map<std::string, std::string> fSystemInfo;
 	os_info fKernelInfo;
+
+	std::vector<struct video_info> fVideoInfo;
 };
 
 #endif /* MACHINE_H_ */

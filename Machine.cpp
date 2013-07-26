@@ -45,8 +45,9 @@ Machine::RetrieveData()
 {
 	if (!_GetDMIDecodeData()) {
 		std::cerr << "Can't find dmidecode. Is it installed?" << std::endl;
-		_GetLSHWData();
 	}
+
+	_GetLSHWData();
 
 	_GetCPUInfo();
 
@@ -193,6 +194,19 @@ Machine::OSInfo() const
 }
 
 
+int
+Machine::CountVideos() const
+{
+	return fVideoInfo.size();
+}
+
+
+video_info
+Machine::VideoInfoFor(int numVideo) const
+{
+	return fVideoInfo[numVideo];
+}
+
 
 // private
 bool
@@ -240,13 +254,14 @@ Machine::_GetLSHWData()
 				std::string sysCtx = "Product Name";
 				sysCtx.append(kSystemInfo);
 				if (fSystemInfo.find(sysCtx) == fSystemInfo.end()) {
-					std::cout << "System" << ": " << value << std::endl;
 					fSystemInfo[sysCtx] = trim(value);
 				}
+			} else if (context == "display") {
+				struct video_info info;
+				info.name = trim(value);
+				fVideoInfo.push_back(info);
 			}
 
-			//std::cout << "device:" << device << "**";
-			//std::cout << context << "** : **" << value << "**" << std::endl;
 		}
 	} catch (...) {
 

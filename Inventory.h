@@ -30,6 +30,7 @@ private:
 	void _AddProcessesInfo(TiXmlElement* parent);
 	void _AddSoftwaresInfo(TiXmlElement* parent);
 	void _AddUsersInfo(TiXmlElement* parent);
+	void _AddVideosInfo(TiXmlElement* parent);
 
 	bool _WriteProlog(TiXmlDocument& document) const;
 

@@ -74,6 +74,7 @@ Inventory::Build(const char* deviceID)
 	_AddProcessesInfo(content);
 	_AddSoftwaresInfo(content);
 	_AddUsersInfo(content);
+	_AddVideosInfo(content);
 
 	TiXmlElement* deviceId = new TiXmlElement("DEVICEID");
 	deviceId->LinkEndChild(new TiXmlText(deviceID));
@@ -560,6 +561,35 @@ Inventory::_AddUsersInfo(TiXmlElement* parent)
 		users->LinkEndChild(login);
 	}
 	parent->LinkEndChild(users);
+}
+
+
+void
+Inventory::_AddVideosInfo(TiXmlElement* parent)
+{
+	for (int i = 0; i < fMachine->CountVideos(); i++) {
+		video_info info = fMachine->VideoInfoFor(i);
+
+		TiXmlElement* video = new TiXmlElement("VIDEOS");
+		TiXmlElement* chipset = new TiXmlElement("CHIPSET");
+		chipset->LinkEndChild(new TiXmlText(info.chipset));
+
+		TiXmlElement* memory = new TiXmlElement("MEMORY");
+		memory->LinkEndChild(new TiXmlText(info.memory));
+
+		TiXmlElement* name = new TiXmlElement("NAME");
+		name->LinkEndChild(new TiXmlText(info.name));
+
+		TiXmlElement* resolution = new TiXmlElement("RESOLUTION");
+		resolution->LinkEndChild(new TiXmlText(info.resolution));
+
+		video->LinkEndChild(chipset);
+		video->LinkEndChild(memory);
+		video->LinkEndChild(name);
+		video->LinkEndChild(resolution);
+
+		parent->LinkEndChild(video);
+	}
 }
 
 
