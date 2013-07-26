@@ -51,7 +51,7 @@ public:
 	kernel_info KernelInfo() const;
 
 private:
-	void _GetDMIDecodeData();
+	bool _GetDMIDecodeData();
 	void _GetCPUInfo();
 	void _GetKernelInfo();
 

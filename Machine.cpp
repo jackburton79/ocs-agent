@@ -42,11 +42,9 @@ Machine::~Machine()
 void
 Machine::RetrieveData()
 {
-	try {
-		// TODO: If dmidecode isn't installed, read from /proc ?
-		_GetDMIDecodeData();
-	} catch (...) {
+	if (!_GetDMIDecodeData()) {
 		std::cerr << "Can't find dmidecode. Is it installed?" << std::endl;
+
 	}
 
 	_GetCPUInfo();
@@ -196,22 +194,28 @@ Machine::KernelInfo() const
 
 
 // private
-void
+bool
 Machine::_GetDMIDecodeData()
 {
-	popen_streambuf dmi("dmidecode", "r");
-	std::istream iStream(&dmi);
+	try {
+		popen_streambuf dmi("dmidecode", "r");
+		std::istream iStream(&dmi);
 
-	std::string string;
-	while (std::getline(iStream, string) > 0) {
-		// Skip the line with "Handle" in it.
-		if (string.find("Handle") == std::string::npos) {
-			std::string header = string;
-			header = trim(header);
+		std::string string;
+		while (std::getline(iStream, string) > 0) {
+			// Skip the line with "Handle" in it.
+			if (string.find("Handle") == std::string::npos) {
+				std::string header = string;
+				header = trim(header);
 
-			_GetSystemInfo(iStream, header);
+				_GetSystemInfo(iStream, header);
+			}
 		}
+	} catch (...) {
+		return false;
 	}
+
+	return true;
 }
 
 
