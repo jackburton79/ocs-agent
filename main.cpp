@@ -8,9 +8,13 @@
 #include "Agent.h"
 #include "Configuration.h"
 
-#include <iostream>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 #include <getopt.h>
+#include <iostream>
+
+
+extern const char* __progname;
 
 static
 struct option sLongOptions[] = {
@@ -24,7 +28,21 @@ struct option sLongOptions[] = {
 static void
 PrintHelpAndExit()
 {
+	std::cout << __progname << std::endl;
+	std::cout << "Usage:" << std::endl;
+	std::cout << "-h [--help]         : Print usage" << std::endl;
+	std::cout << "-c [--conf]         : Specify configuration file" << std::endl;
+	std::cout << "-s [--server]       : Specify OCSInventory server url" << std::endl;
+	std::cout << "If no server is specified, either via the -s option or via the" << std::endl;
+	std::cout << "configuration file (option -c), the program will write a local" << std::endl;
+	std::cout << "inventory in the current working directory." << std::endl;
+	std::cout << "Examples:" << std::endl;
+	std::cout << "    " << __progname;
+	std::cout << " --conf /etc/ocsinventory-ng.conf" << std::endl;
+	std::cout << "    " << __progname;
+	std::cout << " --server http://ocsinventory-ng/ocsinventory" << std::endl;
 
+	::exit(0);
 }
 
 
@@ -44,8 +62,12 @@ main(int argc, char **argv)
 			case 's':
 				serverUrl = optarg;
 				break;
+			case 'h':
+				PrintHelpAndExit();
+				break;
 		}
 	}
+
 
 	if (configFile != NULL)
 		Configuration::Get()->Load(configFile);
