@@ -23,6 +23,7 @@
 
 #include "tinyxml/tinyxml.h"
 
+#define USER_AGENT "OCS-NG_embedded_agent_v0.9"
 
 Inventory::Inventory()
 	:
@@ -123,7 +124,7 @@ Inventory::Send(const char* serverUrl)
 	requestHeader.SetRequest("POST", fullString);
 	requestHeader.SetContentType("application/x-compress");
 	requestHeader.SetContentLength(prologLength);
-	requestHeader.SetUserAgent("OCS-NG_unified_unix_agent_v");
+	requestHeader.SetUserAgent(USER_AGENT);
 	if (httpObject.Request(requestHeader, prologData, prologLength) != 0) {
 		delete[] prologData;
 		std::cerr << "Send: " << httpObject.ErrorString() << std::endl;
@@ -172,7 +173,7 @@ Inventory::Send(const char* serverUrl)
 	requestHeader.SetRequest("POST", fullString);
 	requestHeader.SetContentType("application/x-compress");
 	requestHeader.SetContentLength(compressedSize);
-	requestHeader.SetUserAgent("OCS-NG_unified_unix_agent_v");
+	requestHeader.SetUserAgent(USER_AGENT);
 	if (httpObject.Request(requestHeader, compressedData, compressedSize) != 0) {
 		delete[] compressedData;
 		std::cerr << "Send: " << httpObject.ErrorString() << std::endl;
