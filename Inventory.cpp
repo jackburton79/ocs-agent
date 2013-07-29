@@ -105,7 +105,6 @@ bool
 Inventory::Send(const char* serverUrl)
 {
 	HTTP httpObject;
-	httpObject.SetHost(serverUrl);
 
 	// Send Prolog
 	TiXmlDocument prolog;
@@ -122,6 +121,10 @@ Inventory::Send(const char* serverUrl)
 
 	HTTPRequestHeader requestHeader;
 	requestHeader.SetRequest("POST", inventoryUrl);
+	requestHeader.SetValue("Pragma", "no-cache");
+	requestHeader.SetValue("Keep-Alive", "300");
+	requestHeader.SetValue("Connection", "Keep-Alive, TE");
+	requestHeader.SetValue("TE", "deflate, gzip");
 	requestHeader.SetContentType("application/x-compress");
 	requestHeader.SetContentLength(prologLength);
 	requestHeader.SetUserAgent(USER_AGENT);
@@ -173,6 +176,10 @@ Inventory::Send(const char* serverUrl)
 
 	requestHeader = HTTPRequestHeader();
 	requestHeader.SetRequest("POST", inventoryUrl);
+	requestHeader.SetValue("Pragma", "no-cache");
+	requestHeader.SetValue("Keep-Alive", "300");
+	requestHeader.SetValue("Connection", "Keep-Alive, TE");
+	requestHeader.SetValue("TE", "deflate, gzip");
 	requestHeader.SetContentType("application/x-compress");
 	requestHeader.SetContentLength(compressedSize);
 	requestHeader.SetUserAgent(USER_AGENT);
