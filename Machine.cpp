@@ -242,24 +242,29 @@ Machine::_GetLSHWData()
 
 	try {
 		std::string line;
+
+		// header
 		std::getline(iStream, line);
+
 		size_t devicePos = line.find("Device");
 		size_t classPos = line.find("Class");
 		size_t descriptionPos = line.find("Description");
+
+		// skip ==== line
 		std::getline(iStream, line);
 
 		while (std::getline(iStream, line) > 0) {
 			std::string device = line.substr(devicePos, classPos - devicePos);
-			std::string context = line.substr(classPos, descriptionPos - classPos);
+			std::string devClass = line.substr(classPos, descriptionPos - classPos);
 			std::string value = line.substr(descriptionPos, std::string::npos);
-			trim(context);
-			if (context == "system") {
+			trim(devClass);
+			if (devClass == "system") {
 				std::string sysCtx = "Product Name";
 				sysCtx.append(kSystemInfo);
 				if (fSystemInfo.find(sysCtx) == fSystemInfo.end()) {
 					fSystemInfo[sysCtx] = trim(value);
 				}
-			} else if (context == "display") {
+			} else if (devClass == "display") {
 				struct video_info info;
 				info.name = trim(value);
 				fVideoInfo.push_back(info);
