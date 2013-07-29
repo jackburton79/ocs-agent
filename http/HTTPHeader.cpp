@@ -40,7 +40,12 @@ HTTPHeader::~HTTPHeader()
 void
 HTTPHeader::AddValue(const std::string key, const std::string value)
 {
-	fValues[key] = value;
+	std::map<std::string, std::string>::const_iterator i;
+	i = fValues.find(HTTPContentLength);
+	if ( i != fValues.end())
+		fValues[key].append(", ");
+
+	fValues[key] = fValues[key].append(value);
 }
 
 
@@ -71,27 +76,21 @@ HTTPHeader::ContentType() const
 bool
 HTTPHeader::HasContentLength() const
 {
-	std::map<std::string, std::string>::const_iterator i;
-	i = fValues.find(HTTPContentLength);
-	return i != fValues.end();
+	return fValues.find(HTTPContentLength) != fValues.end();
 }
 
 
 bool
 HTTPHeader::HasContentType() const
 {
-	std::map<std::string, std::string>::const_iterator i;
-	i = fValues.find(HTTPContentType);
-	return i != fValues.end();
+	return fValues.find(HTTPContentType) != fValues.end();
 }
 
 
 bool
 HTTPHeader::HasKey(const std::string key) const
 {
-	std::map<std::string, std::string>::const_iterator i;
-	i = fValues.find(key);
-	return i != fValues.end();
+	return fValues.find(key) != fValues.end();
 }
 
 
@@ -114,7 +113,6 @@ HTTPHeader::SetContentType(const std::string type)
 void
 HTTPHeader::SetValue(const std::string key, const std::string value)
 {
-	// TODO: ATM works like AddValue().
 	fValues[key] = value;
 }
 
@@ -167,6 +165,5 @@ HTTPHeader::_Init()
 bool
 ICompareString::operator()(const std::string a, const std::string b) const
 {
-	//std::cout << a << "<" << b << std::endl;
 	return ::strcasecmp(a.c_str(), b.c_str()) < 0;
 }
