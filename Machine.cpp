@@ -243,12 +243,15 @@ Machine::_GetLSHWData()
 	try {
 		std::string line;
 		std::getline(iStream, line);
+		size_t devicePos = line.find("Device");
+		size_t classPos = line.find("Class");
+		size_t descriptionPos = line.find("Description");
 		std::getline(iStream, line);
 
 		while (std::getline(iStream, line) > 0) {
-			std::string device = line.substr(22, 22);
-			std::string context = line.substr(33, 11);
-			std::string value = line.substr(45, std::string::npos);
+			std::string device = line.substr(devicePos, classPos - devicePos);
+			std::string context = line.substr(classPos, descriptionPos - classPos);
+			std::string value = line.substr(descriptionPos, std::string::npos);
 			trim(context);
 			if (context == "system") {
 				std::string sysCtx = "Product Name";
