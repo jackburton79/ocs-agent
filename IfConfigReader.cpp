@@ -109,7 +109,12 @@ IfConfigReader::_ReadRouteInfo(network_info& info, std::istream& stream)
 	try {
 		std::string line;
 		std::getline(stream, line); // Skip Title
-		std::getline(stream, line); // Skip header
+
+		// header
+		std::getline(stream, line);
+		size_t gatewayPos = line.find("Gateway");
+		size_t maskPos = line.find("Genmask");
+
 		while (std::getline(stream, line) > 0) {
 			Rewind();
 			network_info networkInfo;
@@ -117,11 +122,16 @@ IfConfigReader::_ReadRouteInfo(network_info& info, std::istream& stream)
 			for (i = fItems.begin(); i != fItems.end(); i++) {
 				if (line.find((*i).description) == std::string::npos)
 					continue;
-				std::istringstream iss(line);
-				std::string string;
-				iss >> string;
-				if (string == "0.0.0.0") {
-					iss >> (*i).gateway;
+
+				std::string destination = line.substr(0, gatewayPos);
+				trim(destination);
+				std::string gateway = line.substr(gatewayPos, maskPos - gatewayPos);
+				trim(gateway);
+
+				if (gateway == "0.0.0.0") {
+					i->network = destination;
+				} else if (destination == "0.0.0.0") {
+					i->gateway = gateway;
 					break;
 				}
 			}
