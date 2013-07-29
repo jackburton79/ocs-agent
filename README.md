@@ -12,3 +12,14 @@ when the terminal is powered off).
 So I decided to write a small agent in C++ to be able to inventory also those machines which I'm not able to do, yet.
 The agent is not complete yet, but it can already produce an incomplete inventory of the machine and send it to the 
 OCSInventory server, or save it locally.
+
+Usage:
+-h [--help]         : Print usage
+-c [--conf]         : Specify configuration file
+-s [--server]       : Specify OCSInventory server url
+If no server is specified, either via the -s option or via the
+configuration file (option -c), the program will write a local
+inventory in the current working directory.
+Examples:
+    ocsinventory-agent --conf /etc/ocsinventory-ng.conf
+    ocsinventory-agent --server http://ocsinventory-ng/ocsinventory
