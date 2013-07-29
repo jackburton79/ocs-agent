@@ -12,6 +12,8 @@ when the terminal is powered off).
 So I decided to write a small agent in C++ to be able to inventory also those machines which I'm not able to do, yet.
 The agent is not complete yet, but it can already produce an incomplete inventory of the machine and send it to the 
 OCSInventory server, or save it locally.
+The program weights around 256kb on disk for now, and it only has zlib as dependency, which is already present on any
+Thinstation installation. Actually it also uses tinyxml, but the library is compiled statically into the executable.
 
 Usage:
 -h [--help]         : Print usage
