@@ -20,7 +20,6 @@
 bool
 CompressXml(const TiXmlDocument& document, char*& destination, size_t& destLength)
 {
-	//std::cout << "temp name: " << name << std::endl;
 	FILE* temp = tmpfile();
 	if (temp == NULL) {
 		std::cerr << "CompressXml: cannot create temporary file" << std::endl;
