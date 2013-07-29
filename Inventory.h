@@ -20,6 +20,8 @@ public:
 	bool Save(const char* name);
 	bool Send(const char* serverUrl);
 
+	int Checksum() const;
+
 private:
 	void _AddAccountInfo(TiXmlElement* parent);
 	void _AddBIOSInfo(TiXmlElement* parent);

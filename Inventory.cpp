@@ -183,6 +183,14 @@ Inventory::Send(const char* serverUrl)
 }
 
 
+int
+Inventory::Checksum() const
+{
+	return 1 | 2 | 4 | 8 | 16 | 32 | 64 | 128 | 256 | 512 | 1024
+			| 2048 | 8192 | 16384 | 32768 | 65536 | 131072;
+}
+
+
 // Private
 void
 Inventory::_AddAccountInfo(TiXmlElement* parent)
@@ -333,9 +341,8 @@ Inventory::_AddHardwareInfo(TiXmlElement* parent)
 	TiXmlElement* hardware = new TiXmlElement("HARDWARE");
 
 	TiXmlElement* checksum = new TiXmlElement("CHECKSUM");
-	checksum->LinkEndChild(new TiXmlText("2"));
-	// TODO: Calculate and add checksum
-    //<CHECKSUM>262143</CHECKSUM>
+
+	checksum->LinkEndChild(new TiXmlText(int_to_string(Checksum())));
 
     TiXmlElement* dateLastLoggedUser = new TiXmlElement("DATELASTLOGGEDUSER");
     dateLastLoggedUser->LinkEndChild(new TiXmlText("Thu Jul 11 13:24"));
@@ -396,7 +403,6 @@ Inventory::_AddHardwareInfo(TiXmlElement* parent)
 
     TiXmlElement* uuid = new TiXmlElement("UUID");
     uuid->LinkEndChild(new TiXmlText(fMachine->SystemUUID()));
-
 
     TiXmlElement* vmSystem = new TiXmlElement("VMSYSTEM");
     vmSystem->LinkEndChild(new TiXmlText("Physical"));
