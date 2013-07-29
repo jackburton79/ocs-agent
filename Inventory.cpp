@@ -114,7 +114,7 @@ Inventory::Send(const char* serverUrl)
 	char* prologData = NULL;
 	size_t prologLength = 0;
 	if (!CompressXml(prolog, prologData, prologLength)) {
-		std::cerr << "Error compressing prolog XML" << std::endl;
+		std::cerr << "Inventory::Send(): Error compressing prolog XML" << std::endl;
 		return false;
 	}
 
@@ -127,7 +127,8 @@ Inventory::Send(const char* serverUrl)
 	requestHeader.SetUserAgent(USER_AGENT);
 	if (httpObject.Request(requestHeader, prologData, prologLength) != 0) {
 		delete[] prologData;
-		std::cerr << "Send: " << httpObject.ErrorString() << std::endl;
+		std::cerr << "Inventory::Send(): cannot send prolog: ";
+		std::cerr << httpObject.ErrorString() << std::endl;
 		return false;
 	}
 
@@ -143,7 +144,8 @@ Inventory::Send(const char* serverUrl)
 		char* resultData = new char[contentLength];
 		if (httpObject.Read(resultData, contentLength) < (int)contentLength) {
 			delete[] resultData;
-			std::cerr << "Failed to read XML response: " << httpObject.ErrorString() << std::endl;
+			std::cerr << "Inventory::Send(): Failed to read XML response: ";
+			std::cerr << httpObject.ErrorString() << std::endl;
 			return false;
 		}
 
@@ -165,7 +167,7 @@ Inventory::Send(const char* serverUrl)
 	char* compressedData = NULL;
 	size_t compressedSize;
 	if (!CompressXml(*fDocument, compressedData, compressedSize)) {
-		std::cerr << "Error compressing inventory XML" << std::endl;
+		std::cerr << "Inventory::Send(): Error compressing inventory XML" << std::endl;
 		return false;
 	}
 
@@ -176,7 +178,8 @@ Inventory::Send(const char* serverUrl)
 	requestHeader.SetUserAgent(USER_AGENT);
 	if (httpObject.Request(requestHeader, compressedData, compressedSize) != 0) {
 		delete[] compressedData;
-		std::cerr << "Send: " << httpObject.ErrorString() << std::endl;
+		std::cerr << "Inventory::Send(): Cannot send inventory: ";
+		std::cerr << httpObject.ErrorString() << std::endl;
 		return false;
 	}
 
