@@ -107,7 +107,6 @@ Inventory::Send(const char* serverUrl)
 	HTTP httpObject;
 	httpObject.SetHost(serverUrl);
 
-
 	// Send Prolog
 	TiXmlDocument prolog;
 	_WriteProlog(prolog);
@@ -286,7 +285,7 @@ Inventory::_AddCPUsInfo(TiXmlElement* parent)
 void
 Inventory::_AddDrivesInfo(TiXmlElement* parent)
 {
-	VolumeReader reader("-x tmpfs");
+	VolumeReader reader;
 	volume_info info;
 	while (reader.GetNext(info)) {
 		TiXmlElement* drive = new TiXmlElement("DRIVES");
