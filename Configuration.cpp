@@ -92,8 +92,6 @@ Configuration::ServerURL() const
 bool
 Configuration::LocalInventory() const
 {
-	std::map<std::string, std::string>::const_iterator i;
-	i = fValues.find("server");
-	return i == fValues.end();
+	return fValues.find("server") == fValues.end();
 }
 
