@@ -157,6 +157,9 @@ Inventory::Send(const char* serverUrl)
 		}
 
 		// TODO: Do something with the reply
+#if 1
+		document.Print();
+#endif
 	}
 
 	char* compressedData = NULL;
