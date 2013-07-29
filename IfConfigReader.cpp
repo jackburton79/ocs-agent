@@ -52,9 +52,18 @@ IfConfigReader::_ReadNetworkInfo(network_info& info, std::istream& stream)
 		return false;
 	}
 	try {
-		info.mac_address = line.substr(line.find("HWaddr"), std::string::npos);
+		size_t linkPos = line.find("Link encap:");
+		size_t macPos = line.find("HWaddr");
+
+		info.type = line.substr(linkPos, macPos - linkPos);
+		info.type = info.type.substr(info.type.find(":") + 1, std::string::npos);
+		trim(info.type);
+
+		info.mac_address = line.substr(macPos, std::string::npos);
 		info.mac_address = info.mac_address.substr(info.mac_address.find(" "), std::string::npos);
-		info.mac_address = trim(info.mac_address);
+		trim(info.mac_address);
+
+
 	} catch (...) {
 		// No MAC
 		info.mac_address = "";

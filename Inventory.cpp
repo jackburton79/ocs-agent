@@ -482,7 +482,7 @@ Inventory::_AddNetworksInfo(TiXmlElement* parent)
 		networks->LinkEndChild(status);
 
 		TiXmlElement* type = new TiXmlElement("TYPE");
-		type->LinkEndChild(new TiXmlText(""));
+		type->LinkEndChild(new TiXmlText(info.type));
 		networks->LinkEndChild(type);
 
 		TiXmlElement* virtualDevice = new TiXmlElement("VIRTUALDEV");
