@@ -43,10 +43,40 @@ Inventory::~Inventory()
 
 
 bool
-Inventory::Build(const char* deviceID)
+Inventory::Initialize(const char* deviceID)
+{
+	Clear();
+	TiXmlDeclaration* declaration = new TiXmlDeclaration("1.0", "UTF-8", "");
+	TiXmlElement* request = new TiXmlElement("REQUEST");
+	fDocument->LinkEndChild(declaration);
+	fDocument->LinkEndChild(request);
+	fContent = new TiXmlElement("CONTENT");
+	request->LinkEndChild(fContent);
+
+	TiXmlElement* query = new TiXmlElement("QUERY");
+		// TODO: We only do Inventory for now
+	query->LinkEndChild(new TiXmlText("INVENTORY"));
+	request->LinkEndChild(query);
+
+	TiXmlElement* deviceId = new TiXmlElement("DEVICEID");
+	deviceId->LinkEndChild(new TiXmlText(deviceID));
+
+	request->LinkEndChild(deviceId);
+
+	return true;
+}
+
+
+void
+Inventory::Clear()
 {
 	fDocument->Clear();
+}
 
+
+bool
+Inventory::Build(const char* deviceID)
+{
 	// TODO: Finish this, cleanup.
 	try {
 		fMachine->RetrieveData();
@@ -55,17 +85,9 @@ Inventory::Build(const char* deviceID)
 		return false;
 	}
 
-	TiXmlDeclaration* declaration = new TiXmlDeclaration("1.0", "UTF-8", "");
-	TiXmlElement* request = new TiXmlElement("REQUEST");
-	fDocument->LinkEndChild(declaration);
-	fDocument->LinkEndChild(request);
-
-	TiXmlElement* content = new TiXmlElement("CONTENT");
+	TiXmlElement* content = fContent;
 
 	_AddAccountInfo(content);
-
-	request->LinkEndChild(content);
-
 	_AddBIOSInfo(content);
 	_AddCPUsInfo(content);
 	_AddDrivesInfo(content);
@@ -76,16 +98,9 @@ Inventory::Build(const char* deviceID)
 	_AddUsersInfo(content);
 	_AddVideosInfo(content);
 
-	TiXmlElement* deviceId = new TiXmlElement("DEVICEID");
-	deviceId->LinkEndChild(new TiXmlText(deviceID));
 
-	request->LinkEndChild(deviceId);
 
-	TiXmlElement* query = new TiXmlElement("QUERY");
 
-	// TODO: We only do Inventory for now
-	query->LinkEndChild(new TiXmlText("INVENTORY"));
-	request->LinkEndChild(query);
 
 	return true;
 }

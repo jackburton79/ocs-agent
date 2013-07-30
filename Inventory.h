@@ -16,6 +16,10 @@ public:
 	Inventory();
 	~Inventory();
 
+	bool Initialize(const char* deviceID);
+	void Clear();
+
+
 	bool Build(const char* deviceID);
 	bool Save(const char* name);
 	bool Send(const char* serverUrl);
@@ -23,6 +27,7 @@ public:
 	int Checksum() const;
 
 private:
+
 	void _AddAccountInfo(TiXmlElement* parent);
 	void _AddBIOSInfo(TiXmlElement* parent);
 	void _AddCPUsInfo(TiXmlElement* parent);
@@ -37,6 +42,7 @@ private:
 	bool _WriteProlog(TiXmlDocument& document) const;
 
 	TiXmlDocument* fDocument;
+	TiXmlElement* fContent;
 	Machine* fMachine;
 };
 

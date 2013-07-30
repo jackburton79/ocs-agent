@@ -32,6 +32,9 @@ Agent::Run()
 	Configuration* config = Configuration::Get();
 	Inventory inventory;
 
+	if (!inventory.Initialize(config->DeviceID().c_str()))
+		throw "Cannot initialize Inventory";
+
 	if (inventory.Build(config->DeviceID().c_str())) {
 		if (config->LocalInventory()) {
 			if (!inventory.Save(config->DeviceID().c_str()))
