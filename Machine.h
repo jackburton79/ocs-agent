@@ -65,6 +65,7 @@ public:
 
 private:
 	bool _GetDMIDecodeData();
+	bool _GetLSHWShortData();
 	bool _GetLSHWData();
 	void _GetCPUInfo();
 	void _GetOSInfo();

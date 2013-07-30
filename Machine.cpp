@@ -235,7 +235,7 @@ Machine::_GetDMIDecodeData()
 
 
 bool
-Machine::_GetLSHWData()
+Machine::_GetLSHWShortData()
 {
 	popen_streambuf lshw("lshw -short", "r");
 	std::istream iStream(&lshw);
@@ -271,6 +271,59 @@ Machine::_GetLSHWData()
 				fVideoInfo.push_back(info);
 			}
 
+		}
+	} catch (...) {
+
+	}
+
+	return true;
+}
+
+
+bool
+Machine::_GetLSHWData()
+{
+	popen_streambuf lshw("lshw", "r");
+	std::istream iStream(&lshw);
+
+	try {
+		std::string line;
+		std::string context = kSystemInfo;
+		// skip initial line
+		std::getline(iStream, line);
+
+		while (std::getline(iStream, line) > 0) {
+			trim(line);
+			if (size_t start = line.find("*-") != std::string::npos) {
+				context = line.substr(start + 2, std::string::npos);
+				if (context == "firmware")
+					context = kBIOSInfo;
+				// TODO: Map other contexts to dmidecode ones
+				// TODO: Make this better.
+				continue;
+			}
+			size_t colonPos = line.find(":");
+			if (colonPos == std::string::npos)
+				continue;
+
+			// TODO: Better mapping of keys
+			std::string key = line.substr(0, colonPos);
+			trim(key);
+			std::string value = line.substr(colonPos + 1, std::string::npos);
+			trim(value);
+			if (key == "vendor") {
+				std::string sysCtx = "Manufacturer";
+				sysCtx.append(context);
+				if (fSystemInfo.find(sysCtx) == fSystemInfo.end()) {
+					fSystemInfo[sysCtx] = trim(value);
+				}
+			} else if (key == "product") {
+				std::string sysCtx = "Product Name";
+				sysCtx.append(context);
+				if (fSystemInfo.find(sysCtx) == fSystemInfo.end()) {
+					fSystemInfo[sysCtx] = trim(value);
+				}
+			}
 		}
 	} catch (...) {
 
