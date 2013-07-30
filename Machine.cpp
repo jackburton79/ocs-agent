@@ -267,6 +267,7 @@ Machine::_GetLSHWData()
 			} else if (devClass == "display") {
 				struct video_info info;
 				info.name = trim(value);
+				info.chipset = "VGA compatible controller";
 				fVideoInfo.push_back(info);
 			}
 
