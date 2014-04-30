@@ -14,7 +14,7 @@ The agent is not complete yet, but it can already produce an incomplete inventor
 OCSInventory server, or save it locally.
 The program weights around 170kb on disk for now, and it only has zlib as dependency, which is already present on any
 Thinstation installation.
-Actually it also uses tinyxml2, but the library is compiled statically into the executable.
+It also uses tinyxml2 [link](http://www.grinninglizard.com/tinyxml2), a very small and efficient XML parsing/writing library, linked statically into the executable.
 
     Usage:  
     -h [--help]         : Print usage  
