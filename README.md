@@ -16,13 +16,13 @@ The program weights around 170kb on disk for now, and it only has zlib as depend
 Thinstation installation.
 Actually it also uses tinyxml2, but the library is compiled statically into the executable.
 
-Usage:
--h [--help]         : Print usage
--c [--conf]         : Specify configuration file
--s [--server]       : Specify OCSInventory server url
-If no server is specified, either via the -s option or via the
-configuration file (option -c), the program will write a local
-inventory in the current working directory.
-Examples:
-    ocsinventory-agent --conf /etc/ocsinventory-ng.conf
-    ocsinventory-agent --server http://ocsinventory-ng/ocsinventory
+    Usage:  
+    -h [--help]         : Print usage  
+    -c [--conf]         : Specify configuration file  
+    -s [--server]       : Specify OCSInventory server url
+    If no server is specified, either via the -s option or via the
+    configuration file (option -c), the program will write a local
+    inventory in the current working directory.
+    Examples:  
+        ocsinventory-agent --conf /etc/ocsinventory-ng.conf  
+        ocsinventory-agent --server http://ocsinventory-ng/ocsinventory  
