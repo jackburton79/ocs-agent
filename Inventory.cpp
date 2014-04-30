@@ -97,10 +97,7 @@ Inventory::Build(const char* deviceID)
 	_AddSoftwaresInfo(content);
 	_AddUsersInfo(content);
 	_AddVideosInfo(content);
-
-
-
-
+    _AddMonitorsInfo(content);
 
 	return true;
 }
@@ -623,6 +620,18 @@ Inventory::_AddVideosInfo(tinyxml2::XMLElement* parent)
 
 		parent->LinkEndChild(video);
 	}
+}
+
+
+void
+Inventory::_AddMonitorsInfo(tinyxml2::XMLElement* parent)
+{
+    // TODO: Encapsulate into another class
+    // TODO: Read edid info
+    popen_streambuf buf("find /sys/devices/ -name edid", "r");
+    std::istream stream(&buf);
+
+
 }
 
 

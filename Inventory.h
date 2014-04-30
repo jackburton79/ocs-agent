@@ -41,6 +41,7 @@ private:
     void _AddSoftwaresInfo(tinyxml2::XMLElement* parent);
     void _AddUsersInfo(tinyxml2::XMLElement* parent);
     void _AddVideosInfo(tinyxml2::XMLElement* parent);
+    void _AddMonitorsInfo(tinyxml2::XMLElement* parent);
 
     bool _WriteProlog(tinyxml2::XMLDocument& document) const;
 
