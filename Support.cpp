@@ -21,32 +21,16 @@
 bool
 CompressXml(tinyxml2::XMLDocument& document, char*& destination, size_t& destLength)
 {
-	FILE* temp = tmpfile();
-	if (temp == NULL) {
-		std::cerr << "CompressXml: cannot create temporary file" << std::endl;
-		return false;
-	}
+    tinyxml2::XMLPrinter memoryPrinter;
+    document.Print(&memoryPrinter);
 
-	if (!document.SaveFile(temp)) {
-		std::cerr << "CompressXml: cannot save XML document" << std::endl;
-		fclose(temp);
-		return false;
-
-	}
-	fseek(temp, 0, SEEK_END);
-	size_t fileSize = ftell(temp);
-	fseek(temp, 0, SEEK_SET);
-
-	char* data = new char[fileSize];
-	fread(data, 1, fileSize, temp);
-
-	fclose(temp);
+    int fileSize = memoryPrinter.CStrSize();
 
 	destLength = compressBound(fileSize);
 	destination = new char[destLength];
 
 	if (int compressStatus = compress((Bytef*)destination, (uLongf*)&destLength,
-			(const Bytef*)data, (uLong)fileSize) != Z_OK) {
+            (const Bytef*)memoryPrinter.CStr(), (uLong)fileSize) != Z_OK) {
 		std::cerr << "Compress returned error: " << zError(compressStatus) << std::endl;
 		delete[] destination;
 		return false;
@@ -59,12 +43,6 @@ CompressXml(tinyxml2::XMLDocument& document, char*& destination, size_t& destLen
 bool
 UncompressXml(const char* source, size_t sourceLen, tinyxml2::XMLDocument& document)
 {
-	FILE* temp = tmpfile();
-	if (temp == NULL) {
-		std::cerr << "UncompressXml: cannot create temporary file" << std::endl;
-		return false;
-	}
-
 	char* destination = new char[32768];
 	size_t destLength = 32768;
 
@@ -73,16 +51,12 @@ UncompressXml(const char* source, size_t sourceLen, tinyxml2::XMLDocument& docum
 		std::cerr << "UncompressXml: Failed to decompress XML: ";
 		std::cerr << zError(status) << std::endl;
 		delete[] destination;
-		fclose(temp);
 		return false;
 	}
 
-	fwrite(destination, 1, destLength, temp);
-	delete[] destination;
+    bool result = document.Parse(destination, destLength);
 
-	bool result = document.LoadFile(temp);
-
-	fclose(temp);
+    delete[] destination;
 
 	return result;
 }
