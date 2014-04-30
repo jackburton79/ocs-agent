@@ -21,7 +21,7 @@
 #include <memory>
 
 
-#include "tinyxml/tinyxml.h"
+#include "tinyxml2/tinyxml2.h"
 
 #define USER_AGENT "OCS-NG_unified_unix_agent_v"
 
@@ -30,7 +30,7 @@ Inventory::Inventory()
 	fDocument(NULL),
 	fMachine(NULL)
 {
-	fDocument = new TiXmlDocument;
+    fDocument = new tinyxml2::XMLDocument;
 	fMachine = new Machine;
 }
 
@@ -46,20 +46,20 @@ bool
 Inventory::Initialize(const char* deviceID)
 {
 	Clear();
-	TiXmlDeclaration* declaration = new TiXmlDeclaration("1.0", "UTF-8", "");
-	TiXmlElement* request = new TiXmlElement("REQUEST");
+    tinyxml2::XMLDeclaration* declaration = fDocument->NewDeclaration();
+    tinyxml2::XMLElement* request = fDocument->NewElement("REQUEST");
 	fDocument->LinkEndChild(declaration);
 	fDocument->LinkEndChild(request);
-	fContent = new TiXmlElement("CONTENT");
+    fContent = fDocument->NewElement("CONTENT");
 	request->LinkEndChild(fContent);
 
-	TiXmlElement* query = new TiXmlElement("QUERY");
+    tinyxml2::XMLElement* query = fDocument->NewElement("QUERY");
 		// TODO: We only do Inventory for now
-	query->LinkEndChild(new TiXmlText("INVENTORY"));
+    query->LinkEndChild(fDocument->NewText("INVENTORY"));
 	request->LinkEndChild(query);
 
-	TiXmlElement* deviceId = new TiXmlElement("DEVICEID");
-	deviceId->LinkEndChild(new TiXmlText(deviceID));
+    tinyxml2::XMLElement* deviceId = fDocument->NewElement("DEVICEID");
+    deviceId->LinkEndChild(fDocument->NewText(deviceID));
 
 	request->LinkEndChild(deviceId);
 
@@ -85,7 +85,7 @@ Inventory::Build(const char* deviceID)
 		return false;
 	}
 
-	TiXmlElement* content = fContent;
+    tinyxml2::XMLElement* content = fContent;
 
 	_AddAccountInfo(content);
 	_AddBIOSInfo(content);
@@ -112,7 +112,7 @@ Inventory::Save(const char* name)
 	std::string fullName;
 	fullName.append(name).append(".xml");
 
-	return fDocument->SaveFile(fullName.c_str());
+    return fDocument->SaveFile(fullName.c_str()) == tinyxml2::XML_NO_ERROR;
 }
 
 
@@ -122,7 +122,7 @@ Inventory::Send(const char* serverUrl)
 	HTTP httpObject;
 
 	// Send Prolog
-	TiXmlDocument prolog;
+    tinyxml2::XMLDocument prolog;
 	_WriteProlog(prolog);
 
 	char* prologData = NULL;
@@ -167,7 +167,7 @@ Inventory::Send(const char* serverUrl)
 			return false;
 		}
 
-		TiXmlDocument document;
+        tinyxml2::XMLDocument document;
 		bool uncompress = UncompressXml(resultData, contentLength, document);
 		delete[] resultData;
 
@@ -221,17 +221,17 @@ Inventory::Checksum() const
 
 // Private
 void
-Inventory::_AddAccountInfo(TiXmlElement* parent)
+Inventory::_AddAccountInfo(tinyxml2::XMLElement* parent)
 {
-	TiXmlElement* accountInfo = new TiXmlElement("ACCOUNTINFO");
+    tinyxml2::XMLElement* accountInfo = fDocument->NewElement("ACCOUNTINFO");
 
 	// TODO: ??? We can't store anything
 	for (int a = 0; a < 1; a++) {
-		TiXmlElement* keyName = new TiXmlElement("KEYNAME");
-		keyName->LinkEndChild(new TiXmlText("TAG"));
+        tinyxml2::XMLElement* keyName = fDocument->NewElement("KEYNAME");
+        keyName->LinkEndChild(fDocument->NewElement("TAG"));
 
-		TiXmlElement* keyValue = new TiXmlElement("KEYVALUE");
-		keyValue->LinkEndChild(new TiXmlText("NA"));
+        tinyxml2::XMLElement* keyValue = fDocument->NewElement("KEYVALUE");
+        keyValue->LinkEndChild(fDocument->NewElement("NA"));
 
 		accountInfo->LinkEndChild(keyName);
 		accountInfo->LinkEndChild(keyValue);
@@ -242,36 +242,36 @@ Inventory::_AddAccountInfo(TiXmlElement* parent)
 
 
 void
-Inventory::_AddBIOSInfo(TiXmlElement* parent)
+Inventory::_AddBIOSInfo(tinyxml2::XMLElement* parent)
 {
-	TiXmlElement* bios = new TiXmlElement("BIOS");
+    tinyxml2::XMLElement* bios = fDocument->NewElement("BIOS");
 
-	TiXmlElement* assettag = new TiXmlElement("ASSETTAG");
-	assettag->LinkEndChild(new TiXmlText(fMachine->AssetTag()));
+    tinyxml2::XMLElement* assettag = fDocument->NewElement("ASSETTAG");
+    assettag->LinkEndChild(fDocument->NewText(fMachine->AssetTag().c_str()));
 
-	TiXmlElement* bdate = new TiXmlElement("BDATE");
-	bdate->LinkEndChild(new TiXmlText(fMachine->BIOSDate()));
+    tinyxml2::XMLElement* bdate = fDocument->NewElement("BDATE");
+    bdate->LinkEndChild(fDocument->NewText(fMachine->BIOSDate().c_str()));
 
-	TiXmlElement* bmanufacturer = new TiXmlElement("BMANUFACTURER");
-	bmanufacturer->LinkEndChild(new TiXmlText(fMachine->BIOSManufacturer()));
+    tinyxml2::XMLElement* bmanufacturer = fDocument->NewElement("BMANUFACTURER");
+    bmanufacturer->LinkEndChild(fDocument->NewText(fMachine->BIOSManufacturer().c_str()));
 
-	TiXmlElement* bversion = new TiXmlElement("BVERSION");
-	bversion->LinkEndChild(new TiXmlText(fMachine->BIOSVersion()));
+    tinyxml2::XMLElement* bversion = fDocument->NewElement("BVERSION");
+    bversion->LinkEndChild(fDocument->NewText(fMachine->BIOSVersion().c_str()));
 
-	TiXmlElement* mmanufacturer = new TiXmlElement("MMANUFACTURER");
-	mmanufacturer->LinkEndChild(new TiXmlText(fMachine->MachineManufacturer()));
+    tinyxml2::XMLElement* mmanufacturer = fDocument->NewElement("MMANUFACTURER");
+    mmanufacturer->LinkEndChild(fDocument->NewText(fMachine->MachineManufacturer().c_str()));
 
-	TiXmlElement* mSerial = new TiXmlElement("MSN");
-	mSerial->LinkEndChild(new TiXmlText(fMachine->MachineSerialNumber()));
+    tinyxml2::XMLElement* mSerial = fDocument->NewElement("MSN");
+    mSerial->LinkEndChild(fDocument->NewText(fMachine->MachineSerialNumber().c_str()));
 
-	TiXmlElement* sManufacturer = new TiXmlElement("SMANUFACTURER");
-	sManufacturer->LinkEndChild(new TiXmlText(fMachine->SystemManufacturer()));
+    tinyxml2::XMLElement* sManufacturer = fDocument->NewElement("SMANUFACTURER");
+    sManufacturer->LinkEndChild(fDocument->NewText(fMachine->SystemManufacturer().c_str()));
 
-	TiXmlElement* systemModel = new TiXmlElement("SMODEL");
-	systemModel->LinkEndChild(new TiXmlText(fMachine->SystemModel()));
+    tinyxml2::XMLElement* systemModel = fDocument->NewElement("SMODEL");
+    systemModel->LinkEndChild(fDocument->NewText(fMachine->SystemModel().c_str()));
 
-	TiXmlElement* ssn = new TiXmlElement("SSN");
-	ssn->LinkEndChild(new TiXmlText(fMachine->SystemSerialNumber()));
+    tinyxml2::XMLElement* ssn = fDocument->NewElement("SSN");
+    ssn->LinkEndChild(fDocument->NewText(fMachine->SystemSerialNumber().c_str()));
 
 	bios->LinkEndChild(assettag);
 	bios->LinkEndChild(bdate);
@@ -288,25 +288,25 @@ Inventory::_AddBIOSInfo(TiXmlElement* parent)
 
 
 void
-Inventory::_AddCPUsInfo(TiXmlElement* parent)
+Inventory::_AddCPUsInfo(tinyxml2::XMLElement* parent)
 {
 	// TODO: Check if the fields name and structure are correct.
 	for (int i = 0; i < fMachine->CountProcessors(); i++) {
-		TiXmlElement* cpu = new TiXmlElement("CPUS");
-		TiXmlElement* manufacturer = new TiXmlElement("MANUFACTURER");
-		TiXmlElement* serial = new TiXmlElement("SERIAL");
-		TiXmlElement* speed = new TiXmlElement("SPEED");
-		TiXmlElement* model = new TiXmlElement("TYPE");
+        tinyxml2::XMLElement* cpu = fDocument->NewElement("CPUS");
+        tinyxml2::XMLElement* manufacturer = fDocument->NewElement("MANUFACTURER");
+        tinyxml2::XMLElement* serial = fDocument->NewElement("SERIAL");
+        tinyxml2::XMLElement* speed = fDocument->NewElement("SPEED");
+        tinyxml2::XMLElement* model = fDocument->NewElement("TYPE");
 
 		// TODO: Seems like we should interpretate the vendor_id
 		manufacturer->LinkEndChild(
-				new TiXmlText(fMachine->ProcessorManufacturer(i)));
+                fDocument->NewText(fMachine->ProcessorManufacturer(i).c_str()));
 		serial->LinkEndChild(
-				new TiXmlText(fMachine->ProcessorSerialNumber(i)));
+                fDocument->NewText(fMachine->ProcessorSerialNumber(i).c_str()));
 		speed->LinkEndChild(
-				new TiXmlText(fMachine->ProcessorSpeed(i)));
+                fDocument->NewText(fMachine->ProcessorSpeed(i).c_str()));
 		model->LinkEndChild(
-				new TiXmlText(fMachine->ProcessorType(i)));
+                fDocument->NewText(fMachine->ProcessorType(i).c_str()));
 
 		cpu->LinkEndChild(model);
 		cpu->LinkEndChild(manufacturer);
@@ -319,36 +319,36 @@ Inventory::_AddCPUsInfo(TiXmlElement* parent)
 
 
 void
-Inventory::_AddDrivesInfo(TiXmlElement* parent)
+Inventory::_AddDrivesInfo(tinyxml2::XMLElement* parent)
 {
 	VolumeReader reader;
 	volume_info info;
 	while (reader.GetNext(info)) {
-		TiXmlElement* drive = new TiXmlElement("DRIVES");
+        tinyxml2::XMLElement* drive = fDocument->NewElement("DRIVES");
 
-		TiXmlElement* createDate = new TiXmlElement("CREATEDATE");
-		createDate->LinkEndChild(new TiXmlText(info.create_date));
+        tinyxml2::XMLElement* createDate = fDocument->NewElement("CREATEDATE");
+        createDate->LinkEndChild(fDocument->NewText(info.create_date.c_str()));
 
-		TiXmlElement* fileSystem = new TiXmlElement("FILESYSTEM");
-		fileSystem->LinkEndChild(new TiXmlText(info.filesystem));
+        tinyxml2::XMLElement* fileSystem = fDocument->NewElement("FILESYSTEM");
+        fileSystem->LinkEndChild(fDocument->NewText(info.filesystem.c_str()));
 
-		TiXmlElement* freeSpace = new TiXmlElement("FREE");
-		freeSpace->LinkEndChild(new TiXmlText(int_to_string(info.free)));
+        tinyxml2::XMLElement* freeSpace = fDocument->NewElement("FREE");
+        freeSpace->LinkEndChild(fDocument->NewText(int_to_string(info.free).c_str()));
 
-		TiXmlElement* label = new TiXmlElement("LABEL");
-		label->LinkEndChild(new TiXmlText(info.label));
+        tinyxml2::XMLElement* label = fDocument->NewElement("LABEL");
+        label->LinkEndChild(fDocument->NewText(info.label.c_str()));
 
-		TiXmlElement* serial = new TiXmlElement("SERIAL");
-		serial->LinkEndChild(new TiXmlText(info.serial));
+        tinyxml2::XMLElement* serial = fDocument->NewElement("SERIAL");
+        serial->LinkEndChild(fDocument->NewText(info.serial.c_str()));
 
-		TiXmlElement* total = new TiXmlElement("TOTAL");
-		total->LinkEndChild(new TiXmlText(int_to_string(info.total)));
+        tinyxml2::XMLElement* total = fDocument->NewElement("TOTAL");
+        total->LinkEndChild(fDocument->NewText(int_to_string(info.total).c_str()));
 
-		TiXmlElement* type = new TiXmlElement("TYPE");
-		type->LinkEndChild(new TiXmlText(info.type));
+        tinyxml2::XMLElement* type = fDocument->NewElement("TYPE");
+        type->LinkEndChild(fDocument->NewText(info.type.c_str()));
 
-		TiXmlElement* volumeName = new TiXmlElement("VOLUMN");
-		volumeName->LinkEndChild(new TiXmlText(info.name));
+        tinyxml2::XMLElement* volumeName = fDocument->NewElement("VOLUMN");
+        volumeName->LinkEndChild(fDocument->NewText(info.name.c_str()));
 
 		drive->LinkEndChild(createDate);
 		drive->LinkEndChild(fileSystem);
@@ -364,80 +364,80 @@ Inventory::_AddDrivesInfo(TiXmlElement* parent)
 
 
 void
-Inventory::_AddHardwareInfo(TiXmlElement* parent)
+Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 {
-	TiXmlElement* hardware = new TiXmlElement("HARDWARE");
+    tinyxml2::XMLElement* hardware = fDocument->NewElement("HARDWARE");
 
-	TiXmlElement* checksum = new TiXmlElement("CHECKSUM");
+    tinyxml2::XMLElement* checksum = fDocument->NewElement("CHECKSUM");
 
-	checksum->LinkEndChild(new TiXmlText(int_to_string(Checksum())));
+    checksum->LinkEndChild(fDocument->NewText(int_to_string(Checksum()).c_str()));
 
-    TiXmlElement* dateLastLoggedUser = new TiXmlElement("DATELASTLOGGEDUSER");
-    dateLastLoggedUser->LinkEndChild(new TiXmlText("Thu Jul 11 13:24"));
+    tinyxml2::XMLElement* dateLastLoggedUser = fDocument->NewElement("DATELASTLOGGEDUSER");
+    dateLastLoggedUser->LinkEndChild(fDocument->NewText("Thu Jul 11 13:24"));
     //<DATELASTLOGGEDUSER>Thu Jul 11 13:24</DATELASTLOGGEDUSER>
 
-    TiXmlElement* defaultGW = new TiXmlElement("DEFAULTGATEWAY");
-    defaultGW->LinkEndChild(new TiXmlText("192.168.0.1"));
+    tinyxml2::XMLElement* defaultGW = fDocument->NewElement("DEFAULTGATEWAY");
+    defaultGW->LinkEndChild(fDocument->NewText("192.168.0.1"));
     //<DEFAULTGATEWAY>192.168.22.9</DEFAULTGATEWAY>
 
-    TiXmlElement* description = new TiXmlElement("DESCRIPTION");
+    tinyxml2::XMLElement* description = fDocument->NewElement("DESCRIPTION");
     std::string descriptionString;
     descriptionString.append(fMachine->OSInfo().machine).append("/");
-    description->LinkEndChild(new TiXmlText(descriptionString));
+    description->LinkEndChild(fDocument->NewText(descriptionString.c_str()));
 
-    TiXmlElement* dns = new TiXmlElement("DNS");
-    dns->LinkEndChild(new TiXmlText("192.168.0.1"));
+    tinyxml2::XMLElement* dns = fDocument->NewElement("DNS");
+    dns->LinkEndChild(fDocument->NewText("192.168.0.1"));
     //<DNS>192.168.22.23/192.168.22.24</DNS>
 
-    TiXmlElement* ipAddress = new TiXmlElement("IPADDR");
-    ipAddress->LinkEndChild(new TiXmlText("192.168.0.1"));
+    tinyxml2::XMLElement* ipAddress = fDocument->NewElement("IPADDR");
+    ipAddress->LinkEndChild(fDocument->NewText("192.168.0.1"));
     //<IPADDR>192.168.22.33</IPADDR>
 
-    TiXmlElement* lastLoggedUser = new TiXmlElement("LASTLOGGEDUSER");
-    lastLoggedUser->LinkEndChild(new TiXmlText("root"));
+    tinyxml2::XMLElement* lastLoggedUser = fDocument->NewElement("LASTLOGGEDUSER");
+    lastLoggedUser->LinkEndChild(fDocument->NewText("root"));
    // <LASTLOGGEDUSER>root</LASTLOGGEDUSER>
 
-    TiXmlElement* memory = new TiXmlElement("MEMORY");
-    memory->LinkEndChild(new TiXmlText(fMachine->OSInfo().memory));
+    tinyxml2::XMLElement* memory = fDocument->NewElement("MEMORY");
+    memory->LinkEndChild(fDocument->NewText(fMachine->OSInfo().memory.c_str()));
 
-    TiXmlElement* name = new TiXmlElement("NAME");
-    name->LinkEndChild(new TiXmlText(fMachine->HostName()));
+    tinyxml2::XMLElement* name = fDocument->NewElement("NAME");
+    name->LinkEndChild(fDocument->NewText(fMachine->HostName().c_str()));
 
-    TiXmlElement* osComments = new TiXmlElement("OSCOMMENTS");
-    osComments->LinkEndChild(new TiXmlText(fMachine->OSInfo().comments));
+    tinyxml2::XMLElement* osComments = fDocument->NewElement("OSCOMMENTS");
+    osComments->LinkEndChild(fDocument->NewText(fMachine->OSInfo().comments.c_str()));
 
-    TiXmlElement* osName = new TiXmlElement("OSNAME");
-    osName->LinkEndChild(new TiXmlText(fMachine->OSInfo().os_description));
+    tinyxml2::XMLElement* osName = fDocument->NewElement("OSNAME");
+    osName->LinkEndChild(fDocument->NewText(fMachine->OSInfo().os_description.c_str()));
 
-    TiXmlElement* osVersion = new TiXmlElement("OSVERSION");
-    osVersion->LinkEndChild(new TiXmlText(fMachine->OSInfo().os_release));
+    tinyxml2::XMLElement* osVersion = fDocument->NewElement("OSVERSION");
+    osVersion->LinkEndChild(fDocument->NewText(fMachine->OSInfo().os_release.c_str()));
 
-    TiXmlElement* processorN = new TiXmlElement("PROCESSORN");
-    processorN->LinkEndChild(new TiXmlText(int_to_string(fMachine->CountProcessors())));
+    tinyxml2::XMLElement* processorN = fDocument->NewElement("PROCESSORN");
+    processorN->LinkEndChild(fDocument->NewText(int_to_string(fMachine->CountProcessors()).c_str()));
 
-    TiXmlElement* processorS = new TiXmlElement("PROCESSORS");
-    processorS->LinkEndChild(new TiXmlText(fMachine->ProcessorSpeed(0)));
+    tinyxml2::XMLElement* processorS = fDocument->NewElement("PROCESSORS");
+    processorS->LinkEndChild(fDocument->NewText(fMachine->ProcessorSpeed(0).c_str()));
 
-    TiXmlElement* processorT = new TiXmlElement("PROCESSORT");
-    processorT->LinkEndChild(new TiXmlText(fMachine->ProcessorType(0)));
+    tinyxml2::XMLElement* processorT = fDocument->NewElement("PROCESSORT");
+    processorT->LinkEndChild(fDocument->NewText(fMachine->ProcessorType(0).c_str()));
 
-    TiXmlElement* swap = new TiXmlElement("SWAP");
-    swap->LinkEndChild(new TiXmlText(fMachine->OSInfo().swap));
+    tinyxml2::XMLElement* swap = fDocument->NewElement("SWAP");
+    swap->LinkEndChild(fDocument->NewText(fMachine->OSInfo().swap.c_str()));
 
-    TiXmlElement* userID = new TiXmlElement("USERID");
+    tinyxml2::XMLElement* userID = fDocument->NewElement("USERID");
     // TODO: Fix this
-    userID->LinkEndChild(new TiXmlText("root"));
+    userID->LinkEndChild(fDocument->NewText("root"));
     //<USERID>root</USERID>
 
-    TiXmlElement* uuid = new TiXmlElement("UUID");
-    uuid->LinkEndChild(new TiXmlText(fMachine->SystemUUID()));
+    tinyxml2::XMLElement* uuid = fDocument->NewElement("UUID");
+    uuid->LinkEndChild(fDocument->NewText(fMachine->SystemUUID().c_str()));
 
-    TiXmlElement* vmSystem = new TiXmlElement("VMSYSTEM");
-    vmSystem->LinkEndChild(new TiXmlText("Physical"));
+    tinyxml2::XMLElement* vmSystem = fDocument->NewElement("VMSYSTEM");
+    vmSystem->LinkEndChild(fDocument->NewText("Physical"));
    // <VMSYSTEM>Xen</VMSYSTEM>
 
-    TiXmlElement* workGroup = new TiXmlElement("WORKGROUP");
-    workGroup->LinkEndChild(new TiXmlText(fMachine->OSInfo().domain_name));
+    tinyxml2::XMLElement* workGroup = fDocument->NewElement("WORKGROUP");
+    workGroup->LinkEndChild(fDocument->NewText(fMachine->OSInfo().domain_name.c_str()));
 
     hardware->LinkEndChild(checksum);
     hardware->LinkEndChild(dateLastLoggedUser);
@@ -464,7 +464,7 @@ Inventory::_AddHardwareInfo(TiXmlElement* parent)
 
 
 void
-Inventory::_AddNetworksInfo(TiXmlElement* parent)
+Inventory::_AddNetworksInfo(tinyxml2::XMLElement* parent)
 {
 	IfConfigReader ifCfgReader;
 
@@ -473,54 +473,54 @@ Inventory::_AddNetworksInfo(TiXmlElement* parent)
 		if (info.description == "lo")
 			continue;
 
-		TiXmlElement* networks = new TiXmlElement("NETWORKS");
+        tinyxml2::XMLElement* networks = fDocument->NewElement("NETWORKS");
 
-		TiXmlElement* description = new TiXmlElement("DESCRIPTION");
-		description->LinkEndChild(new TiXmlText(info.description));
+        tinyxml2::XMLElement* description = fDocument->NewElement("DESCRIPTION");
+        description->LinkEndChild(fDocument->NewText(info.description.c_str()));
 		networks->LinkEndChild(description);
 
-		TiXmlElement* driver = new TiXmlElement("DRIVER");
-		driver->LinkEndChild(new TiXmlText("pif"));
+        tinyxml2::XMLElement* driver = fDocument->NewElement("DRIVER");
+        driver->LinkEndChild(fDocument->NewText("pif"));
 		networks->LinkEndChild(driver);
 
-		TiXmlElement* ipAddress = new TiXmlElement("IPADDRESS");
-		ipAddress->LinkEndChild(new TiXmlText(info.ip_address));
+        tinyxml2::XMLElement* ipAddress = fDocument->NewElement("IPADDRESS");
+        ipAddress->LinkEndChild(fDocument->NewText(info.ip_address.c_str()));
 		networks->LinkEndChild(ipAddress);
 
-		TiXmlElement* ipDHCP = new TiXmlElement("IPDHCP");
-		ipDHCP->LinkEndChild(new TiXmlText(info.dhcp_ip));
+        tinyxml2::XMLElement* ipDHCP = fDocument->NewElement("IPDHCP");
+        ipDHCP->LinkEndChild(fDocument->NewText(info.dhcp_ip.c_str()));
 		networks->LinkEndChild(ipDHCP);
 
-		TiXmlElement* gateway = new TiXmlElement("IPGATEWAY");
-		gateway->LinkEndChild(new TiXmlText(info.gateway));
+        tinyxml2::XMLElement* gateway = fDocument->NewElement("IPGATEWAY");
+        gateway->LinkEndChild(fDocument->NewText(info.gateway.c_str()));
 		networks->LinkEndChild(gateway);
 
-		TiXmlElement* ipMask = new TiXmlElement("IPMASK");
-		ipMask->LinkEndChild(new TiXmlText(info.netmask));
+        tinyxml2::XMLElement* ipMask = fDocument->NewElement("IPMASK");
+        ipMask->LinkEndChild(fDocument->NewText(info.netmask.c_str()));
 		networks->LinkEndChild(ipMask);
 
-		TiXmlElement* ipSubnet = new TiXmlElement("IPSUBNET");
-		ipSubnet->LinkEndChild(new TiXmlText(info.network));
+        tinyxml2::XMLElement* ipSubnet = fDocument->NewElement("IPSUBNET");
+        ipSubnet->LinkEndChild(fDocument->NewText(info.network.c_str()));
 		networks->LinkEndChild(ipSubnet);
 
-		TiXmlElement* mac = new TiXmlElement("MACADDR");
-		mac->LinkEndChild(new TiXmlText(info.mac_address));
+        tinyxml2::XMLElement* mac = fDocument->NewElement("MACADDR");
+        mac->LinkEndChild(fDocument->NewText(info.mac_address.c_str()));
 		networks->LinkEndChild(mac);
 
-		TiXmlElement* pciSlot = new TiXmlElement("PCISLOT");
-		pciSlot->LinkEndChild(new TiXmlText(""));
+        tinyxml2::XMLElement* pciSlot = fDocument->NewElement("PCISLOT");
+        pciSlot->LinkEndChild(fDocument->NewText(""));
 		networks->LinkEndChild(pciSlot);
 
-		TiXmlElement* status = new TiXmlElement("STATUS");
-		status->LinkEndChild(new TiXmlText(info.status));
+        tinyxml2::XMLElement* status = fDocument->NewElement("STATUS");
+        status->LinkEndChild(fDocument->NewText(info.status.c_str()));
 		networks->LinkEndChild(status);
 
-		TiXmlElement* type = new TiXmlElement("TYPE");
-		type->LinkEndChild(new TiXmlText(info.type));
+        tinyxml2::XMLElement* type = fDocument->NewElement("TYPE");
+        type->LinkEndChild(fDocument->NewText(info.type.c_str()));
 		networks->LinkEndChild(type);
 
-		TiXmlElement* virtualDevice = new TiXmlElement("VIRTUALDEV");
-		virtualDevice->LinkEndChild(new TiXmlText(""));
+        tinyxml2::XMLElement* virtualDevice = fDocument->NewElement("VIRTUALDEV");
+        virtualDevice->LinkEndChild(fDocument->NewText(""));
 		networks->LinkEndChild(virtualDevice);
 
 
@@ -530,36 +530,36 @@ Inventory::_AddNetworksInfo(TiXmlElement* parent)
 
 
 void
-Inventory::_AddProcessesInfo(TiXmlElement* parent)
+Inventory::_AddProcessesInfo(tinyxml2::XMLElement* parent)
 {
 	RunningProcessesList processList;
 	process_info processInfo;
 	while (processList.GetNext(processInfo)) {
-		TiXmlElement* process = new TiXmlElement("PROCESSES");
+        tinyxml2::XMLElement* process = fDocument->NewElement("PROCESSES");
 
-		TiXmlElement* cmd = new TiXmlElement("CMD");
-		cmd->LinkEndChild(new TiXmlText(processInfo.cmdline.c_str()));
+        tinyxml2::XMLElement* cmd = fDocument->NewElement("CMD");
+        cmd->LinkEndChild(fDocument->NewText(processInfo.cmdline.c_str()));
 
-		TiXmlElement* cpuUsage = new TiXmlElement("CPUUSAGE");
-		cpuUsage->LinkEndChild(new TiXmlText(""));
+        tinyxml2::XMLElement* cpuUsage = fDocument->NewElement("CPUUSAGE");
+        cpuUsage->LinkEndChild(fDocument->NewText(""));
 
-		TiXmlElement* mem = new TiXmlElement("MEM");
-		mem->LinkEndChild(new TiXmlText(int_to_string(processInfo.memory)));
+        tinyxml2::XMLElement* mem = fDocument->NewElement("MEM");
+        mem->LinkEndChild(fDocument->NewText(int_to_string(processInfo.memory).c_str()));
 
-		TiXmlElement* pid = new TiXmlElement("PID");
-		pid->LinkEndChild(new TiXmlText(int_to_string(processInfo.pid)));
+        tinyxml2::XMLElement* pid = fDocument->NewElement("PID");
+        pid->LinkEndChild(fDocument->NewText(int_to_string(processInfo.pid).c_str()));
 
-		TiXmlElement* started = new TiXmlElement("STARTED");
-		started->LinkEndChild(new TiXmlText(""));
+        tinyxml2::XMLElement* started = fDocument->NewElement("STARTED");
+        started->LinkEndChild(fDocument->NewText(""));
 
-		TiXmlElement* tty = new TiXmlElement("TTY");
-		tty->LinkEndChild(new TiXmlText(""));
+        tinyxml2::XMLElement* tty = fDocument->NewElement("TTY");
+        tty->LinkEndChild(fDocument->NewText(""));
 
-		TiXmlElement* user = new TiXmlElement("USER");
-		user->LinkEndChild(new TiXmlText(processInfo.user));
+        tinyxml2::XMLElement* user = fDocument->NewElement("USER");
+        user->LinkEndChild(fDocument->NewText(processInfo.user.c_str()));
 
-		TiXmlElement* virtualMem = new TiXmlElement("VIRTUALMEMORY");
-		virtualMem->LinkEndChild(new TiXmlText(int_to_string(processInfo.virtualmem)));
+        tinyxml2::XMLElement* virtualMem = fDocument->NewElement("VIRTUALMEMORY");
+        virtualMem->LinkEndChild(fDocument->NewText(int_to_string(processInfo.virtualmem).c_str()));
 
 		process->LinkEndChild(cmd);
 		process->LinkEndChild(cpuUsage);
@@ -576,21 +576,21 @@ Inventory::_AddProcessesInfo(TiXmlElement* parent)
 
 
 void
-Inventory::_AddSoftwaresInfo(TiXmlElement* parent)
+Inventory::_AddSoftwaresInfo(tinyxml2::XMLElement* parent)
 {
 
 }
 
 
 void
-Inventory::_AddUsersInfo(TiXmlElement* parent)
+Inventory::_AddUsersInfo(tinyxml2::XMLElement* parent)
 {
-	TiXmlElement* users = new TiXmlElement("USERS");
+    tinyxml2::XMLElement* users = fDocument->NewElement("USERS");
 
 	LoggedUsers usersInfo;
 	for (int i = 0; i < usersInfo.Count(); i++) {
-		TiXmlElement* login = new TiXmlElement("LOGIN");
-		login->LinkEndChild(new TiXmlText(usersInfo.UserAt(i).c_str()));
+        tinyxml2::XMLElement* login = fDocument->NewElement("LOGIN");
+        login->LinkEndChild(fDocument->NewText(usersInfo.UserAt(i).c_str()));
 		users->LinkEndChild(login);
 	}
 	parent->LinkEndChild(users);
@@ -598,23 +598,23 @@ Inventory::_AddUsersInfo(TiXmlElement* parent)
 
 
 void
-Inventory::_AddVideosInfo(TiXmlElement* parent)
+Inventory::_AddVideosInfo(tinyxml2::XMLElement* parent)
 {
 	for (int i = 0; i < fMachine->CountVideos(); i++) {
 		video_info info = fMachine->VideoInfoFor(i);
 
-		TiXmlElement* video = new TiXmlElement("VIDEOS");
-		TiXmlElement* chipset = new TiXmlElement("CHIPSET");
-		chipset->LinkEndChild(new TiXmlText(info.chipset));
+        tinyxml2::XMLElement* video = fDocument->NewElement("VIDEOS");
+        tinyxml2::XMLElement* chipset = fDocument->NewElement("CHIPSET");
+        chipset->LinkEndChild(fDocument->NewText(info.chipset.c_str()));
 
-		TiXmlElement* memory = new TiXmlElement("MEMORY");
-		memory->LinkEndChild(new TiXmlText(info.memory));
+        tinyxml2::XMLElement* memory = fDocument->NewElement("MEMORY");
+        memory->LinkEndChild(fDocument->NewText(info.memory.c_str()));
 
-		TiXmlElement* name = new TiXmlElement("NAME");
-		name->LinkEndChild(new TiXmlText(info.name));
+        tinyxml2::XMLElement* name = fDocument->NewElement("NAME");
+        name->LinkEndChild(fDocument->NewText(info.name.c_str()));
 
-		TiXmlElement* resolution = new TiXmlElement("RESOLUTION");
-		resolution->LinkEndChild(new TiXmlText(info.resolution));
+        tinyxml2::XMLElement* resolution = fDocument->NewElement("RESOLUTION");
+        resolution->LinkEndChild(fDocument->NewText(info.resolution.c_str()));
 
 		video->LinkEndChild(chipset);
 		video->LinkEndChild(memory);
@@ -627,22 +627,22 @@ Inventory::_AddVideosInfo(TiXmlElement* parent)
 
 
 bool
-Inventory::_WriteProlog(TiXmlDocument& document) const
+Inventory::_WriteProlog(tinyxml2::XMLDocument& document) const
 {
 	Configuration* config = Configuration::Get();
 
-	TiXmlDeclaration* declaration = new TiXmlDeclaration("1.0", "UTF-8", "");
+    tinyxml2::XMLDeclaration* declaration = fDocument->NewDeclaration();
 	document.LinkEndChild(declaration);
 
-	TiXmlElement* request = new TiXmlElement("REQUEST");
+    tinyxml2::XMLElement* request = fDocument->NewElement("REQUEST");
 	document.LinkEndChild(request);
 
-	TiXmlElement* deviceID = new TiXmlElement("DEVICEID");
-	deviceID->LinkEndChild(new TiXmlText(config->DeviceID().c_str()));
+    tinyxml2::XMLElement* deviceID = fDocument->NewElement("DEVICEID");
+    deviceID->LinkEndChild(fDocument->NewText(config->DeviceID().c_str()));
 	request->LinkEndChild(deviceID);
 
-	TiXmlElement* query = new TiXmlElement("QUERY");
-	query->LinkEndChild(new TiXmlText("PROLOG"));
+    tinyxml2::XMLElement* query = fDocument->NewElement("QUERY");
+    query->LinkEndChild(fDocument->NewText("PROLOG"));
 
 	request->LinkEndChild(query);
 

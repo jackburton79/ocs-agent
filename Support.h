@@ -14,9 +14,11 @@
 #include <streambuf>
 #include <string>
 
-class TiXmlDocument;
-bool CompressXml(const TiXmlDocument& document, char*& destination, size_t& destLength);
-bool UncompressXml(const char* source, size_t sourceLen, TiXmlDocument& document);
+namespace tinyxml2 {
+    class XMLDocument;
+}
+bool CompressXml(tinyxml2::XMLDocument& document, char*& destination, size_t& destLength);
+bool UncompressXml(const char* source, size_t sourceLen, tinyxml2::XMLDocument& document);
 
 class popen_streambuf : public std::streambuf {
 public:

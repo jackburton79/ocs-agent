@@ -8,9 +8,12 @@
 #ifndef INVENTORY_H_
 #define INVENTORY_H_
 
+namespace tinyxml2 {
+    class XMLDocument;
+    class XMLElement;
+}
+
 class Machine;
-class TiXmlDocument;
-class TiXmlElement;
 class Inventory {
 public:
 	Inventory();
@@ -28,21 +31,21 @@ public:
 
 private:
 
-	void _AddAccountInfo(TiXmlElement* parent);
-	void _AddBIOSInfo(TiXmlElement* parent);
-	void _AddCPUsInfo(TiXmlElement* parent);
-	void _AddDrivesInfo(TiXmlElement* parent);
-	void _AddHardwareInfo(TiXmlElement* parent);
-	void _AddNetworksInfo(TiXmlElement* parent);
-	void _AddProcessesInfo(TiXmlElement* parent);
-	void _AddSoftwaresInfo(TiXmlElement* parent);
-	void _AddUsersInfo(TiXmlElement* parent);
-	void _AddVideosInfo(TiXmlElement* parent);
+    void _AddAccountInfo(tinyxml2::XMLElement* parent);
+    void _AddBIOSInfo(tinyxml2::XMLElement* parent);
+    void _AddCPUsInfo(tinyxml2::XMLElement* parent);
+    void _AddDrivesInfo(tinyxml2::XMLElement* parent);
+    void _AddHardwareInfo(tinyxml2::XMLElement* parent);
+    void _AddNetworksInfo(tinyxml2::XMLElement* parent);
+    void _AddProcessesInfo(tinyxml2::XMLElement* parent);
+    void _AddSoftwaresInfo(tinyxml2::XMLElement* parent);
+    void _AddUsersInfo(tinyxml2::XMLElement* parent);
+    void _AddVideosInfo(tinyxml2::XMLElement* parent);
 
-	bool _WriteProlog(TiXmlDocument& document) const;
+    bool _WriteProlog(tinyxml2::XMLDocument& document) const;
 
-	TiXmlDocument* fDocument;
-	TiXmlElement* fContent;
+    tinyxml2::XMLDocument* fDocument;
+    tinyxml2::XMLElement* fContent;
 	Machine* fMachine;
 };
 

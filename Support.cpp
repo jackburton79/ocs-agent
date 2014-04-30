@@ -10,15 +10,16 @@
 
 #include "Support.h"
 
+#include <iostream>
 #include <streambuf>
 #include <string.h>
 
-#include "tinyxml/tinyxml.h"
+#include "tinyxml2/tinyxml2.h"
 
 #include <zlib.h>
 
 bool
-CompressXml(const TiXmlDocument& document, char*& destination, size_t& destLength)
+CompressXml(tinyxml2::XMLDocument& document, char*& destination, size_t& destLength)
 {
 	FILE* temp = tmpfile();
 	if (temp == NULL) {
@@ -56,7 +57,7 @@ CompressXml(const TiXmlDocument& document, char*& destination, size_t& destLengt
 
 
 bool
-UncompressXml(const char* source, size_t sourceLen, TiXmlDocument& document)
+UncompressXml(const char* source, size_t sourceLen, tinyxml2::XMLDocument& document)
 {
 	FILE* temp = tmpfile();
 	if (temp == NULL) {
