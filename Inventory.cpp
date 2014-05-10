@@ -11,9 +11,10 @@
 #include "LoggedUsers.h"
 #include "Machine.h"
 #include "RunningProcessesList.h"
+#include "Screens.h"
 #include "Support.h"
 #include "VolumeReader.h"
-#include "edid-decode.h"
+
 
 #include "http/HTTP.h"
 
@@ -627,15 +628,14 @@ Inventory::_AddVideosInfo(tinyxml2::XMLElement* parent)
 void
 Inventory::_AddMonitorsInfo(tinyxml2::XMLElement* parent)
 {
-#if 0
-    // TODO: Encapsulate into another class
-    popen_streambuf buf("find /sys/devices/ -name edid", "r");
-    std::istream stream(&buf);
 
-    std::string line;
-    while (std::getline(stream, line))
-        print_edid_info((char*)line.c_str());
-#endif
+    Screens screens;
+
+    screen_info info;
+    while (screens.GetNext(info)) {
+        std::cout << "name: " << info.name << ", manufacturer: " <<  info.manufacturer << std::endl;
+    }
+
 }
 
 

@@ -32,6 +32,8 @@
 #include <time.h>
 #include <ctype.h>
 
+#include "edid-decode.h"
+
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(*(x)))
 
 static int claims_one_point_oh = 0;
@@ -76,6 +78,7 @@ struct field {
     struct value *values;
     int n_values;
 };
+
 
 #define DEFINE_FIELD(n, var, s, e, ...)				\
     static struct value var##_values[] =  {			\
@@ -1370,7 +1373,7 @@ static void dump_breakdown(unsigned char *edid)
     printf("\n");
 }
 
-int print_edid_info(char *filename)
+int get_edid_info(const char *filename, struct edid_info* info)
 {
     int fd;
     unsigned char *edid;
@@ -1392,20 +1395,26 @@ int print_edid_info(char *filename)
     if (fd != 0)
 	close(fd);
 
-    dump_breakdown(edid);
+   // dump_breakdown(edid);
 
     if (!edid || memcmp(edid, "\x00\xFF\xFF\xFF\xFF\xFF\xFF\x00", 8)) {
-	printf("No header found\n");
+	//printf("No header found\n");
 	// return 1;
     }
 
+    strncpy(info->manufacturer, manufacturer_name(edid + 0x08), sizeof(info->manufacturer));
+    info->model = (unsigned short)(edid[0x0A] + (edid[0x0B] << 8));
+    info->serial_number = (unsigned int)(edid[0x0C] + (edid[0x0D] << 8)
+			   + (edid[0x0E] << 16) + (edid[0x0F] << 24));
+			   
+   
     printf("Manufacturer: %s Model %x Serial Number %u\n",
 	    manufacturer_name(edid + 0x08),
 	    (unsigned short)(edid[0x0A] + (edid[0x0B] << 8)),
 	    (unsigned int)(edid[0x0C] + (edid[0x0D] << 8)
 			   + (edid[0x0E] << 16) + (edid[0x0F] << 24)));
     /* XXX need manufacturer ID table */
-
+    return 0;
     time(&the_time);
     ptm = localtime(&the_time);
     if (edid[0x10] < 55 || edid[0x10] == 0xff) {

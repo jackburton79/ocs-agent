@@ -12,9 +12,10 @@ CPP_SRCS += \
 ../Machine.cpp \
 ../ProcReader.cpp \
 ../RunningProcessesList.cpp \
+../Screens.cpp \
 ../Support.cpp \
 ../VolumeReader.cpp \
-../edid-decode.c \
+../edid-decode.c 	\
 ../main.cpp 
 
 OBJS += \
@@ -26,6 +27,7 @@ OBJS += \
 ./Machine.o \
 ./ProcReader.o \
 ./RunningProcessesList.o \
+./Screens.o \
 ./Support.o \
 ./VolumeReader.o \
 ./edid-decode.o \
@@ -40,6 +42,7 @@ CPP_DEPS += \
 ./Machine.d \
 ./ProcReader.d \
 ./RunningProcessesList.d \
+./Screens.d \
 ./Support.d \
 ./VolumeReader.d \
 ./edid-decode.d \
