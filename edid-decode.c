@@ -1408,13 +1408,15 @@ int get_edid_info(const char *filename, struct edid_info* info)
 			   + (edid[0x0E] << 16) + (edid[0x0F] << 24));
 			   
    
-    printf("Manufacturer: %s Model %x Serial Number %u\n",
+    /*printf("Manufacturer: %s Model %x Serial Number %u\n",
 	    manufacturer_name(edid + 0x08),
 	    (unsigned short)(edid[0x0A] + (edid[0x0B] << 8)),
 	    (unsigned int)(edid[0x0C] + (edid[0x0D] << 8)
-			   + (edid[0x0E] << 16) + (edid[0x0F] << 24)));
+			   + (edid[0x0E] << 16) + (edid[0x0F] << 24)));*/
     /* XXX need manufacturer ID table */
+    
     return 0;
+    
     time(&the_time);
     ptm = localtime(&the_time);
     if (edid[0x10] < 55 || edid[0x10] == 0xff) {
