@@ -634,6 +634,26 @@ Inventory::_AddMonitorsInfo(tinyxml2::XMLElement* parent)
     screen_info info;
     while (screens.GetNext(info)) {
         std::cout << "name: " << info.name << ", manufacturer: " <<  info.manufacturer << std::endl;
+        tinyxml2::XMLElement* monitor = fDocument->NewElement("MONITORS");
+        tinyxml2::XMLElement* base64 = fDocument->NewElement("BASE64");
+        tinyxml2::XMLElement* caption = fDocument->NewElement("CAPTION");
+        tinyxml2::XMLElement* description = fDocument->NewElement("DESCRIPTION");
+        tinyxml2::XMLElement* manufacturer = fDocument->NewElement("MANUFACTURER");
+        tinyxml2::XMLElement* serial = fDocument->NewElement("SERIAL");
+        tinyxml2::XMLElement* uuencode = fDocument->NewElement("UUENCODE");
+
+        manufacturer->LinkEndChild(fDocument->NewText((info.manufacturer.c_str())));
+        serial->LinkEndChild(fDocument->NewText((info.serial_number.c_str())));
+
+        monitor->LinkEndChild(base64);
+        monitor->LinkEndChild(caption);
+        monitor->LinkEndChild(description);
+        monitor->LinkEndChild(manufacturer);
+        monitor->LinkEndChild(serial);
+        monitor->LinkEndChild(uuencode);
+
+
+        parent->LinkEndChild(monitor);
     }
 
 }
