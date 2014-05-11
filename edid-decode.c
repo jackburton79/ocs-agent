@@ -1399,7 +1399,7 @@ int get_edid_info(const char *filename, struct edid_info* info)
 
     if (!edid || memcmp(edid, "\x00\xFF\xFF\xFF\xFF\xFF\xFF\x00", 8)) {
 	//printf("No header found\n");
-	// return 1;
+	 return 1;
     }
 
     strncpy(info->manufacturer, manufacturer_name(edid + 0x08), sizeof(info->manufacturer));
