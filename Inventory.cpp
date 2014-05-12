@@ -664,18 +664,18 @@ Inventory::_WriteProlog(tinyxml2::XMLDocument& document) const
 {
 	Configuration* config = Configuration::Get();
 
-    tinyxml2::XMLDeclaration* declaration = fDocument->NewDeclaration();
+    tinyxml2::XMLDeclaration* declaration = document.NewDeclaration();
 	document.LinkEndChild(declaration);
 
-    tinyxml2::XMLElement* request = fDocument->NewElement("REQUEST");
+    tinyxml2::XMLElement* request = document.NewElement("REQUEST");
 	document.LinkEndChild(request);
 
-    tinyxml2::XMLElement* deviceID = fDocument->NewElement("DEVICEID");
-    deviceID->LinkEndChild(fDocument->NewText(config->DeviceID().c_str()));
+    tinyxml2::XMLElement* deviceID = document.NewElement("DEVICEID");
+    deviceID->LinkEndChild(document.NewText(config->DeviceID().c_str()));
 	request->LinkEndChild(deviceID);
 
-    tinyxml2::XMLElement* query = fDocument->NewElement("QUERY");
-    query->LinkEndChild(fDocument->NewText("PROLOG"));
+    tinyxml2::XMLElement* query = document.NewElement("QUERY");
+    query->LinkEndChild(document.NewText("PROLOG"));
 
 	request->LinkEndChild(query);
 
