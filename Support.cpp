@@ -24,7 +24,7 @@ CompressXml(tinyxml2::XMLDocument& document, char*& destination, size_t& destLen
     tinyxml2::XMLPrinter memoryPrinter;
     document.Print(&memoryPrinter);
 
-    int fileSize = memoryPrinter.CStrSize();
+    int fileSize = memoryPrinter.CStrSize() - 1;
 
 	destLength = compressBound(fileSize);
 	destination = new char[destLength];
@@ -54,11 +54,11 @@ UncompressXml(const char* source, size_t sourceLen, tinyxml2::XMLDocument& docum
 		return false;
 	}
 
-    bool result = document.Parse(destination, destLength);
+	tinyxml2::XMLError result = document.Parse(destination, destLength - 1);
 
     delete[] destination;
 
-	return result;
+	return result == tinyxml2::XML_SUCCESS;
 }
 
 
