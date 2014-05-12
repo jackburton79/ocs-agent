@@ -1382,6 +1382,8 @@ int get_edid_info(const char *filename, struct edid_info* info)
     struct tm *ptm;
     int analog, i;
 
+	info->description[0] = '\0';
+
     if ((fd = open(filename, O_RDONLY)) == -1) {
 	perror(filename);
 	return 1;
@@ -1407,16 +1409,9 @@ int get_edid_info(const char *filename, struct edid_info* info)
     info->serial_number = (unsigned int)(edid[0x0C] + (edid[0x0D] << 8)
 			   + (edid[0x0E] << 16) + (edid[0x0F] << 24));
 			   
-   
-    /*printf("Manufacturer: %s Model %x Serial Number %u\n",
-	    manufacturer_name(edid + 0x08),
-	    (unsigned short)(edid[0x0A] + (edid[0x0B] << 8)),
-	    (unsigned int)(edid[0x0C] + (edid[0x0D] << 8)
-			   + (edid[0x0E] << 16) + (edid[0x0F] << 24)));*/
-    /* XXX need manufacturer ID table */
-    
-    return 0;
-    
+   	    
+	int week = 0;
+	int year = 0;
     time(&the_time);
     ptm = localtime(&the_time);
     if (edid[0x10] < 55 || edid[0x10] == 0xff) {
@@ -1424,15 +1419,20 @@ int get_edid_info(const char *filename, struct edid_info* info)
 	if (edid[0x11] > 0x0f) {
 	    if (edid[0x10] == 0xff) {
 		has_valid_year = 1;
-		printf("Made week %hd of model year %hd\n", edid[0x10],
-		       edid[0x11]);
+		week = edid[0x10];
+		year = edid[0x11];
 	    } else if (edid[0x11] + 90 <= ptm->tm_year) {
 		has_valid_year = 1;
-		printf("Made week %hd of %hd\n", edid[0x10], edid[0x11] + 1990);
+		week = edid[0x10];
+		year = edid[0x11] + 1990;
 	    }
 	}
     }
 
+	if (has_valid_year && has_valid_week)
+		snprintf(info->description, sizeof(info->description), "%s (%hd/%hd)", info->manufacturer, week, year);
+
+	return 0;
     printf("EDID version: %hd.%hd\n", edid[0x12], edid[0x13]);
     if (edid[0x12] == 1) {
 	if (edid[0x13] > 4) {

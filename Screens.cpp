@@ -18,6 +18,7 @@ Screens::Screens()
         edid_info edidInfo;
         info.name = line;
         if (get_edid_info(line.c_str(), &edidInfo) == 0) {
+			info.description = edidInfo.description;
             info.manufacturer = edidInfo.manufacturer;
             info.model = edidInfo.model;
             info.serial_number = edidInfo.serial_number;

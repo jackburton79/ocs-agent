@@ -3,9 +3,11 @@
 
 
 struct edid_info {
-  char manufacturer[64];
+  char description[32];
+  char manufacturer[16];
+  char type[16];
   int model;
-  int serial_number;  
+  int serial_number;
 };
 
 extern
