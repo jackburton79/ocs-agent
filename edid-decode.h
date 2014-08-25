@@ -7,7 +7,7 @@ struct edid_info {
   char manufacturer[16];
   char type[16];
   int model;
-  int serial_number;
+  char serial_number[32];
 };
 
 extern
