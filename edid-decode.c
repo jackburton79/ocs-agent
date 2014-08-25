@@ -483,8 +483,6 @@ detailed_block(unsigned char *x, int in_extension)
 		   extract_string(x + 5, &has_valid_string_termination, 13));
 	    return 1;
 	case 0xFF:
-	    // printf("Serial number: %s\n",
-		   extract_string(x + 5, &has_valid_string_termination, 13));
 	    strcpy(tmp, extract_string(x + 5, &has_valid_string_termination, 13));
 	    return 1;
 	default:
@@ -1408,8 +1406,6 @@ int get_edid_info(const char *filename, struct edid_info* info)
 
     strncpy(info->manufacturer, manufacturer_name(edid + 0x08), sizeof(info->manufacturer));
     info->model = (unsigned short)(edid[0x0A] + (edid[0x0B] << 8));
-    // info->serial_number = (unsigned int)(edid[0x0C] + (edid[0x0D] << 8)
-			   + (edid[0x0E] << 16) + (edid[0x0F] << 24));
    	    
 	int week = 0;
 	int year = 0;
