@@ -66,7 +66,6 @@ static int warning_excessive_dotclock_correction = 0;
 static int warning_zero_preferred_refresh = 0;
 
 static int conformant = 1;
-static char tmp[32];
 
 struct value {
     int value;
@@ -483,9 +482,8 @@ detailed_block(unsigned char *x, int in_extension)
 		   extract_string(x + 5, &has_valid_string_termination, 13));
 	    return 1;
 	case 0xFF:
-	    // printf("Serial number: %s\n",
+	    printf("Serial number: %s\n",
 		   extract_string(x + 5, &has_valid_string_termination, 13));
-	    strcpy(tmp, extract_string(x + 5, &has_valid_string_termination, 13));
 	    return 1;
 	default:
 	    printf("Unknown monitor description type %d\n", x[3]);
@@ -1408,8 +1406,9 @@ int get_edid_info(const char *filename, struct edid_info* info)
 
     strncpy(info->manufacturer, manufacturer_name(edid + 0x08), sizeof(info->manufacturer));
     info->model = (unsigned short)(edid[0x0A] + (edid[0x0B] << 8));
-    // info->serial_number = (unsigned int)(edid[0x0C] + (edid[0x0D] << 8)
+    info->serial_number = (unsigned int)(edid[0x0C] + (edid[0x0D] << 8)
 			   + (edid[0x0E] << 16) + (edid[0x0F] << 24));
+			   
    	    
 	int week = 0;
 	int year = 0;
@@ -1430,11 +1429,11 @@ int get_edid_info(const char *filename, struct edid_info* info)
 	}
     }
 
-//	if (has_valid_year && has_valid_week)
+	if (has_valid_year && has_valid_week)
 		snprintf(info->description, sizeof(info->description), "%s (%hd/%hd)", info->manufacturer, week, year);
 
-//	return 0;
-//    printf("EDID version: %hd.%hd\n", edid[0x12], edid[0x13]);
+	return 0;
+    printf("EDID version: %hd.%hd\n", edid[0x12], edid[0x13]);
     if (edid[0x12] == 1) {
 	if (edid[0x13] > 4) {
 	    printf("Claims > 1.4, assuming 1.4 conformance\n");
@@ -1733,8 +1732,8 @@ int get_edid_info(const char *filename, struct edid_info* info)
     if (warning_zero_preferred_refresh)
 	printf("Warning: CVT block does not set preferred refresh rate\n");
 
-    strncpy(info->serial_number, tmp, sizeof(info->serial_number));
     free(edid);
+
     return !conformant;
 }
 
