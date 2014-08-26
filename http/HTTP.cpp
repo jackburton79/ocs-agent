@@ -171,13 +171,20 @@ HTTP::Request(HTTPRequestHeader& header, const void* data, size_t length)
 	int code;
 	::sscanf(statusLine.c_str(), "HTTP/1.%*d %03d", (int*)&code);
 
-	// TODO: Add a Clear() method
-	fLastResponse = HTTPResponseHeader();
-	fLastResponse.SetStatusLine(code, statusLine.c_str());
-	while (_ReadLineFromSocket(replyString, fFD)) {
-		size_t pos = replyString.find(":");
-		fLastResponse.SetValue(replyString.substr(0, pos),
-				replyString.substr(pos + 1, std::string::npos));
+	try {
+		// TODO: Add a Clear() method
+		fLastResponse = HTTPResponseHeader();
+		fLastResponse.SetStatusLine(code, statusLine.c_str());
+		while (_ReadLineFromSocket(replyString, fFD)) {
+			size_t pos = replyString.find(":");
+			fLastResponse.SetValue(replyString.substr(0, pos),
+					replyString.substr(pos + 1, std::string::npos));
+		}
+	} catch (int error) {
+		fLastError = error;
+		return error;
+	} catch (...) {
+		return -1;
 	}
 
 	return 0;
@@ -250,6 +257,9 @@ HTTP::_ReadLineFromSocket(std::string& string, int socket)
 		if (byte != '\015')
 			s.write(&byte, sizeRead);
 	}
+
+	if (sizeRead < 0)
+		throw errno;
 
 	string = s.str();
 
