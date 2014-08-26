@@ -195,16 +195,7 @@ HTTP::_HandleConnectionIfNeeded(const std::string string, const int port)
 #endif
 	if (fFD >= 0) {
 		if (hostName == "" || (hostName == fHost && port == fPort)) {
-			// We were already connected to this host.
-			// Check if connection is still up
-			struct sockaddr_in peer;
-			socklen_t len = sizeof(peer);
-			if (::getpeername(fFD, (sockaddr*)&peer, &len ) == 0) {
-				//std::cout << "connection peer: " << inet_ntoa(peer.sin_addr) << std::endl;
-				return true;
-			} else {
-				std::cerr << "HTTP: Connection was closed by server. Reconnecting..." << std::endl;
-			}
+			return true;
 		}
 		::close(fFD);
 		fFD = -1;
