@@ -187,6 +187,8 @@ Inventory::Send(const char* serverUrl)
 		return false;
 	}
 
+        HTTP httpObject2;
+
 	requestHeader = HTTPRequestHeader();
 	requestHeader.SetRequest("POST", inventoryUrl);
 	requestHeader.SetValue("Pragma", "no-cache");
@@ -196,10 +198,10 @@ Inventory::Send(const char* serverUrl)
 	requestHeader.SetContentType("application/x-compress");
 	requestHeader.SetContentLength(compressedSize);
 	requestHeader.SetUserAgent(USER_AGENT);
-	if (httpObject.Request(requestHeader, compressedData, compressedSize) != 0) {
+	if (httpObject2.Request(requestHeader, compressedData, compressedSize) != 0) {
 		delete[] compressedData;
 		std::cerr << "Inventory::Send(): Cannot send inventory: ";
-		std::cerr << httpObject.ErrorString() << std::endl;
+		std::cerr << httpObject2.ErrorString() << std::endl;
 		return false;
 	}
 
