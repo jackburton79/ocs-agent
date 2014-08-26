@@ -121,7 +121,7 @@ Inventory::Send(const char* serverUrl)
 	HTTP httpObject;
 
 	// Send Prolog
-    tinyxml2::XMLDocument prolog;
+	tinyxml2::XMLDocument prolog;
 	_WriteProlog(prolog);
 
 	char* prologData = NULL;
@@ -166,7 +166,7 @@ Inventory::Send(const char* serverUrl)
 			return false;
 		}
 
-        tinyxml2::XMLDocument document;
+        	tinyxml2::XMLDocument document;
 		bool uncompress = UncompressXml(resultData, contentLength, document);
 		delete[] resultData;
 
