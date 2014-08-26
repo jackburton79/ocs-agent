@@ -148,7 +148,7 @@ HTTP::Request(HTTPRequestHeader& header, const void* data, size_t length)
 
 	std::string string = fCurrentRequest.ToString().append(CRLF);
 
-#if 1
+#if 0
 	std::cout << string << std::endl;
 #endif
 	if (::write(fFD, string.c_str(), string.length())
