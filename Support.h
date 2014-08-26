@@ -14,11 +14,24 @@
 #include <streambuf>
 #include <string>
 
-namespace tinyxml2 {
-    class XMLDocument;
-}
+#include "tinyxml2/tinyxml2.h"
+
 bool CompressXml(tinyxml2::XMLDocument& document, char*& destination, size_t& destLength);
 bool UncompressXml(const char* source, size_t sourceLen, tinyxml2::XMLDocument& document);
+
+
+class ResponseFinder : public tinyxml2::XMLVisitor {
+public:
+        ResponseFinder();
+	virtual bool VisitEnter(const tinyxml2::XMLElement& element, const tinyxml2::XMLAttribute* attr);
+        virtual bool Visit(const tinyxml2::XMLText& text);
+
+	std::string Response() const;
+private:
+	std::string fResponse;
+	bool fFound;
+};
+
 
 class popen_streambuf : public std::streambuf {
 public:

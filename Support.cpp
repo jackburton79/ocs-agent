@@ -2,7 +2,7 @@
  * Support.cpp
  *
  *  Created on: 11/lug/2013
- *      Author: stefano
+ *      Author: Stefano Ceccherini
  *      Code for popen_streambuf found here:
  *      http://stackoverflow.com/questions/1683051/file-and-istream-connect-the-two
  */
@@ -18,13 +18,53 @@
 
 #include <zlib.h>
 
+ResponseFinder::ResponseFinder()
+	:
+	XMLVisitor(),
+	fFound(false)	
+{
+}
+
+
+/* virtual */
+bool
+ResponseFinder::VisitEnter(const tinyxml2::XMLElement& element, const tinyxml2::XMLAttribute*)
+{
+	if (::strcmp(element.Name(), "RESPONSE") == 0)
+		fFound = true;
+	
+	return true;
+}
+
+
+/* virtual */
+bool
+ResponseFinder::Visit(const tinyxml2::XMLText& text)
+{	
+	if (fFound) {
+		fResponse = text.Value();
+		return false;
+		
+	}
+	
+	return true;
+}
+
+
+std::string
+ResponseFinder::Response() const
+{
+	return fResponse;
+}
+
+
 bool
 CompressXml(tinyxml2::XMLDocument& document, char*& destination, size_t& destLength)
 {
-    tinyxml2::XMLPrinter memoryPrinter;
-    document.Print(&memoryPrinter);
+	tinyxml2::XMLPrinter memoryPrinter;
+	document.Print(&memoryPrinter);
 
-    int fileSize = memoryPrinter.CStrSize() - 1;
+	int fileSize = memoryPrinter.CStrSize() - 1;
 
 	destLength = compressBound(fileSize);
 	destination = new char[destLength];
@@ -56,7 +96,7 @@ UncompressXml(const char* source, size_t sourceLen, tinyxml2::XMLDocument& docum
 
 	tinyxml2::XMLError result = document.Parse(destination, destLength - 1);
 
-    delete[] destination;
+	delete[] destination;
 
 	return result == tinyxml2::XML_SUCCESS;
 }
