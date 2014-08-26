@@ -243,7 +243,7 @@ HTTP::_ReadLineFromSocket(std::string& string, int socket)
 {
 	std::ostringstream s;
 	char byte;
-	size_t sizeRead = 0;
+	int sizeRead = 0;
 	while ((sizeRead = ::read(socket, &byte, 1)) > 0) {
 		if (byte == '\012')
 			break;
