@@ -163,9 +163,14 @@ HTTP::Request(HTTPRequestHeader& header, const void* data, size_t length)
 			return errno;
 		}
 	}
-
+	
 	std::string replyString;
-	_ReadLineFromSocket(replyString, fFD);
+	try {
+		_ReadLineFromSocket(replyString, fFD);
+	} catch (int error) {
+		fLastError = error;
+		return error;
+	}
 
 	std::string statusLine = replyString;
 	int code;
