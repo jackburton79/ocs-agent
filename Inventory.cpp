@@ -21,6 +21,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <memory>
+#include <unistd.h>
 
 #include "tinyxml2/tinyxml2.h"
 
@@ -120,13 +121,13 @@ Inventory::Send(const char* serverUrl)
 	HTTP httpObject;
 
 	// Send Prolog
+	std::cerr << "Inventory::Send(): Prolog... ";
 	tinyxml2::XMLDocument prolog;
 	_WriteProlog(prolog);
-
 	char* prologData = NULL;
 	size_t prologLength = 0;
 	if (!CompressXml(prolog, prologData, prologLength)) {
-		std::cerr << "Inventory::Send(): Error compressing prolog XML" << std::endl;
+		std::cerr << "error compressing prolog XML" << std::endl;
 		return false;
 	}
 
@@ -143,50 +144,69 @@ Inventory::Send(const char* serverUrl)
 	requestHeader.SetUserAgent(USER_AGENT);
 	if (httpObject.Request(requestHeader, prologData, prologLength) != 0) {
 		delete[] prologData;
-		std::cerr << "Inventory::Send(): cannot send prolog: ";
+		std::cerr << "cannot send prolog: ";
 		std::cerr << httpObject.ErrorString() << std::endl;
 		return false;
 	}
 
 	delete[] prologData;
 
+	std::cerr << "OK!" << std::endl;
+
+	std::cerr << "Inventory::Send(): waiting for server response... ";
 	const HTTPResponseHeader& responseHeader = httpObject.LastResponse();
-	std::cout << responseHeader.ToString() << std::endl;
-	if (responseHeader.StatusCode() == 200
-			&& responseHeader.HasContentLength()) {
-		size_t contentLength =
-				::strtol(responseHeader.Value(HTTPContentLength).c_str(),
-						NULL, 10);
-		char* resultData = new char[contentLength];
-		if (httpObject.Read(resultData, contentLength) < (int)contentLength) {
-			delete[] resultData;
-			std::cerr << "Inventory::Send(): Failed to read XML response: ";
-			std::cerr << httpObject.ErrorString() << std::endl;
-			return false;
-		}
-
-        	tinyxml2::XMLDocument document;
-		bool uncompress = UncompressXml(resultData, contentLength, document);
-		delete[] resultData;
-
-		if (!uncompress) {
-			std::cerr << "Inventory::Send(): Failed to decompress XML response" << std::endl;
-			return false;
-		}
-
-		// TODO: Do something with the reply
-#if 1
-		document.Print();
-#endif
-	}
-
-	char* compressedData = NULL;
-	size_t compressedSize;
-	if (!CompressXml(*fDocument, compressedData, compressedSize)) {
-		std::cerr << "Inventory::Send(): Error compressing inventory XML" << std::endl;
+	if (responseHeader.StatusCode() != 200
+			|| !responseHeader.HasContentLength()) {
+		std::cout << responseHeader.ToString() << std::endl;
 		return false;
 	}
 
+	size_t contentLength = ::strtol(responseHeader.Value(HTTPContentLength).c_str(), NULL, 10);
+	char* resultData = new char[contentLength];
+	if (httpObject.Read(resultData, contentLength) < (int)contentLength) {
+		delete[] resultData;
+		std::cerr << "failed to read XML response: ";
+		std::cerr << httpObject.ErrorString() << std::endl;
+		return false;
+	}
+
+	std::cerr << "OK!" << std::endl;
+
+	std::cerr << "Inventory::Send(): Decompressing XML... ";
+       	tinyxml2::XMLDocument document;
+	bool uncompress = UncompressXml(resultData, contentLength, document);
+	delete[] resultData;
+	if (!uncompress) {
+		std::cerr << "failed to decompress XML" << std::endl;
+		return false;
+	}
+		
+	std::cerr << "OK!" << std::endl;
+
+	std::cerr << "Inventory::Send(): server replied ";
+	ResponseFinder responseFinder;
+	document.Accept(&responseFinder);
+	std::string serverResponse = responseFinder.Response();
+	
+	std::cerr << serverResponse;
+	if (serverResponse != "SEND") {
+		std::cerr << ": server not ready to accept inventory" << std::endl;
+		return false;
+	}
+	
+	std::cerr << ": OK!" << std::endl;
+
+	std::cerr << "Inventory::Send(): Compressing XML inventory data... ";
+	char* compressedData = NULL;
+	size_t compressedSize;
+	if (!CompressXml(*fDocument, compressedData, compressedSize)) {
+		std::cerr << "error compressing inventory XML" << std::endl;
+		return false;
+	}
+
+	std::cerr << "OK!" << std::endl;
+
+	std::cerr << "Inventory::Send(): Sending inventory...";
 	requestHeader = HTTPRequestHeader();
 	requestHeader.SetRequest("POST", inventoryUrl);
 	requestHeader.SetValue("Pragma", "no-cache");
@@ -198,10 +218,12 @@ Inventory::Send(const char* serverUrl)
 	requestHeader.SetUserAgent(USER_AGENT);
 	if (httpObject.Request(requestHeader, compressedData, compressedSize) != 0) {
 		delete[] compressedData;
-		std::cerr << "Inventory::Send(): Cannot send inventory: ";
+		std::cerr << "cannot send inventory: ";
 		std::cerr << httpObject.ErrorString() << std::endl;
 		return false;
 	}
+
+	std::cerr << "OK!" << std::endl;
 
 	delete[] compressedData;
 
@@ -225,11 +247,11 @@ Inventory::_AddAccountInfo(tinyxml2::XMLElement* parent)
 
 	// TODO: ??? We can't store anything
 	for (int a = 0; a < 1; a++) {
-        tinyxml2::XMLElement* keyName = fDocument->NewElement("KEYNAME");
-        keyName->LinkEndChild(fDocument->NewElement("TAG"));
+        	tinyxml2::XMLElement* keyName = fDocument->NewElement("KEYNAME");
+        	keyName->LinkEndChild(fDocument->NewElement("TAG"));
 
-        tinyxml2::XMLElement* keyValue = fDocument->NewElement("KEYVALUE");
-        keyValue->LinkEndChild(fDocument->NewElement("NA"));
+        	tinyxml2::XMLElement* keyValue = fDocument->NewElement("KEYVALUE");
+        	keyValue->LinkEndChild(fDocument->NewElement("NA"));
 
 		accountInfo->LinkEndChild(keyName);
 		accountInfo->LinkEndChild(keyValue);
