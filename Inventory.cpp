@@ -48,6 +48,7 @@ bool
 Inventory::Initialize(const char* deviceID)
 {
 	Clear();
+	std::cerr << "Inventory::Initialize(): Device ID: " << deviceID << "...";
     	tinyxml2::XMLDeclaration* declaration = fDocument->NewDeclaration();
     	tinyxml2::XMLElement* request = fDocument->NewElement("REQUEST");
 	fDocument->LinkEndChild(declaration);
@@ -65,6 +66,7 @@ Inventory::Initialize(const char* deviceID)
 
 	request->LinkEndChild(deviceId);
 
+	std::cerr << "OK!" << std::endl;
 	return true;
 }
 
@@ -79,11 +81,12 @@ Inventory::Clear()
 bool
 Inventory::Build(const char* deviceID)
 {
+	std::cerr << "Building inventory... ";
 	// TODO: Finish this, cleanup.
 	try {
 		fMachine->RetrieveData();
 	} catch (...) {
-		std::cerr << "Cannot retrieve machine data." << std::endl;
+		std::cerr << "cannot retrieve machine data." << std::endl;
 		return false;
 	}
 
@@ -101,6 +104,7 @@ Inventory::Build(const char* deviceID)
 	_AddVideosInfo(content);
     	_AddMonitorsInfo(content);
 
+	std::cerr << "OK!" << std::endl;
 	return true;
 }
 
@@ -108,10 +112,21 @@ Inventory::Build(const char* deviceID)
 bool
 Inventory::Save(const char* name)
 {
+	std::cerr << "Saving inventory as ";
 	std::string fullName;
 	fullName.append(name).append(".xml");
 
-    	return fDocument->SaveFile(fullName.c_str()) == tinyxml2::XML_NO_ERROR;
+	std::cerr << fullName << "... ";
+	
+	bool result = fDocument->SaveFile(fullName.c_str()) == tinyxml2::XML_NO_ERROR;
+	if (result)
+		std::cerr << "OK!";
+	else
+		std::cerr << "Failed!";
+
+	std::cerr << std::endl;
+
+	return result;
 }
 
 
