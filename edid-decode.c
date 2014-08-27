@@ -34,6 +34,8 @@
 
 #include "edid-decode.h"
 
+#define printf (void) 
+
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(*(x)))
 
 static int claims_one_point_oh = 0;
@@ -1373,6 +1375,7 @@ static void dump_breakdown(unsigned char *edid)
     printf("\n");
 }
 
+
 int get_edid_info(const char *filename, struct edid_info* info)
 {
     int fd;
@@ -1407,8 +1410,8 @@ int get_edid_info(const char *filename, struct edid_info* info)
     strncpy(info->manufacturer, manufacturer_name(edid + 0x08), sizeof(info->manufacturer));
     info->model = (unsigned short)(edid[0x0A] + (edid[0x0B] << 8));
    	    
-	int week = 0;
-	int year = 0;
+    int week = 0;
+    int year = 0;
     time(&the_time);
     ptm = localtime(&the_time);
     if (edid[0x10] < 55 || edid[0x10] == 0xff) {
@@ -1733,6 +1736,7 @@ int get_edid_info(const char *filename, struct edid_info* info)
     free(edid);
     return !conformant;
 }
+#undef printf
 
 /*
  * Notes on panel extensions: (TODO, implement me in the code)
