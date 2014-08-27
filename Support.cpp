@@ -110,8 +110,6 @@ popen_streambuf::popen_streambuf(const char* fileName, const char* mode)
 	popen_streambuf* buf = open(fileName, mode);
 	if (buf == NULL)
 		throw -1;
-
-	// TODO: How to tell if the command does not exist ?
 }
 
 
