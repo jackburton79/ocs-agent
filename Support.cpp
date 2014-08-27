@@ -21,7 +21,7 @@
 
 // TODO: Move XML stuff to XML.h/cpp
 
-ResponseFinder::ResponseFinder(const char* elementName)
+ElementFinder::ElementFinder(const char* elementName)
 	:
 	XMLVisitor(),
 	fElementName(elementName),
@@ -32,7 +32,7 @@ ResponseFinder::ResponseFinder(const char* elementName)
 
 /* virtual */
 bool
-ResponseFinder::VisitEnter(const tinyxml2::XMLElement& element, const tinyxml2::XMLAttribute*)
+ElementFinder::VisitEnter(const tinyxml2::XMLElement& element, const tinyxml2::XMLAttribute*)
 {
 	if (fElementName.compare(element.Name()) == 0) {
 		fResponse = element.GetText();
@@ -45,7 +45,7 @@ ResponseFinder::VisitEnter(const tinyxml2::XMLElement& element, const tinyxml2::
 
 
 std::string
-ResponseFinder::Response() const
+ElementFinder::Response() const
 {
 	return fResponse;
 }
