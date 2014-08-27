@@ -49,20 +49,20 @@ Inventory::Initialize(const char* deviceID)
 {
 	Clear();
 	std::cerr << "Inventory::Initialize(): Device ID: " << deviceID << "...";
-    	tinyxml2::XMLDeclaration* declaration = fDocument->NewDeclaration();
-    	tinyxml2::XMLElement* request = fDocument->NewElement("REQUEST");
+	tinyxml2::XMLDeclaration* declaration = fDocument->NewDeclaration();
+	tinyxml2::XMLElement* request = fDocument->NewElement("REQUEST");
 	fDocument->LinkEndChild(declaration);
 	fDocument->LinkEndChild(request);
-    	fContent = fDocument->NewElement("CONTENT");
+	fContent = fDocument->NewElement("CONTENT");
 	request->LinkEndChild(fContent);
 
-    	tinyxml2::XMLElement* query = fDocument->NewElement("QUERY");
+	tinyxml2::XMLElement* query = fDocument->NewElement("QUERY");
 		// TODO: We only do Inventory for now
-    	query->LinkEndChild(fDocument->NewText("INVENTORY"));
+	query->LinkEndChild(fDocument->NewText("INVENTORY"));
 	request->LinkEndChild(query);
 
  	tinyxml2::XMLElement* deviceId = fDocument->NewElement("DEVICEID");
-    	deviceId->LinkEndChild(fDocument->NewText(deviceID));
+	deviceId->LinkEndChild(fDocument->NewText(deviceID));
 
 	request->LinkEndChild(deviceId);
 
@@ -90,7 +90,7 @@ Inventory::Build(const char* deviceID)
 		return false;
 	}
 
-    	tinyxml2::XMLElement* content = fContent;
+	tinyxml2::XMLElement* content = fContent;
 
 	_AddAccountInfo(content);
 	_AddBIOSInfo(content);
@@ -102,7 +102,7 @@ Inventory::Build(const char* deviceID)
 	_AddSoftwaresInfo(content);
 	_AddUsersInfo(content);
 	_AddVideosInfo(content);
-    	_AddMonitorsInfo(content);
+	_AddMonitorsInfo(content);
 
 	std::cerr << "OK!" << std::endl;
 	return true;
@@ -188,7 +188,7 @@ Inventory::Send(const char* serverUrl)
 	std::cerr << "OK!" << std::endl;
 
 	std::cerr << "Inventory::Send(): Decompressing XML... ";
-       	tinyxml2::XMLDocument document;
+	tinyxml2::XMLDocument document;
 	bool uncompress = UncompressXml(resultData, contentLength, document);
 	delete[] resultData;
 	if (!uncompress) {
@@ -258,15 +258,15 @@ Inventory::Checksum() const
 void
 Inventory::_AddAccountInfo(tinyxml2::XMLElement* parent)
 {
-    	tinyxml2::XMLElement* accountInfo = fDocument->NewElement("ACCOUNTINFO");
+	tinyxml2::XMLElement* accountInfo = fDocument->NewElement("ACCOUNTINFO");
 
 	// TODO: ??? We can't store anything
 	for (int a = 0; a < 1; a++) {
-        	tinyxml2::XMLElement* keyName = fDocument->NewElement("KEYNAME");
-        	keyName->LinkEndChild(fDocument->NewElement("TAG"));
+		tinyxml2::XMLElement* keyName = fDocument->NewElement("KEYNAME");
+		keyName->LinkEndChild(fDocument->NewElement("TAG"));
 
-        	tinyxml2::XMLElement* keyValue = fDocument->NewElement("KEYVALUE");
-        	keyValue->LinkEndChild(fDocument->NewElement("NA"));
+		tinyxml2::XMLElement* keyValue = fDocument->NewElement("KEYVALUE");
+		keyValue->LinkEndChild(fDocument->NewElement("NA"));
 
 		accountInfo->LinkEndChild(keyName);
 		accountInfo->LinkEndChild(keyValue);
@@ -327,21 +327,21 @@ Inventory::_AddCPUsInfo(tinyxml2::XMLElement* parent)
 {
 	// TODO: Check if the fields name and structure are correct.
 	for (int i = 0; i < fMachine->CountProcessors(); i++) {
-        	tinyxml2::XMLElement* cpu = fDocument->NewElement("CPUS");
-        	tinyxml2::XMLElement* manufacturer = fDocument->NewElement("MANUFACTURER");
-        	tinyxml2::XMLElement* serial = fDocument->NewElement("SERIAL");
-        	tinyxml2::XMLElement* speed = fDocument->NewElement("SPEED");
-        	tinyxml2::XMLElement* model = fDocument->NewElement("TYPE");
+		tinyxml2::XMLElement* cpu = fDocument->NewElement("CPUS");
+		tinyxml2::XMLElement* manufacturer = fDocument->NewElement("MANUFACTURER");
+		tinyxml2::XMLElement* serial = fDocument->NewElement("SERIAL");
+		tinyxml2::XMLElement* speed = fDocument->NewElement("SPEED");
+		tinyxml2::XMLElement* model = fDocument->NewElement("TYPE");
 
 		// TODO: Seems like we should interpretate the vendor_id
 		manufacturer->LinkEndChild(
-        		fDocument->NewText(fMachine->ProcessorManufacturer(i).c_str()));
+		fDocument->NewText(fMachine->ProcessorManufacturer(i).c_str()));
 		serial->LinkEndChild(
-        		fDocument->NewText(fMachine->ProcessorSerialNumber(i).c_str()));
+		fDocument->NewText(fMachine->ProcessorSerialNumber(i).c_str()));
 		speed->LinkEndChild(
-        		fDocument->NewText(fMachine->ProcessorSpeed(i).c_str()));
+		fDocument->NewText(fMachine->ProcessorSpeed(i).c_str()));
 		model->LinkEndChild(
-        		fDocument->NewText(fMachine->ProcessorType(i).c_str()));
+		fDocument->NewText(fMachine->ProcessorType(i).c_str()));
 
 		cpu->LinkEndChild(model);
 		cpu->LinkEndChild(manufacturer);
@@ -359,31 +359,31 @@ Inventory::_AddDrivesInfo(tinyxml2::XMLElement* parent)
 	VolumeReader reader;
 	volume_info info;
 	while (reader.GetNext(info)) {
-        	tinyxml2::XMLElement* drive = fDocument->NewElement("DRIVES");
+		tinyxml2::XMLElement* drive = fDocument->NewElement("DRIVES");
 
-        	tinyxml2::XMLElement* createDate = fDocument->NewElement("CREATEDATE");
-        	createDate->LinkEndChild(fDocument->NewText(info.create_date.c_str()));
+		tinyxml2::XMLElement* createDate = fDocument->NewElement("CREATEDATE");
+		createDate->LinkEndChild(fDocument->NewText(info.create_date.c_str()));
 
-        	tinyxml2::XMLElement* fileSystem = fDocument->NewElement("FILESYSTEM");
-        	fileSystem->LinkEndChild(fDocument->NewText(info.filesystem.c_str()));
+		tinyxml2::XMLElement* fileSystem = fDocument->NewElement("FILESYSTEM");
+		fileSystem->LinkEndChild(fDocument->NewText(info.filesystem.c_str()));
 
-        	tinyxml2::XMLElement* freeSpace = fDocument->NewElement("FREE");
-        	freeSpace->LinkEndChild(fDocument->NewText(int_to_string(info.free).c_str()));
+		tinyxml2::XMLElement* freeSpace = fDocument->NewElement("FREE");
+		freeSpace->LinkEndChild(fDocument->NewText(int_to_string(info.free).c_str()));
 
-        	tinyxml2::XMLElement* label = fDocument->NewElement("LABEL");
-        	label->LinkEndChild(fDocument->NewText(info.label.c_str()));
+		tinyxml2::XMLElement* label = fDocument->NewElement("LABEL");
+		label->LinkEndChild(fDocument->NewText(info.label.c_str()));
 
-        	tinyxml2::XMLElement* serial = fDocument->NewElement("SERIAL");
-        	serial->LinkEndChild(fDocument->NewText(info.serial.c_str()));
+		tinyxml2::XMLElement* serial = fDocument->NewElement("SERIAL");
+		serial->LinkEndChild(fDocument->NewText(info.serial.c_str()));
 
-        	tinyxml2::XMLElement* total = fDocument->NewElement("TOTAL");
-        	total->LinkEndChild(fDocument->NewText(int_to_string(info.total).c_str()));
+		tinyxml2::XMLElement* total = fDocument->NewElement("TOTAL");
+		total->LinkEndChild(fDocument->NewText(int_to_string(info.total).c_str()));
 
-        	tinyxml2::XMLElement* type = fDocument->NewElement("TYPE");
-        	type->LinkEndChild(fDocument->NewText(info.type.c_str()));
+		tinyxml2::XMLElement* type = fDocument->NewElement("TYPE");
+		type->LinkEndChild(fDocument->NewText(info.type.c_str()));
 
-        	tinyxml2::XMLElement* volumeName = fDocument->NewElement("VOLUMN");
-        	volumeName->LinkEndChild(fDocument->NewText(info.name.c_str()));
+		tinyxml2::XMLElement* volumeName = fDocument->NewElement("VOLUMN");
+		volumeName->LinkEndChild(fDocument->NewText(info.name.c_str()));
 
 		drive->LinkEndChild(createDate);
 		drive->LinkEndChild(fileSystem);
@@ -519,11 +519,11 @@ Inventory::_AddNetworksInfo(tinyxml2::XMLElement* parent)
 		networks->LinkEndChild(driver);
 
 		tinyxml2::XMLElement* ipAddress = fDocument->NewElement("IPADDRESS");
-        	ipAddress->LinkEndChild(fDocument->NewText(info.ip_address.c_str()));
+		ipAddress->LinkEndChild(fDocument->NewText(info.ip_address.c_str()));
 		networks->LinkEndChild(ipAddress);
 
 		tinyxml2::XMLElement* ipDHCP = fDocument->NewElement("IPDHCP");
-        	ipDHCP->LinkEndChild(fDocument->NewText(info.dhcp_ip.c_str()));
+		ipDHCP->LinkEndChild(fDocument->NewText(info.dhcp_ip.c_str()));
 		networks->LinkEndChild(ipDHCP);
 
 		tinyxml2::XMLElement* gateway = fDocument->NewElement("IPGATEWAY");
@@ -624,7 +624,7 @@ Inventory::_AddUsersInfo(tinyxml2::XMLElement* parent)
 	LoggedUsers usersInfo;
 	for (int i = 0; i < usersInfo.Count(); i++) {
 		tinyxml2::XMLElement* login = fDocument->NewElement("LOGIN");
-        	login->LinkEndChild(fDocument->NewText(usersInfo.UserAt(i).c_str()));
+		login->LinkEndChild(fDocument->NewText(usersInfo.UserAt(i).c_str()));
 		users->LinkEndChild(login);
 	}
 	parent->LinkEndChild(users);
@@ -664,30 +664,29 @@ void
 Inventory::_AddMonitorsInfo(tinyxml2::XMLElement* parent)
 {
 
-    Screens screens;
+	Screens screens;
 
-    screen_info info;
-    while (screens.GetNext(info)) {
-        std::cout << "name: " << info.name << ", manufacturer: " <<  info.manufacturer << std::endl;
-        tinyxml2::XMLElement* monitor = fDocument->NewElement("MONITORS");
-	tinyxml2::XMLElement* id = fDocument->NewElement("ID"); 	
-        tinyxml2::XMLElement* caption = fDocument->NewElement("CAPTION");
-        tinyxml2::XMLElement* description = fDocument->NewElement("DESCRIPTION");
-        tinyxml2::XMLElement* manufacturer = fDocument->NewElement("MANUFACTURER");
-        tinyxml2::XMLElement* serial = fDocument->NewElement("SERIAL");
+	screen_info info;
+	while (screens.GetNext(info)) {
+		tinyxml2::XMLElement* monitor = fDocument->NewElement("MONITORS");
+		tinyxml2::XMLElement* id = fDocument->NewElement("ID"); 	
+		tinyxml2::XMLElement* caption = fDocument->NewElement("CAPTION");
+		tinyxml2::XMLElement* description = fDocument->NewElement("DESCRIPTION");
+		tinyxml2::XMLElement* manufacturer = fDocument->NewElement("MANUFACTURER");
+		tinyxml2::XMLElement* serial = fDocument->NewElement("SERIAL");
 
-	description->LinkEndChild(fDocument->NewText(info.description.c_str()));
-        manufacturer->LinkEndChild(fDocument->NewText(info.manufacturer.c_str()));
-        serial->LinkEndChild(fDocument->NewText(info.serial_number.c_str()));
+		description->LinkEndChild(fDocument->NewText(info.description.c_str()));
+		manufacturer->LinkEndChild(fDocument->NewText(info.manufacturer.c_str()));
+		serial->LinkEndChild(fDocument->NewText(info.serial_number.c_str()));
 
-        monitor->LinkEndChild(id);
-        monitor->LinkEndChild(caption);
-        monitor->LinkEndChild(description);
-        monitor->LinkEndChild(manufacturer);
-        monitor->LinkEndChild(serial);
+		monitor->LinkEndChild(id);
+		monitor->LinkEndChild(caption);
+		monitor->LinkEndChild(description);
+		monitor->LinkEndChild(manufacturer);
+		monitor->LinkEndChild(serial);
 
-        parent->LinkEndChild(monitor);
-    }
+		parent->LinkEndChild(monitor);
+	}
 
 }
 
@@ -699,17 +698,13 @@ Inventory::_WriteProlog(tinyxml2::XMLDocument& document) const
 
 	tinyxml2::XMLDeclaration* declaration = document.NewDeclaration();
 	document.LinkEndChild(declaration);
-
 	tinyxml2::XMLElement* request = document.NewElement("REQUEST");
 	document.LinkEndChild(request);
-
 	tinyxml2::XMLElement* deviceID = document.NewElement("DEVICEID");
 	deviceID->LinkEndChild(document.NewText(config->DeviceID().c_str()));
 	request->LinkEndChild(deviceID);
-
 	tinyxml2::XMLElement* query = document.NewElement("QUERY");
 	query->LinkEndChild(document.NewText("PROLOG"));
-
 	request->LinkEndChild(query);
 
 	return true;
