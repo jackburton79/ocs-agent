@@ -71,21 +71,16 @@ IfConfigReader::_ReadNetworkInfo(network_info& info, std::istream& stream)
 
 	std::getline(stream, line);
 	if (line.find("inet addr:") != std::string::npos) {
-		size_t mask;
-		size_t bcast;
 		try {
-			mask = line.find("Mask");
-			bcast = line.find("Bcast");
+			size_t mask = line.find("Mask");
+			size_t bcast = line.find("Bcast");
 			info.netmask = line.substr(line.find(':', mask) + 1, bcast - 1);
+			size_t colon = line.find(":");
+                        info.ip_address = line.substr(colon + 1, std::min(mask, bcast) - colon - 3);	
 
 		} catch (...) {
 			// no netmask or broadcast
 			info.netmask = "";
-		}
-		try {
-			size_t colon = line.find(":");
-			info.ip_address = line.substr(colon + 1, std::min(mask, bcast) - colon - 3);
-		} catch (...) {
 			info.ip_address = "";
 		}
 
