@@ -212,6 +212,9 @@ Machine::VideoInfoFor(int numVideo) const
 bool
 Machine::_GetDMIDecodeData()
 {
+	if (!CommandExists("dmidecode"))
+		return false;
+
 	try {
 		popen_streambuf dmi("dmidecode", "r");
 		std::istream iStream(&dmi);
@@ -237,6 +240,9 @@ Machine::_GetDMIDecodeData()
 bool
 Machine::_GetLSHWShortData()
 {
+	if (!CommandExists("lshw"))
+		return false;
+
 	popen_streambuf lshw("lshw -short", "r");
 	std::istream iStream(&lshw);
 
@@ -283,6 +289,9 @@ Machine::_GetLSHWShortData()
 bool
 Machine::_GetLSHWData()
 {
+	if (!CommandExists("lshw"))
+		return false;
+
 	popen_streambuf lshw("lshw", "r");
 	std::istream iStream(&lshw);
 
@@ -416,22 +425,24 @@ Machine::_GetOSInfo()
 void
 Machine::_IdentifyOS()
 {
-	popen_streambuf lsb;
-	lsb.open("lsb_release -a", "r");
-	std::istream lsbStream(&lsb);
-	std::string line;
-	while (std::getline(lsbStream, line) > 0) {
-		size_t pos = line.find(':');
-		if (pos != std::string::npos) {
-			std::string key = line.substr(0, pos);
-			if (key == "Description") {
-				std::string value = line.substr(pos + 1, std::string::npos);
-				fKernelInfo.os_description = trim(value);
+	if (CommandExists("lsb_release")) {
+		std::cout << "LSB!!!" << std::endl;
+		popen_streambuf lsb;
+		lsb.open("lsb_release -a", "r");
+		std::istream lsbStream(&lsb);
+		std::string line;
+		while (std::getline(lsbStream, line) > 0) {
+			size_t pos = line.find(':');
+			if (pos != std::string::npos) {
+				std::string key = line.substr(0, pos);
+				if (key == "Description") {
+					std::string value = line.substr(pos + 1, std::string::npos);
+					fKernelInfo.os_description = trim(value);
+				}
 			}
 		}
-	}
-
-	if (fKernelInfo.os_description == "") {
+	} else {
+		std::cout << "NO LSB" << std::endl;
 		// there is no lsb_release command.
 		// try to identify the system in another way
 		if (::access("/etc/thinstation.global", F_OK) != -1)
