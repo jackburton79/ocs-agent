@@ -222,7 +222,7 @@ Inventory::Send(const char* serverUrl)
 	std::cerr << "OK!" << std::endl;
 
 	std::cerr << "Inventory::Send(): Sending inventory...";
-	requestHeader = HTTPRequestHeader();
+	requestHeader.Clear();
 	requestHeader.SetRequest("POST", inventoryUrl);
 	requestHeader.SetValue("Pragma", "no-cache");
 	requestHeader.SetValue("Keep-Alive", "300");
