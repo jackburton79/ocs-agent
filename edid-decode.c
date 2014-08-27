@@ -1734,7 +1734,7 @@ int get_edid_info(const char *filename, struct edid_info* info)
 
     strncpy(info->serial_number, tmp, sizeof(info->serial_number));
     free(edid);
-    return !conformant;
+    return 0;
 }
 #undef printf
 
