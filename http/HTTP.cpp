@@ -9,6 +9,7 @@
 #include "HTTPDefines.h"
 #include "HTTPRequestHeader.h"
 #include "HTTPResponseHeader.h"
+#include "../Support.h"
 
 #include <arpa/inet.h>
 #include <sys/socket.h>
@@ -175,15 +176,15 @@ HTTP::Request(HTTPRequestHeader& header, const void* data, size_t length)
 	std::string statusLine = replyString;
 	int code;
 	::sscanf(statusLine.c_str(), "HTTP/1.%*d %03d", (int*)&code);
-
 	try {
 		// TODO: Add a Clear() method
 		fLastResponse = HTTPResponseHeader();
 		fLastResponse.SetStatusLine(code, statusLine.c_str());
 		while (_ReadLineFromSocket(replyString, fFD)) {
 			size_t pos = replyString.find(":");
-			fLastResponse.SetValue(replyString.substr(0, pos),
-					replyString.substr(pos + 1, std::string::npos));
+			std::string value = replyString.substr(pos + 1, std::string::npos);
+			trim(value);
+			fLastResponse.SetValue(replyString.substr(0, pos), value);
 		}
 	} catch (int error) {
 		fLastError = error;
@@ -206,7 +207,11 @@ HTTP::_HandleConnectionIfNeeded(const std::string string, const int port)
 	std::cout << port << ")" << std::endl;
 #endif
 	if (fFD >= 0) {
-		if (hostName == "" || (hostName == fHost && port == fPort)) {
+		HTTPResponseHeader lastResponse = LastResponse();
+		if (lastResponse.HasKey("connection")
+			&& lastResponse.Value("connection") == "close") {
+			// Server closed connection
+		} else if (hostName == "" || (hostName == fHost && port == fPort)) {
 			return true;
 		}
 		::close(fFD);
