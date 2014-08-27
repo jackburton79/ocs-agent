@@ -426,7 +426,6 @@ void
 Machine::_IdentifyOS()
 {
 	if (CommandExists("lsb_release")) {
-		std::cout << "LSB!!!" << std::endl;
 		popen_streambuf lsb;
 		lsb.open("lsb_release -a", "r");
 		std::istream lsbStream(&lsb);
@@ -442,7 +441,6 @@ Machine::_IdentifyOS()
 			}
 		}
 	} else {
-		std::cout << "NO LSB" << std::endl;
 		// there is no lsb_release command.
 		// try to identify the system in another way
 		if (::access("/etc/thinstation.global", F_OK) != -1)
