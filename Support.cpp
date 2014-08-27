@@ -12,11 +12,14 @@
 
 #include <iostream>
 #include <streambuf>
+#include <string>
 #include <string.h>
 
 #include "tinyxml2/tinyxml2.h"
 
 #include <zlib.h>
+
+// TODO: Move XML stuff to XML.h/cpp
 
 ResponseFinder::ResponseFinder()
 	:
@@ -203,3 +206,19 @@ popen_streambuf::showmanyc()
 		return egptr() - gptr();
 	return 0;
 }
+
+
+bool
+CommandExists(const char* command)
+{
+	std::string fullCommand;
+	fullCommand.append("type ").append(command).append(" > /dev/null 2>&1");
+
+	int result = -1;
+	int systemStatus = system(fullCommand.c_str());
+	if (systemStatus == 0)
+		result = WEXITSTATUS(systemStatus);
+		
+	return result == 0;
+}
+
