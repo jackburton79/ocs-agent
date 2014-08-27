@@ -105,6 +105,18 @@ HTTPRequestHeader::SetRequest(const std::string method,
 
 
 
+/* virtual */
+void
+HTTPRequestHeader::Clear()
+{
+	HTTPHeader::Clear();
+	fMethod = "";
+	fPath = "";
+
+	_Init();
+}
+
+
 HTTPRequestHeader&
 HTTPRequestHeader::operator=(const HTTPRequestHeader& header)
 {

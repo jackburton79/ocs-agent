@@ -25,6 +25,8 @@ public:
 
 	virtual std::string ToString() const;
 
+	virtual void Clear();
+	
 	HTTPResponseHeader& operator=(const HTTPResponseHeader& header);
 
 private:

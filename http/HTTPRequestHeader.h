@@ -31,6 +31,8 @@ public:
 	void SetRequest(const std::string method, const std::string path,
 			int majorVer = 1, int minorVer = 1);
 
+	virtual void Clear();
+	
 	HTTPRequestHeader& operator=(const HTTPRequestHeader& header);
 
 private:

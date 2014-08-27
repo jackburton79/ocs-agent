@@ -38,7 +38,7 @@ public:
 	virtual std::string ToString() const;
 	std::string Value(const std::string key) const;
 
-	void Clear();
+	virtual void Clear();
 
 	HTTPHeader& operator=(const HTTPHeader&);
 

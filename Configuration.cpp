@@ -66,7 +66,7 @@ Configuration::DeviceID() const
 {
 	std::string hostName;
 	char buffer[64];
-	if (gethostname(buffer, sizeof(buffer)) != 0)
+	if (::gethostname(buffer, sizeof(buffer)) != 0)
 		throw errno;
 
 	hostName.append(buffer);

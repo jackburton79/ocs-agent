@@ -147,6 +147,7 @@ HTTPHeader::Value(const std::string key) const
 }
 
 
+/* virtual */
 void
 HTTPHeader::Clear()
 {

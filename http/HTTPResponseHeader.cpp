@@ -69,6 +69,16 @@ HTTPResponseHeader::ToString() const
 }
 
 
+/* virtual */
+void
+HTTPResponseHeader::Clear()
+{
+	HTTPHeader::Clear();
+	fCode = 0;
+	fText = "";
+}
+
+
 HTTPResponseHeader&
 HTTPResponseHeader::operator=(const HTTPResponseHeader& header)
 {

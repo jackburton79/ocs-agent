@@ -15,7 +15,7 @@
 Agent::Agent()
 {
 	if (geteuid() != 0) {
-        throw std::string("This program needs to be run as root");
+		throw std::string("This program needs to be run as root");
 	}
 }
 
