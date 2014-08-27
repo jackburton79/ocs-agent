@@ -62,7 +62,7 @@ CompressXml(tinyxml2::XMLDocument& document, char*& destination, size_t& destLen
 	destination = new char[destLength];
 
 	if (int compressStatus = compress((Bytef*)destination, (uLongf*)&destLength,
-            (const Bytef*)memoryPrinter.CStr(), (uLong)fileSize) != Z_OK) {
+			(const Bytef*)memoryPrinter.CStr(), (uLong)fileSize) != Z_OK) {
 		std::cerr << "Compress returned error: " << zError(compressStatus) << std::endl;
 		delete[] destination;
 		return false;
