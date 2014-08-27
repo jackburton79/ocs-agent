@@ -24,12 +24,10 @@ class ResponseFinder : public tinyxml2::XMLVisitor {
 public:
         ResponseFinder();
 	virtual bool VisitEnter(const tinyxml2::XMLElement& element, const tinyxml2::XMLAttribute* attr);
-        virtual bool Visit(const tinyxml2::XMLText& text);
 
 	std::string Response() const;
 private:
 	std::string fResponse;
-	bool fFound;
 };
 
 

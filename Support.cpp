@@ -24,7 +24,7 @@
 ResponseFinder::ResponseFinder()
 	:
 	XMLVisitor(),
-	fFound(false)	
+	fResponse("")
 {
 }
 
@@ -33,25 +33,14 @@ ResponseFinder::ResponseFinder()
 bool
 ResponseFinder::VisitEnter(const tinyxml2::XMLElement& element, const tinyxml2::XMLAttribute*)
 {
-	if (::strcmp(element.Name(), "RESPONSE") == 0)
-		fFound = true;
-	
-	return true;
-}
-
-
-/* virtual */
-bool
-ResponseFinder::Visit(const tinyxml2::XMLText& text)
-{	
-	if (fFound) {
-		fResponse = text.Value();
+	if (::strcmp(element.Name(), "RESPONSE") == 0) {
+		fResponse = element.GetText();
 		return false;
-		
 	}
 	
 	return true;
 }
+
 
 
 std::string
