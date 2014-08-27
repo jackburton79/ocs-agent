@@ -177,8 +177,7 @@ HTTP::Request(HTTPRequestHeader& header, const void* data, size_t length)
 	int code;
 	::sscanf(statusLine.c_str(), "HTTP/1.%*d %03d", (int*)&code);
 	try {
-		// TODO: Add a Clear() method
-		fLastResponse = HTTPResponseHeader();
+		fLastResponse.Clear();
 		fLastResponse.SetStatusLine(code, statusLine.c_str());
 		while (_ReadLineFromSocket(replyString, fFD)) {
 			size_t pos = replyString.find(":");

@@ -38,6 +38,7 @@ public:
 	virtual std::string ToString() const;
 	std::string Value(const std::string key) const;
 
+	void Clear();
 
 	HTTPHeader& operator=(const HTTPHeader&);
 

@@ -147,6 +147,13 @@ HTTPHeader::Value(const std::string key) const
 }
 
 
+void
+HTTPHeader::Clear()
+{
+	fValues.clear();
+}
+
+
 HTTPHeader&
 HTTPHeader::operator=(const HTTPHeader& header)
 {
