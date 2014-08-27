@@ -199,7 +199,7 @@ Inventory::Send(const char* serverUrl)
 	std::cerr << "OK!" << std::endl;
 
 	std::cerr << "Inventory::Send(): server replied ";
-	ResponseFinder responseFinder;
+	ResponseFinder responseFinder("RESPONSE");
 	document.Accept(&responseFinder);
 	std::string serverResponse = responseFinder.Response();
 	

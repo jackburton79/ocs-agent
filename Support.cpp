@@ -21,9 +21,10 @@
 
 // TODO: Move XML stuff to XML.h/cpp
 
-ResponseFinder::ResponseFinder()
+ResponseFinder::ResponseFinder(const char* elementName)
 	:
 	XMLVisitor(),
+	fElementName(elementName),
 	fResponse("")
 {
 }
@@ -33,7 +34,7 @@ ResponseFinder::ResponseFinder()
 bool
 ResponseFinder::VisitEnter(const tinyxml2::XMLElement& element, const tinyxml2::XMLAttribute*)
 {
-	if (::strcmp(element.Name(), "RESPONSE") == 0) {
+	if (fElementName.compare(element.Name()) == 0) {
 		fResponse = element.GetText();
 		return false;
 	}
