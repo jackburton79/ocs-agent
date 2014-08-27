@@ -206,12 +206,13 @@ HTTP::_HandleConnectionIfNeeded(const std::string string, const int port)
 	std::cout << port << ")" << std::endl;
 #endif
 	if (fFD >= 0) {
-		HTTPResponseHeader lastResponse = LastResponse();
-		if (lastResponse.HasKey("connection")
-			&& lastResponse.Value("connection") == "close") {
-			// Server closed connection
-		} else if (hostName == "" || (hostName == fHost && port == fPort)) {
-			return true;
+		if (hostName == "" || (hostName == fHost && port == fPort)) {
+			// we can reuse the existing connection,
+			// unless the server closed it already.
+			HTTPResponseHeader lastResponse = LastResponse();
+			if (!lastResponse.HasKey("connection")
+				|| lastResponse.Value("connection") != "close") 
+		 		return true;
 		}
 		::close(fFD);
 		fFD = -1;
