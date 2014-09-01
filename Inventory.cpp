@@ -15,7 +15,7 @@
 #include "Storages.h"
 #include "Support.h"
 #include "VolumeReader.h"
-
+#include "XML.h"
 
 #include "http/HTTP.h"
 
@@ -143,7 +143,7 @@ Inventory::Send(const char* serverUrl)
 	_WriteProlog(prolog);
 	char* prologData = NULL;
 	size_t prologLength = 0;
-	if (!CompressXml(prolog, prologData, prologLength)) {
+	if (!XML::Compress(prolog, prologData, prologLength)) {
 		std::cerr << "error compressing prolog XML" << std::endl;
 		return false;
 	}
@@ -191,7 +191,7 @@ Inventory::Send(const char* serverUrl)
 
 	std::cerr << "Inventory::Send(): Decompressing XML... ";
 	tinyxml2::XMLDocument document;
-	bool uncompress = UncompressXml(resultData, contentLength, document);
+	bool uncompress = XML::Uncompress(resultData, contentLength, document);
 	delete[] resultData;
 	if (!uncompress) {
 		std::cerr << "failed to decompress XML" << std::endl;
@@ -201,9 +201,7 @@ Inventory::Send(const char* serverUrl)
 	std::cerr << "OK!" << std::endl;
 
 	std::cerr << "Inventory::Send(): server replied ";
-	ElementFinder responseFinder("RESPONSE");
-	document.Accept(&responseFinder);
-	std::string serverResponse = responseFinder.Response();
+	std::string serverResponse = XML::GetTextElementValue(document, "RESPONSE");
 	
 	std::cerr << serverResponse;
 	if (serverResponse != "SEND") {
@@ -216,7 +214,7 @@ Inventory::Send(const char* serverUrl)
 	std::cerr << "Inventory::Send(): Compressing XML inventory data... ";
 	char* compressedData = NULL;
 	size_t compressedSize;
-	if (!CompressXml(*fDocument, compressedData, compressedSize)) {
+	if (!XML::Compress(*fDocument, compressedData, compressedSize)) {
 		std::cerr << "error compressing inventory XML" << std::endl;
 		return false;
 	}

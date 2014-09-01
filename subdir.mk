@@ -16,6 +16,7 @@ CPP_SRCS += \
 ../Storages.cpp \
 ../Support.cpp \
 ../VolumeReader.cpp \
+../XML.cpp \
 ../edid-decode.c 	\
 ../main.cpp 
 
@@ -32,6 +33,7 @@ OBJS += \
 ./Storages.o \
 ./Support.o \
 ./VolumeReader.o \
+./XML.o \
 ./edid-decode.o \
 ./main.o 
 
@@ -49,6 +51,7 @@ CPP_DEPS += \
 ./Storages.d \
 ./Support.d \
 ./VolumeReader.d \
+./XML.d \
 ./edid-decode.d \
 ./main.d 
 

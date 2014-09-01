@@ -20,18 +20,6 @@ bool CompressXml(tinyxml2::XMLDocument& document, char*& destination, size_t& de
 bool UncompressXml(const char* source, size_t sourceLen, tinyxml2::XMLDocument& document);
 
 
-class ElementFinder : public tinyxml2::XMLVisitor {
-public:
-	ElementFinder(const char* elementName);
-	virtual bool VisitEnter(const tinyxml2::XMLElement& element, const tinyxml2::XMLAttribute* attr);
-
-	std::string Response() const;
-private:
-	std::string fElementName;
-	std::string fResponse;
-};
-
-
 class popen_streambuf : public std::streambuf {
 public:
 	popen_streambuf();
