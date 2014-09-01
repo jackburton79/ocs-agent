@@ -84,9 +84,9 @@ XML::Compress(const tinyxml2::XMLDocument& document, char*& destination, size_t&
 bool
 XML::Uncompress(const char* source, size_t sourceLen, tinyxml2::XMLDocument& document)
 {
-	char* destination = new char[32768];
 	size_t destLength = 32768;
-
+	char* destination = new char[destLength];
+	
 	if (int status = uncompress((Bytef*)destination, (uLongf*)&destLength,
 			(const Bytef*)source, (uLong)sourceLen) != Z_OK) {
 		std::cerr << "UncompressXml: Failed to decompress XML: ";
