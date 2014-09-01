@@ -6,6 +6,7 @@
  */
 
 #include "Configuration.h"
+#include "Drives.h"
 #include "IfConfigReader.h"
 #include "Inventory.h"
 #include "LoggedUsers.h"
@@ -95,6 +96,7 @@ Inventory::Build(const char* deviceID)
 	_AddAccountInfo(content);
 	_AddBIOSInfo(content);
 	_AddCPUsInfo(content);
+	_AddDisksInfo(content);
 	_AddDrivesInfo(content);
 	_AddHardwareInfo(content);
 	_AddNetworksInfo(content);
@@ -354,6 +356,22 @@ Inventory::_AddCPUsInfo(tinyxml2::XMLElement* parent)
 
 
 void
+Inventory::_AddDisksInfo(tinyxml2::XMLElement* parent)
+{
+	Drives drives;
+	for (int i = 0; i < drives.Count(); i++) {
+		drive_info info = drives.DriveAt(i);
+#if 0		
+		std::cout << std::endl;
+		std::cout << "Drive number " << i << std::endl;
+		std::cout << "manufacturer: " << info.manufacturer << std::endl;
+		std::cout << "model: " << info.model << std::endl;
+#endif
+	}
+}
+
+
+void
 Inventory::_AddDrivesInfo(tinyxml2::XMLElement* parent)
 {
 	VolumeReader reader;
@@ -420,10 +438,7 @@ Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 	descriptionString.append(fMachine->OSInfo().machine).append("/");
 	description->LinkEndChild(fDocument->NewText(descriptionString.c_str()));
 
-	tinyxml2::XMLElement* dns = fDocument->NewElement("DNS");
-	dns->LinkEndChild(fDocument->NewText("192.168.0.1"));
-	//<DNS>192.168.22.23/192.168.22.24</DNS>
-
+	// TODO: Fix this
 	tinyxml2::XMLElement* ipAddress = fDocument->NewElement("IPADDR");
 	ipAddress->LinkEndChild(fDocument->NewText("192.168.0.1"));
 	//<IPADDR>192.168.22.33</IPADDR>

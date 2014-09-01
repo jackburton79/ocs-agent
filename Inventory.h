@@ -34,6 +34,7 @@ private:
     void _AddAccountInfo(tinyxml2::XMLElement* parent);
     void _AddBIOSInfo(tinyxml2::XMLElement* parent);
     void _AddCPUsInfo(tinyxml2::XMLElement* parent);
+    void _AddDisksInfo(tinyxml2::XMLElement* parent);
     void _AddDrivesInfo(tinyxml2::XMLElement* parent);
     void _AddHardwareInfo(tinyxml2::XMLElement* parent);
     void _AddNetworksInfo(tinyxml2::XMLElement* parent);
