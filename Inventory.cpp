@@ -371,27 +371,26 @@ Inventory::_AddStoragesInfo(tinyxml2::XMLElement* parent)
 		tinyxml2::XMLElement* manufacturer = fDocument->NewElement("MANUFACTURER");
 		manufacturer->LinkEndChild(fDocument->NewText(info.manufacturer.c_str()));
 
-		// TODO: NAME = MODEL ?
 		tinyxml2::XMLElement* name = fDocument->NewElement("NAME");
-                name->LinkEndChild(fDocument->NewText(info.model.c_str()));
+                name->LinkEndChild(fDocument->NewText(info.name.c_str()));
 		
 		tinyxml2::XMLElement* model = fDocument->NewElement("MODEL");
 		model->LinkEndChild(fDocument->NewText(info.model.c_str()));
 
 		tinyxml2::XMLElement* description = fDocument->NewElement("DESCRIPTION");
-                description->LinkEndChild(fDocument->NewText(""));
+                description->LinkEndChild(fDocument->NewText(info.description.c_str()));
 
 		tinyxml2::XMLElement* type = fDocument->NewElement("TYPE");
-                type->LinkEndChild(fDocument->NewText(""));
+                type->LinkEndChild(fDocument->NewText(info.type.c_str()));
 		
 		tinyxml2::XMLElement* diskSize = fDocument->NewElement("DISKSIZE");
-                diskSize->LinkEndChild(fDocument->NewText(""));
+                diskSize->LinkEndChild(fDocument->NewText(info.size.c_str()));
 
 		tinyxml2::XMLElement* serialNumber = fDocument->NewElement("SERIALNUMBER");
-                serialNumber->LinkEndChild(fDocument->NewText(""));
+                serialNumber->LinkEndChild(fDocument->NewText(info.serial_number.c_str()));
 		
 		tinyxml2::XMLElement* firmware = fDocument->NewElement("FIRMWARE");
-                firmware->LinkEndChild(fDocument->NewText(""));
+                firmware->LinkEndChild(fDocument->NewText(info.firmware.c_str()));
 		
 		storage->LinkEndChild(manufacturer);
 		storage->LinkEndChild(name);

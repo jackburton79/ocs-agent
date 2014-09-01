@@ -62,7 +62,10 @@ Storages::_ReadStoragesInfo()
 			trim(info.manufacturer);
 			info.model = vendorLine.substr(26, 17); 
                       	trim(info.model);
- 
+			// TODO: Name = Model ?
+			info.name = info.model;
+			info.type = typeLine.substr(10, 26);
+			trim(info.type); 
 			fStorages.push_back(info);
                 }
         } catch (...) {
