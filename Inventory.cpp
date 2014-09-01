@@ -371,8 +371,9 @@ Inventory::_AddStoragesInfo(tinyxml2::XMLElement* parent)
 		tinyxml2::XMLElement* manufacturer = fDocument->NewElement("MANUFACTURER");
 		manufacturer->LinkEndChild(fDocument->NewText(info.manufacturer.c_str()));
 
+		// TODO: NAME = MODEL ?
 		tinyxml2::XMLElement* name = fDocument->NewElement("NAME");
-                name->LinkEndChild(fDocument->NewText(""));
+                name->LinkEndChild(fDocument->NewText(info.model.c_str()));
 		
 		tinyxml2::XMLElement* model = fDocument->NewElement("MODEL");
 		model->LinkEndChild(fDocument->NewText(info.model.c_str()));
