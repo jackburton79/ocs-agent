@@ -371,11 +371,36 @@ Inventory::_AddStoragesInfo(tinyxml2::XMLElement* parent)
 		tinyxml2::XMLElement* manufacturer = fDocument->NewElement("MANUFACTURER");
 		manufacturer->LinkEndChild(fDocument->NewText(info.manufacturer.c_str()));
 
+		tinyxml2::XMLElement* name = fDocument->NewElement("NAME");
+                name->LinkEndChild(fDocument->NewText(""));
+		
 		tinyxml2::XMLElement* model = fDocument->NewElement("MODEL");
 		model->LinkEndChild(fDocument->NewText(info.model.c_str()));
 
+		tinyxml2::XMLElement* description = fDocument->NewElement("DESCRIPTION");
+                description->LinkEndChild(fDocument->NewText(""));
+
+		tinyxml2::XMLElement* type = fDocument->NewElement("TYPE");
+                type->LinkEndChild(fDocument->NewText(""));
+		
+		tinyxml2::XMLElement* diskSize = fDocument->NewElement("DISKSIZE");
+                diskSize->LinkEndChild(fDocument->NewText(""));
+
+		tinyxml2::XMLElement* serialNumber = fDocument->NewElement("SERIALNUMBER");
+                serialNumber->LinkEndChild(fDocument->NewText(""));
+		
+		tinyxml2::XMLElement* firmware = fDocument->NewElement("FIRMWARE");
+                firmware->LinkEndChild(fDocument->NewText(""));
+		
 		storage->LinkEndChild(manufacturer);
+		storage->LinkEndChild(name);
 		storage->LinkEndChild(model);
+		storage->LinkEndChild(description);
+		storage->LinkEndChild(type);
+		storage->LinkEndChild(diskSize);
+		storage->LinkEndChild(serialNumber);
+		storage->LinkEndChild(firmware);
+
 		parent->LinkEndChild(storage);
 	}
 }
