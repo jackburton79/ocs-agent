@@ -6,13 +6,13 @@
  */
 
 #include "Configuration.h"
-#include "Drives.h"
 #include "IfConfigReader.h"
 #include "Inventory.h"
 #include "LoggedUsers.h"
 #include "Machine.h"
 #include "RunningProcessesList.h"
 #include "Screens.h"
+#include "Storages.h"
 #include "Support.h"
 #include "VolumeReader.h"
 
@@ -96,7 +96,7 @@ Inventory::Build(const char* deviceID)
 	_AddAccountInfo(content);
 	_AddBIOSInfo(content);
 	_AddCPUsInfo(content);
-	_AddDisksInfo(content);
+	_AddStoragesInfo(content);
 	_AddDrivesInfo(content);
 	_AddHardwareInfo(content);
 	_AddNetworksInfo(content);
@@ -356,14 +356,14 @@ Inventory::_AddCPUsInfo(tinyxml2::XMLElement* parent)
 
 
 void
-Inventory::_AddDisksInfo(tinyxml2::XMLElement* parent)
+Inventory::_AddStoragesInfo(tinyxml2::XMLElement* parent)
 {
-	Drives drives;
-	for (int i = 0; i < drives.Count(); i++) {
-		drive_info info = drives.DriveAt(i);
+	Storages storages;
+	for (int i = 0; i < storages.Count(); i++) {
+		storage_info info = storages.StorageAt(i);
 #if 0		
 		std::cout << std::endl;
-		std::cout << "Drive number " << i << std::endl;
+		std::cout << "Storage number " << i << std::endl;
 		std::cout << "manufacturer: " << info.manufacturer << std::endl;
 		std::cout << "model: " << info.model << std::endl;
 #endif
@@ -493,7 +493,6 @@ Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 	hardware->LinkEndChild(dateLastLoggedUser);
 	hardware->LinkEndChild(defaultGW);
 	hardware->LinkEndChild(description);
-	hardware->LinkEndChild(dns);
 	hardware->LinkEndChild(ipAddress);
 	hardware->LinkEndChild(lastLoggedUser);
 	hardware->LinkEndChild(memory);

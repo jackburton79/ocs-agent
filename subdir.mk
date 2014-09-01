@@ -6,7 +6,6 @@
 CPP_SRCS += \
 ../Agent.cpp \
 ../Configuration.cpp \
-../Drives.cpp \
 ../IfConfigReader.cpp \
 ../Inventory.cpp \
 ../LoggedUsers.cpp \
@@ -14,6 +13,7 @@ CPP_SRCS += \
 ../ProcReader.cpp \
 ../RunningProcessesList.cpp \
 ../Screens.cpp \
+../Storages.cpp \
 ../Support.cpp \
 ../VolumeReader.cpp \
 ../edid-decode.c 	\
@@ -22,7 +22,6 @@ CPP_SRCS += \
 OBJS += \
 ./Agent.o \
 ./Configuration.o \
-./Drives.o \
 ./IfConfigReader.o \
 ./Inventory.o \
 ./LoggedUsers.o \
@@ -30,6 +29,7 @@ OBJS += \
 ./ProcReader.o \
 ./RunningProcessesList.o \
 ./Screens.o \
+./Storages.o \
 ./Support.o \
 ./VolumeReader.o \
 ./edid-decode.o \
@@ -46,6 +46,7 @@ CPP_DEPS += \
 ./ProcReader.d \
 ./RunningProcessesList.d \
 ./Screens.d \
+./Storages.d \
 ./Support.d \
 ./VolumeReader.d \
 ./edid-decode.d \
