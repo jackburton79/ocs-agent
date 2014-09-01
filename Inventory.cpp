@@ -360,6 +360,7 @@ Inventory::_AddStoragesInfo(tinyxml2::XMLElement* parent)
 {
 	Storages storages;
 	for (int i = 0; i < storages.Count(); i++) {
+		tinyxml2::XMLElement* storage = fDocument->NewElement("STORAGES");
 		storage_info info = storages.StorageAt(i);
 #if 0		
 		std::cout << std::endl;
@@ -367,6 +368,15 @@ Inventory::_AddStoragesInfo(tinyxml2::XMLElement* parent)
 		std::cout << "manufacturer: " << info.manufacturer << std::endl;
 		std::cout << "model: " << info.model << std::endl;
 #endif
+		tinyxml2::XMLElement* manufacturer = fDocument->NewElement("MANUFACTURER");
+		manufacturer->LinkEndChild(fDocument->NewText(info.manufacturer.c_str()));
+
+		tinyxml2::XMLElement* model = fDocument->NewElement("MODEL");
+		model->LinkEndChild(fDocument->NewText(info.model.c_str()));
+
+		storage->LinkEndChild(manufacturer);
+		storage->LinkEndChild(model);
+		parent->LinkEndChild(storage);
 	}
 }
 
