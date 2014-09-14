@@ -69,6 +69,7 @@ static int warning_zero_preferred_refresh = 0;
 
 static int conformant = 1;
 static char tmp[32];
+static char tmp2[13];
 
 struct value {
     int value;
@@ -220,23 +221,12 @@ extract_string(unsigned char *x, int *valid_termination, int len)
     memset(ret, 0, sizeof(ret));
 
     for (i = 0; i < len; i++) {
-	if (isalnum(x[i])) {
-	    ret[i] = x[i];
-	} else if (!seen_newline) {
-	    if (x[i] == 0x0a) {
-		seen_newline = 1;
-	    } else {
-		*valid_termination = 0;
-		return ret;
-	    }
-	} else {
-	    if (x[i] != 0x20) {
-		*valid_termination = 0;
-		return ret;
-	    }
-	}
-    }
+        printf("%02x", x[i]);
+        if (x[i] != 0x0a)
+            ret[i] = x[i];
+            printf("\n");
 
+        }
     return ret;
 }
 
@@ -325,9 +315,7 @@ detailed_block(unsigned char *x, int in_extension)
 	    strncat((char *)name, (char *)x + 5, 13);
 	    if (strchr((char *)name, '\n')) {
 		name_descriptor_terminated = 1;
-		printf("Monitor name: %s\n",
-		       extract_string(name, &has_valid_string_termination,
-				      strlen((char *)name)));
+		strcpy(tmp2, extract_string((char *)name, &has_valid_string_termination, 13));
 	    }
 	    return 1;
 	case 0xFD:
@@ -1408,7 +1396,7 @@ int get_edid_info(const char *filename, struct edid_info* info)
     }
 
     strncpy(info->manufacturer, manufacturer_name(edid + 0x08), sizeof(info->manufacturer));
-    info->model = (unsigned short)(edid[0x0A] + (edid[0x0B] << 8));
+    // info->model = (unsigned short)(edid[0x0A] + (edid[0x0B] << 8));
    	    
     int week = 0;
     int year = 0;
@@ -1732,6 +1720,7 @@ int get_edid_info(const char *filename, struct edid_info* info)
     if (warning_zero_preferred_refresh)
 	printf("Warning: CVT block does not set preferred refresh rate\n");
 
+    strncpy(info->model, tmp2, sizeof(info->model));
     strncpy(info->serial_number, tmp, sizeof(info->serial_number));
     free(edid);
     return 0;
