@@ -722,6 +722,7 @@ Inventory::_AddMonitorsInfo(tinyxml2::XMLElement* parent)
 		tinyxml2::XMLElement* manufacturer = fDocument->NewElement("MANUFACTURER");
 		tinyxml2::XMLElement* serial = fDocument->NewElement("SERIAL");
 
+		caption->LinkEndChild(fDocument->NewText(info.model.c_str()));
 		description->LinkEndChild(fDocument->NewText(info.description.c_str()));
 		manufacturer->LinkEndChild(fDocument->NewText(info.manufacturer.c_str()));
 		serial->LinkEndChild(fDocument->NewText(info.serial_number.c_str()));
