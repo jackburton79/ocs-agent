@@ -13,6 +13,9 @@
 
 LoggedUsers::LoggedUsers()
 {
+	if (!CommandExists("who"))
+		throw "Missing command \"who\"";
+
 	popen_streambuf who("export LC_ALL=C; who", "r");
 	std::istream iStream(&who);
 
