@@ -80,6 +80,9 @@ main(int argc, char **argv)
 	} catch (std::string& errorString) {
 		std::cerr << errorString << std::endl;
 		return 1;
+	} catch (const char* string) {
+		std::cerr << string << std::endl;
+		return 1;
 	} catch (int error) {
 		std::cerr << strerror(error) << std::endl;
 		return 1;
