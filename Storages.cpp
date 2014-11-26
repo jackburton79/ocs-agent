@@ -38,11 +38,12 @@ Storages::StorageAt(int i) const
 void
 Storages::_ReadStoragesInfo()
 {
-	ProcReader procReader("scsi/scsi");
+	try {
+		ProcReader procReader("scsi/scsi");
 
-	std::istream stream(&procReader);
-        std::string line;
-        try {
+		std::istream stream(&procReader);
+        	std::string line;
+        
 		for (;;) {
 			std::string dummy;
 			if (std::getline(stream, dummy) <= 0)
@@ -69,7 +70,7 @@ Storages::_ReadStoragesInfo()
 			fStorages.push_back(info);
                 }
         } catch (...) {
-		std::cout << "Caught exception" << std::endl;
+		std::cout << "No storage info" << std::endl;
         }
 }
 
