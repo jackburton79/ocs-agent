@@ -17,8 +17,15 @@
 
 ProcReader::ProcReader(const char* sub)
 {
-	if (open(sub, "r") == NULL)
-		throw "File not found";
+	std::string fullName = "/proc/";
+	fullName.append(sub);
+	
+	if (ProcReader::open(fullName.c_str(), "r") == NULL) {
+		std::string errorString;
+		errorString.append("File not found: ");
+		errorString.append(fullName);
+		throw errorString;
+	}
 }
 
 
@@ -42,10 +49,7 @@ ProcReader::ReadLine()
 ProcReader*
 ProcReader::open(const char* fileName, const char* mode)
 {
-	std::string fullName = "/proc/";
-	fullName.append(fileName);
-
-	fFD = ::open(fullName.c_str(), O_RDONLY);
+	fFD = ::open(fileName, O_RDONLY);
 	if (fFD < 0)
 		return NULL;
 
