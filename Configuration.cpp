@@ -137,11 +137,11 @@ Configuration::LocalInventory() const
 void
 Configuration::_GenerateDeviceID()
 {
-	std::string deviceID;
 	char buffer[64];
 	if (::gethostname(buffer, sizeof(buffer)) != 0)
 		throw errno;
 
+	std::string deviceID;
 	deviceID.append(buffer);
 	// TODO: PXE-booted machines can't have this saved anywhere.
 	// Either use the MAC address to generate this, or just keep it fixed.
