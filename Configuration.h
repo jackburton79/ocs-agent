@@ -16,6 +16,9 @@ public:
 	static Configuration* Get();
 
 	bool Load(const char* fileName);
+	bool Save(const char* fileName);
+	bool Save();
+
 	bool SetServer(const char* fileName);
 
 	std::string DeviceID() const;
@@ -26,7 +29,10 @@ private:
 	Configuration();
 	~Configuration();
 
+	void _GenerateDeviceID();
+
 	std::map<std::string, std::string> fValues;
+	std::string fConfigFileName;
 
 };
 

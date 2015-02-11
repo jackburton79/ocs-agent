@@ -10,7 +10,12 @@
 #include <cerrno>
 #include <fstream>
 
+#include <assert.h>
 #include <unistd.h>
+
+
+const static char* kServer = "server";
+const static char* kDeviceID = "deviceID";
 
 
 static Configuration* sConfiguration;
@@ -38,6 +43,7 @@ Configuration::Get()
 bool
 Configuration::Load(const char* fileName)
 {
+	fConfigFileName = fileName;
 	try {
 		std::ifstream configFile(fileName);
 		std::string line;
@@ -49,7 +55,40 @@ Configuration::Load(const char* fileName)
 		}
 	} catch (...) {
 	}
+
+	// Generate a DeviceID if we don't have one
+	std::map<std::string, std::string>::const_iterator i;
+	i = fValues.find("deviceID");
+	if (i == fValues.end())
+		_GenerateDeviceID();
+
 	return true;
+}
+
+
+bool
+Configuration::Save(const char* fileName)
+{
+	try {
+		std::ofstream configFile(fileName, std::ios_base::out);
+		std::map<std::string, std::string>::const_iterator i;
+		for (i = fValues.begin(); i != fValues.end(); i++) {
+			configFile << i->first << "=" << i->second << std::endl;
+		}
+	} catch (...) {
+		return false;
+	}
+	return true;
+}
+
+
+bool
+Configuration::Save()
+{
+	if (fConfigFileName == "")
+		return false;
+
+	return Save(fConfigFileName.c_str());
 }
 
 
@@ -64,16 +103,15 @@ Configuration::SetServer(const char* serverUrl)
 std::string
 Configuration::DeviceID() const
 {
-	std::string hostName;
-	char buffer[64];
-	if (::gethostname(buffer, sizeof(buffer)) != 0)
-		throw errno;
+	std::map<std::string, std::string>::const_iterator i;
+	i = fValues.find("deviceID");
+	if (i == fValues.end()) {
+		const_cast<Configuration*>(this)->_GenerateDeviceID();
+		i = fValues.find("deviceID");
+	}
 
-	hostName.append(buffer);
-	// TODO: PXE-booted machines can't have this saved anywhere.
-	// Either use the MAC address to generate this, or just keep it fixed.
-	hostName.append("-2013-05-10-10-10-10");
-	return hostName;
+	assert(i->second != "");
+	return i->second;
 }
 
 
@@ -95,3 +133,19 @@ Configuration::LocalInventory() const
 	return fValues.find("server") == fValues.end();
 }
 
+
+void
+Configuration::_GenerateDeviceID()
+{
+	std::string deviceID;
+	char buffer[64];
+	if (::gethostname(buffer, sizeof(buffer)) != 0)
+		throw errno;
+
+	deviceID.append(buffer);
+	// TODO: PXE-booted machines can't have this saved anywhere.
+	// Either use the MAC address to generate this, or just keep it fixed.
+	deviceID.append("-2013-05-10-10-10-10");
+
+	fValues["deviceID"] = deviceID;
+}

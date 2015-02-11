@@ -90,6 +90,10 @@ main(int argc, char **argv)
 		std::cerr << "Unhandled exception." << std::endl;
 		return 1;
 	}
+
+	if (configFile != NULL)
+		Configuration::Get()->Save();
+
 	return 0;
 }
 
