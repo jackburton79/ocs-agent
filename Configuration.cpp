@@ -58,7 +58,7 @@ Configuration::Load(const char* fileName)
 
 	// Generate a DeviceID if we don't have one
 	std::map<std::string, std::string>::const_iterator i;
-	i = fValues.find("deviceID");
+	i = fValues.find(kDeviceID);
 	if (i == fValues.end())
 		_GenerateDeviceID();
 
@@ -95,7 +95,7 @@ Configuration::Save()
 bool
 Configuration::SetServer(const char* serverUrl)
 {
-	fValues["server"] = serverUrl;
+	fValues[kServer] = serverUrl;
 	return true;
 }
 
@@ -104,10 +104,10 @@ std::string
 Configuration::DeviceID() const
 {
 	std::map<std::string, std::string>::const_iterator i;
-	i = fValues.find("deviceID");
+	i = fValues.find(kDeviceID);
 	if (i == fValues.end()) {
 		const_cast<Configuration*>(this)->_GenerateDeviceID();
-		i = fValues.find("deviceID");
+		i = fValues.find(kDeviceID);
 	}
 
 	assert(i->second != "");
@@ -130,7 +130,7 @@ Configuration::ServerURL() const
 bool
 Configuration::LocalInventory() const
 {
-	return fValues.find("server") == fValues.end();
+	return fValues.find(kServer) == fValues.end();
 }
 
 
@@ -147,5 +147,5 @@ Configuration::_GenerateDeviceID()
 	// Either use the MAC address to generate this, or just keep it fixed.
 	deviceID.append("-2013-05-10-10-10-10");
 
-	fValues["deviceID"] = deviceID;
+	fValues[kDeviceID] = deviceID;
 }
