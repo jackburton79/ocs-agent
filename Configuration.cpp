@@ -16,7 +16,7 @@
 #include <assert.h>
 #include <unistd.h>
 
-#include <iostream>
+#include <ctime>
 
 const static char* kServer = "server";
 const static char* kDeviceID = "deviceID";
@@ -154,8 +154,21 @@ Configuration::_GenerateDeviceID()
 			}
 		}
 	}
+
+	time_t rawtime;
+  	struct tm* timeinfo;
+  	char timeString[80];
+
+  	time(&rawtime);
+  	timeinfo = localtime(&rawtime);
+
+	strftime(timeString, 80, "%Y-%m-%d-%I:%M:%S", timeinfo);
+	
 	// DeviceID Needs to have a date appended in this very format,
 	// otherwise OCSInventoryNG will not accept the inventory
-	deviceID.append("-2013-05-10-10-10-10");
+    deviceID.append(timeString);
+
+	//deviceID.append("-2013-05-10-10-10-10");
+
 	fValues[kDeviceID] = deviceID;
 }
