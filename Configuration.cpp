@@ -13,6 +13,9 @@
 #include <assert.h>
 #include <unistd.h>
 
+#include <iostream>
+#include <ctime>
+
 
 const static char* kServer = "server";
 const static char* kDeviceID = "deviceID";
@@ -145,7 +148,21 @@ Configuration::_GenerateDeviceID()
 	deviceID.append(buffer);
 	// TODO: PXE-booted machines can't have this saved anywhere.
 	// Either use the MAC address to generate this, or just keep it fixed.
-	deviceID.append("-2013-05-10-10-10-10");
+	
+	time_t rawtime;
+  	struct tm * timeinfo;
+  	char buffer2[80];
+
+  	time (&rawtime);
+  	timeinfo = localtime(&rawtime);
+
+	strftime(buffer2,80,"%Y-%m-%d %I:%M:%S",timeinfo);
+	
+	std::string str(buffer2);
+
+	//  std::cout << str;
+        deviceID.append(str);
+	//deviceID.append("-2013-05-10-10-10-10");
 
 	fValues[kDeviceID] = deviceID;
 }
