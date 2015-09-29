@@ -162,9 +162,9 @@ Configuration::_GenerateDeviceID()
   	time(&rawtime);
   	timeinfo = localtime(&rawtime);
 
-	strftime(timeString, 80, "%Y-%m-%d-%I:%M:%S", timeinfo);
+	strftime(timeString, 80, "-%Y-%m-%d-%H:%M:%S", timeinfo);
 	
-	// DeviceID Needs to have a date appended in this very format,
+	// DeviceID needs to have a date appended in this very format,
 	// otherwise OCSInventoryNG will not accept the inventory
     deviceID.append(timeString);
 
