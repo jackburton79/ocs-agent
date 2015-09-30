@@ -6,13 +6,17 @@
  */
 
 #include "Configuration.h"
+#include "IfConfigReader.h"
+#include "Machine.h"
 
+#include <algorithm>
 #include <cerrno>
 #include <fstream>
 
 #include <assert.h>
 #include <unistd.h>
 
+#include <iostream>
 
 const static char* kServer = "server";
 const static char* kDeviceID = "deviceID";
@@ -137,15 +141,21 @@ Configuration::LocalInventory() const
 void
 Configuration::_GenerateDeviceID()
 {
-	char buffer[64];
-	if (::gethostname(buffer, sizeof(buffer)) != 0)
-		throw errno;
-
-	std::string deviceID;
-	deviceID.append(buffer);
-	// TODO: PXE-booted machines can't have this saved anywhere.
-	// Either use the MAC address to generate this, or just keep it fixed.
+	std::string deviceID = Machine::Get()->SystemSerialNumber();
+	if (deviceID == "") {
+		network_info info;
+		IfConfigReader reader;
+		while (reader.GetNext(info)) {
+			if (info.description != "lo") {
+				deviceID = info.mac_address;
+				deviceID.erase(std::remove(deviceID.begin(), deviceID.end(), ':'),
+						deviceID.end());
+				break;
+			}
+		}
+	}
+	// DeviceID Needs to have a date appended in this very format,
+	// otherwise OCSInventoryNG will not accept the inventory
 	deviceID.append("-2013-05-10-10-10-10");
-
 	fValues[kDeviceID] = deviceID;
 }

@@ -28,10 +28,24 @@ const char* kBIOSInfo = "BIOS Information";
 const char* kSystemInfo = "System Information";
 const char* kProcessorInfo = "Processor Info";
 
+
+static Machine* sMachine = NULL;
+
+/* static */
+Machine*
+Machine::Get()
+{
+	if (sMachine == NULL)
+		sMachine = new Machine();
+	return sMachine;
+}
+
+
 Machine::Machine()
 	:
 	fNumCPUs(0)
 {
+	_RetrieveData();
 }
 
 
@@ -41,14 +55,13 @@ Machine::~Machine()
 
 
 void
-Machine::RetrieveData()
+Machine::_RetrieveData()
 {
 	if (!_GetDMIDecodeData()) {
 		std::cerr << "Can't find dmidecode. Is it installed?" << std::endl;
 	}
 
 	_GetLSHWData();
-
 	_GetCPUInfo();
 
 	try {

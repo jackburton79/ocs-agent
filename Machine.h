@@ -34,10 +34,7 @@ struct video_info {
 
 class Machine {
 public:
-	Machine();
-	~Machine();
-
-	void RetrieveData();
+	static Machine* Get();
 
 	std::string AssetTag() const;
 	std::string BIOSManufacturer() const;
@@ -64,6 +61,10 @@ public:
 	video_info VideoInfoFor(int numVideo) const;
 
 private:
+	Machine();
+	~Machine();
+
+	void _RetrieveData();
 	bool _GetDMIDecodeData();
 	bool _GetLSHWShortData();
 	bool _GetLSHWData();

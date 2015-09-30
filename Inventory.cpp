@@ -34,14 +34,13 @@ Inventory::Inventory()
 	fMachine(NULL)
 {
 	fDocument = new tinyxml2::XMLDocument;
-	fMachine = new Machine;
+	fMachine = Machine::Get();
 }
 
 
 Inventory::~Inventory()
 {
 	delete fDocument;
-	delete fMachine;
 }
 
 
@@ -84,12 +83,6 @@ Inventory::Build(const char* deviceID)
 {
 	std::cerr << "Building inventory... ";
 	// TODO: Finish this, cleanup.
-	try {
-		fMachine->RetrieveData();
-	} catch (...) {
-		std::cerr << "cannot retrieve machine data." << std::endl;
-		return false;
-	}
 
 	tinyxml2::XMLElement* content = fContent;
 
