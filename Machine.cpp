@@ -483,11 +483,11 @@ Machine::_GetSystemInfo(std::istream& stream, std::string header)
 		try {
 			std::string name = string.substr(0, pos);
 			trim(name);
-			// TODO: We should prepend the header, actually
-			name.append(header);
+			std::string fullString = header;
+			fullString.append(name);
 			std::string value = string.substr(pos + 2, std::string::npos);
 
-			fSystemInfo[trim(name)] = trim(value);
+			fSystemInfo[trim(fullString)] = trim(value);
 
 		} catch (...) {
 
@@ -500,7 +500,9 @@ std::string
 Machine::_GetValue(std::string string, std::string header) const
 {
 	std::map<std::string, std::string>::const_iterator i;
-	i = fSystemInfo.find(string.append(header));
+	std::string fullString = header;
+	fullString.append(string);
+	i = fSystemInfo.find(fullString);
 	if (i != fSystemInfo.end())
 		return i->second;
 
