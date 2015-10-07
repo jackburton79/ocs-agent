@@ -85,15 +85,15 @@ private:
 	void _GetSystemInfo(std::istream& stream, std::string header);
 
 	std::string _GetValue(std::string string, std::string header) const;
+	std::vector<std::string> _GetValues(std::string string, std::string header) const;
+
 	std::string _ProcessorInfo(const char* info, int num) const;
 
 	// TODO: Use a std::vector, more than 16 cpu aren't uncommon nowadays
 	int fNumCPUs;
 	std::map<std::string, std::string> fCPUInfo[16];
-	int fNumMemories;
-	std::map<std::string, std::string> fMemoryInfo[16];
 
-	std::map<std::string, std::string> fSystemInfo;
+	std::multimap<std::string, std::string> fSystemInfo;
 	os_info fKernelInfo;
 
 	std::vector<struct video_info> fVideoInfo;

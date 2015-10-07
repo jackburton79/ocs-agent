@@ -27,7 +27,7 @@
 const char* kBIOSInfo = "BIOS Information";
 const char* kSystemInfo = "System Information";
 const char* kProcessorInfo = "Processor Info";
-
+const char* kMemoryDevice = "Memory Device";
 
 static Machine* sMachine = NULL;
 
@@ -43,8 +43,7 @@ Machine::Get()
 
 Machine::Machine()
 	:
-	fNumCPUs(0),
-	fNumMemories(0)
+	fNumCPUs(0)
 {
 	_RetrieveData();
 }
@@ -282,7 +281,7 @@ Machine::_GetLSHWShortData()
 				std::string sysCtx = "Product Name";
 				sysCtx.append(kSystemInfo);
 				if (fSystemInfo.find(sysCtx) == fSystemInfo.end()) {
-					fSystemInfo[sysCtx] = trim(value);
+					fSystemInfo.insert(std::pair<std::string, std::string>(sysCtx, trim(value)));
 				}
 			} else if (devClass == "display") {
 				struct video_info info;
@@ -338,13 +337,13 @@ Machine::_GetLSHWData()
 				std::string sysCtx = "Manufacturer";
 				sysCtx.append(context);
 				if (fSystemInfo.find(sysCtx) == fSystemInfo.end()) {
-					fSystemInfo[sysCtx] = trim(value);
+					fSystemInfo.insert(std::pair<std::string, std::string>(sysCtx, trim(value)));
 				}
 			} else if (key == "product") {
 				std::string sysCtx = "Product Name";
 				sysCtx.append(context);
 				if (fSystemInfo.find(sysCtx) == fSystemInfo.end()) {
-					fSystemInfo[sysCtx] = trim(value);
+					fSystemInfo.insert(std::pair<std::string, std::string>(sysCtx, trim(value)));
 				}
 			}
 		}
@@ -488,7 +487,7 @@ Machine::_GetSystemInfo(std::istream& stream, std::string header)
 			fullString.append(name);
 			std::string value = string.substr(pos + 2, std::string::npos);
 
-			fSystemInfo[trim(fullString)] = trim(value);
+			fSystemInfo.insert(std::pair<std::string, std::string>(trim(fullString), trim(value)));
 
 		} catch (...) {
 
@@ -510,11 +509,30 @@ Machine::_GetValue(std::string string, std::string header) const
 	return "";
 }
 
+
+std::vector<std::string>
+Machine::_GetValues(std::string string, std::string header) const
+{
+	std::vector<std::string> stringList;
+	std::pair <std::multimap<std::string, std::string>::const_iterator,
+			std::multimap<std::string, std::string>::const_iterator> result;
+
+	std::string fullString = header;
+	fullString.append(string);
+	result = fSystemInfo.equal_range(fullString);
+	for (std::multimap<std::string, std::string>::const_iterator i = result.first;
+			i != result.second; i++) {
+		stringList.push_back(i->second);
+	}
+	return stringList;
+}
+
+
 int
 Machine::CountMemories()
 {
-	return 1;
-	return fNumMemories;
+	std::vector<std::string> values = _GetValues("Size", kMemoryDevice);
+	return values.size();
 }
 
 
@@ -543,7 +561,8 @@ Machine::MemoryDescription(int num)
 std::string
 Machine::MemoryCapacity(int num)
 {
-	return _GetValue("Size", "Memory Device");
+	std::vector<std::string> values = _GetValues("Size", kMemoryDevice);
+	return values.at(num);
 }
 
 
@@ -557,14 +576,16 @@ Machine::MemoryPurpose(int num)
 std::string
 Machine::MemoryType(int num)
 {
-	return _GetValue("Type", "Memory Device");
+	std::vector<std::string> values = _GetValues("Type", kMemoryDevice);
+	return values.at(num);
 }
 
 
 std::string
 Machine::MemorySpeed(int num)
 {
-	return _GetValue("Speed", "Memory Device");
+	std::vector<std::string> values = _GetValues("Speed", kMemoryDevice);
+	return values.at(num);
 }
 
 
@@ -578,7 +599,8 @@ Machine::MemoryNumSlots(int num)
 std::string
 Machine::MemorySerialNumber(int num)
 {
-	return _GetValue("Serial Number", "Memory Device");
+	std::vector<std::string> values = _GetValues("Serial Number", kMemoryDevice);
+	return values.at(num);
 }
 
 
