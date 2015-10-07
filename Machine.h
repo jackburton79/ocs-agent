@@ -55,6 +55,17 @@ public:
 	std::string ProcessorSerialNumber(int numCpu) const;
 	std::string ProcessorType(int numCpu) const;
 
+	int CountMemories();
+	std::string MemoryID(int num);
+	std::string MemoryCaption(int num);
+	std::string MemoryDescription(int num);
+	std::string MemoryCapacity(int num);
+	std::string MemoryPurpose(int num);
+	std::string MemoryType(int num);
+	std::string MemorySpeed(int num);
+	std::string MemoryNumSlots(int num);
+	std::string MemorySerialNumber(int num);
+
 	os_info OSInfo() const;
 
 	int CountVideos() const;
@@ -79,6 +90,9 @@ private:
 	// TODO: Use a std::vector, more than 16 cpu aren't uncommon nowadays
 	int fNumCPUs;
 	std::map<std::string, std::string> fCPUInfo[16];
+	int fNumMemories;
+	std::map<std::string, std::string> fMemoryInfo[16];
+
 	std::map<std::string, std::string> fSystemInfo;
 	os_info fKernelInfo;
 

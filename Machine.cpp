@@ -43,7 +43,8 @@ Machine::Get()
 
 Machine::Machine()
 	:
-	fNumCPUs(0)
+	fNumCPUs(0),
+	fNumMemories(0)
 {
 	_RetrieveData();
 }
@@ -509,6 +510,76 @@ Machine::_GetValue(std::string string, std::string header) const
 	return "";
 }
 
+int
+Machine::CountMemories()
+{
+	return 1;
+	return fNumMemories;
+}
+
+
+std::string
+Machine::MemoryID(int num)
+{
+	return "";
+	//return _GetValue()
+}
+
+
+std::string
+Machine::MemoryCaption(int num)
+{
+	return "";
+}
+
+
+std::string
+Machine::MemoryDescription(int num)
+{
+	return "";
+}
+
+
+std::string
+Machine::MemoryCapacity(int num)
+{
+	return _GetValue("Size", "Memory Device");
+}
+
+
+std::string
+Machine::MemoryPurpose(int num)
+{
+	return "";
+}
+
+
+std::string
+Machine::MemoryType(int num)
+{
+	return _GetValue("Type", "Memory Device");
+}
+
+
+std::string
+Machine::MemorySpeed(int num)
+{
+	return _GetValue("Speed", "Memory Device");
+}
+
+
+std::string
+Machine::MemoryNumSlots(int num)
+{
+	return "";
+}
+
+
+std::string
+Machine::MemorySerialNumber(int num)
+{
+	return _GetValue("Serial Number", "Memory Device");
+}
 
 
 std::string

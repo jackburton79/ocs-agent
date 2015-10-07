@@ -91,6 +91,7 @@ Inventory::Build(const char* deviceID)
 	_AddCPUsInfo(content);
 	_AddStoragesInfo(content);
 	_AddDrivesInfo(content);
+	_AddMemoriesInfo(content);
 	_AddHardwareInfo(content);
 	_AddNetworksInfo(content);
 	_AddProcessesInfo(content);
@@ -393,6 +394,49 @@ Inventory::_AddStoragesInfo(tinyxml2::XMLElement* parent)
 		storage->LinkEndChild(firmware);
 
 		parent->LinkEndChild(storage);
+	}
+}
+
+
+void
+Inventory::_AddMemoriesInfo(tinyxml2::XMLElement* parent)
+{
+	for (int i = 0; i < fMachine->CountMemories(); i++) {
+		tinyxml2::XMLElement* memory = fDocument->NewElement("MEMORIES");
+
+		tinyxml2::XMLElement* id = fDocument->NewElement("ID");
+		tinyxml2::XMLElement* description = fDocument->NewElement("DESCRIPTION");
+		tinyxml2::XMLElement* capacity = fDocument->NewElement("CAPACITY");
+		tinyxml2::XMLElement* purpose = fDocument->NewElement("PURPOSE");
+		tinyxml2::XMLElement* type = fDocument->NewElement("TYPE");
+		tinyxml2::XMLElement* speed = fDocument->NewElement("SPEED");
+		tinyxml2::XMLElement* numSlots = fDocument->NewElement("NUMSLOTS");
+		tinyxml2::XMLElement* serial = fDocument->NewElement("SERIALNUMBER");
+
+		id->LinkEndChild(fDocument->NewText(fMachine->MemoryID(i).c_str()));
+		memory->LinkEndChild(id);
+
+		description->LinkEndChild(fDocument->NewText(fMachine->MemoryDescription(i).c_str()));
+		memory->LinkEndChild(description);
+
+		capacity->LinkEndChild(fDocument->NewText(fMachine->MemoryCapacity(i).c_str()));
+		memory->LinkEndChild(capacity);
+
+		purpose->LinkEndChild(fDocument->NewText(fMachine->MemoryPurpose(i).c_str()));
+		memory->LinkEndChild(purpose);
+
+		type->LinkEndChild(fDocument->NewText(fMachine->MemoryType(i).c_str()));
+		memory->LinkEndChild(type);
+
+		speed->LinkEndChild(fDocument->NewText(fMachine->MemorySpeed(i).c_str()));
+		memory->LinkEndChild(speed);
+
+		memory->LinkEndChild(numSlots);
+
+		serial->LinkEndChild(fDocument->NewText(fMachine->MemorySerialNumber(i).c_str()));
+		memory->LinkEndChild(serial);
+
+		parent->LinkEndChild(memory);
 	}
 }
 
