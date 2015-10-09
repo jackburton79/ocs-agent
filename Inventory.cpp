@@ -31,6 +31,7 @@
 Inventory::Inventory()
 	:
 	fDocument(NULL),
+	fContent(NULL),
 	fMachine(NULL)
 {
 	fDocument = new tinyxml2::XMLDocument;
