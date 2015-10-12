@@ -156,13 +156,11 @@ Configuration::_GenerateDeviceID()
 	}
 
 	time_t rawtime;
-  	struct tm* timeinfo;
-  	char timeString[80];
-
   	time(&rawtime);
-  	timeinfo = localtime(&rawtime);
+  	struct tm* timeinfo = localtime(&rawtime);
 
-	strftime(timeString, 80, "-%Y-%m-%d-%H-%M-%S", timeinfo);
+  	char timeString[80];
+	strftime(timeString, sizeof(timeString), "-%Y-%m-%d-%H-%M-%S", timeinfo);
 	
 	// DeviceID needs to have a date appended in this very format,
 	// otherwise OCSInventoryNG will not accept the inventory
