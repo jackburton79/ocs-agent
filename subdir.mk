@@ -10,6 +10,8 @@ CPP_SRCS += \
 ../Inventory.cpp \
 ../LoggedUsers.cpp \
 ../Machine.cpp \
+../NetworkInterface.cpp \
+../NetworkRoster.cpp \
 ../ProcReader.cpp \
 ../RunningProcessesList.cpp \
 ../Screens.cpp \
@@ -27,6 +29,8 @@ OBJS += \
 ./Inventory.o \
 ./LoggedUsers.o \
 ./Machine.o \
+./NetworkInterface.o \
+./NetworkRoster.o \
 ./ProcReader.o \
 ./RunningProcessesList.o \
 ./Screens.o \
@@ -45,6 +49,8 @@ CPP_DEPS += \
 ./Inventory.d \
 ./LoggedUsers.d \
 ./Machine.d \
+./NetworkInterface.d \
+./NetworkRoster.d \
 ./ProcReader.d \
 ./RunningProcessesList.d \
 ./Screens.d \
