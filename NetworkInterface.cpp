@@ -17,6 +17,7 @@
 #include <netinet/in.h>
 #include <sys/ioctl.h>
 
+#include <iomanip>
 #include <iostream>
 #include <sstream>
 
@@ -59,7 +60,7 @@ NetworkInterface::HardwareAddress() const
 		int byte = (addr->sa_data[i] & 0xFF);
 		if (i != 0)
 			stream << ":";
-		stream << std::hex << byte;
+		stream << std::hex << std::setw(2) << std::setfill('0') << byte;
 	}
 
 	return stream.str();
@@ -87,6 +88,17 @@ NetworkInterface::NetMask() const
 
 	struct sockaddr_in* ipaddr = (struct sockaddr_in*)&ifr.ifr_netmask;
 	return inet_ntoa(ipaddr->sin_addr);
+}
+
+
+std::string
+NetworkInterface::Status() const
+{
+	struct ifreq ifr;
+	if (_DoRequest(SIOCGIFFLAGS, ifr) != 0)
+		return "";
+
+	return ifr.ifr_flags & IFF_UP ? "Up" : "Down";
 }
 
 
