@@ -78,14 +78,10 @@ HTTPRequestHeader::ToString() const
 	string.append(fMethod).append(" ");
 	string.append(resource).append(" ");
 	string.append("HTTP/1.1").append(CRLF);
-
-	if (HasKey(HTTPHost)) {
+	if (HasKey(HTTPHost))
 		string.append(HTTPHost).append(": ").append(Value(HTTPHost)).append(CRLF);
-	}
 	string.append(HTTPUserAgent).append(": ").append(fUserAgent).append(CRLF);
-
 	string.append(HTTPHeader::ToString());
-
 
 	return string;
 }
