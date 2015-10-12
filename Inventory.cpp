@@ -24,6 +24,8 @@
 #include <memory>
 #include <unistd.h>
 
+#include "NetworkInterface.h"
+#include "NetworkRoster.h"
 #include "tinyxml2/tinyxml2.h"
 
 #define USER_AGENT "OCS-NG_unified_unix_agent_v"
@@ -586,17 +588,17 @@ Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 void
 Inventory::_AddNetworksInfo(tinyxml2::XMLElement* parent)
 {
-	IfConfigReader ifCfgReader;
-
-	network_info info;
-	while (ifCfgReader.GetNext(info)) {
-		if (info.description == "lo")
+	NetworkRoster roster;
+	NetworkInterface interface;
+	unsigned int cookie = 0;
+	while (roster.GetNextInterface(&cookie, interface) == 0) {
+		if (interface.Name() == "lo")
 			continue;
 
 		tinyxml2::XMLElement* networks = fDocument->NewElement("NETWORKS");
 
 		tinyxml2::XMLElement* description = fDocument->NewElement("DESCRIPTION");
-		description->LinkEndChild(fDocument->NewText(info.description.c_str()));
+		description->LinkEndChild(fDocument->NewText(interface.Name().c_str()));
 		networks->LinkEndChild(description);
 
 		tinyxml2::XMLElement* driver = fDocument->NewElement("DRIVER");
@@ -604,27 +606,27 @@ Inventory::_AddNetworksInfo(tinyxml2::XMLElement* parent)
 		networks->LinkEndChild(driver);
 
 		tinyxml2::XMLElement* ipAddress = fDocument->NewElement("IPADDRESS");
-		ipAddress->LinkEndChild(fDocument->NewText(info.ip_address.c_str()));
+		ipAddress->LinkEndChild(fDocument->NewText(interface.IPAddress().c_str()));
 		networks->LinkEndChild(ipAddress);
 
 		tinyxml2::XMLElement* ipDHCP = fDocument->NewElement("IPDHCP");
-		ipDHCP->LinkEndChild(fDocument->NewText(info.dhcp_ip.c_str()));
+		ipDHCP->LinkEndChild(fDocument->NewText(""));
 		networks->LinkEndChild(ipDHCP);
 
 		tinyxml2::XMLElement* gateway = fDocument->NewElement("IPGATEWAY");
-		gateway->LinkEndChild(fDocument->NewText(info.gateway.c_str()));
+		gateway->LinkEndChild(fDocument->NewText(""));
 		networks->LinkEndChild(gateway);
 
 		tinyxml2::XMLElement* ipMask = fDocument->NewElement("IPMASK");
-		ipMask->LinkEndChild(fDocument->NewText(info.netmask.c_str()));
+		ipMask->LinkEndChild(fDocument->NewText(interface.NetMask().c_str()));
 		networks->LinkEndChild(ipMask);
 
 		tinyxml2::XMLElement* ipSubnet = fDocument->NewElement("IPSUBNET");
-		ipSubnet->LinkEndChild(fDocument->NewText(info.network.c_str()));
+		ipSubnet->LinkEndChild(fDocument->NewText(interface.BroadcastAddress().c_str()));
 		networks->LinkEndChild(ipSubnet);
 
 		tinyxml2::XMLElement* mac = fDocument->NewElement("MACADDR");
-		mac->LinkEndChild(fDocument->NewText(info.mac_address.c_str()));
+		mac->LinkEndChild(fDocument->NewText(interface.HardwareAddress().c_str()));
 		networks->LinkEndChild(mac);
 
 		tinyxml2::XMLElement* pciSlot = fDocument->NewElement("PCISLOT");
@@ -632,11 +634,11 @@ Inventory::_AddNetworksInfo(tinyxml2::XMLElement* parent)
 		networks->LinkEndChild(pciSlot);
 
 		tinyxml2::XMLElement* status = fDocument->NewElement("STATUS");
-		status->LinkEndChild(fDocument->NewText(info.status.c_str()));
+		status->LinkEndChild(fDocument->NewText(interface.Status().c_str()));
 		networks->LinkEndChild(status);
 
 		tinyxml2::XMLElement* type = fDocument->NewElement("TYPE");
-		type->LinkEndChild(fDocument->NewText(info.type.c_str()));
+		type->LinkEndChild(fDocument->NewText(interface.Type().c_str()));
 		networks->LinkEndChild(type);
 
 		tinyxml2::XMLElement* virtualDevice = fDocument->NewElement("VIRTUALDEV");

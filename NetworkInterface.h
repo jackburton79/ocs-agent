@@ -20,6 +20,8 @@ public:
 	std::string HardwareAddress() const;
 	std::string IPAddress() const;
 	std::string NetMask() const;
+	std::string BroadcastAddress() const;
+	std::string Type() const;
 	std::string Status() const;
 
 private:

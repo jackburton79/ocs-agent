@@ -92,6 +92,25 @@ NetworkInterface::NetMask() const
 
 
 std::string
+NetworkInterface::BroadcastAddress() const
+{
+	struct ifreq ifr;
+	if (_DoRequest(SIOCGIFBRDADDR, ifr) != 0)
+		return "";
+
+	struct sockaddr_in* ipaddr = (struct sockaddr_in*)&ifr.ifr_broadaddr;
+	return inet_ntoa(ipaddr->sin_addr);
+}
+
+
+std::string
+NetworkInterface::Type() const
+{
+	return "";
+}
+
+
+std::string
 NetworkInterface::Status() const
 {
 	struct ifreq ifr;

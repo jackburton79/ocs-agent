@@ -6,8 +6,9 @@
  */
 
 #include "Configuration.h"
-#include "IfConfigReader.h"
 #include "Machine.h"
+#include "NetworkInterface.h"
+#include "NetworkRoster.h"
 
 #include <algorithm>
 #include <cerrno>
@@ -143,11 +144,12 @@ Configuration::_GenerateDeviceID()
 {
 	std::string deviceID = Machine::Get()->SystemSerialNumber();
 	if (deviceID == "") {
-		network_info info;
-		IfConfigReader reader;
-		while (reader.GetNext(info)) {
-			if (info.description != "lo") {
-				deviceID = info.mac_address;
+		NetworkRoster roster;
+		NetworkInterface interface;
+		unsigned int cookie = 0;
+		while (roster.GetNextInterface(&cookie, interface) == 0) {
+			if (interface.Name() != "lo") {
+				deviceID = interface.HardwareAddress();
 				deviceID.erase(std::remove(deviceID.begin(), deviceID.end(), ':'),
 						deviceID.end());
 				break;
