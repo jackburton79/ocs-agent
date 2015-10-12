@@ -40,7 +40,14 @@ NetworkInterface::~NetworkInterface()
 
 
 std::string
-NetworkInterface::HardwareAddress()
+NetworkInterface::Name() const
+{
+	return fName;
+}
+
+
+std::string
+NetworkInterface::HardwareAddress() const
 {
 	struct ifreq ifr;
 	if (_DoRequest(SIOCGIFHWADDR, ifr) != 0)
@@ -60,7 +67,7 @@ NetworkInterface::HardwareAddress()
 
 
 std::string
-NetworkInterface::IPAddress()
+NetworkInterface::IPAddress() const
 {
 	struct ifreq ifr;
 	if (_DoRequest(SIOCGIFADDR, ifr) != 0)
@@ -72,7 +79,7 @@ NetworkInterface::IPAddress()
 
 
 std::string
-NetworkInterface::NetMask()
+NetworkInterface::NetMask() const
 {
 	struct ifreq ifr;
 	if (_DoRequest(SIOCGIFNETMASK, ifr) != 0)
@@ -84,7 +91,7 @@ NetworkInterface::NetMask()
 
 
 int
-NetworkInterface::_DoRequest(int request, struct ifreq& ifr)
+NetworkInterface::_DoRequest(int request, struct ifreq& ifr)  const
 {
 	size_t ifNameLen = fName.size();
 	if (ifNameLen < sizeof(ifr.ifr_name)) {

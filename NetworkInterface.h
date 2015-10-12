@@ -16,13 +16,14 @@ public:
 	NetworkInterface(const char* name);
 	~NetworkInterface();
 
-	std::string HardwareAddress();
-	std::string IPAddress();
-	std::string NetMask();
+	std::string Name() const;
+	std::string HardwareAddress() const;
+	std::string IPAddress() const;
+	std::string NetMask() const;
 
 private:
 
-	int _DoRequest(int request, struct ifreq& ifr);
+	int _DoRequest(int request, struct ifreq& ifr) const;
 	std::string fName;
 };
 
