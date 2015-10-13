@@ -501,19 +501,29 @@ Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 	dateLastLoggedUser->LinkEndChild(fDocument->NewText("Thu Jul 11 13:24"));
 	//<DATELASTLOGGEDUSER>Thu Jul 11 13:24</DATELASTLOGGEDUSER>
 
+	// Find first active interface
+	NetworkRoster roster;
+	NetworkInterface interface;
+	unsigned int cookie = 0;
+	while (roster.GetNextInterface(&cookie, interface) == 0) {
+		std::cout << interface.Name() << " " << interface.Status() << std::endl;
+		if (interface.Name() != "lo" && interface.IPAddress() != ""
+				&& interface.IPAddress() != "0.0.0.0")
+			break;
+	}
+
+	std::string defaultGateway;
+	roster.GetDefaultGateway(interface.Name().c_str(), defaultGateway);
 	tinyxml2::XMLElement* defaultGW = fDocument->NewElement("DEFAULTGATEWAY");
-	defaultGW->LinkEndChild(fDocument->NewText("192.168.0.1"));
-	//<DEFAULTGATEWAY>192.168.22.9</DEFAULTGATEWAY>
+	defaultGW->LinkEndChild(fDocument->NewText(defaultGateway.c_str()));
 
 	tinyxml2::XMLElement* description = fDocument->NewElement("DESCRIPTION");
 	std::string descriptionString;
 	descriptionString.append(fMachine->OSInfo().machine).append("/");
 	description->LinkEndChild(fDocument->NewText(descriptionString.c_str()));
 
-	// TODO: Fix this
 	tinyxml2::XMLElement* ipAddress = fDocument->NewElement("IPADDR");
-	ipAddress->LinkEndChild(fDocument->NewText("192.168.0.1"));
-	//<IPADDR>192.168.22.33</IPADDR>
+	ipAddress->LinkEndChild(fDocument->NewText(interface.IPAddress().c_str()));
 
 	tinyxml2::XMLElement* lastLoggedUser = fDocument->NewElement("LASTLOGGEDUSER");
 	lastLoggedUser->LinkEndChild(fDocument->NewText("root"));
