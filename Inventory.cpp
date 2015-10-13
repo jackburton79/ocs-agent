@@ -6,7 +6,6 @@
  */
 
 #include "Configuration.h"
-#include "IfConfigReader.h"
 #include "Inventory.h"
 #include "LoggedUsers.h"
 #include "Machine.h"

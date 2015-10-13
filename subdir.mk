@@ -6,7 +6,6 @@
 CPP_SRCS += \
 ../Agent.cpp \
 ../Configuration.cpp \
-../IfConfigReader.cpp \
 ../Inventory.cpp \
 ../LoggedUsers.cpp \
 ../Machine.cpp \
@@ -25,7 +24,6 @@ CPP_SRCS += \
 OBJS += \
 ./Agent.o \
 ./Configuration.o \
-./IfConfigReader.o \
 ./Inventory.o \
 ./LoggedUsers.o \
 ./Machine.o \
@@ -45,7 +43,6 @@ CPP_DEPS += \
 ./Agent.d \
 ./Configuration.d \
 ./Drives.d \
-./IfConfigReader.d \
 ./Inventory.d \
 ./LoggedUsers.d \
 ./Machine.d \
