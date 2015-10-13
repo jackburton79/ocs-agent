@@ -24,7 +24,6 @@
 
 NetworkInterface::NetworkInterface()
 {
-
 }
 
 
@@ -32,6 +31,8 @@ NetworkInterface::NetworkInterface(const char* name)
 	:
 	fName(name)
 {
+	if (fName.size() > IFNAMSIZ)
+		throw "NetworkInterface::NetworkInterface(): Name too long";
 }
 
 
@@ -57,7 +58,7 @@ NetworkInterface::HardwareAddress() const
 	struct sockaddr* addr = (struct sockaddr*)&ifr.ifr_hwaddr;
 	std::ostringstream stream;
 	for (size_t i = 0; i < ETHER_ADDR_LEN; i++) {
-		int byte = (addr->sa_data[i] & 0xFF);
+		int byte = addr->sa_data[i] & 0xFF;
 		if (i != 0)
 			stream << ":";
 		stream << std::hex << std::setw(2) << std::setfill('0') << byte;
@@ -106,6 +107,7 @@ NetworkInterface::BroadcastAddress() const
 std::string
 NetworkInterface::Type() const
 {
+	// TODO:
 	return "";
 }
 
@@ -125,12 +127,8 @@ int
 NetworkInterface::_DoRequest(int request, struct ifreq& ifr)  const
 {
 	size_t ifNameLen = fName.size();
-	if (ifNameLen < sizeof(ifr.ifr_name)) {
-		::memcpy(ifr.ifr_name, fName.c_str(), ifNameLen);
-		ifr.ifr_name[ifNameLen] = 0;
-	} else {
-		std::cerr << "interface name is too long" << std::endl;
-	}
+	::memcpy(ifr.ifr_name, fName.c_str(), ifNameLen);
+	ifr.ifr_name[ifNameLen] = 0;
 
 	int fd = ::socket(AF_INET, SOCK_DGRAM, 0);
 	if (fd == -1)
