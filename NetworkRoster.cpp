@@ -36,7 +36,8 @@ int
 NetworkRoster::CountInterfaces(int family)
 {
 	ifaddrs* addrs = NULL;
-	getifaddrs(&addrs);
+	if (getifaddrs(&addrs) != 0)
+		return errno;
 
 	std::set<std::string> interfaces;
 	ifaddrs* addr = addrs;
