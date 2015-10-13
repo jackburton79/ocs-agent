@@ -111,12 +111,11 @@ Machine::SystemManufacturer() const
 std::string
 Machine::HostName() const
 {
-	popen_streambuf p("hostname -s", "r");
-	std::istream stream(&p);
-	std::string line;
-	std::getline(stream, line);
+	struct ::utsname utsName;
+	if (uname(&utsName) != 0)
+		return "";
 
-	return line;
+	return utsName.nodename;
 }
 
 
