@@ -506,7 +506,6 @@ Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 	NetworkInterface interface;
 	unsigned int cookie = 0;
 	while (roster.GetNextInterface(&cookie, interface) == 0) {
-		std::cout << interface.Name() << " " << interface.Status() << std::endl;
 		if (interface.Name() != "lo" && interface.IPAddress() != ""
 				&& interface.IPAddress() != "0.0.0.0")
 			break;
