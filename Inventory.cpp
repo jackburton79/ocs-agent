@@ -614,7 +614,9 @@ Inventory::_AddNetworksInfo(tinyxml2::XMLElement* parent)
 		networks->LinkEndChild(ipDHCP);
 
 		tinyxml2::XMLElement* gateway = fDocument->NewElement("IPGATEWAY");
-		gateway->LinkEndChild(fDocument->NewText(""));
+		std::string gatewayString;
+		roster.GetDefaultGateway(interface.Name().c_str(), gatewayString);
+		gateway->LinkEndChild(fDocument->NewText(gatewayString.c_str()));
 		networks->LinkEndChild(gateway);
 
 		tinyxml2::XMLElement* ipMask = fDocument->NewElement("IPMASK");
