@@ -526,7 +526,6 @@ Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 
 	tinyxml2::XMLElement* lastLoggedUser = fDocument->NewElement("LASTLOGGEDUSER");
 	lastLoggedUser->LinkEndChild(fDocument->NewText("root"));
-	// <LASTLOGGEDUSER>root</LASTLOGGEDUSER>
 
 	tinyxml2::XMLElement* memory = fDocument->NewElement("MEMORY");
 	memory->LinkEndChild(fDocument->NewText(fMachine->OSInfo().memory.c_str()));
