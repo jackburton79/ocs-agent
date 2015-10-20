@@ -12,12 +12,12 @@
 
 #include <algorithm>
 #include <cerrno>
+#include <ctime>
 #include <fstream>
 
 #include <assert.h>
 #include <unistd.h>
 
-#include <ctime>
 
 const static char* kServer = "server";
 const static char* kDeviceID = "deviceID";
@@ -124,7 +124,7 @@ std::string
 Configuration::ServerURL() const
 {
 	std::map<std::string, std::string>::const_iterator i;
-	i = fValues.find("server");
+	i = fValues.find(kServer);
 	if (i != fValues.end())
 		return i->second;
 
@@ -157,8 +157,7 @@ Configuration::_GenerateDeviceID()
 		}
 	}
 
-	time_t rawtime;
-  	time(&rawtime);
+	time_t rawtime = time(NULL);
   	struct tm* timeinfo = localtime(&rawtime);
 
   	char timeString[80];
