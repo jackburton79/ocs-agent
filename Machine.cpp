@@ -417,16 +417,12 @@ Machine::_GetOSInfo()
 			std::string swapString = string.substr(pos + 1, std::string::npos);
 
 			int swapInt = ::strtol(trim(swapString).c_str(), NULL, 10) / 1024;
-			std::ostringstream stringStream;
-			stringStream << swapInt;
-			fKernelInfo.swap = stringStream.str();
+			fKernelInfo.swap = int_to_string(swapInt);
 		} else if ((pos = string.find("MemTotal:")) != std::string::npos) {
 			pos = string.find(":");
 			std::string memString = string.substr(pos + 1, std::string::npos);
 			int memInt = ::strtol(trim(memString).c_str(), NULL, 10) / 1024;
-			std::ostringstream stringStream;
-			stringStream << memInt;
-			fKernelInfo.memory = stringStream.str();
+			fKernelInfo.memory = int_to_string(memInt);
 		}
 	}
 
@@ -467,11 +463,9 @@ Machine::_IdentifyOS()
 void
 Machine::_GetSystemInfo(std::istream& stream, std::string header)
 {
-	//std::cout << header << std::endl;
 	std::string string;
 	size_t pos = 0;
 	while (std::getline(stream, string) > 0) {
-		//std::cout << "*** " << string << "*** " << std::endl;
 		if (string == "")
 			break;
 
