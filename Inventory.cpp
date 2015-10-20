@@ -497,9 +497,10 @@ Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 
 	checksum->LinkEndChild(fDocument->NewText(int_to_string(Checksum()).c_str()));
 
+	LoggedUsers users;
+	user_entry user = users.UserEntryAt(users.Count() - 1);
 	tinyxml2::XMLElement* dateLastLoggedUser = fDocument->NewElement("DATELASTLOGGEDUSER");
-	dateLastLoggedUser->LinkEndChild(fDocument->NewText("Thu Jul 11 13:24"));
-	//<DATELASTLOGGEDUSER>Thu Jul 11 13:24</DATELASTLOGGEDUSER>
+	dateLastLoggedUser->LinkEndChild(fDocument->NewText(user.logintimestring.c_str()));
 
 	// Find first active interface
 	NetworkRoster roster;
@@ -525,7 +526,7 @@ Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 	ipAddress->LinkEndChild(fDocument->NewText(interface.IPAddress().c_str()));
 
 	tinyxml2::XMLElement* lastLoggedUser = fDocument->NewElement("LASTLOGGEDUSER");
-	lastLoggedUser->LinkEndChild(fDocument->NewText("root"));
+	lastLoggedUser->LinkEndChild(fDocument->NewText(user.login.c_str()));
 
 	tinyxml2::XMLElement* memory = fDocument->NewElement("MEMORY");
 	memory->LinkEndChild(fDocument->NewText(fMachine->OSInfo().memory.c_str()));
@@ -721,7 +722,7 @@ Inventory::_AddUsersInfo(tinyxml2::XMLElement* parent)
 		LoggedUsers usersInfo;
 		for (int i = 0; i < usersInfo.Count(); i++) {
 			tinyxml2::XMLElement* login = fDocument->NewElement("LOGIN");
-			login->LinkEndChild(fDocument->NewText(usersInfo.UserAt(i).c_str()));
+			login->LinkEndChild(fDocument->NewText(usersInfo.LoginNameAt(i).c_str()));
 			users->LinkEndChild(login);
 		}
 		parent->LinkEndChild(users);

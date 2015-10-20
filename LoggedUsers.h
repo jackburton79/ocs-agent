@@ -8,8 +8,15 @@
 #ifndef LOGGEDUSERS_H_
 #define LOGGEDUSERS_H_
 
+#include <ctime>
 #include <string>
 #include <vector>
+
+struct user_entry {
+	std::string login;
+	std::string logintimestring;
+	time_t logintime;
+};
 
 class LoggedUsers {
 public:
@@ -17,10 +24,11 @@ public:
 	~LoggedUsers();
 
 	int Count() const;
-	std::string UserAt(int i) const;
+	std::string LoginNameAt(int i) const;
+	user_entry UserEntryAt(int i) const;
 
 private:
-	std::vector<std::string> fUsers;
+	std::vector<user_entry> fUsers;
 };
 
 #endif /* LOGGEDUSERS_H_ */

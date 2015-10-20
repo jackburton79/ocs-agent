@@ -8,25 +8,31 @@
 #include "LoggedUsers.h"
 #include "Support.h"
 
-
+#include <ctime>
 #include <istream>
+
+#include <utmpx.h>
 
 LoggedUsers::LoggedUsers()
 {
-	if (!CommandExists("who"))
-		throw "Missing command \"who\"";
+	setutxent();
 
-	popen_streambuf who("export LC_ALL=C; who", "r");
-	std::istream iStream(&who);
-
-	std::string string;
-	while (std::getline(iStream, string) > 0) {
-		size_t pos = string.find(" ");
-		if (pos != std::string::npos) {
-			string = string.substr(0, pos);
-			fUsers.push_back(string);
+	struct utmpx* record = NULL;
+	while ((record = getutxent()) != NULL) {
+		if (record->ut_type == USER_PROCESS) {
+			user_entry entry;
+			entry.login = record->ut_user;
+			time_t loginTime = record->ut_tv.tv_sec;
+			entry.logintime = loginTime;
+			struct tm* timeinfo = localtime(&loginTime);
+			char timeString[80];
+			strftime(timeString, sizeof(timeString), "%a %b %d %R", timeinfo);
+			entry.logintimestring = timeString;
+			fUsers.push_back(entry);
 		}
 	}
+
+	endutxent();
 }
 
 
@@ -42,8 +48,15 @@ LoggedUsers::Count() const
 }
 
 
-std::string
-LoggedUsers::UserAt(int i) const
+user_entry
+LoggedUsers::UserEntryAt(int i) const
 {
 	return fUsers[i];
+}
+
+
+std::string
+LoggedUsers::LoginNameAt(int i) const
+{
+	return fUsers[i].login;
 }
