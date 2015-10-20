@@ -35,14 +35,15 @@ Agent::Run()
 		throw "Cannot initialize Inventory";
 
 	if (inventory.Build(config->DeviceID().c_str())) {
-		if (config->LocalInventory()) {
-			if (!inventory.Save(config->DeviceID().c_str()))
-				std::cerr << "Cannot save output file." << std::endl;
-		} else {
-			if (!inventory.Send(config->ServerURL().c_str()))
-				std::cerr << "Cannot send inventory." << std::endl;
+		if (!config->LocalInventory()) {
+			if (inventory.Send(config->ServerURL().c_str()))
+				return;
 
+			std::cerr << "Cannot send inventory. Will try to save it locally." << std::endl;
 		}
+		if (!inventory.Save(config->DeviceID().c_str()))
+			std::cerr << "Cannot save inventory file." << std::endl;
+
 	}
 }
 
