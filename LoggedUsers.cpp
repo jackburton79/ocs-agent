@@ -25,7 +25,7 @@ LoggedUsers::LoggedUsers()
 			time_t loginTime = record->ut_tv.tv_sec;
 			entry.logintime = loginTime;
 			struct tm* timeinfo = localtime(&loginTime);
-			char timeString[80];
+			char timeString[64];
 			strftime(timeString, sizeof(timeString), "%a %b %d %R", timeinfo);
 			entry.logintimestring = timeString;
 			fUsers.push_back(entry);
