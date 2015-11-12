@@ -89,15 +89,6 @@ HTTP::ErrorString() const
 }
 
 
-int
-HTTP::Get(const std::string path)
-{
-	HTTPRequestHeader requestHeader("GET", path);
-
-	return Request(requestHeader);
-}
-
-
 HTTPResponseHeader
 HTTP::LastResponse() const
 {
@@ -117,7 +108,25 @@ HTTP::SetHost(const std::string hostName, int port)
 
 
 int
-HTTP::Post(const std::string path, char* data)
+HTTP::Get(const std::string path)
+{
+	HTTPRequestHeader requestHeader("GET", path);
+
+	return Request(requestHeader);
+}
+
+
+int
+HTTP::Put(const std::string path, const char* data)
+{
+	HTTPRequestHeader requestHeader("PUT", path);
+
+	return Request(requestHeader, data);
+}
+
+
+int
+HTTP::Post(const std::string path, const char* data)
 {
 	HTTPRequestHeader requestHeader("POST", path);
 
