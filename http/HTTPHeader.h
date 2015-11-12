@@ -2,7 +2,7 @@
  * HTTPHeader.h
  *
  *  Created on: 23/lug/2013
- *      Author: stefano
+ *  Copyright 2013-2014 Stefano Ceccherini (stefano.ceccherini@gmail.com)
  */
 
 #ifndef HTTPHEADER_H_
