@@ -33,11 +33,11 @@ public:
 
 	int SetHost(const std::string hostName, int port = 80);
 	int Get(const std::string path);
-	int Put(const std::string path, const char* data);
-	int Post(const std::string path, const char* data);
+	int Put(const std::string path, const char* data, const size_t dataLength);
+	int Post(const std::string path, const char* data, const size_t dataLength);
 
 	int Request(HTTPRequestHeader& header, const void* data = NULL,
-			size_t dataLength = 0);
+			const size_t dataLength = 0);
 
 	int Read(void* data, const size_t& length);
 

@@ -117,20 +117,20 @@ HTTP::Get(const std::string path)
 
 
 int
-HTTP::Put(const std::string path, const char* data)
+HTTP::Put(const std::string path, const char* data, const size_t dataLength)
 {
 	HTTPRequestHeader requestHeader("PUT", path);
 
-	return Request(requestHeader, data);
+	return Request(requestHeader, data, dataLength);
 }
 
 
 int
-HTTP::Post(const std::string path, const char* data)
+HTTP::Post(const std::string path, const char* data, const size_t dataLength)
 {
 	HTTPRequestHeader requestHeader("POST", path);
 
-	return Request(requestHeader, data);
+	return Request(requestHeader, data, dataLength);
 }
 
 
@@ -147,7 +147,7 @@ HTTP::Read(void* data,  const size_t& length)
 
 
 int
-HTTP::Request(HTTPRequestHeader& header, const void* data, size_t length)
+HTTP::Request(HTTPRequestHeader& header, const void* data, const size_t length)
 {
 	if (!_HandleConnectionIfNeeded(header.Path()))
 		return -1;
