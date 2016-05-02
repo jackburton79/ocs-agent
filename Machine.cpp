@@ -277,8 +277,8 @@ Machine::_GetLSHWShortData()
 			std::string value = line.substr(descriptionPos, std::string::npos);
 			trim(devClass);
 			if (devClass == "system") {
-				std::string sysCtx = "Product Name";
-				sysCtx.append(kSystemInfo);
+				std::string sysCtx = kSystemInfo;
+				sysCtx.append("Product Name");
 				if (fSystemInfo.find(sysCtx) == fSystemInfo.end()) {
 					fSystemInfo.insert(std::pair<std::string, std::string>(sysCtx, trim(value)));
 				}
@@ -333,14 +333,14 @@ Machine::_GetLSHWData()
 			std::string value = line.substr(colonPos + 1, std::string::npos);
 			trim(value);
 			if (key == "vendor") {
-				std::string sysCtx = "Manufacturer";
-				sysCtx.append(context);
+				std::string sysCtx = context;
+				sysCtx.append("Manufacturer");
 				if (fSystemInfo.find(sysCtx) == fSystemInfo.end()) {
 					fSystemInfo.insert(std::pair<std::string, std::string>(sysCtx, trim(value)));
 				}
 			} else if (key == "product") {
-				std::string sysCtx = "Product Name";
-				sysCtx.append(context);
+				std::string sysCtx = context;
+				sysCtx.append("Product Name");
 				if (fSystemInfo.find(sysCtx) == fSystemInfo.end()) {
 					fSystemInfo.insert(std::pair<std::string, std::string>(sysCtx, trim(value)));
 				}
