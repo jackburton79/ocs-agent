@@ -497,11 +497,6 @@ Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 
 	checksum->LinkEndChild(fDocument->NewText(int_to_string(Checksum()).c_str()));
 
-	LoggedUsers users;
-	user_entry user = users.UserEntryAt(users.Count() - 1);
-	tinyxml2::XMLElement* dateLastLoggedUser = fDocument->NewElement("DATELASTLOGGEDUSER");
-	dateLastLoggedUser->LinkEndChild(fDocument->NewText(user.logintimestring.c_str()));
-
 	// Find first active interface
 	NetworkRoster roster;
 	NetworkInterface interface;
@@ -525,8 +520,6 @@ Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 	tinyxml2::XMLElement* ipAddress = fDocument->NewElement("IPADDR");
 	ipAddress->LinkEndChild(fDocument->NewText(interface.IPAddress().c_str()));
 
-	tinyxml2::XMLElement* lastLoggedUser = fDocument->NewElement("LASTLOGGEDUSER");
-	lastLoggedUser->LinkEndChild(fDocument->NewText(user.login.c_str()));
 
 	tinyxml2::XMLElement* memory = fDocument->NewElement("MEMORY");
 	memory->LinkEndChild(fDocument->NewText(fMachine->OSInfo().memory.c_str()));
@@ -571,11 +564,25 @@ Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 	workGroup->LinkEndChild(fDocument->NewText(fMachine->OSInfo().domain_name.c_str()));
 
 	hardware->LinkEndChild(checksum);
-	hardware->LinkEndChild(dateLastLoggedUser);
 	hardware->LinkEndChild(defaultGW);
 	hardware->LinkEndChild(description);
 	hardware->LinkEndChild(ipAddress);
-	hardware->LinkEndChild(lastLoggedUser);
+
+	try {
+		LoggedUsers users;
+		if (users.Count() > 0) {
+			user_entry user = users.UserEntryAt(users.Count() - 1);
+			tinyxml2::XMLElement* dateLastLoggedUser = fDocument->NewElement("DATELASTLOGGEDUSER");
+			dateLastLoggedUser->LinkEndChild(fDocument->NewText(user.logintimestring.c_str()));
+			hardware->LinkEndChild(dateLastLoggedUser);
+			tinyxml2::XMLElement* lastLoggedUser = fDocument->NewElement("LASTLOGGEDUSER");
+			lastLoggedUser->LinkEndChild(fDocument->NewText(user.login.c_str()));
+			hardware->LinkEndChild(lastLoggedUser);
+		}
+	} catch (...) {
+		// Not a big issue, after all.
+	}
+
 	hardware->LinkEndChild(memory);
 	hardware->LinkEndChild(name);
 	hardware->LinkEndChild(osComments);
