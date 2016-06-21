@@ -156,16 +156,13 @@ Configuration::_GenerateDeviceID()
 			}
 		}
 	}
-
-	time_t rawtime = time(NULL);
-  	struct tm* timeinfo = localtime(&rawtime);
-
-  	char timeString[80];
-	strftime(timeString, sizeof(timeString), "-%Y-%m-%d-%H-%M-%S", timeinfo);
 	
+	if (deviceID == "")
+		deviceID = Machine::Get()->HostName();
+
 	// DeviceID needs to have a date appended in this very format,
-	// otherwise OCSInventoryNG will not accept the inventory
-    deviceID.append(timeString);
+	// otherwise OCSInventoryNG will reject the inventory
+    deviceID.append("2016-01-01-01-01-01");
 
 	fValues[kDeviceID] = deviceID;
 }
