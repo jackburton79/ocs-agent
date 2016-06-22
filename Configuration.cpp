@@ -162,7 +162,7 @@ Configuration::_GenerateDeviceID()
 
 	// DeviceID needs to have a date appended in this very format,
 	// otherwise OCSInventoryNG will reject the inventory
-    deviceID.append("2016-01-01-01-01-01");
+    deviceID.append("-2016-01-01-01-01-01");
 
 	fValues[kDeviceID] = deviceID;
 }
