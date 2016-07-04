@@ -403,7 +403,6 @@ Machine::_GetOSInfo()
 	fKernelInfo.comments = uName.version;
 	fKernelInfo.os_release = uName.release;
 	fKernelInfo.domain_name = uName.domainname;
-
 	fKernelInfo.machine = uName.machine;
 
 	ProcReader proc("meminfo");
@@ -415,13 +414,12 @@ Machine::_GetOSInfo()
 		if ((pos = string.find("SwapTotal:")) != std::string::npos) {
 			pos = string.find(":");
 			std::string swapString = string.substr(pos + 1, std::string::npos);
-
-			int swapInt = ::strtol(trim(swapString).c_str(), NULL, 10) / 1024;
+			int swapInt = ::strtol(trim(swapString).c_str(), NULL, 10) / 1000;
 			fKernelInfo.swap = int_to_string(swapInt);
 		} else if ((pos = string.find("MemTotal:")) != std::string::npos) {
 			pos = string.find(":");
 			std::string memString = string.substr(pos + 1, std::string::npos);
-			int memInt = ::strtol(trim(memString).c_str(), NULL, 10) / 1024;
+			int memInt = ::strtol(trim(memString).c_str(), NULL, 10) / 1000;
 			fKernelInfo.memory = int_to_string(memInt);
 		}
 	}
