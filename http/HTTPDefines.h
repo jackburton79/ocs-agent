@@ -12,6 +12,8 @@
 
 #define CRLF "\015\012"
 
+#define HTTP_OK 200
+
 extern std::string HTTPProtocolPrefix;
 extern std::string HTTPHost;
 extern std::string HTTPContentType;

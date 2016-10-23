@@ -168,7 +168,7 @@ Inventory::Send(const char* serverUrl)
 
 	std::cerr << "Inventory::Send(): waiting for server response... ";
 	const HTTPResponseHeader& responseHeader = httpObject.LastResponse();
-	if (responseHeader.StatusCode() != 200
+	if (responseHeader.StatusCode() != HTTP_OK
 			|| !responseHeader.HasContentLength()) {
 		std::cout << responseHeader.ToString() << std::endl;
 		return false;
@@ -196,10 +196,8 @@ Inventory::Send(const char* serverUrl)
 		
 	std::cerr << "OK!" << std::endl;
 
-	std::cerr << "Inventory::Send(): server replied ";
 	std::string serverResponse = XML::GetTextElementValue(document, "RESPONSE");
-	
-	std::cerr << serverResponse;
+	std::cerr << "Inventory::Send(): server replied " << serverResponse;
 	if (serverResponse != "SEND") {
 		std::cerr << ": server not ready to accept inventory" << std::endl;
 		return false;
