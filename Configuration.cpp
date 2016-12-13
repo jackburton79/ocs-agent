@@ -62,9 +62,7 @@ Configuration::Load(const char* fileName)
 	}
 
 	// Generate a DeviceID if we don't have one
-	std::map<std::string, std::string>::const_iterator i;
-	i = fValues.find(kDeviceID);
-	if (i == fValues.end())
+	if (fValues.find(kDeviceID) == fValues.end())
 		_GenerateDeviceID();
 
 	return true;
