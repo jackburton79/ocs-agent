@@ -2,7 +2,7 @@
  * ProcReader.h
  *
  *  Created on: 15/lug/2013
- *      Author: stefano
+ *      Author: Stefano Ceccherini
  */
 
 #ifndef PROCREADER_H_

@@ -2,7 +2,7 @@
  * RunningProcesses.h
  *
  *  Created on: 16/lug/2013
- *      Author: stefano
+ *      Author: Stefano Ceccherini
  */
 
 #ifndef RUNNINGPROCESSES_H_

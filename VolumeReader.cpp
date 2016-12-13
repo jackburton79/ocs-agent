@@ -2,7 +2,7 @@
  * VolumeReader.cpp
  *
  *  Created on: 19/lug/2013
- *      Author: stefano
+ *      Author: Stefano Ceccherini
  */
 
 #include "Support.h"

@@ -2,7 +2,7 @@
  * Inventory.cpp
  *
  *  Created on: 11/lug/2013
- *      Author: stefano
+ *      Author: Stefano Ceccherini
  */
 
 #include "Configuration.h"

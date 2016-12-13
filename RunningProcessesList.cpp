@@ -2,7 +2,7 @@
  * RunningProcesses.cpp
  *
  *  Created on: 16/lug/2013
- *      Author: stefano
+ *      Author: Stefano Ceccherini
  */
 
 #include "ProcReader.h"

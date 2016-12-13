@@ -2,7 +2,7 @@
  * Configuration.h
  *
  *  Created on: 13/lug/2013
- *      Author: stefano
+ *      Author: Stefano Ceccherini
  */
 
 #ifndef CONFIGURATION_H_

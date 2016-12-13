@@ -2,7 +2,7 @@
  * Configuration.cpp
  *
  *  Created on: 13/lug/2013
- *      Author: stefano
+ *      Author: Stefano Ceccherini
  */
 
 #include "Configuration.h"

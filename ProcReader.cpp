@@ -2,7 +2,7 @@
  * ProcReader.cpp
  *
  *  Created on: 15/lug/2013
- *      Author: stefano
+ *      Author: Stefano Ceccherini
  */
 
 #include "ProcReader.h"

@@ -2,7 +2,7 @@
  * NetworkInterfaceRoster.cpp
  *
  *  Created on: 12 ott 2015
- *      Author: stefano
+ *      Author: Stefano Ceccherini
  */
 
 #include "NetworkRoster.h"

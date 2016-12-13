@@ -2,7 +2,7 @@
  * Machine.h
  *
  *  Created on: 11/lug/2013
- *      Author: stefano
+ *      Author: Stefano Ceccherini
  */
 
 #ifndef MACHINE_H_

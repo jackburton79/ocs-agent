@@ -2,7 +2,7 @@
  * Network.h
  *
  *  Created on: 12 ott 2015
- *      Author: stefano
+ *      Author: Stefano Ceccherini
  */
 
 #ifndef NETWORKINTERFACE_H_

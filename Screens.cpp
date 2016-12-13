@@ -1,4 +1,10 @@
-
+/*
+ * Screens.cpp
+ *
+ *  Created on: 15/lug/2015
+ *      Author: Stefano Ceccherini
+ */
+ 
 #include "Screens.h"
 #include "edid-decode.h"
 #include "Support.h"
@@ -10,7 +16,7 @@
 Screens::Screens()
 {
     if (!CommandExists("find"))
-	throw "Missing command \"find\"";
+        throw "Missing command \"find\"";
 
     popen_streambuf buf("find /sys/devices/ -name edid", "r");
     std::istream stream(&buf);

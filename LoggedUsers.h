@@ -2,7 +2,7 @@
  * LoggedUsers.h
  *
  *  Created on: 15/lug/2013
- *      Author: stefano
+ *      Author: Stefano Ceccherini
  */
 
 #ifndef LOGGEDUSERS_H_

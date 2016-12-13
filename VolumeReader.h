@@ -2,7 +2,7 @@
  * VolumeReader.h
  *
  *  Created on: 19/lug/2013
- *      Author: stefano
+ *      Author: Stefano Ceccherini
  */
 
 #ifndef VOLUMEREADER_H_
