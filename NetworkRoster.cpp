@@ -98,7 +98,7 @@ NetworkRoster::GetDefaultGateway(const char* interfaceName,
 		size_t gatewayPos = line.find("Gateway");
 		size_t maskPos = line.find("Genmask");
 
-		while (std::getline(stream, line) > 0) {
+		while (std::getline(stream, line)) {
 			if (line.find(interfaceName) == std::string::npos)
 				continue;
 

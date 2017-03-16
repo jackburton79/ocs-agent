@@ -62,7 +62,7 @@ RunningProcessesList::_ReadProcessInfo(process_info& info, std::string pid)
 	std::istream stream(&status);
 	std::string line;
 	try {
-		while (std::getline(stream, line) > 0) {
+		while (std::getline(stream, line)) {
 			if (line.find("VmSize") != std::string::npos) {
 				size_t pos = line.find(":");
 				if (pos == std::string::npos)

@@ -46,16 +46,16 @@ Storages::_ReadStoragesInfo()
         
 		for (;;) {
 			std::string dummy;
-			if (std::getline(stream, dummy) <= 0)
+			if (!std::getline(stream, dummy))
 				break;
 			std::string hostLine;
 			std::string vendorLine;
 			std::string typeLine;
-			if (std::getline(stream, hostLine) <= 0)
+			if (!std::getline(stream, hostLine))
 				break;
-			if (std::getline(stream, vendorLine) <= 0)
+			if (!std::getline(stream, vendorLine))
 				break;
-			if (std::getline(stream, typeLine) <= 0)
+			if (!std::getline(stream, typeLine))
 				break;	
 
 			storage_info info;
@@ -70,7 +70,7 @@ Storages::_ReadStoragesInfo()
 			fStorages.push_back(info);
                 }
         } catch (...) {
-		std::cout << "No storage info" << std::endl;
+        	std::cout << "No storage info" << std::endl;
         }
 }
 

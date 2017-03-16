@@ -232,7 +232,7 @@ Machine::_GetDMIDecodeData()
 		std::istream iStream(&dmi);
 
 		std::string string;
-		while (std::getline(iStream, string) > 0) {
+		while (std::getline(iStream, string)) {
 			// Skip the line with "Handle" in it.
 			if (string.find("Handle") == std::string::npos) {
 				std::string header = string;
@@ -271,7 +271,7 @@ Machine::_GetLSHWShortData()
 		// skip ==== line
 		std::getline(iStream, line);
 
-		while (std::getline(iStream, line) > 0) {
+		while (std::getline(iStream, line)) {
 			std::string device = line.substr(devicePos, classPos - devicePos);
 			std::string devClass = line.substr(classPos, descriptionPos - classPos);
 			std::string value = line.substr(descriptionPos, std::string::npos);
@@ -313,7 +313,7 @@ Machine::_GetLSHWData()
 		// skip initial line
 		std::getline(iStream, line);
 
-		while (std::getline(iStream, line) > 0) {
+		while (std::getline(iStream, line)) {
 			trim(line);
 			if (size_t start = line.find("*-") != std::string::npos) {
 				context = line.substr(start + 2, std::string::npos);
@@ -362,7 +362,7 @@ Machine::_GetCPUInfo()
 
 	std::string string;
 	int processorNum = 0;
-	while (std::getline(iStream, string) > 0) {
+	while (std::getline(iStream, string)) {
 		if (string.find("processor") != std::string::npos) {
 			fNumCPUs++;
 
@@ -410,7 +410,7 @@ Machine::_GetOSInfo()
 
 	std::string string;
 	size_t pos;
-	while (std::getline(stream, string) > 0) {
+	while (std::getline(stream, string)) {
 		if ((pos = string.find("SwapTotal:")) != std::string::npos) {
 			pos = string.find(":");
 			std::string swapString = string.substr(pos + 1, std::string::npos);
@@ -436,7 +436,7 @@ Machine::_IdentifyOS()
 		lsb.open("lsb_release -a", "r");
 		std::istream lsbStream(&lsb);
 		std::string line;
-		while (std::getline(lsbStream, line) > 0) {
+		while (std::getline(lsbStream, line)) {
 			size_t pos = line.find(':');
 			if (pos != std::string::npos) {
 				std::string key = line.substr(0, pos);
@@ -463,7 +463,7 @@ Machine::_GetSystemInfo(std::istream& stream, std::string header)
 {
 	std::string string;
 	size_t pos = 0;
-	while (std::getline(stream, string) > 0) {
+	while (std::getline(stream, string)) {
 		if (string == "")
 			break;
 

@@ -52,7 +52,7 @@ Configuration::Load(const char* fileName)
 	try {
 		std::ifstream configFile(fileName);
 		std::string line;
-		while (std::getline(configFile, line) > 0) {
+		while (std::getline(configFile, line)) {
 			size_t pos = line.find("=");
 			if (pos != std::string::npos) {
 				fValues[line.substr(0, pos)] = line.substr(pos + 1, std::string::npos);

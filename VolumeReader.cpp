@@ -21,7 +21,7 @@ VolumeReader::VolumeReader(const char* options)
 
 	std::string line;
 	std::getline(stream, line); // Skip the first line
-	while (std::getline(stream, line) > 0) {
+	while (std::getline(stream, line)) {
 		std::istringstream iss(line);
 
 		volume_info info;
