@@ -244,12 +244,13 @@ HTTP::_HandleConnectionIfNeeded(const std::string string, const int port)
 	}
 
 	struct timeval tv;
-	tv.tv_sec = 30;
+	tv.tv_sec = 15;
 	tv.tv_usec = 0;
 
 	::setsockopt(fFD, SOL_SOCKET, SO_KEEPALIVE, 0, 0);
 	::setsockopt(fFD, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv,sizeof(struct timeval));
-
+	::setsockopt(fFD, SOL_SOCKET, SO_SNDTIMEO, (char *)&tv,sizeof(struct timeval));
+	
 	struct sockaddr_in serverAddr;
 	::memset((char*)&serverAddr, 0, sizeof(serverAddr));
 	::memcpy((char*)&serverAddr.sin_addr, hostEnt->h_addr, hostEnt->h_length);
