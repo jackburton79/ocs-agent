@@ -16,6 +16,7 @@
 #include <sys/stat.h>
 
 extern const char* __progname;
+const char* version = "1.2";
 
 static
 struct option sLongOptions[] = {
@@ -31,14 +32,14 @@ struct option sLongOptions[] = {
 static void
 PrintHelpAndExit()
 {
-	std::cout << __progname << std::endl;
+	std::cout << __progname << " " << version << std::endl;
 	std::cout << "Usage:" << std::endl;
 	std::cout << "-h [--help]         : Print usage" << std::endl;
 	std::cout << "-c [--conf]         : Specify configuration file" << std::endl;
 	std::cout << "-s [--server]       : Specify OCSInventory server url" << std::endl;
 	std::cout << "-o [--output]       : Specify output file name" << std::endl;
 	std::cout << "-D [--daemonize]    : Detach from running terminal" << std::endl;
-	std::cout << "The -o and -s option are mutually exclusive. If no server or output file is specified,";
+	std::cout << "The -o and -s option are mutually exclusive. If no server or output file is specified, ";
 	std::cout << "either via the -s/-o option or via configuration file (option -c),";
 	std::cout << "the program will exit without doing anything." << std::endl;
 	std::cout << "Examples:" << std::endl;
