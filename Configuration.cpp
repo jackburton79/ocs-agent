@@ -21,6 +21,7 @@
 
 const static char* kServer = "server";
 const static char* kDeviceID = "deviceID";
+const static char* kOutputFileName = "outputFileName";
 
 
 static Configuration* sConfiguration;
@@ -103,6 +104,14 @@ Configuration::SetServer(const char* serverUrl)
 }
 
 
+bool
+Configuration::SetOutputFileName(const char* fileName)
+{
+	fValues[kOutputFileName] = fileName;
+	return true;
+}
+
+
 std::string
 Configuration::DeviceID() const
 {
@@ -134,6 +143,17 @@ bool
 Configuration::LocalInventory() const
 {
 	return fValues.find(kServer) == fValues.end();
+}
+
+
+std::string
+Configuration::OutputFileName() const
+{
+	std::map<std::string, std::string>::const_iterator i;
+	i = fValues.find(kOutputFileName);
+	if (i != fValues.end())
+		return i->second;
+	return "";
 }
 
 

@@ -41,9 +41,15 @@ Agent::Run()
 
 			std::cerr << "Cannot send inventory. Will try to save it locally." << std::endl;
 		}
-		if (!inventory.Save(config->DeviceID().c_str()))
-			std::cerr << "Cannot save inventory file." << std::endl;
-
+		std::string fullFileName = config->OutputFileName();
+		if (fullFileName.empty()) {
+			std::cerr << "Cannot save inventory: no path or file name specified." << std::endl;
+		} else {
+			if (fullFileName[fullFileName.size() - 1] == '/')
+				fullFileName.append(config->DeviceID().c_str()).append(".xml");
+			if (!inventory.Save(config->DeviceID().c_str(), fullFileName.c_str()))
+				std::cerr << "Cannot save inventory file." << std::endl;
+		}
 	}
 }
 

@@ -21,8 +21,9 @@ static
 struct option sLongOptions[] = {
 		{ "conf", required_argument, 0, 'c' },
 		{ "server", required_argument, 0, 's' },
-		{ "help", no_argument, 0, 'h' },
+		{ "output", required_argument, 0, 'o' },
 		{ "daemonize", no_argument, 0, 'D' },
+		{ "help", no_argument, 0, 'h' },
 		{ 0, 0, 0, 0 }
 };
 
@@ -35,15 +36,21 @@ PrintHelpAndExit()
 	std::cout << "-h [--help]         : Print usage" << std::endl;
 	std::cout << "-c [--conf]         : Specify configuration file" << std::endl;
 	std::cout << "-s [--server]       : Specify OCSInventory server url" << std::endl;
+	std::cout << "-o [--output]       : Specify output file name" << std::endl;
 	std::cout << "-D [--daemonize]    : Detach from running terminal" << std::endl;
-	std::cout << "If no server is specified, either via the -s option or via the" << std::endl;
-	std::cout << "configuration file (option -c), the program will write a local" << std::endl;
-	std::cout << "inventory in the current working directory." << std::endl;
+	std::cout << "The -o and -s option are mutually exclusive. If no server or output file is specified,";
+	std::cout << "either via the -s/-o option or via configuration file (option -c),";
+	std::cout << "the program will exit without doing anything." << std::endl;
 	std::cout << "Examples:" << std::endl;
 	std::cout << "    " << __progname;
 	std::cout << " --conf /etc/ocsinventory-ng.conf" << std::endl;
 	std::cout << "    " << __progname;
 	std::cout << " --server http://ocsinventory-ng/ocsinventory" << std::endl;
+	std::cout << "    " << __progname;
+	std::cout << " --output /path/to/output/inventoryFile.xml" << std::endl;
+	std::cout << "    " << __progname;
+	std::cout << " --output /path/to/output/" << std::endl;
+	
 
 	::exit(0);
 }
@@ -54,10 +61,11 @@ main(int argc, char **argv)
 {
 	char* configFile = NULL;
 	char* serverUrl = NULL;
+	char* fullFileName = NULL;
 	int optIndex = 0;
 	int c = 0;
 	bool daemonize = false;
-	while ((c = ::getopt_long(argc, argv, "c:s:Dh",
+	while ((c = ::getopt_long(argc, argv, "c:s:Do:h",
 			sLongOptions, &optIndex)) != -1) {
 		switch (c) {
 			case 'c':
@@ -69,6 +77,9 @@ main(int argc, char **argv)
 			case 'D':
 				daemonize = true;
 				break;
+			case 'o':
+				fullFileName = optarg;
+				break;
 			case 'h':
 				PrintHelpAndExit();
 				break;
@@ -76,9 +87,7 @@ main(int argc, char **argv)
 	}
 
 	if (daemonize) {
-		pid_t processID = 0;
-		pid_t sid = 0;
-		processID = fork();
+		pid_t processID = fork();
 		if (processID < 0) {
 			std::cerr << "Failed to daemonize. Exiting..." << std::endl;
 			// Return failure in exit status
@@ -92,8 +101,8 @@ main(int argc, char **argv)
 		umask(0);
 
 		//set new session
-		sid = setsid();
-		if(sid < 0)
+		pid_t sid = setsid();
+		if (sid < 0)
 			exit(1);
 
 		close(STDIN_FILENO);
@@ -105,7 +114,8 @@ main(int argc, char **argv)
 		Configuration::Get()->Load(configFile);
 	else if (serverUrl)
 		Configuration::Get()->SetServer(serverUrl);
-
+	else if (fullFileName)
+		Configuration::Get()->SetOutputFileName(fullFileName);
 	try {
 		Agent agent;
 		agent.Run();

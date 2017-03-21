@@ -19,11 +19,13 @@ public:
 	bool Save(const char* fileName);
 	bool Save();
 
-	bool SetServer(const char* fileName);
-
+	bool SetServer(const char* serverUrl);
+	bool SetOutputFileName(const char* fileName);
+	
 	std::string DeviceID() const;
 	std::string ServerURL() const;
 	bool LocalInventory() const;
+	std::string OutputFileName() const;
 
 private:
 	Configuration();

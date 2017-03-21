@@ -108,15 +108,16 @@ Inventory::Build(const char* deviceID)
 
 
 bool
-Inventory::Save(const char* name)
+Inventory::Save(const char* name, const char* fileName)
 {
-	std::cerr << "Saving inventory as ";
-	std::string fullName;
-	fullName.append(name).append(".xml");
-
-	std::cerr << fullName << "... ";
+	if (name == NULL || fileName == NULL)
+		return false;
+		
+	std::cerr << "Saving " << name << " inventory as ";
 	
-	bool result = fDocument->SaveFile(fullName.c_str()) == tinyxml2::XML_NO_ERROR;
+	std::cerr << fileName << "... ";
+	
+	bool result = fDocument->SaveFile(fileName) == tinyxml2::XML_NO_ERROR;
 	if (result)
 		std::cerr << "OK!";
 	else
