@@ -16,13 +16,15 @@ The program weights around 250kb on disk for now, and it only has zlib as depend
 Thinstation installation.
 It also uses  [tinyxml2](http://www.grinninglizard.com/tinyxml2), a very small and efficient XML parsing/writing library, linked statically into the executable.
 
-    Usage:  
-    -h [--help]         : Print usage  
-    -c [--conf]         : Specify configuration file  
-    -s [--server]       : Specify OCSInventory server url
-    If no server is specified, either via the -s option or via the
-    configuration file (option -c), the program will write a local
-    inventory in the current working directory.
-    Examples:  
-        ocsinventory-agent --conf /etc/ocsinventory-ng.conf  
-        ocsinventory-agent --server http://ocsinventory-ng/ocsinventory  
+  Usage:
+  -h [--help]         : Print usage
+  -c [--conf]         : Specify configuration file
+  -s [--server]       : Specify OCSInventory server url
+  -o [--output]       : Specify output file name
+  -D [--daemonize]    : Detach from running terminal
+  The -o and -s option are mutually exclusive. If no server or output file is specified, either via the -s/-o option or via configuration file (option -c),the program will exit without doing anything.
+  Examples:
+    ocsinventory-agent --conf /etc/ocsinventory-ng.conf
+    ocsinventory-agent --server http://ocsinventory-ng/ocsinventory
+    ocsinventory-agent --output /path/to/output/inventoryFile.xml
+    ocsinventory-agent --output /path/to/output/
