@@ -161,7 +161,7 @@ void
 Configuration::_GenerateDeviceID()
 {
 	std::string deviceID = Machine::Get()->SystemSerialNumber();
-	if (deviceID == "") {
+	if (deviceID <= 1) {
 		NetworkRoster roster;
 		NetworkInterface interface;
 		unsigned int cookie = 0;
@@ -177,7 +177,7 @@ Configuration::_GenerateDeviceID()
 	
 	if (deviceID == "")
 		deviceID = Machine::Get()->HostName();
-
+	
 	// DeviceID needs to have a date appended in this very format,
 	// otherwise OCSInventoryNG will reject the inventory
     deviceID.append("-2016-01-01-01-01-01");
