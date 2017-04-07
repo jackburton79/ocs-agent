@@ -161,7 +161,7 @@ void
 Configuration::_GenerateDeviceID()
 {
 	std::string deviceID = Machine::Get()->SystemSerialNumber();
-	if (deviceID <= 1) {
+	if (deviceID.length() <= 1) {
 		NetworkRoster roster;
 		NetworkInterface interface;
 		unsigned int cookie = 0;
@@ -178,9 +178,15 @@ Configuration::_GenerateDeviceID()
 	if (deviceID == "")
 		deviceID = Machine::Get()->HostName();
 	
+	std::string biosDateString = Machine::Get()->BIOSDate();
+	struct tm biosDate;
+	strptime(biosDateString.c_str(), "%m/%d/%Y", &biosDate);
+	
 	// DeviceID needs to have a date appended in this very format,
 	// otherwise OCSInventoryNG will reject the inventory
-    deviceID.append("-2016-01-01-01-01-01");
+	char targetString[32];
+	strftime(targetString, sizeof(targetString), "-%Y-%m-%d-00-00-00", &biosDate);
+    deviceID.append(targetString);
 
 	fValues[kDeviceID] = deviceID;
 }
