@@ -39,7 +39,7 @@ void
 Storages::_ReadStoragesInfo()
 {
 	try {
-		ProcReader procReader("scsi/scsi");
+		ProcReader procReader("/proc/scsi/scsi");
 
 		std::istream stream(&procReader);
         	std::string line;

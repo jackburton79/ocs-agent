@@ -15,7 +15,7 @@
 
 class ProcReader : public std::streambuf {
 public:
-	ProcReader(const char* sub);
+	ProcReader(const char* fullPath);
 	virtual ~ProcReader();
 
 	ProcReader* open(const char* command, const char* mode);

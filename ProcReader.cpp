@@ -15,15 +15,12 @@
 #include <string.h>
 #include <unistd.h>
 
-ProcReader::ProcReader(const char* sub)
+ProcReader::ProcReader(const char* fullPath)
 {
-	std::string fullName = "/proc/";
-	fullName.append(sub);
-	
-	if (ProcReader::open(fullName.c_str(), "r") == NULL) {
+	if (ProcReader::open(fullPath, "r") == NULL) {
 		std::string errorString;
 		errorString.append("File not found: ");
-		errorString.append(fullName);
+		errorString.append(fullPath);
 		throw errorString;
 	}
 }

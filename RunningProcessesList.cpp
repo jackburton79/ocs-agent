@@ -54,10 +54,10 @@ void
 RunningProcessesList::_ReadProcessInfo(process_info& info, std::string pid)
 {
 	info.pid = strtol(pid.c_str(), NULL, 10);
-	info.cmdline = ProcReader((pid + std::string("/cmdline")).c_str()).ReadLine();
+	info.cmdline = ProcReader(("/proc/" + pid + std::string("/cmdline")).c_str()).ReadLine();
 
 	// TODO: Refactor, too much duplicated code
-	ProcReader status((pid + std::string("/status")).c_str());
+	ProcReader status(("/proc/" + pid + std::string("/status")).c_str());
 
 	std::istream stream(&status);
 	std::string line;

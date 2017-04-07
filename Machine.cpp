@@ -357,7 +357,7 @@ Machine::_GetLSHWData()
 void
 Machine::_GetCPUInfo()
 {
-	ProcReader cpu("/cpuinfo");
+	ProcReader cpu("/proc/cpuinfo");
 	std::istream iStream(&cpu);
 
 	std::string string;
@@ -405,7 +405,7 @@ Machine::_GetOSInfo()
 	fKernelInfo.domain_name = uName.domainname;
 	fKernelInfo.machine = uName.machine;
 
-	ProcReader proc("meminfo");
+	ProcReader proc("/proc/meminfo");
 	std::istream stream(&proc);
 
 	std::string string;
