@@ -463,13 +463,14 @@ Machine::_GetOSInfo()
 		}
 	}
 
-	_IdentifyOS();
+	fKernelInfo.os_description = _OSDescription();
 }
 
 
-void
-Machine::_IdentifyOS()
+std::string 
+Machine::_OSDescription()
 {
+	std::string osDescription;
 	if (CommandExists("lsb_release")) {
 		popen_streambuf lsb;
 		lsb.open("lsb_release -a", "r");
@@ -481,7 +482,7 @@ Machine::_IdentifyOS()
 				std::string key = line.substr(0, pos);
 				if (key == "Description") {
 					std::string value = line.substr(pos + 1, std::string::npos);
-					fKernelInfo.os_description = trim(value);
+					osDescription = trim(value);
 				}
 			}
 		}
@@ -489,11 +490,12 @@ Machine::_IdentifyOS()
 		// there is no lsb_release command.
 		// try to identify the system in another way
 		if (::access("/etc/thinstation.global", F_OK) != -1)
-			fKernelInfo.os_description = "Thinstation";
+			osDescription = "Thinstation";
 		else
-			fKernelInfo.os_description = "Unknown";
+			osDescription = "Unknown";
 	}
-
+	
+	return osDescription;
 }
 
 

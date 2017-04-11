@@ -128,13 +128,11 @@ private:
 	bool _GetLSHWData();
 	void _GetCPUInfo();
 	void _GetOSInfo();
-	void _IdentifyOS();
 	void _GetSystemInfo(std::istream& stream, std::string header);
-
+	
+	std::string _OSDescription();
 	std::string _GetValue(std::string string, std::string header) const;
 	std::vector<std::string> _GetValues(std::string string, std::string header) const;
-
-	std::string _ProcessorInfo(const char* info, int num) const;
 
 	// TODO: Use a std::vector, more than 16 cpu aren't uncommon nowadays
 	int fNumCPUs;
