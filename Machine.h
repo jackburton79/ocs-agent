@@ -12,45 +12,6 @@
 #include <string>
 #include <vector>
 
-
-struct system_info {
-	std::string vendor;
-};
-
-
-struct bios_info {
-	std::string vendor;
-	std::string release_date;
-	std::string version;
-};
-
-
-struct product_info {
-	std::string name;
-	std::string serial;
-	std::string version;
-	std::string uuid;
-};
-
-
-struct board_info {
-	std::string asset_tag;
-	std::string name;
-	std::string serial;
-	std::string vendor;
-	std::string version;
-};
-
-
-struct chassis_info {
-	std::string asset_tag;
-	std::string serial;
-	std::string type;
-	std::string vendor;
-	std::string version;
-};
-
-
 struct os_info {
 	std::string comments;
 	std::string hostname;
@@ -115,7 +76,6 @@ private:
 	~Machine();
 
 	void _RetrieveData();
-	bool _GetDMIData();
 	bool _GetDMIDecodeData();
 	bool _GetLSHWShortData();
 	bool _GetLSHWData();
@@ -133,12 +93,8 @@ private:
 	int fNumCPUs;
 	std::map<std::string, std::string> fCPUInfo[16];
 
-	bios_info fBIOSInfo;
-	chassis_info fChassisInfo;
-	board_info fBoardInfo;
-	product_info fProductInfo;
+	std::multimap<std::string, std::string> fSystemInfo;
 	os_info fKernelInfo;
-	system_info fSystemInfo;
 
 	std::vector<struct video_info> fVideoInfo;
 };

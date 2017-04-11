@@ -57,9 +57,6 @@ Machine::~Machine()
 void
 Machine::_RetrieveData()
 {
-	// Try /sys/devices/virtual/dmi/id tree
-	_GetDMIData();
-	
 	if (!_GetDMIDecodeData()) {
 		std::cerr << "Can't find dmidecode. Is it installed?" << std::endl;
 	}
@@ -78,35 +75,36 @@ Machine::_RetrieveData()
 std::string
 Machine::AssetTag() const
 {
-	return fChassisInfo.asset_tag;
+	return "";
 }
 
 
 std::string
 Machine::BIOSVersion() const
 {
-	return fBIOSInfo.version;
+	return _GetValue("Version", kBIOSInfo);
 }
 
 
 std::string
 Machine::BIOSManufacturer() const
 {
-	return fBIOSInfo.vendor;
+	return _GetValue("Vendor", kBIOSInfo);
 }
 
 
 std::string
 Machine::BIOSDate() const
 {
-	return fBIOSInfo.release_date;
+	return _GetValue("Release Date", kBIOSInfo);
 }
 
 
 std::string
 Machine::SystemManufacturer() const
 {
-	return fSystemInfo.vendor;
+	return _GetValue("Manufacturer", kSystemInfo);
+
 }
 
 
@@ -124,35 +122,35 @@ Machine::HostName() const
 std::string
 Machine::SystemModel() const
 {
-	return fProductInfo.name;
+	return _GetValue("Product Name", kSystemInfo);
 }
 
 
 std::string
 Machine::SystemSerialNumber() const
 {
-	return fProductInfo.serial;
+	return _GetValue("Serial Number", kSystemInfo);
 }
 
 
 std::string
 Machine::SystemUUID() const
 {
-	return fProductInfo.uuid;
+	return _GetValue("UUID", kSystemInfo);
 }
 
 
 std::string
 Machine::MachineSerialNumber() const
 {
-	return fBoardInfo.serial;
+	return _GetValue("Serial Number", "Base Board Information");
 }
 
 
 std::string
 Machine::MachineManufacturer() const
 {
-	return fBoardInfo.vendor;
+	return _GetValue("Manufacturer", "Base Board Information");
 }
 
 
@@ -224,38 +222,6 @@ Machine::VideoInfoFor(int numVideo) const
 
 // private
 bool
-Machine::_GetDMIData()
-{
-	try {
-		fBIOSInfo.release_date = ProcReader("/sys/devices/virtual/dmi/id/bios_date").ReadLine();
-		fBIOSInfo.vendor = ProcReader("/sys/devices/virtual/dmi/id/bios_vendor").ReadLine();
-		fBIOSInfo.version = ProcReader("/sys/devices/virtual/dmi/id/bios_version").ReadLine();
-		
-		fProductInfo.name = ProcReader("/sys/devices/virtual/dmi/id/product_name").ReadLine();
-		fProductInfo.version = ProcReader("/sys/devices/virtual/dmi/id/product_version").ReadLine();
-		fProductInfo.uuid = ProcReader("/sys/devices/virtual/dmi/id/product_uuid").ReadLine();
-		fProductInfo.serial = ProcReader("/sys/devices/virtual/dmi/id/product_serial").ReadLine();
-		
-		fChassisInfo.asset_tag = ProcReader("/sys/devices/virtual/dmi/id/chassis_asset_tag").ReadLine();
-		fChassisInfo.serial = ProcReader("/sys/devices/virtual/dmi/id/chassis_serial").ReadLine();
-		fChassisInfo.type = ProcReader("/sys/devices/virtual/dmi/id/chassis_type").ReadLine();
-		fChassisInfo.vendor = ProcReader("/sys/devices/virtual/dmi/id/chassis_vendor").ReadLine();
-		fChassisInfo.version = ProcReader("/sys/devices/virtual/dmi/id/chassis_version").ReadLine();
-		
-		fBoardInfo.asset_tag = ProcReader("/sys/devices/virtual/dmi/id/board_asset_tag").ReadLine();
-		fBoardInfo.name = ProcReader("/sys/devices/virtual/dmi/id/board_name").ReadLine();
-		fBoardInfo.vendor = ProcReader("/sys/devices/virtual/dmi/id/board_vendor").ReadLine();
-		fBoardInfo.version = ProcReader("/sys/devices/virtual/dmi/id/board_version").ReadLine();
-		
-		fSystemInfo.vendor = ProcReader("/sys/devices/virtual/dmi/id/sys_vendor").ReadLine();
-	} catch (...) {
-		return false;
-	}
-	return true;
-}
-
-
-bool
 Machine::_GetDMIDecodeData()
 {
 	if (!CommandExists("dmidecode"))
@@ -286,7 +252,7 @@ Machine::_GetDMIDecodeData()
 bool
 Machine::_GetLSHWShortData()
 {
-/*	if (!CommandExists("lshw"))
+	if (!CommandExists("lshw"))
 		return false;
 
 	popen_streambuf lshw("lshw -short", "r");
@@ -327,7 +293,7 @@ Machine::_GetLSHWShortData()
 	} catch (...) {
 
 	}
-*/
+
 	return true;
 }
 
@@ -335,7 +301,7 @@ Machine::_GetLSHWShortData()
 bool
 Machine::_GetLSHWData()
 {
-/*	if (!CommandExists("lshw"))
+	if (!CommandExists("lshw"))
 		return false;
 
 	popen_streambuf lshw("lshw", "r");
@@ -383,7 +349,7 @@ Machine::_GetLSHWData()
 	} catch (...) {
 
 	}
-*/
+
 	return true;
 }
 
@@ -495,7 +461,7 @@ Machine::_IdentifyOS()
 void
 Machine::_GetSystemInfo(std::istream& stream, std::string header)
 {
-	/*std::string string;
+	std::string string;
 	size_t pos = 0;
 	while (std::getline(stream, string)) {
 		if (string == "")
@@ -517,20 +483,20 @@ Machine::_GetSystemInfo(std::istream& stream, std::string header)
 		} catch (...) {
 
 		}
-	}*/
+	}
 }
 
 
 std::string
 Machine::_GetValue(std::string string, std::string header) const
 {
-	/*std::map<std::string, std::string>::const_iterator i;
+	std::map<std::string, std::string>::const_iterator i;
 	std::string fullString = header;
 	fullString.append(string);
 	i = fSystemInfo.find(fullString);
 	if (i != fSystemInfo.end())
 		return i->second;
-*/
+
 	return "";
 }
 
@@ -539,7 +505,16 @@ std::vector<std::string>
 Machine::_GetValues(std::string string, std::string header) const
 {
 	std::vector<std::string> stringList;
+	std::pair <std::multimap<std::string, std::string>::const_iterator,
+			std::multimap<std::string, std::string>::const_iterator> result;
 
+	std::string fullString = header;
+	fullString.append(string);
+	result = fSystemInfo.equal_range(fullString);
+	for (std::multimap<std::string, std::string>::const_iterator i = result.first;
+			i != result.second; i++) {
+		stringList.push_back(i->second);
+	}
 	return stringList;
 }
 
