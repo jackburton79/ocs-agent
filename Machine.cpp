@@ -60,11 +60,11 @@ Machine::_RetrieveData()
 	// Try /sys/devices/virtual/dmi/id tree
 	_GetDMIData();
 	
-	if (!_GetDMIDecodeData()) {
+/*if (!_GetDMIDecodeData()) {
 		std::cerr << "Can't find dmidecode. Is it installed?" << std::endl;
 	}
 
-	_GetLSHWData();
+	_GetLSHWData();*/
 	_GetCPUInfo();
 
 	try {
@@ -166,14 +166,14 @@ Machine::CountProcessors() const
 std::string
 Machine::ProcessorManufacturer(int numCpu) const
 {
-	return _ProcessorInfo("vendor_id", numCpu);
+	return fCPUInfo[numCpu].manufacturer;
 }
 
 
 std::string
 Machine::ProcessorSpeed(int numCpu) const
 {
-	std::string mhz = _ProcessorInfo("cpu MHz", numCpu);
+	std::string mhz = fCPUInfo[numCpu].speed;
 
 	size_t pos = mhz.find(".");
 	if (pos != std::string::npos) {
@@ -195,8 +195,7 @@ Machine::ProcessorSerialNumber(int numCpu) const
 std::string
 Machine::ProcessorType(int numCpu) const
 {
-	std::string model = _ProcessorInfo("model name", numCpu);
-	trim(model);
+	std::string model = fCPUInfo[numCpu].type;
 	return model;
 }
 
@@ -416,8 +415,14 @@ Machine::_GetCPUInfo()
 			try {
 				std::string name = string.substr(0, pos);
 				std::string value = string.substr(pos + 1, std::string::npos);
-
-				fCPUInfo[processorNum][trim(name)] = trim(value);
+				name = trim(name);
+				
+				if (name == "model name")
+					fCPUInfo[processorNum].type = trim(value);
+				else if (name == "cpu MHz")
+					fCPUInfo[processorNum].speed = trim(value);
+				else if (name == "vendor_id")
+					fCPUInfo[processorNum].manufacturer = trim(value);
 
 			} catch (...) {
 			}
@@ -617,18 +622,4 @@ Machine::MemorySerialNumber(int num)
 {
 	std::vector<std::string> values = _GetValues("Serial Number", kMemoryDevice);
 	return values.at(num);
-}
-
-
-std::string
-Machine::_ProcessorInfo(const char* info, int num) const
-{
-	if (num < 0 || num >= fNumCPUs)
-		return "";
-
-	std::map<std::string, std::string>::const_iterator i;
-	i = fCPUInfo[num].find(info);
-	if (i != fCPUInfo[num].end())
-		return i->second;
-	return "";
 }

@@ -51,6 +51,13 @@ struct chassis_info {
 };
 
 
+struct processor_info {
+	std::string manufacturer;
+	std::string type;
+	std::string speed;
+};
+
+
 struct os_info {
 	std::string comments;
 	std::string hostname;
@@ -131,7 +138,7 @@ private:
 
 	// TODO: Use a std::vector, more than 16 cpu aren't uncommon nowadays
 	int fNumCPUs;
-	std::map<std::string, std::string> fCPUInfo[16];
+	processor_info fCPUInfo[16];
 
 	bios_info fBIOSInfo;
 	chassis_info fChassisInfo;
