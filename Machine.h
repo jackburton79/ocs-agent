@@ -138,7 +138,7 @@ private:
 	bool _GetLSHWData();
 	void _GetCPUInfo();
 	void _GetOSInfo();
-	void _GetInfoForHandle(std::istream& stream, std::string header);
+	void _ExtractNeededInfo(std::multimap<std::string, std::string>);
 	
 	std::string _OSDescription();
 	

@@ -292,22 +292,131 @@ Machine::_GetDMIDecodeData()
 	try {
 		popen_streambuf dmi("dmidecode", "r");
 		std::istream iStream(&dmi);
-
 		std::string string;
+		std::multimap<std::string, std::string> systemInfo;
 		while (std::getline(iStream, string)) {
 			// Skip the line with "Handle" in it.
 			if (string.find("Handle") == std::string::npos) {
 				std::string handle = string;
-				handle = trim(handle);
+				trim(handle);
+				size_t pos = 0;
+				while (std::getline(iStream, string)) {
+					if (string == "")
+						break;
 
-				_GetInfoForHandle(iStream, handle);
+					pos = string.find(":");
+					if (pos == std::string::npos)
+						continue;
+
+					try {
+						std::string name = string.substr(0, pos);
+						trim(name);
+						std::string fullString = handle;
+						fullString.append(name);
+						std::string value = string.substr(pos + 2, std::string::npos);
+
+						systemInfo.insert(std::pair<std::string, std::string>(trim(fullString), trim(value)));
+						std::cout << fullString << "=" << value << std::endl;
+					} catch (...) {
+
+					}
+				}
 			}
 		}
+		_ExtractNeededInfo(systemInfo);
 	} catch (...) {
 		return false;
 	}
 
 	return true;
+}
+
+
+void
+Machine::_ExtractNeededInfo(std::multimap<std::string, std::string> systemInfo)
+{
+	std::string string;
+	string = GetValueFromMap(systemInfo, "Release Date", kBIOSInfo);
+	if (string != "" && fBIOSInfo.release_date == "")
+		fBIOSInfo.release_date = string;
+	string = GetValueFromMap(systemInfo, "Vendor", kBIOSInfo);
+	if (string != "" && fBIOSInfo.vendor == "")
+		fBIOSInfo.vendor = string;
+	string = GetValueFromMap(systemInfo, "Version", kBIOSInfo);
+	if (string != "" && fBIOSInfo.version == "")
+		fBIOSInfo.version = string;
+	string = GetValueFromMap(systemInfo, "Product Name", kSystemInfo);
+	if (string != "" && fProductInfo.name == "")
+		fProductInfo.name = string;
+	string = GetValueFromMap(systemInfo, "Version", kSystemInfo);
+	if (string != "" && fProductInfo.version == "")
+		fProductInfo.version = string;
+	string = GetValueFromMap(systemInfo, "UUID", kSystemInfo);
+	if (string != "" && fProductInfo.uuid == "")
+		fProductInfo.uuid = string;
+	string = GetValueFromMap(systemInfo, "Serial Number", kSystemInfo);
+	if (string != "" && fProductInfo.serial == "")
+		fProductInfo.serial = string;
+	string = GetValueFromMap(systemInfo, "Asset Tag", "Chassis Information");
+	if (string != "" && fChassisInfo.asset_tag == "")
+		fChassisInfo.asset_tag = string;
+	string = GetValueFromMap(systemInfo, "Serial Number", "Chassis Information");
+	if (string != "" && fChassisInfo.serial == "")
+		fChassisInfo.serial = string;
+	string = GetValueFromMap(systemInfo, "Type", "Chassis Information");
+	if (string != "" && fChassisInfo.type == "")
+		fChassisInfo.type = string;
+	string = GetValueFromMap(systemInfo, "Manufacturer", "Chassis Information");
+	if (string != "" && fChassisInfo.vendor == "")
+		fChassisInfo.vendor = string;
+	string = GetValueFromMap(systemInfo, "Version",  "Chassis Information");
+	if (string != "" && fChassisInfo.version == "")
+		fChassisInfo.version = string;
+
+	string = GetValueFromMap(systemInfo, "Asset Tag", "Base Board Information");
+	if (string != "" && fBoardInfo.asset_tag == "")
+		fBoardInfo.asset_tag = string;
+	string = GetValueFromMap(systemInfo, "Product Name", "Base Board Information");
+	if (string != "" && fBoardInfo.name == "")
+		fBoardInfo.name = string;
+	string = GetValueFromMap(systemInfo, "Manufacturer", "Base Board Information");
+	if (string != "" && fBoardInfo.vendor == "")
+		fBoardInfo.vendor = string;
+	string = GetValueFromMap(systemInfo, "Version", "Base Board Information");
+	if (string != "" && fBoardInfo.version == "")
+		fBoardInfo.version = string;
+	string = GetValueFromMap(systemInfo, "Serial Number", "Base Board Information");
+	if (string != "" && fBoardInfo.serial == "")
+		fBoardInfo.serial = string;
+
+	string = GetValueFromMap(systemInfo, "Manufacturer", kSystemInfo);
+	if (string != "" && fSystemInfo.vendor == "")
+		fSystemInfo.vendor = string;
+
+
+	std::vector<std::string> values = GetValuesFromMultiMap(systemInfo,
+											"Size", "Memory Device");
+	for (size_t i = 0; i < values.size(); i++) {
+		memory_device_info info;
+		info.size = values.at(i);
+		fMemoryInfo.push_back(info);
+	}
+
+	values = GetValuesFromMultiMap(systemInfo, "Type", "Memory Device");
+	for (size_t i = 0; i < values.size(); i++)
+		fMemoryInfo.at(i).type = values.at(i);
+	values = GetValuesFromMultiMap(systemInfo, "Speed", "Memory Device");
+	for (size_t i = 0; i < values.size(); i++)
+		fMemoryInfo.at(i).speed = values.at(i);
+	values = GetValuesFromMultiMap(systemInfo, "Manufacturer", "Memory Device");
+	for (size_t i = 0; i < values.size(); i++)
+		fMemoryInfo.at(i).vendor = values.at(i);
+	values = GetValuesFromMultiMap(systemInfo, "Asset Tag", "Memory Device");
+	for (size_t i = 0; i < values.size(); i++)
+		fMemoryInfo.at(i).asset_tag = values.at(i);
+	values = GetValuesFromMultiMap(systemInfo, "Serial Number", "Memory Device");
+	for (size_t i = 0; i < values.size(); i++)
+		fMemoryInfo.at(i).serial = values.at(i);
 }
 
 
@@ -527,124 +636,6 @@ Machine::_OSDescription()
 	
 	return osDescription;
 }
-
-
-void
-Machine::_GetInfoForHandle(std::istream& stream, std::string header)
-{
-	std::multimap<std::string, std::string> systemInfo;
-	
-	std::string string;
-	size_t pos = 0;
-	while (std::getline(stream, string)) {
-		if (string == "")
-			break;
-
-		pos = string.find(":");
-		if (pos == std::string::npos)
-			continue;
-
-		try {
-			std::string name = string.substr(0, pos);
-			trim(name);
-			std::string fullString = header;
-			fullString.append(name);
-			std::string value = string.substr(pos + 2, std::string::npos);
-
-			systemInfo.insert(std::pair<std::string, std::string>(trim(fullString), trim(value)));
-			std::cout << fullString << "=" << value << std::endl;
-		} catch (...) {
-
-		}
-	}
-	
-	// TODO: This gets called multiple times, once for every handle.
-	// Plus, it's not pretty
-	string = GetValueFromMap(systemInfo, "Release Date", kBIOSInfo);
-	if (string != "" && fBIOSInfo.release_date == "")
-		fBIOSInfo.release_date = string;
-	string = GetValueFromMap(systemInfo, "Vendor", kBIOSInfo);	
-	if (string != "" && fBIOSInfo.vendor == "")
-		fBIOSInfo.vendor = string;
-	string = GetValueFromMap(systemInfo, "Version", kBIOSInfo);
-	if (string != "" && fBIOSInfo.version == "")
-		fBIOSInfo.version = string;
-	string = GetValueFromMap(systemInfo, "Product Name", kSystemInfo);
-	if (string != "" && fProductInfo.name == "")		
-		fProductInfo.name = string;
-	string = GetValueFromMap(systemInfo, "Version", kSystemInfo);
-	if (string != "" && fProductInfo.version == "")
-		fProductInfo.version = string;
-	string = GetValueFromMap(systemInfo, "UUID", kSystemInfo);
-	if (string != "" && fProductInfo.uuid == "")
-		fProductInfo.uuid = string;
-	string = GetValueFromMap(systemInfo, "Serial Number", kSystemInfo);
-	if (string != "" && fProductInfo.serial == "")
-		fProductInfo.serial = string;
-	string = GetValueFromMap(systemInfo, "Asset Tag", "Chassis Information");
-	if (string != "" && fChassisInfo.asset_tag == "")
-		fChassisInfo.asset_tag = string;
-	string = GetValueFromMap(systemInfo, "Serial Number", "Chassis Information");
-	if (string != "" && fChassisInfo.serial == "")
-		fChassisInfo.serial = string;
-	string = GetValueFromMap(systemInfo, "Type", "Chassis Information");
-	if (string != "" && fChassisInfo.type == "")
-		fChassisInfo.type = string;
-	string = GetValueFromMap(systemInfo, "Manufacturer", "Chassis Information");
-	if (string != "" && fChassisInfo.vendor == "")
-		fChassisInfo.vendor = string;
-	string = GetValueFromMap(systemInfo, "Version",  "Chassis Information");
-	if (string != "" && fChassisInfo.version == "")
-		fChassisInfo.version = string;
-	
-	string = GetValueFromMap(systemInfo, "Asset Tag", "Base Board Information");
-	if (string != "" && fBoardInfo.asset_tag == "")
-		fBoardInfo.asset_tag = string;
-	string = GetValueFromMap(systemInfo, "Product Name", "Base Board Information");
-	if (string != "" && fBoardInfo.name == "")
-		fBoardInfo.name = string;
-	string = GetValueFromMap(systemInfo, "Manufacturer", "Base Board Information");
-	if (string != "" && fBoardInfo.vendor == "")
-		fBoardInfo.vendor = string;
-	string = GetValueFromMap(systemInfo, "Version", "Base Board Information");
-	if (string != "" && fBoardInfo.version == "")
-		fBoardInfo.version = string;
-	string = GetValueFromMap(systemInfo, "Serial Number", "Base Board Information");
-	if (string != "" && fBoardInfo.serial == "")
-		fBoardInfo.serial = string;
-	
-	string = GetValueFromMap(systemInfo, "Manufacturer", kSystemInfo);
-	if (string != "" && fSystemInfo.vendor == "")
-		fSystemInfo.vendor = string;
-		
-	
-	std::vector<std::string> values = GetValuesFromMultiMap(systemInfo,
-											"Size", "Memory Device");
-	for (size_t i = 0; i < values.size(); i++) {
-		memory_device_info info;
-		info.size = values.at(i);
-		fMemoryInfo.push_back(info);
-	}
-	
-	values = GetValuesFromMultiMap(systemInfo, "Type", "Memory Device");
-	for (size_t i = 0; i < values.size(); i++)
-		fMemoryInfo.at(i).type = values.at(i);
-	values = GetValuesFromMultiMap(systemInfo, "Speed", "Memory Device");
-	for (size_t i = 0; i < values.size(); i++)
-		fMemoryInfo.at(i).speed = values.at(i);
-	values = GetValuesFromMultiMap(systemInfo, "Manufacturer", "Memory Device");
-	for (size_t i = 0; i < values.size(); i++)
-		fMemoryInfo.at(i).vendor = values.at(i);
-	values = GetValuesFromMultiMap(systemInfo, "Asset Tag", "Memory Device");
-	for (size_t i = 0; i < values.size(); i++)
-		fMemoryInfo.at(i).asset_tag = values.at(i);
-	values = GetValuesFromMultiMap(systemInfo, "Serial Number", "Memory Device");
-	for (size_t i = 0; i < values.size(); i++)
-		fMemoryInfo.at(i).serial = values.at(i);
-}
-
-
-
 
 
 int
