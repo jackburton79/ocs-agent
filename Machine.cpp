@@ -254,28 +254,28 @@ bool
 Machine::_GetDMIData()
 {
 	try {
-		fBIOSInfo.release_date = ProcReader("/sys/devices/virtual/dmi/id/bios_date").ReadLine();
-		fBIOSInfo.vendor = ProcReader("/sys/devices/virtual/dmi/id/bios_vendor").ReadLine();
-		fBIOSInfo.version = ProcReader("/sys/devices/virtual/dmi/id/bios_version").ReadLine();
+		fBIOSInfo.release_date = trimmed(ProcReader("/sys/devices/virtual/dmi/id/bios_date").ReadLine());
+		fBIOSInfo.vendor = trimmed(ProcReader("/sys/devices/virtual/dmi/id/bios_vendor").ReadLine());
+		fBIOSInfo.version = trimmed(ProcReader("/sys/devices/virtual/dmi/id/bios_version").ReadLine());
 		
-		fProductInfo.name = ProcReader("/sys/devices/virtual/dmi/id/product_name").ReadLine();
-		fProductInfo.version = ProcReader("/sys/devices/virtual/dmi/id/product_version").ReadLine();
-		fProductInfo.uuid = ProcReader("/sys/devices/virtual/dmi/id/product_uuid").ReadLine();
-		fProductInfo.serial = ProcReader("/sys/devices/virtual/dmi/id/product_serial").ReadLine();
+		fProductInfo.name = trimmed(ProcReader("/sys/devices/virtual/dmi/id/product_name").ReadLine());
+		fProductInfo.version = trimmed(ProcReader("/sys/devices/virtual/dmi/id/product_version").ReadLine());
+		fProductInfo.uuid = trimmed(ProcReader("/sys/devices/virtual/dmi/id/product_uuid").ReadLine());
+		fProductInfo.serial = trimmed(ProcReader("/sys/devices/virtual/dmi/id/product_serial").ReadLine());
 		
-		fChassisInfo.asset_tag = ProcReader("/sys/devices/virtual/dmi/id/chassis_asset_tag").ReadLine();
-		fChassisInfo.serial = ProcReader("/sys/devices/virtual/dmi/id/chassis_serial").ReadLine();
-		fChassisInfo.type = ProcReader("/sys/devices/virtual/dmi/id/chassis_type").ReadLine();
-		fChassisInfo.vendor = ProcReader("/sys/devices/virtual/dmi/id/chassis_vendor").ReadLine();
-		fChassisInfo.version = ProcReader("/sys/devices/virtual/dmi/id/chassis_version").ReadLine();
+		fChassisInfo.asset_tag = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_asset_tag").ReadLine());
+		fChassisInfo.serial = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_serial").ReadLine());
+		fChassisInfo.type = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_type").ReadLine());
+		fChassisInfo.vendor = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_vendor").ReadLine());
+		fChassisInfo.version = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_version").ReadLine());
 		
-		fBoardInfo.asset_tag = ProcReader("/sys/devices/virtual/dmi/id/board_asset_tag").ReadLine();
-		fBoardInfo.name = ProcReader("/sys/devices/virtual/dmi/id/board_name").ReadLine();
-		fBoardInfo.serial = ProcReader("/sys/devices/virtual/dmi/id/board_serial").ReadLine();
-		fBoardInfo.vendor = ProcReader("/sys/devices/virtual/dmi/id/board_vendor").ReadLine();
-		fBoardInfo.version = ProcReader("/sys/devices/virtual/dmi/id/board_version").ReadLine();
+		fBoardInfo.asset_tag = trimmed(ProcReader("/sys/devices/virtual/dmi/id/board_asset_tag").ReadLine());
+		fBoardInfo.name = trimmed(ProcReader("/sys/devices/virtual/dmi/id/board_name").ReadLine());
+		fBoardInfo.serial = trimmed(ProcReader("/sys/devices/virtual/dmi/id/board_serial").ReadLine());
+		fBoardInfo.vendor = trimmed(ProcReader("/sys/devices/virtual/dmi/id/board_vendor").ReadLine());
+		fBoardInfo.version = trimmed(ProcReader("/sys/devices/virtual/dmi/id/board_version").ReadLine());
 		
-		fSystemInfo.vendor = ProcReader("/sys/devices/virtual/dmi/id/sys_vendor").ReadLine();
+		fSystemInfo.vendor = trimmed(ProcReader("/sys/devices/virtual/dmi/id/sys_vendor").ReadLine());
 	} catch (...) {
 		return false;
 	}
