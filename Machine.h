@@ -131,12 +131,11 @@ private:
 	void _GetSystemInfo(std::istream& stream, std::string header);
 	
 	std::string _OSDescription();
+	
 	std::string _GetValue(std::string string, std::string header) const;
 	std::vector<std::string> _GetValues(std::string string, std::string header) const;
 
-	// TODO: Use a std::vector, more than 16 cpu aren't uncommon nowadays
-	int fNumCPUs;
-	processor_info fCPUInfo[16];
+	std::vector<processor_info> fCPUInfo;
 
 	bios_info fBIOSInfo;
 	chassis_info fChassisInfo;

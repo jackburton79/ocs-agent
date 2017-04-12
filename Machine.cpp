@@ -42,8 +42,6 @@ Machine::Get()
 
 
 Machine::Machine()
-	:
-	fNumCPUs(0)
 {
 	_RetrieveData();
 }
@@ -159,7 +157,7 @@ Machine::MachineManufacturer() const
 int
 Machine::CountProcessors() const
 {
-	return fNumCPUs;
+	return fCPUInfo.size();
 }
 
 
@@ -397,7 +395,8 @@ Machine::_GetCPUInfo()
 	int processorNum = 0;
 	while (std::getline(iStream, string)) {
 		if (string.find("processor") != std::string::npos) {
-			fNumCPUs++;
+			processor_info newInfo;
+			fCPUInfo.push_back(newInfo);
 
 			// Get the processor number
 			size_t pos = string.find(":");
