@@ -316,7 +316,6 @@ Machine::_GetDMIDecodeData()
 						std::string value = string.substr(pos + 2, std::string::npos);
 
 						systemInfo.insert(std::pair<std::string, std::string>(trim(fullString), trim(value)));
-						std::cout << fullString << "=" << value << std::endl;
 					} catch (...) {
 
 					}
