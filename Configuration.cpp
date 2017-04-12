@@ -160,8 +160,8 @@ Configuration::OutputFileName() const
 void
 Configuration::_GenerateDeviceID()
 {
-	std::string deviceID = Machine::Get()->SystemSerialNumber();
-	if (deviceID.length() <= 1) {
+	std::string deviceID = Machine::Get()->SystemUUID();
+	if (deviceID.length() <= 1 || ) {
 		NetworkRoster roster;
 		NetworkInterface interface;
 		unsigned int cookie = 0;
@@ -184,7 +184,7 @@ Configuration::_GenerateDeviceID()
 	
 	// DeviceID needs to have a date appended in this very format,
 	// otherwise OCSInventoryNG will reject the inventory
-	char targetString[32];
+	char targetString[128];
 	strftime(targetString, sizeof(targetString), "-%Y-%m-%d-00-00-00", &biosDate);
     deviceID.append(targetString);
 
