@@ -73,7 +73,6 @@ Machine::_RetrieveData()
 	// Try /sys/devices/virtual/dmi/id tree
 	_GetDMIData();
 	_GetDMIDecodeData();
-	
 
 	//_GetLSHWData();
 	_GetCPUInfo();
@@ -235,7 +234,6 @@ Machine::VideoInfoFor(int numVideo) const
 bool
 Machine::_GetDMIData()
 {
-	return false;
 	try {
 		fBIOSInfo.release_date = ProcReader("/sys/devices/virtual/dmi/id/bios_date").ReadLine();
 		fBIOSInfo.vendor = ProcReader("/sys/devices/virtual/dmi/id/bios_vendor").ReadLine();
@@ -280,10 +278,10 @@ Machine::_GetDMIDecodeData()
 		while (std::getline(iStream, string)) {
 			// Skip the line with "Handle" in it.
 			if (string.find("Handle") == std::string::npos) {
-				std::string header = string;
-				header = trim(header);
+				std::string handle = string;
+				handle = trim(handle);
 
-				_GetSystemInfo(iStream, header);
+				_GetInfoForHandle(iStream, handle);
 			}
 		}
 	} catch (...) {
@@ -513,7 +511,7 @@ Machine::_OSDescription()
 
 
 void
-Machine::_GetSystemInfo(std::istream& stream, std::string header)
+Machine::_GetInfoForHandle(std::istream& stream, std::string header)
 {
 	std::multimap<std::string, std::string> systemInfo;
 	
@@ -535,34 +533,70 @@ Machine::_GetSystemInfo(std::istream& stream, std::string header)
 			std::string value = string.substr(pos + 2, std::string::npos);
 
 			systemInfo.insert(std::pair<std::string, std::string>(trim(fullString), trim(value)));
-
+			std::cout << fullString << "=" << value << std::endl;
 		} catch (...) {
 
 		}
 	}
 	
-	fBIOSInfo.release_date = GetValueFromMap(systemInfo, "Release Date", kBIOSInfo);
-	fBIOSInfo.vendor = GetValueFromMap(systemInfo, "Vendor", kBIOSInfo);
-	fBIOSInfo.version = GetValueFromMap(systemInfo, "Version", kBIOSInfo);
+	// TODO: This gets called multiple times, once for every handle.
+	// Plus, it's not pretty
+	string = GetValueFromMap(systemInfo, "Release Date", kBIOSInfo);
+	if (string != "" && fBIOSInfo.release_date == "")
+		fBIOSInfo.release_date = string;
+	string = GetValueFromMap(systemInfo, "Vendor", kBIOSInfo);	
+	if (string != "" && fBIOSInfo.vendor == "")
+		fBIOSInfo.vendor = string;
+	string = GetValueFromMap(systemInfo, "Version", kBIOSInfo);
+	if (string != "" && fBIOSInfo.version == "")
+		fBIOSInfo.version = string;
+	string = GetValueFromMap(systemInfo, "Product Name", kSystemInfo);
+	if (string != "" && fProductInfo.name == "")		
+		fProductInfo.name = string;
+	string = GetValueFromMap(systemInfo, "Version", kSystemInfo);
+	if (string != "" && fProductInfo.version == "")
+		fProductInfo.version = string;
+	string = GetValueFromMap(systemInfo, "UUID", kSystemInfo);
+	if (string != "" && fProductInfo.uuid == "")
+		fProductInfo.uuid = string;
+	string = GetValueFromMap(systemInfo, "Serial Number", kSystemInfo);
+	if (string != "" && fProductInfo.serial == "")
+		fProductInfo.serial = string;
+	string = GetValueFromMap(systemInfo, "Asset Tag", "Chassis Information");
+	if (string != "" && fChassisInfo.asset_tag == "")
+		fChassisInfo.asset_tag = string;
+	string = GetValueFromMap(systemInfo, "Serial Number", "Chassis Information");
+	if (string != "" && fChassisInfo.serial == "")
+		fChassisInfo.serial = string;
+	string = GetValueFromMap(systemInfo, "Type", "Chassis Information");
+	if (string != "" && fChassisInfo.type == "")
+		fChassisInfo.type = string;
+	string = GetValueFromMap(systemInfo, "Manufacturer", "Chassis Information");
+	if (string != "" && fChassisInfo.vendor == "")
+		fChassisInfo.vendor = string;
+	string = GetValueFromMap(systemInfo, "Version",  "Chassis Information");
+	if (string != "" && fChassisInfo.version == "")
+		fChassisInfo.version = string;
 	
-	//fProductInfo.name = GetValueFromMap(systemInfo, 
-	//fProductInfo.version = GetValueFromMap(systemInfo, 
-	fProductInfo.uuid = GetValueFromMap(systemInfo, "UUID", kSystemInfo);
-	fProductInfo.serial = GetValueFromMap(systemInfo, "Serial Number", kSystemInfo);
+	string = GetValueFromMap(systemInfo, "Asset Tag", "Base Board Information");
+	if (string != "" && fBoardInfo.asset_tag == "")
+		fBoardInfo.asset_tag = string;
+	string = GetValueFromMap(systemInfo, "Product Name", "Base Board Information");
+	if (string != "" && fBoardInfo.name == "")
+		fBoardInfo.name = string;
+	string = GetValueFromMap(systemInfo, "Manufacturer", "Base Board Information");
+	if (string != "" && fBoardInfo.vendor == "")
+		fBoardInfo.vendor = string;
+	string = GetValueFromMap(systemInfo, "Version", "Base Board Information");
+	if (string != "" && fBoardInfo.version == "")
+		fBoardInfo.version = string;
+	string = GetValueFromMap(systemInfo, "Serial Number", "Base Board Information");
+	if (string != "" && fBoardInfo.serial == "")
+		fBoardInfo.serial = string;
 	
-	//fChassisInfo.asset_tag = GetValueFromMap(systemInfo, 
-	//fChassisInfo.serial = GetValueFromMap(systemInfo, 
-	//fChassisInfo.type = GetValueFromMap(systemInfo, 
-	//fChassisInfo.vendor = GetValueFromMap(systemInfo, 
-	//fChassisInfo.version = GetValueFromMap(systemInfo, 
-	
-	//fBoardInfo.asset_tag = GetValueFromMap(systemInfo, 
-	//fBoardInfo.name = GetValueFromMap(systemInfo, 
-	fBoardInfo.vendor = GetValueFromMap(systemInfo, "Manufacturer", "Base Board Information");
-	//fBoardInfo.version = GetValueFromMap(systemInfo, 
-	fBoardInfo.serial = GetValueFromMap(systemInfo, "Serial Number", "Base Board Information");
-	
-	fSystemInfo.vendor = GetValueFromMap(systemInfo, "Manufacturer", kSystemInfo);	
+	string = GetValueFromMap(systemInfo, "Manufacturer", kSystemInfo);
+	if (string != "" && fSystemInfo.vendor == "")
+		fSystemInfo.vendor = string;
 }
 
 
