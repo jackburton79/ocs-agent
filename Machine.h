@@ -78,6 +78,16 @@ struct video_info {
 };
 
 
+struct memory_device_info {
+	std::string size;
+	std::string type;
+	std::string vendor;
+	std::string speed;
+	std::string serial;
+	std::string asset_tag;	
+};
+
+
 class Machine {
 public:
 	static Machine* Get();
@@ -132,11 +142,9 @@ private:
 	
 	std::string _OSDescription();
 	
-	std::string _GetValue(std::string string, std::string header) const;
-	std::vector<std::string> _GetValues(std::string string, std::string header) const;
-
 	std::vector<processor_info> fCPUInfo;
-
+	std::vector<memory_device_info> fMemoryInfo;
+	
 	bios_info fBIOSInfo;
 	chassis_info fChassisInfo;
 	board_info fBoardInfo;

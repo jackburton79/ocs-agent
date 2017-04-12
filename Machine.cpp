@@ -46,6 +46,25 @@ GetValueFromMap(std::multimap<std::string, std::string> &map, std::string string
 }
 
 
+static std::vector<std::string>
+GetValuesFromMultiMap(std::multimap<std::string, std::string> &multiMap,
+	std::string string, std::string header)
+{
+	std::vector<std::string> stringList;
+	std::pair <std::multimap<std::string, std::string>::const_iterator,
+		std::multimap<std::string, std::string>::const_iterator> result;
+  
+	std::string fullString = header;
+	fullString.append(string);
+	result = multiMap.equal_range(fullString);
+	for (std::multimap<std::string, std::string>::const_iterator i = result.first;
+			i != result.second; i++) {
+		stringList.push_back(i->second);
+	}
+	return stringList;
+}
+
+
 /* static */
 Machine*
 Machine::Get()
@@ -597,24 +616,41 @@ Machine::_GetInfoForHandle(std::istream& stream, std::string header)
 	string = GetValueFromMap(systemInfo, "Manufacturer", kSystemInfo);
 	if (string != "" && fSystemInfo.vendor == "")
 		fSystemInfo.vendor = string;
+		
+	
+	std::vector<std::string> values = GetValuesFromMultiMap(systemInfo,
+											"Size", "Memory Device");
+	for (size_t i = 0; i < values.size(); i++) {
+		memory_device_info info;
+		info.size = values.at(i);
+		fMemoryInfo.push_back(info);
+	}
+	
+	values = GetValuesFromMultiMap(systemInfo, "Type", "Memory Device");
+	for (size_t i = 0; i < values.size(); i++)
+		fMemoryInfo.at(i).type = values.at(i);
+	values = GetValuesFromMultiMap(systemInfo, "Speed", "Memory Device");
+	for (size_t i = 0; i < values.size(); i++)
+		fMemoryInfo.at(i).speed = values.at(i);
+	values = GetValuesFromMultiMap(systemInfo, "Manufacturer", "Memory Device");
+	for (size_t i = 0; i < values.size(); i++)
+		fMemoryInfo.at(i).vendor = values.at(i);
+	values = GetValuesFromMultiMap(systemInfo, "Asset Tag", "Memory Device");
+	for (size_t i = 0; i < values.size(); i++)
+		fMemoryInfo.at(i).asset_tag = values.at(i);
+	values = GetValuesFromMultiMap(systemInfo, "Serial Number", "Memory Device");
+	for (size_t i = 0; i < values.size(); i++)
+		fMemoryInfo.at(i).serial = values.at(i);
 }
 
 
 
-std::vector<std::string>
-Machine::_GetValues(std::string string, std::string header) const
-{
-	std::vector<std::string> stringList;
-
-	return stringList;
-}
 
 
 int
 Machine::CountMemories()
 {
-	std::vector<std::string> values = _GetValues("Size", kMemoryDevice);
-	return values.size();
+	return fMemoryInfo.size();
 }
 
 
@@ -622,7 +658,7 @@ std::string
 Machine::MemoryID(int num)
 {
 	return "";
-	//return _GetValue()
+	// return fMemoryInfo.at(num).id
 }
 
 
@@ -643,8 +679,7 @@ Machine::MemoryDescription(int num)
 std::string
 Machine::MemoryCapacity(int num)
 {
-	std::vector<std::string> values = _GetValues("Size", kMemoryDevice);
-	return values.at(num);
+	return fMemoryInfo.at(num).size;
 }
 
 
@@ -658,16 +693,14 @@ Machine::MemoryPurpose(int num)
 std::string
 Machine::MemoryType(int num)
 {
-	std::vector<std::string> values = _GetValues("Type", kMemoryDevice);
-	return values.at(num);
+	return fMemoryInfo.at(num).type;
 }
 
 
 std::string
 Machine::MemorySpeed(int num)
 {
-	std::vector<std::string> values = _GetValues("Speed", kMemoryDevice);
-	return values.at(num);
+	return fMemoryInfo.at(num).speed;
 }
 
 
@@ -681,6 +714,5 @@ Machine::MemoryNumSlots(int num)
 std::string
 Machine::MemorySerialNumber(int num)
 {
-	std::vector<std::string> values = _GetValues("Serial Number", kMemoryDevice);
-	return values.at(num);
+	return fMemoryInfo.at(num).serial;
 }
