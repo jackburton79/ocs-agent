@@ -31,6 +31,21 @@ const char* kMemoryDevice = "Memory Device";
 
 static Machine* sMachine = NULL;
 
+
+static std::string
+GetValueFromMap(std::multimap<std::string, std::string> &map, std::string string, std::string header)
+{
+	std::map<std::string, std::string>::const_iterator i;
+	std::string fullString = header;
+	fullString.append(string);
+	i = map.find(fullString);
+	if (i != map.end())
+		return i->second;
+
+	return "";
+}
+
+
 /* static */
 Machine*
 Machine::Get()
@@ -57,12 +72,10 @@ Machine::_RetrieveData()
 {
 	// Try /sys/devices/virtual/dmi/id tree
 	_GetDMIData();
+	_GetDMIDecodeData();
 	
-/*if (!_GetDMIDecodeData()) {
-		std::cerr << "Can't find dmidecode. Is it installed?" << std::endl;
-	}
 
-	_GetLSHWData();*/
+	//_GetLSHWData();
 	_GetCPUInfo();
 
 	try {
@@ -222,6 +235,7 @@ Machine::VideoInfoFor(int numVideo) const
 bool
 Machine::_GetDMIData()
 {
+	return false;
 	try {
 		fBIOSInfo.release_date = ProcReader("/sys/devices/virtual/dmi/id/bios_date").ReadLine();
 		fBIOSInfo.vendor = ProcReader("/sys/devices/virtual/dmi/id/bios_vendor").ReadLine();
@@ -240,6 +254,7 @@ Machine::_GetDMIData()
 		
 		fBoardInfo.asset_tag = ProcReader("/sys/devices/virtual/dmi/id/board_asset_tag").ReadLine();
 		fBoardInfo.name = ProcReader("/sys/devices/virtual/dmi/id/board_name").ReadLine();
+		fBoardInfo.serial = ProcReader("/sys/devices/virtual/dmi/id/board_serial").ReadLine();
 		fBoardInfo.vendor = ProcReader("/sys/devices/virtual/dmi/id/board_vendor").ReadLine();
 		fBoardInfo.version = ProcReader("/sys/devices/virtual/dmi/id/board_version").ReadLine();
 		
@@ -500,7 +515,9 @@ Machine::_OSDescription()
 void
 Machine::_GetSystemInfo(std::istream& stream, std::string header)
 {
-	/*std::string string;
+	std::multimap<std::string, std::string> systemInfo;
+	
+	std::string string;
 	size_t pos = 0;
 	while (std::getline(stream, string)) {
 		if (string == "")
@@ -517,27 +534,37 @@ Machine::_GetSystemInfo(std::istream& stream, std::string header)
 			fullString.append(name);
 			std::string value = string.substr(pos + 2, std::string::npos);
 
-			fSystemInfo.insert(std::pair<std::string, std::string>(trim(fullString), trim(value)));
+			systemInfo.insert(std::pair<std::string, std::string>(trim(fullString), trim(value)));
 
 		} catch (...) {
 
 		}
-	}*/
+	}
+	
+	fBIOSInfo.release_date = GetValueFromMap(systemInfo, "Release Date", kBIOSInfo);
+	fBIOSInfo.vendor = GetValueFromMap(systemInfo, "Vendor", kBIOSInfo);
+	fBIOSInfo.version = GetValueFromMap(systemInfo, "Version", kBIOSInfo);
+	
+	//fProductInfo.name = GetValueFromMap(systemInfo, 
+	//fProductInfo.version = GetValueFromMap(systemInfo, 
+	fProductInfo.uuid = GetValueFromMap(systemInfo, "UUID", kSystemInfo);
+	fProductInfo.serial = GetValueFromMap(systemInfo, "Serial Number", kSystemInfo);
+	
+	//fChassisInfo.asset_tag = GetValueFromMap(systemInfo, 
+	//fChassisInfo.serial = GetValueFromMap(systemInfo, 
+	//fChassisInfo.type = GetValueFromMap(systemInfo, 
+	//fChassisInfo.vendor = GetValueFromMap(systemInfo, 
+	//fChassisInfo.version = GetValueFromMap(systemInfo, 
+	
+	//fBoardInfo.asset_tag = GetValueFromMap(systemInfo, 
+	//fBoardInfo.name = GetValueFromMap(systemInfo, 
+	fBoardInfo.vendor = GetValueFromMap(systemInfo, "Manufacturer", "Base Board Information");
+	//fBoardInfo.version = GetValueFromMap(systemInfo, 
+	fBoardInfo.serial = GetValueFromMap(systemInfo, "Serial Number", "Base Board Information");
+	
+	fSystemInfo.vendor = GetValueFromMap(systemInfo, "Manufacturer", kSystemInfo);	
 }
 
-
-std::string
-Machine::_GetValue(std::string string, std::string header) const
-{
-	/*std::map<std::string, std::string>::const_iterator i;
-	std::string fullString = header;
-	fullString.append(string);
-	i = fSystemInfo.find(fullString);
-	if (i != fSystemInfo.end())
-		return i->second;
-*/
-	return "";
-}
 
 
 std::vector<std::string>
