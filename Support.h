@@ -53,6 +53,12 @@ static inline std::string& trim(std::string& s) {
 	return ltrim(rtrim(s));
 }
 
+static inline std::string trimmed(const std::string& s) {
+	std::string newString = s;
+	ltrim(rtrim(newString));
+	return newString;
+}
+
 static inline std::string int_to_string(int i) {
 	std::ostringstream stream;
 	stream << i;
