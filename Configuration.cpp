@@ -161,7 +161,7 @@ void
 Configuration::_GenerateDeviceID()
 {
 	std::string deviceID = Machine::Get()->SystemUUID();
-	if (deviceID.length() <= 1 || ) {
+	if (deviceID.length() <= 1) {
 		NetworkRoster roster;
 		NetworkInterface interface;
 		unsigned int cookie = 0;
