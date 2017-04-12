@@ -185,7 +185,6 @@ Machine::ProcessorSpeed(int numCpu) const
 std::string
 Machine::ProcessorSerialNumber(int numCpu) const
 {
-	//std::string mhz = _GetValue("Serial Number", numCpu);
 	return "";
 }
 
