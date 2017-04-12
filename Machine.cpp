@@ -647,8 +647,7 @@ Machine::CountMemories()
 std::string
 Machine::MemoryID(int num)
 {
-	return "";
-	// return fMemoryInfo.at(num).id
+	return int_to_string(num);
 }
 
 
