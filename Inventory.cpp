@@ -405,7 +405,6 @@ Inventory::_AddMemoriesInfo(tinyxml2::XMLElement* parent)
 	for (int i = 0; i < fMachine->CountMemories(); i++) {
 		tinyxml2::XMLElement* memory = fDocument->NewElement("MEMORIES");
 
-		tinyxml2::XMLElement* id = fDocument->NewElement("ID");
 		tinyxml2::XMLElement* description = fDocument->NewElement("DESCRIPTION");
 		tinyxml2::XMLElement* capacity = fDocument->NewElement("CAPACITY");
 		tinyxml2::XMLElement* purpose = fDocument->NewElement("PURPOSE");
@@ -414,8 +413,6 @@ Inventory::_AddMemoriesInfo(tinyxml2::XMLElement* parent)
 		tinyxml2::XMLElement* numSlots = fDocument->NewElement("NUMSLOTS");
 		tinyxml2::XMLElement* serial = fDocument->NewElement("SERIALNUMBER");
 
-		id->LinkEndChild(fDocument->NewText(fMachine->MemoryID(i).c_str()));
-		memory->LinkEndChild(id);
 
 		description->LinkEndChild(fDocument->NewText(fMachine->MemoryDescription(i).c_str()));
 		memory->LinkEndChild(description);

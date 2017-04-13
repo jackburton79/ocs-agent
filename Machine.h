@@ -114,7 +114,6 @@ public:
 	std::string ProcessorType(int numCpu) const;
 
 	int CountMemories();
-	std::string MemoryID(int num);
 	std::string MemoryCaption(int num);
 	std::string MemoryDescription(int num);
 	std::string MemoryCapacity(int num);

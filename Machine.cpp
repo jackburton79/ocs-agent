@@ -648,13 +648,6 @@ Machine::CountMemories()
 
 
 std::string
-Machine::MemoryID(int num)
-{
-	return int_to_string(num);
-}
-
-
-std::string
 Machine::MemoryCaption(int num)
 {
 	return "";
