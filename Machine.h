@@ -71,6 +71,7 @@ struct os_info {
 
 
 struct video_info {
+	std::string vendor;
 	std::string chipset;
 	std::string memory;
 	std::string name;
@@ -135,7 +136,6 @@ private:
 	void _RetrieveData();
 	bool _GetDMIData();
 	bool _GetDMIDecodeData();
-	bool _GetLSHWShortData();
 	bool _GetLSHWData();
 	void _GetCPUInfo();
 	void _GetOSInfo();

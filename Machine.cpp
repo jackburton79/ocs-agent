@@ -393,8 +393,20 @@ Machine::_ExtractNeededInfo(std::multimap<std::string, std::string> systemInfo)
 	if (string != "" && fSystemInfo.vendor == "")
 		fSystemInfo.vendor = string;
 
-
+	// Graphics cards
 	std::vector<std::string> values = GetValuesFromMultiMap(systemInfo,
+											"Manufacturer", "Display");
+	for (size_t i = 0; i < values.size(); i++) {
+		video_info info;
+		info.vendor = values.at(i);
+		fVideoInfo.push_back(info);
+	}	
+	values = GetValuesFromMultiMap(systemInfo, "description", "Display");
+	for (size_t i = 0; i < values.size(); i++)
+		fVideoInfo.at(i).chipset = values.at(i);
+	
+	// Memory slots
+	values = GetValuesFromMultiMap(systemInfo,
 											"Size", kMemoryDevice);
 	for (size_t i = 0; i < values.size(); i++) {
 		memory_device_info info;
@@ -424,55 +436,6 @@ Machine::_ExtractNeededInfo(std::multimap<std::string, std::string> systemInfo)
 
 
 bool
-Machine::_GetLSHWShortData()
-{
-/*	if (!CommandExists("lshw"))
-		return false;
-
-	popen_streambuf lshw("lshw -short", "r");
-	std::istream iStream(&lshw);
-
-	try {
-		std::string line;
-
-		// header
-		std::getline(iStream, line);
-
-		size_t devicePos = line.find("Device");
-		size_t classPos = line.find("Class");
-		size_t descriptionPos = line.find("Description");
-
-		// skip ==== line
-		std::getline(iStream, line);
-
-		while (std::getline(iStream, line)) {
-			std::string device = line.substr(devicePos, classPos - devicePos);
-			std::string devClass = line.substr(classPos, descriptionPos - classPos);
-			std::string value = line.substr(descriptionPos, std::string::npos);
-			trim(devClass);
-			if (devClass == "system") {
-				std::string sysCtx = kSystemInfo;
-				sysCtx.append("Product Name");
-				if (fSystemInfo.find(sysCtx) == fSystemInfo.end()) {
-					fSystemInfo.insert(std::pair<std::string, std::string>(sysCtx, trim(value)));
-				}
-			} else if (devClass == "display") {
-				struct video_info info;
-				info.name = trim(value);
-				info.chipset = "VGA compatible controller";
-				fVideoInfo.push_back(info);
-			}
-
-		}
-	} catch (...) {
-
-	}
-*/
-	return true;
-}
-
-
-bool
 Machine::_GetLSHWData()
 {
 	if (!CommandExists("lshw"))
@@ -491,9 +454,11 @@ Machine::_GetLSHWData()
 		while (std::getline(iStream, line)) {
 			trim(line);
 			if (size_t start = line.find("*-") != std::string::npos) {
-				context = line.substr(start + 2, std::string::npos);
+				context = line.substr(start + 1, std::string::npos);
 				if (context == "firmware")
 					context = kBIOSInfo;
+				else if (context == "display")
+					context = "Display";
 				// TODO: Map other contexts to dmidecode ones
 				// TODO: Make this better.
 				continue;
@@ -506,19 +471,18 @@ Machine::_GetLSHWData()
 			std::string key = line.substr(0, colonPos);
 			trim(key);
 			std::string value = line.substr(colonPos + 1, std::string::npos);
+			std::string sysCtx = trimmed(context);
 			if (key == "vendor") {
-				std::string sysCtx = context;
 				sysCtx.append("Manufacturer");
-				if (systemInfo.find(sysCtx) == systemInfo.end()) {
-					systemInfo.insert(std::pair<std::string, std::string>(sysCtx, trimmed(value)));
-				}
 			} else if (key == "product") {
-				std::string sysCtx = context;
 				sysCtx.append("Product Name");
-				if (systemInfo.find(sysCtx) == systemInfo.end()) {
-					systemInfo.insert(std::pair<std::string, std::string>(sysCtx, trimmed(value)));
-				}
-			}
+			} else if (key == "date") {
+				sysCtx.append("Release Date");
+			} else
+				continue;
+				
+			if (systemInfo.find(sysCtx) == systemInfo.end())
+				systemInfo.insert(std::pair<std::string, std::string>(sysCtx, trimmed(value)));		
 		}
 	} catch (...) {
 
