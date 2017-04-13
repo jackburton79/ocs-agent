@@ -79,6 +79,8 @@ struct video_info {
 
 
 struct memory_device_info {
+	std::string description;
+	std::string purpose;
 	std::string size;
 	std::string type;
 	std::string vendor;

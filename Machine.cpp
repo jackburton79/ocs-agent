@@ -401,6 +401,9 @@ Machine::_ExtractNeededInfo(std::multimap<std::string, std::string> systemInfo)
 		fMemoryInfo.push_back(info);
 	}
 
+	values = GetValuesFromMultiMap(systemInfo, "Bank Locator", "Memory Device");
+	for (size_t i = 0; i < values.size(); i++)
+		fMemoryInfo.at(i).description = values.at(i);
 	values = GetValuesFromMultiMap(systemInfo, "Type", "Memory Device");
 	for (size_t i = 0; i < values.size(); i++)
 		fMemoryInfo.at(i).type = values.at(i);
@@ -661,7 +664,7 @@ Machine::MemoryCaption(int num)
 std::string
 Machine::MemoryDescription(int num)
 {
-	return "";
+	return fMemoryInfo.at(num).description;
 }
 
 
@@ -675,7 +678,7 @@ Machine::MemoryCapacity(int num)
 std::string
 Machine::MemoryPurpose(int num)
 {
-	return "";
+	return fMemoryInfo.at(num).purpose;
 }
 
 
@@ -694,7 +697,7 @@ Machine::MemorySpeed(int num)
 
 
 std::string
-Machine::MemoryNumSlots(int num)
+Machine::MemoryNumSlot(int num)
 {
 	return int_to_string(num);
 }
