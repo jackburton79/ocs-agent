@@ -84,7 +84,7 @@ struct memory_device_info {
 	std::string vendor;
 	std::string speed;
 	std::string serial;
-	std::string asset_tag;	
+	std::string asset_tag;
 };
 
 
@@ -119,7 +119,7 @@ public:
 	std::string MemoryPurpose(int num);
 	std::string MemoryType(int num);
 	std::string MemorySpeed(int num);
-	std::string MemoryNumSlots(int num);
+	std::string MemoryNumSlot(int num);
 	std::string MemorySerialNumber(int num);
 
 	os_info OSInfo() const;

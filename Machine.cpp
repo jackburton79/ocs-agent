@@ -696,7 +696,7 @@ Machine::MemorySpeed(int num)
 std::string
 Machine::MemoryNumSlots(int num)
 {
-	return "";
+	return int_to_string(num);
 }
 
 
