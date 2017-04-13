@@ -432,6 +432,7 @@ Inventory::_AddMemoriesInfo(tinyxml2::XMLElement* parent)
 		speed->LinkEndChild(fDocument->NewText(fMachine->MemorySpeed(i).c_str()));
 		memory->LinkEndChild(speed);
 
+		numSlots->LinkEndChild(fDocument->NewText(fMachine->MemoryNumSlots(i).c_str()));
 		memory->LinkEndChild(numSlots);
 
 		serial->LinkEndChild(fDocument->NewText(fMachine->MemorySerialNumber(i).c_str()));
