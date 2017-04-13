@@ -51,6 +51,13 @@ struct chassis_info {
 };
 
 
+struct processor_info {
+	std::string manufacturer;
+	std::string type;
+	std::string speed;
+};
+
+
 struct os_info {
 	std::string comments;
 	std::string hostname;
@@ -64,10 +71,23 @@ struct os_info {
 
 
 struct video_info {
+	std::string vendor;
 	std::string chipset;
 	std::string memory;
 	std::string name;
 	std::string resolution;
+};
+
+
+struct memory_device_info {
+	std::string description;
+	std::string purpose;
+	std::string size;
+	std::string type;
+	std::string vendor;
+	std::string speed;
+	std::string serial;
+	std::string asset_tag;
 };
 
 
@@ -95,14 +115,13 @@ public:
 	std::string ProcessorType(int numCpu) const;
 
 	int CountMemories();
-	std::string MemoryID(int num);
 	std::string MemoryCaption(int num);
 	std::string MemoryDescription(int num);
 	std::string MemoryCapacity(int num);
 	std::string MemoryPurpose(int num);
 	std::string MemoryType(int num);
 	std::string MemorySpeed(int num);
-	std::string MemoryNumSlots(int num);
+	std::string MemoryNumSlot(int num);
 	std::string MemorySerialNumber(int num);
 
 	os_info OSInfo() const;
@@ -117,22 +136,16 @@ private:
 	void _RetrieveData();
 	bool _GetDMIData();
 	bool _GetDMIDecodeData();
-	bool _GetLSHWShortData();
 	bool _GetLSHWData();
 	void _GetCPUInfo();
 	void _GetOSInfo();
-	void _IdentifyOS();
-	void _GetSystemInfo(std::istream& stream, std::string header);
-
-	std::string _GetValue(std::string string, std::string header) const;
-	std::vector<std::string> _GetValues(std::string string, std::string header) const;
-
-	std::string _ProcessorInfo(const char* info, int num) const;
-
-	// TODO: Use a std::vector, more than 16 cpu aren't uncommon nowadays
-	int fNumCPUs;
-	std::map<std::string, std::string> fCPUInfo[16];
-
+	void _ExtractNeededInfo(std::multimap<std::string, std::string>);
+	
+	std::string _OSDescription();
+	
+	std::vector<processor_info> fCPUInfo;
+	std::vector<memory_device_info> fMemoryInfo;
+	
 	bios_info fBIOSInfo;
 	chassis_info fChassisInfo;
 	board_info fBoardInfo;

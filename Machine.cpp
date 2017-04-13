@@ -31,6 +31,40 @@ const char* kMemoryDevice = "Memory Device";
 
 static Machine* sMachine = NULL;
 
+
+static std::string
+GetValueFromMap(std::multimap<std::string, std::string> &map, std::string string, std::string header)
+{
+	std::map<std::string, std::string>::const_iterator i;
+	std::string fullString = header;
+	fullString.append(string);
+	i = map.find(fullString);
+	if (i != map.end())
+		return i->second;
+
+	return "";
+}
+
+
+static std::vector<std::string>
+GetValuesFromMultiMap(std::multimap<std::string, std::string> &multiMap,
+	std::string string, std::string header)
+{
+	std::vector<std::string> stringList;
+	std::pair <std::multimap<std::string, std::string>::const_iterator,
+		std::multimap<std::string, std::string>::const_iterator> result;
+  
+	std::string fullString = header;
+	fullString.append(string);
+	result = multiMap.equal_range(fullString);
+	for (std::multimap<std::string, std::string>::const_iterator i = result.first;
+			i != result.second; i++) {
+		stringList.push_back(i->second);
+	}
+	return stringList;
+}
+
+
 /* static */
 Machine*
 Machine::Get()
@@ -42,8 +76,6 @@ Machine::Get()
 
 
 Machine::Machine()
-	:
-	fNumCPUs(0)
 {
 	_RetrieveData();
 }
@@ -57,14 +89,11 @@ Machine::~Machine()
 void
 Machine::_RetrieveData()
 {
-	// Try /sys/devices/virtual/dmi/id tree
+	// Try /sys/devices/virtual/dmi/id tree, then 'dmidecode', then 'lshw'
 	_GetDMIData();
-	
-	if (!_GetDMIDecodeData()) {
-		std::cerr << "Can't find dmidecode. Is it installed?" << std::endl;
-	}
-
+	_GetDMIDecodeData();
 	_GetLSHWData();
+	
 	_GetCPUInfo();
 
 	try {
@@ -159,21 +188,21 @@ Machine::MachineManufacturer() const
 int
 Machine::CountProcessors() const
 {
-	return fNumCPUs;
+	return fCPUInfo.size();
 }
 
 
 std::string
 Machine::ProcessorManufacturer(int numCpu) const
 {
-	return _ProcessorInfo("vendor_id", numCpu);
+	return fCPUInfo[numCpu].manufacturer;
 }
 
 
 std::string
 Machine::ProcessorSpeed(int numCpu) const
 {
-	std::string mhz = _ProcessorInfo("cpu MHz", numCpu);
+	std::string mhz = fCPUInfo[numCpu].speed;
 
 	size_t pos = mhz.find(".");
 	if (pos != std::string::npos) {
@@ -187,7 +216,6 @@ Machine::ProcessorSpeed(int numCpu) const
 std::string
 Machine::ProcessorSerialNumber(int numCpu) const
 {
-	//std::string mhz = _GetValue("Serial Number", numCpu);
 	return "";
 }
 
@@ -195,8 +223,7 @@ Machine::ProcessorSerialNumber(int numCpu) const
 std::string
 Machine::ProcessorType(int numCpu) const
 {
-	std::string model = _ProcessorInfo("model name", numCpu);
-	trim(model);
+	std::string model = fCPUInfo[numCpu].type;
 	return model;
 }
 
@@ -227,27 +254,28 @@ bool
 Machine::_GetDMIData()
 {
 	try {
-		fBIOSInfo.release_date = ProcReader("/sys/devices/virtual/dmi/id/bios_date").ReadLine();
-		fBIOSInfo.vendor = ProcReader("/sys/devices/virtual/dmi/id/bios_vendor").ReadLine();
-		fBIOSInfo.version = ProcReader("/sys/devices/virtual/dmi/id/bios_version").ReadLine();
+		fBIOSInfo.release_date = trimmed(ProcReader("/sys/devices/virtual/dmi/id/bios_date").ReadLine());
+		fBIOSInfo.vendor = trimmed(ProcReader("/sys/devices/virtual/dmi/id/bios_vendor").ReadLine());
+		fBIOSInfo.version = trimmed(ProcReader("/sys/devices/virtual/dmi/id/bios_version").ReadLine());
 		
-		fProductInfo.name = ProcReader("/sys/devices/virtual/dmi/id/product_name").ReadLine();
-		fProductInfo.version = ProcReader("/sys/devices/virtual/dmi/id/product_version").ReadLine();
-		fProductInfo.uuid = ProcReader("/sys/devices/virtual/dmi/id/product_uuid").ReadLine();
-		fProductInfo.serial = ProcReader("/sys/devices/virtual/dmi/id/product_serial").ReadLine();
+		fProductInfo.name = trimmed(ProcReader("/sys/devices/virtual/dmi/id/product_name").ReadLine());
+		fProductInfo.version = trimmed(ProcReader("/sys/devices/virtual/dmi/id/product_version").ReadLine());
+		fProductInfo.uuid = trimmed(ProcReader("/sys/devices/virtual/dmi/id/product_uuid").ReadLine());
+		fProductInfo.serial = trimmed(ProcReader("/sys/devices/virtual/dmi/id/product_serial").ReadLine());
 		
-		fChassisInfo.asset_tag = ProcReader("/sys/devices/virtual/dmi/id/chassis_asset_tag").ReadLine();
-		fChassisInfo.serial = ProcReader("/sys/devices/virtual/dmi/id/chassis_serial").ReadLine();
-		fChassisInfo.type = ProcReader("/sys/devices/virtual/dmi/id/chassis_type").ReadLine();
-		fChassisInfo.vendor = ProcReader("/sys/devices/virtual/dmi/id/chassis_vendor").ReadLine();
-		fChassisInfo.version = ProcReader("/sys/devices/virtual/dmi/id/chassis_version").ReadLine();
+		fChassisInfo.asset_tag = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_asset_tag").ReadLine());
+		fChassisInfo.serial = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_serial").ReadLine());
+		fChassisInfo.type = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_type").ReadLine());
+		fChassisInfo.vendor = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_vendor").ReadLine());
+		fChassisInfo.version = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_version").ReadLine());
 		
-		fBoardInfo.asset_tag = ProcReader("/sys/devices/virtual/dmi/id/board_asset_tag").ReadLine();
-		fBoardInfo.name = ProcReader("/sys/devices/virtual/dmi/id/board_name").ReadLine();
-		fBoardInfo.vendor = ProcReader("/sys/devices/virtual/dmi/id/board_vendor").ReadLine();
-		fBoardInfo.version = ProcReader("/sys/devices/virtual/dmi/id/board_version").ReadLine();
+		fBoardInfo.asset_tag = trimmed(ProcReader("/sys/devices/virtual/dmi/id/board_asset_tag").ReadLine());
+		fBoardInfo.name = trimmed(ProcReader("/sys/devices/virtual/dmi/id/board_name").ReadLine());
+		fBoardInfo.serial = trimmed(ProcReader("/sys/devices/virtual/dmi/id/board_serial").ReadLine());
+		fBoardInfo.vendor = trimmed(ProcReader("/sys/devices/virtual/dmi/id/board_vendor").ReadLine());
+		fBoardInfo.version = trimmed(ProcReader("/sys/devices/virtual/dmi/id/board_version").ReadLine());
 		
-		fSystemInfo.vendor = ProcReader("/sys/devices/virtual/dmi/id/sys_vendor").ReadLine();
+		fSystemInfo.vendor = trimmed(ProcReader("/sys/devices/virtual/dmi/id/sys_vendor").ReadLine());
 	} catch (...) {
 		return false;
 	}
@@ -264,17 +292,37 @@ Machine::_GetDMIDecodeData()
 	try {
 		popen_streambuf dmi("dmidecode", "r");
 		std::istream iStream(&dmi);
-
 		std::string string;
+		std::multimap<std::string, std::string> systemInfo;
 		while (std::getline(iStream, string)) {
 			// Skip the line with "Handle" in it.
 			if (string.find("Handle") == std::string::npos) {
-				std::string header = string;
-				header = trim(header);
+				std::string handle = string;
+				trim(handle);
+				size_t pos = 0;
+				while (std::getline(iStream, string)) {
+					if (string == "")
+						break;
 
-				_GetSystemInfo(iStream, header);
+					pos = string.find(":");
+					if (pos == std::string::npos)
+						continue;
+
+					try {
+						std::string name = string.substr(0, pos);
+						trim(name);
+						std::string fullString = handle;
+						fullString.append(name);
+						std::string value = string.substr(pos + 2, std::string::npos);
+
+						systemInfo.insert(std::pair<std::string, std::string>(trim(fullString), trim(value)));
+					} catch (...) {
+
+					}
+				}
 			}
 		}
+		_ExtractNeededInfo(systemInfo);
 	} catch (...) {
 		return false;
 	}
@@ -283,64 +331,120 @@ Machine::_GetDMIDecodeData()
 }
 
 
-bool
-Machine::_GetLSHWShortData()
+void
+Machine::_ExtractNeededInfo(std::multimap<std::string, std::string> systemInfo)
 {
-/*	if (!CommandExists("lshw"))
-		return false;
+	std::string string;
+	string = GetValueFromMap(systemInfo, "Release Date", kBIOSInfo);
+	if (string != "" && fBIOSInfo.release_date == "")
+		fBIOSInfo.release_date = string;
+	string = GetValueFromMap(systemInfo, "Vendor", kBIOSInfo);
+	if (string != "" && fBIOSInfo.vendor == "")
+		fBIOSInfo.vendor = string;
+	string = GetValueFromMap(systemInfo, "Version", kBIOSInfo);
+	if (string != "" && fBIOSInfo.version == "")
+		fBIOSInfo.version = string;
+	string = GetValueFromMap(systemInfo, "Product Name", kSystemInfo);
+	if (string != "" && fProductInfo.name == "")
+		fProductInfo.name = string;
+	string = GetValueFromMap(systemInfo, "Version", kSystemInfo);
+	if (string != "" && fProductInfo.version == "")
+		fProductInfo.version = string;
+	string = GetValueFromMap(systemInfo, "UUID", kSystemInfo);
+	if (string != "" && fProductInfo.uuid == "")
+		fProductInfo.uuid = string;
+	string = GetValueFromMap(systemInfo, "Serial Number", kSystemInfo);
+	if (string != "" && fProductInfo.serial == "")
+		fProductInfo.serial = string;
+		
+	string = GetValueFromMap(systemInfo, "Asset Tag", "Chassis Information");
+	if (string != "" && fChassisInfo.asset_tag == "")
+		fChassisInfo.asset_tag = string;
+	string = GetValueFromMap(systemInfo, "Serial Number", "Chassis Information");
+	if (string != "" && fChassisInfo.serial == "")
+		fChassisInfo.serial = string;
+	string = GetValueFromMap(systemInfo, "Type", "Chassis Information");
+	if (string != "" && fChassisInfo.type == "")
+		fChassisInfo.type = string;
+	string = GetValueFromMap(systemInfo, "Manufacturer", "Chassis Information");
+	if (string != "" && fChassisInfo.vendor == "")
+		fChassisInfo.vendor = string;
+	string = GetValueFromMap(systemInfo, "Version",  "Chassis Information");
+	if (string != "" && fChassisInfo.version == "")
+		fChassisInfo.version = string;
 
-	popen_streambuf lshw("lshw -short", "r");
-	std::istream iStream(&lshw);
+	string = GetValueFromMap(systemInfo, "Asset Tag", "Base Board Information");
+	if (string != "" && fBoardInfo.asset_tag == "")
+		fBoardInfo.asset_tag = string;
+	string = GetValueFromMap(systemInfo, "Product Name", "Base Board Information");
+	if (string != "" && fBoardInfo.name == "")
+		fBoardInfo.name = string;
+	string = GetValueFromMap(systemInfo, "Manufacturer", "Base Board Information");
+	if (string != "" && fBoardInfo.vendor == "")
+		fBoardInfo.vendor = string;
+	string = GetValueFromMap(systemInfo, "Version", "Base Board Information");
+	if (string != "" && fBoardInfo.version == "")
+		fBoardInfo.version = string;
+	string = GetValueFromMap(systemInfo, "Serial Number", "Base Board Information");
+	if (string != "" && fBoardInfo.serial == "")
+		fBoardInfo.serial = string;
 
-	try {
-		std::string line;
+	string = GetValueFromMap(systemInfo, "Manufacturer", kSystemInfo);
+	if (string != "" && fSystemInfo.vendor == "")
+		fSystemInfo.vendor = string;
 
-		// header
-		std::getline(iStream, line);
-
-		size_t devicePos = line.find("Device");
-		size_t classPos = line.find("Class");
-		size_t descriptionPos = line.find("Description");
-
-		// skip ==== line
-		std::getline(iStream, line);
-
-		while (std::getline(iStream, line)) {
-			std::string device = line.substr(devicePos, classPos - devicePos);
-			std::string devClass = line.substr(classPos, descriptionPos - classPos);
-			std::string value = line.substr(descriptionPos, std::string::npos);
-			trim(devClass);
-			if (devClass == "system") {
-				std::string sysCtx = kSystemInfo;
-				sysCtx.append("Product Name");
-				if (fSystemInfo.find(sysCtx) == fSystemInfo.end()) {
-					fSystemInfo.insert(std::pair<std::string, std::string>(sysCtx, trim(value)));
-				}
-			} else if (devClass == "display") {
-				struct video_info info;
-				info.name = trim(value);
-				info.chipset = "VGA compatible controller";
-				fVideoInfo.push_back(info);
-			}
-
-		}
-	} catch (...) {
-
+	// Graphics cards
+	std::vector<std::string> values = GetValuesFromMultiMap(systemInfo,
+											"Manufacturer", "Display");
+	for (size_t i = 0; i < values.size(); i++) {
+		video_info info;
+		info.vendor = values.at(i);
+		fVideoInfo.push_back(info);
+	}	
+	values = GetValuesFromMultiMap(systemInfo, "description", "Display");
+	for (size_t i = 0; i < values.size(); i++)
+		fVideoInfo.at(i).chipset = values.at(i);
+	
+	// Memory slots
+	values = GetValuesFromMultiMap(systemInfo,
+											"Size", kMemoryDevice);
+	for (size_t i = 0; i < values.size(); i++) {
+		memory_device_info info;
+		info.size = values.at(i);
+		fMemoryInfo.push_back(info);
 	}
-*/
-	return true;
+
+	values = GetValuesFromMultiMap(systemInfo, "Bank Locator", kMemoryDevice);
+	for (size_t i = 0; i < values.size(); i++)
+		fMemoryInfo.at(i).description = values.at(i);
+	values = GetValuesFromMultiMap(systemInfo, "Type", kMemoryDevice);
+	for (size_t i = 0; i < values.size(); i++)
+		fMemoryInfo.at(i).type = values.at(i);
+	values = GetValuesFromMultiMap(systemInfo, "Speed", kMemoryDevice);
+	for (size_t i = 0; i < values.size(); i++)
+		fMemoryInfo.at(i).speed = values.at(i);
+	values = GetValuesFromMultiMap(systemInfo, "Manufacturer", kMemoryDevice);
+	for (size_t i = 0; i < values.size(); i++)
+		fMemoryInfo.at(i).vendor = values.at(i);
+	values = GetValuesFromMultiMap(systemInfo, "Asset Tag", kMemoryDevice);
+	for (size_t i = 0; i < values.size(); i++)
+		fMemoryInfo.at(i).asset_tag = values.at(i);
+	values = GetValuesFromMultiMap(systemInfo, "Serial Number", kMemoryDevice);
+	for (size_t i = 0; i < values.size(); i++)
+		fMemoryInfo.at(i).serial = values.at(i);
 }
 
 
 bool
 Machine::_GetLSHWData()
 {
-/*	if (!CommandExists("lshw"))
+	if (!CommandExists("lshw"))
 		return false;
 
 	popen_streambuf lshw("lshw", "r");
 	std::istream iStream(&lshw);
-
+	
+	std::multimap<std::string, std::string> systemInfo;
 	try {
 		std::string line;
 		std::string context = kSystemInfo;
@@ -350,9 +454,11 @@ Machine::_GetLSHWData()
 		while (std::getline(iStream, line)) {
 			trim(line);
 			if (size_t start = line.find("*-") != std::string::npos) {
-				context = line.substr(start + 2, std::string::npos);
+				context = line.substr(start + 1, std::string::npos);
 				if (context == "firmware")
 					context = kBIOSInfo;
+				else if (context == "display")
+					context = "Display";
 				// TODO: Map other contexts to dmidecode ones
 				// TODO: Make this better.
 				continue;
@@ -365,25 +471,25 @@ Machine::_GetLSHWData()
 			std::string key = line.substr(0, colonPos);
 			trim(key);
 			std::string value = line.substr(colonPos + 1, std::string::npos);
-			trim(value);
+			std::string sysCtx = trimmed(context);
 			if (key == "vendor") {
-				std::string sysCtx = context;
 				sysCtx.append("Manufacturer");
-				if (fSystemInfo.find(sysCtx) == fSystemInfo.end()) {
-					fSystemInfo.insert(std::pair<std::string, std::string>(sysCtx, trim(value)));
-				}
 			} else if (key == "product") {
-				std::string sysCtx = context;
 				sysCtx.append("Product Name");
-				if (fSystemInfo.find(sysCtx) == fSystemInfo.end()) {
-					fSystemInfo.insert(std::pair<std::string, std::string>(sysCtx, trim(value)));
-				}
-			}
+			} else if (key == "date") {
+				sysCtx.append("Release Date");
+			} else
+				continue;
+				
+			if (systemInfo.find(sysCtx) == systemInfo.end())
+				systemInfo.insert(std::pair<std::string, std::string>(sysCtx, trimmed(value)));		
 		}
 	} catch (...) {
 
 	}
-*/
+	
+	_ExtractNeededInfo(systemInfo);
+	
 	return true;
 }
 
@@ -398,7 +504,8 @@ Machine::_GetCPUInfo()
 	int processorNum = 0;
 	while (std::getline(iStream, string)) {
 		if (string.find("processor") != std::string::npos) {
-			fNumCPUs++;
+			processor_info newInfo;
+			fCPUInfo.push_back(newInfo);
 
 			// Get the processor number
 			size_t pos = string.find(":");
@@ -416,8 +523,14 @@ Machine::_GetCPUInfo()
 			try {
 				std::string name = string.substr(0, pos);
 				std::string value = string.substr(pos + 1, std::string::npos);
-
-				fCPUInfo[processorNum][trim(name)] = trim(value);
+				name = trim(name);
+				
+				if (name == "model name")
+					fCPUInfo[processorNum].type = trim(value);
+				else if (name == "cpu MHz")
+					fCPUInfo[processorNum].speed = trim(value);
+				else if (name == "vendor_id")
+					fCPUInfo[processorNum].manufacturer = trim(value);
 
 			} catch (...) {
 			}
@@ -458,13 +571,14 @@ Machine::_GetOSInfo()
 		}
 	}
 
-	_IdentifyOS();
+	fKernelInfo.os_description = _OSDescription();
 }
 
 
-void
-Machine::_IdentifyOS()
+std::string 
+Machine::_OSDescription()
 {
+	std::string osDescription;
 	if (CommandExists("lsb_release")) {
 		popen_streambuf lsb;
 		lsb.open("lsb_release -a", "r");
@@ -476,7 +590,7 @@ Machine::_IdentifyOS()
 				std::string key = line.substr(0, pos);
 				if (key == "Description") {
 					std::string value = line.substr(pos + 1, std::string::npos);
-					fKernelInfo.os_description = trim(value);
+					osDescription = trim(value);
 				}
 			}
 		}
@@ -484,79 +598,19 @@ Machine::_IdentifyOS()
 		// there is no lsb_release command.
 		// try to identify the system in another way
 		if (::access("/etc/thinstation.global", F_OK) != -1)
-			fKernelInfo.os_description = "Thinstation";
+			osDescription = "Thinstation";
 		else
-			fKernelInfo.os_description = "Unknown";
+			osDescription = "Unknown";
 	}
-
-}
-
-
-void
-Machine::_GetSystemInfo(std::istream& stream, std::string header)
-{
-	/*std::string string;
-	size_t pos = 0;
-	while (std::getline(stream, string)) {
-		if (string == "")
-			break;
-
-		pos = string.find(":");
-		if (pos == std::string::npos)
-			continue;
-
-		try {
-			std::string name = string.substr(0, pos);
-			trim(name);
-			std::string fullString = header;
-			fullString.append(name);
-			std::string value = string.substr(pos + 2, std::string::npos);
-
-			fSystemInfo.insert(std::pair<std::string, std::string>(trim(fullString), trim(value)));
-
-		} catch (...) {
-
-		}
-	}*/
-}
-
-
-std::string
-Machine::_GetValue(std::string string, std::string header) const
-{
-	/*std::map<std::string, std::string>::const_iterator i;
-	std::string fullString = header;
-	fullString.append(string);
-	i = fSystemInfo.find(fullString);
-	if (i != fSystemInfo.end())
-		return i->second;
-*/
-	return "";
-}
-
-
-std::vector<std::string>
-Machine::_GetValues(std::string string, std::string header) const
-{
-	std::vector<std::string> stringList;
-
-	return stringList;
+	
+	return osDescription;
 }
 
 
 int
 Machine::CountMemories()
 {
-	std::vector<std::string> values = _GetValues("Size", kMemoryDevice);
-	return values.size();
-}
-
-
-std::string
-Machine::MemoryID(int num)
-{
-	return "";
-	//return _GetValue()
+	return fMemoryInfo.size();
 }
 
 
@@ -570,65 +624,47 @@ Machine::MemoryCaption(int num)
 std::string
 Machine::MemoryDescription(int num)
 {
-	return "";
+	return fMemoryInfo.at(num).description;
 }
 
 
 std::string
 Machine::MemoryCapacity(int num)
 {
-	std::vector<std::string> values = _GetValues("Size", kMemoryDevice);
-	return values.at(num);
+	return fMemoryInfo.at(num).size;
 }
 
 
 std::string
 Machine::MemoryPurpose(int num)
 {
-	return "";
+	return fMemoryInfo.at(num).purpose;
 }
 
 
 std::string
 Machine::MemoryType(int num)
 {
-	std::vector<std::string> values = _GetValues("Type", kMemoryDevice);
-	return values.at(num);
+	return fMemoryInfo.at(num).type;
 }
 
 
 std::string
 Machine::MemorySpeed(int num)
 {
-	std::vector<std::string> values = _GetValues("Speed", kMemoryDevice);
-	return values.at(num);
+	return fMemoryInfo.at(num).speed;
 }
 
 
 std::string
-Machine::MemoryNumSlots(int num)
+Machine::MemoryNumSlot(int num)
 {
-	return "";
+	return int_to_string(num);
 }
 
 
 std::string
 Machine::MemorySerialNumber(int num)
 {
-	std::vector<std::string> values = _GetValues("Serial Number", kMemoryDevice);
-	return values.at(num);
-}
-
-
-std::string
-Machine::_ProcessorInfo(const char* info, int num) const
-{
-	if (num < 0 || num >= fNumCPUs)
-		return "";
-
-	std::map<std::string, std::string>::const_iterator i;
-	i = fCPUInfo[num].find(info);
-	if (i != fCPUInfo[num].end())
-		return i->second;
-	return "";
+	return fMemoryInfo.at(num).serial;
 }
