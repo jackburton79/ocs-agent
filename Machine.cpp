@@ -89,11 +89,11 @@ Machine::~Machine()
 void
 Machine::_RetrieveData()
 {
-	// Try /sys/devices/virtual/dmi/id tree
+	// Try /sys/devices/virtual/dmi/id tree, then 'dmidecode', then 'lshw'
 	_GetDMIData();
 	_GetDMIDecodeData();
-
-	//_GetLSHWData();
+	_GetLSHWData();
+	
 	_GetCPUInfo();
 
 	try {
@@ -356,6 +356,7 @@ Machine::_ExtractNeededInfo(std::multimap<std::string, std::string> systemInfo)
 	string = GetValueFromMap(systemInfo, "Serial Number", kSystemInfo);
 	if (string != "" && fProductInfo.serial == "")
 		fProductInfo.serial = string;
+		
 	string = GetValueFromMap(systemInfo, "Asset Tag", "Chassis Information");
 	if (string != "" && fChassisInfo.asset_tag == "")
 		fChassisInfo.asset_tag = string;
@@ -394,29 +395,29 @@ Machine::_ExtractNeededInfo(std::multimap<std::string, std::string> systemInfo)
 
 
 	std::vector<std::string> values = GetValuesFromMultiMap(systemInfo,
-											"Size", "Memory Device");
+											"Size", kMemoryDevice);
 	for (size_t i = 0; i < values.size(); i++) {
 		memory_device_info info;
 		info.size = values.at(i);
 		fMemoryInfo.push_back(info);
 	}
 
-	values = GetValuesFromMultiMap(systemInfo, "Bank Locator", "Memory Device");
+	values = GetValuesFromMultiMap(systemInfo, "Bank Locator", kMemoryDevice);
 	for (size_t i = 0; i < values.size(); i++)
 		fMemoryInfo.at(i).description = values.at(i);
-	values = GetValuesFromMultiMap(systemInfo, "Type", "Memory Device");
+	values = GetValuesFromMultiMap(systemInfo, "Type", kMemoryDevice);
 	for (size_t i = 0; i < values.size(); i++)
 		fMemoryInfo.at(i).type = values.at(i);
-	values = GetValuesFromMultiMap(systemInfo, "Speed", "Memory Device");
+	values = GetValuesFromMultiMap(systemInfo, "Speed", kMemoryDevice);
 	for (size_t i = 0; i < values.size(); i++)
 		fMemoryInfo.at(i).speed = values.at(i);
-	values = GetValuesFromMultiMap(systemInfo, "Manufacturer", "Memory Device");
+	values = GetValuesFromMultiMap(systemInfo, "Manufacturer", kMemoryDevice);
 	for (size_t i = 0; i < values.size(); i++)
 		fMemoryInfo.at(i).vendor = values.at(i);
-	values = GetValuesFromMultiMap(systemInfo, "Asset Tag", "Memory Device");
+	values = GetValuesFromMultiMap(systemInfo, "Asset Tag", kMemoryDevice);
 	for (size_t i = 0; i < values.size(); i++)
 		fMemoryInfo.at(i).asset_tag = values.at(i);
-	values = GetValuesFromMultiMap(systemInfo, "Serial Number", "Memory Device");
+	values = GetValuesFromMultiMap(systemInfo, "Serial Number", kMemoryDevice);
 	for (size_t i = 0; i < values.size(); i++)
 		fMemoryInfo.at(i).serial = values.at(i);
 }
@@ -474,12 +475,13 @@ Machine::_GetLSHWShortData()
 bool
 Machine::_GetLSHWData()
 {
-/*	if (!CommandExists("lshw"))
+	if (!CommandExists("lshw"))
 		return false;
 
 	popen_streambuf lshw("lshw", "r");
 	std::istream iStream(&lshw);
-
+	
+	std::multimap<std::string, std::string> systemInfo;
 	try {
 		std::string line;
 		std::string context = kSystemInfo;
@@ -504,25 +506,26 @@ Machine::_GetLSHWData()
 			std::string key = line.substr(0, colonPos);
 			trim(key);
 			std::string value = line.substr(colonPos + 1, std::string::npos);
-			trim(value);
 			if (key == "vendor") {
 				std::string sysCtx = context;
 				sysCtx.append("Manufacturer");
-				if (fSystemInfo.find(sysCtx) == fSystemInfo.end()) {
-					fSystemInfo.insert(std::pair<std::string, std::string>(sysCtx, trim(value)));
+				if (systemInfo.find(sysCtx) == systemInfo.end()) {
+					systemInfo.insert(std::pair<std::string, std::string>(sysCtx, trimmed(value)));
 				}
 			} else if (key == "product") {
 				std::string sysCtx = context;
 				sysCtx.append("Product Name");
-				if (fSystemInfo.find(sysCtx) == fSystemInfo.end()) {
-					fSystemInfo.insert(std::pair<std::string, std::string>(sysCtx, trim(value)));
+				if (systemInfo.find(sysCtx) == systemInfo.end()) {
+					systemInfo.insert(std::pair<std::string, std::string>(sysCtx, trimmed(value)));
 				}
 			}
 		}
 	} catch (...) {
 
 	}
-*/
+	
+	_ExtractNeededInfo(systemInfo);
+	
 	return true;
 }
 
