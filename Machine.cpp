@@ -344,6 +344,7 @@ Machine::_ExtractNeededInfo(std::multimap<std::string, std::string> systemInfo)
 	string = GetValueFromMap(systemInfo, "Version", kBIOSInfo);
 	if (string != "" && fBIOSInfo.version == "")
 		fBIOSInfo.version = string;
+		
 	string = GetValueFromMap(systemInfo, "Product Name", kSystemInfo);
 	if (string != "" && fProductInfo.name == "")
 		fProductInfo.name = string;
@@ -405,9 +406,12 @@ Machine::_ExtractNeededInfo(std::multimap<std::string, std::string> systemInfo)
 	for (size_t i = 0; i < values.size(); i++)
 		fVideoInfo.at(i).chipset = values.at(i);
 	
+	values = GetValuesFromMultiMap(systemInfo, "Product Name", "Display");
+	for (size_t i = 0; i < values.size(); i++)
+		fVideoInfo.at(i).name = values.at(i);
+		
 	// Memory slots
-	values = GetValuesFromMultiMap(systemInfo,
-											"Size", kMemoryDevice);
+	values = GetValuesFromMultiMap(systemInfo, "Size", kMemoryDevice);
 	for (size_t i = 0; i < values.size(); i++) {
 		memory_device_info info;
 		info.size = values.at(i);
@@ -432,6 +436,9 @@ Machine::_ExtractNeededInfo(std::multimap<std::string, std::string> systemInfo)
 	values = GetValuesFromMultiMap(systemInfo, "Serial Number", kMemoryDevice);
 	for (size_t i = 0; i < values.size(); i++)
 		fMemoryInfo.at(i).serial = values.at(i);
+	values = GetValuesFromMultiMap(systemInfo, "Purpose", kMemoryDevice);
+	for (size_t i = 0; i < values.size(); i++)
+		fMemoryInfo.at(i).purpose = values.at(i);
 }
 
 
@@ -451,6 +458,8 @@ Machine::_GetLSHWData()
 		// skip initial line
 		std::getline(iStream, line);
 
+		// This code basically maps lshw "contexts" to dmidecode
+		// ones. Yes, it's pretty ugly.
 		while (std::getline(iStream, line)) {
 			trim(line);
 			if (size_t start = line.find("*-") != std::string::npos) {
@@ -461,13 +470,15 @@ Machine::_GetLSHWData()
 					context.erase(unclaimedPos, context.length());
 
 				trim(context);
-
+	
 				if (context == "firmware")
 					context = kBIOSInfo;
 				else if (context == "display")
 					context = "Display";
 				// TODO: Map other contexts to dmidecode ones
 				// TODO: Make this better.
+				else if (context == "memory")
+					context = kMemoryDevice;
 				continue;
 			}
 			size_t colonPos = line.find(":");
@@ -475,19 +486,29 @@ Machine::_GetLSHWData()
 				continue;
 
 			// TODO: Better mapping of keys
+			
 			std::string key = line.substr(0, colonPos);
 			trim(key);
 			std::string value = line.substr(colonPos + 1, std::string::npos);
 			std::string sysCtx = trimmed(context);
-			if (key == "vendor") {
-				sysCtx.append("Manufacturer");
-			} else if (key == "product") {
-				sysCtx.append("Product Name");
-			} else if (key == "date") {
-				sysCtx.append("Release Date");
-			} else
-				continue;
-				
+			if (sysCtx == kMemoryDevice) {
+				if (key == "size")
+					sysCtx.append("Size");
+				else if (key == "description")
+					sysCtx.append("Purpose");
+				else
+					continue;
+			} else {
+				if (key == "vendor") {
+					sysCtx.append("Manufacturer");
+				} else if (key == "product") {
+					sysCtx.append("Product Name");
+				} else if (key == "date") {
+					sysCtx.append("Release Date");
+				} else
+					continue;
+			}
+			
 			if (systemInfo.find(sysCtx) == systemInfo.end())
 				systemInfo.insert(std::pair<std::string, std::string>(sysCtx, trimmed(value)));		
 		}
