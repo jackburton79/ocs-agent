@@ -6,12 +6,15 @@
  */
 
 #include "NetworkInterface.h"
+#include "Support.h"
 
 #include <errno.h>
 #include <string.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <arpa/inet.h>
+#include <linux/ethtool.h>
+#include <linux/sockios.h>
 #include <net/ethernet.h>
 #include <net/if.h>
 #include <netinet/in.h>
@@ -109,6 +112,24 @@ NetworkInterface::Type() const
 {
 	// TODO:
 	return "";
+}
+
+
+std::string
+NetworkInterface::Speed() const
+{
+	struct ifreq ifr;
+	struct ethtool_cmd edata;
+
+	ifr.ifr_data = (char*)&edata;
+
+	edata.cmd = ETHTOOL_GSET;
+
+	if (_DoRequest(SIOCETHTOOL, ifr) != 0)
+		return "0";
+
+	// TODO: Duplex
+	return int_to_string(ethtool_cmd_speed(&edata));
 }
 
 

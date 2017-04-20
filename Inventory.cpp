@@ -654,6 +654,10 @@ Inventory::_AddNetworksInfo(tinyxml2::XMLElement* parent)
 		type->LinkEndChild(fDocument->NewText(interface.Type().c_str()));
 		networks->LinkEndChild(type);
 
+		tinyxml2::XMLElement* speed = fDocument->NewElement("SPEED");
+		speed->LinkEndChild(fDocument->NewText(interface.Speed().c_str()));
+		networks->LinkEndChild(speed);
+
 		tinyxml2::XMLElement* virtualDevice = fDocument->NewElement("VIRTUALDEV");
 		virtualDevice->LinkEndChild(fDocument->NewText(""));
 		networks->LinkEndChild(virtualDevice);
