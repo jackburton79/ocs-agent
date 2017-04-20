@@ -537,8 +537,8 @@ Machine::_GetCPUInfo()
 	ProcReader cpu("/proc/cpuinfo");
 	std::istream iStream(&cpu);
 
-	// First pass: we get every processor info into an array,
-	// based on processor number. Then we examine the array and 
+	// First pass: we get every processor info into a map,
+	// based on processor number. Then we examine the map and 
 	// check if some cpu share the physical_id. If so, we merge
 	// them into the same processor (later).
 	std::map<int, processor_info> tmpCPUInfo;
@@ -553,7 +553,7 @@ Machine::_GetCPUInfo()
 			std::string valueString = string.substr(pos + 2, std::string::npos);
 			trim(valueString);
 			processorNum = ::strtol(valueString.c_str(), NULL, 10);
-			
+
 			processor_info newInfo;
 			newInfo.physical_id = 0;
 			newInfo.cores = 1;
@@ -588,10 +588,8 @@ Machine::_GetCPUInfo()
 	std::map<int, processor_info>::const_iterator i;	
 	for (i = tmpCPUInfo.begin(); i != tmpCPUInfo.end(); i++) {
 		const processor_info& cpu = i->second;
-		if (size_t(cpu.physical_id) >= fCPUInfo.size()) {	
+		if (size_t(cpu.physical_id) >= fCPUInfo.size())
 			fCPUInfo.resize(cpu.physical_id + 1);
-		}
-
 		fCPUInfo[cpu.physical_id].type = cpu.type;
 		fCPUInfo[cpu.physical_id].speed = cpu.speed;
 		fCPUInfo[cpu.physical_id].cores = cpu.cores;
