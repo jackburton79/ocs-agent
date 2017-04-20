@@ -228,6 +228,14 @@ Machine::ProcessorType(int numCpu) const
 }
 
 
+std::string
+Machine::ProcessorCores(int numCpu) const
+{
+	std::string model = fCPUInfo[numCpu].cores;
+	return model;
+}
+
+
 os_info
 Machine::OSInfo() const
 {
@@ -529,21 +537,27 @@ Machine::_GetCPUInfo()
 	ProcReader cpu("/proc/cpuinfo");
 	std::istream iStream(&cpu);
 
+	// First pass: we get every processor info into an array,
+	// based on processor number. Then we examine the array and 
+	// check if some cpu share the physical_id. If so, we merge
+	// them into the same processor (later).
+	std::map<int, processor_info> tmpCPUInfo;
 	std::string string;
 	int processorNum = 0;
 	while (std::getline(iStream, string)) {
 		if (string.find("processor") != std::string::npos) {
-			processor_info newInfo;
-			fCPUInfo.push_back(newInfo);
-
 			// Get the processor number
 			size_t pos = string.find(":");
 			if (pos == std::string::npos)
 				continue;
-
 			std::string valueString = string.substr(pos + 2, std::string::npos);
 			trim(valueString);
 			processorNum = ::strtol(valueString.c_str(), NULL, 10);
+			
+			processor_info newInfo;
+			newInfo.physical_id = 0;
+			newInfo.cores = 1;
+			tmpCPUInfo[processorNum] = newInfo;
 		} else {
 			size_t pos = string.find(":");
 			if (pos == std::string::npos)
@@ -552,18 +566,36 @@ Machine::_GetCPUInfo()
 			try {
 				std::string name = string.substr(0, pos);
 				std::string value = string.substr(pos + 1, std::string::npos);
-				name = trim(name);
-				
+				trim(name);
+				trim(value);
 				if (name == "model name")
-					fCPUInfo[processorNum].type = trim(value);
+					tmpCPUInfo[processorNum].type = value;
 				else if (name == "cpu MHz")
-					fCPUInfo[processorNum].speed = trim(value);
+					tmpCPUInfo[processorNum].speed = value;
 				else if (name == "vendor_id")
-					fCPUInfo[processorNum].manufacturer = trim(value);
+					tmpCPUInfo[processorNum].manufacturer = value;
+				else if (name == "cpu cores")
+					tmpCPUInfo[processorNum].cores = value;
+				else if (name == "physical id")
+					tmpCPUInfo[processorNum].physical_id =
+						strtol(value.c_str(), NULL, 0);
 
 			} catch (...) {
 			}
 		}
+	}
+	
+	std::map<int, processor_info>::const_iterator i;	
+	for (i = tmpCPUInfo.begin(); i != tmpCPUInfo.end(); i++) {
+		const processor_info& cpu = i->second;
+		if (size_t(cpu.physical_id) >= fCPUInfo.size()) {	
+			fCPUInfo.resize(cpu.physical_id + 1);
+		}
+
+		fCPUInfo[cpu.physical_id].type = cpu.type;
+		fCPUInfo[cpu.physical_id].speed = cpu.speed;
+		fCPUInfo[cpu.physical_id].cores = cpu.cores;
+		fCPUInfo[cpu.physical_id].manufacturer = cpu.manufacturer;
 	}
 }
 
