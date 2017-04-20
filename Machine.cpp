@@ -556,7 +556,7 @@ Machine::_GetCPUInfo()
 
 			processor_info newInfo;
 			newInfo.physical_id = 0;
-			newInfo.cores = 1;
+			newInfo.cores = "1";
 			tmpCPUInfo[processorNum] = newInfo;
 		} else {
 			size_t pos = string.find(":");
