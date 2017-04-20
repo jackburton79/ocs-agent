@@ -464,7 +464,7 @@ Machine::_GetLSHWData()
 			trim(line);
 			if (size_t start = line.find("*-") != std::string::npos) {
 				context = line.substr(start + 1, std::string::npos);
-				// lshw can add "UNCLAIMED" if there is no driver for the device
+				// lshw adds "UNCLAIMED" if there is no driver for the device
 				size_t unclaimedPos = context.find("UNCLAIMED");
 				if (unclaimedPos != std::string::npos)
 					context.erase(unclaimedPos, context.length());
@@ -477,7 +477,8 @@ Machine::_GetLSHWData()
 					context = "Display";
 				// TODO: Map other contexts to dmidecode ones
 				// TODO: Make this better.
-				else if (context == "memory")
+				// 'memory' or 'memory:0, memory:1, etc.'
+				else if (context.find("memory") != std::string::npos)
 					context = kMemoryDevice;
 				continue;
 			}
