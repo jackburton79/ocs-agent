@@ -6,15 +6,12 @@
  */
 
 #include "NetworkInterface.h"
-#include "Support.h"
 
 #include <errno.h>
 #include <string.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <arpa/inet.h>
-#include <linux/ethtool.h>
-#include <linux/sockios.h>
 #include <net/ethernet.h>
 #include <net/if.h>
 #include <netinet/in.h>
@@ -23,23 +20,6 @@
 #include <iomanip>
 #include <iostream>
 #include <sstream>
-
-
-static std::string
-SpeedToString(int speed)
-{
-	std::string unit = "";
-	std::string count = "";
-	if (speed / 1000 >= 1) {
-		unit = "Gb/s";
-		count = int_to_string(speed / 1000);
-	} else if (speed / 1 >= 1) {
-		unit = "Mb/s";
-		count = int_to_string(speed);
-	}
-
-	return count.append(" ").append(unit);
-}
 
 
 NetworkInterface::NetworkInterface()
@@ -135,18 +115,7 @@ NetworkInterface::Type() const
 std::string
 NetworkInterface::Speed() const
 {
-	struct ifreq ifr;
-	struct ethtool_cmd edata;
-
-	ifr.ifr_data = (char*)&edata;
-
-	edata.cmd = ETHTOOL_GSET;
-
-	if (_DoRequest(SIOCETHTOOL, ifr) != 0)
-		return "0";
-
-	// TODO: Duplex
-	return SpeedToString(ethtool_cmd_speed(&edata));
+	return "";
 }
 
 
