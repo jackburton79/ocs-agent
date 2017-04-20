@@ -100,6 +100,7 @@ main(int argc, char **argv)
 			exit(0);
 
 		umask(0);
+		chdir("/");
 
 		//set new session
 		pid_t sid = setsid();
