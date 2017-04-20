@@ -52,9 +52,11 @@ struct chassis_info {
 
 
 struct processor_info {
+	int physical_id;
 	std::string manufacturer;
 	std::string type;
 	std::string speed;
+	std::string cores;
 };
 
 
@@ -113,6 +115,7 @@ public:
 	std::string ProcessorManufacturer(int numCpu) const;
 	std::string ProcessorSerialNumber(int numCpu) const;
 	std::string ProcessorType(int numCpu) const;
+	std::string ProcessorCores(int numCpu) const;
 
 	int CountMemories();
 	std::string MemoryCaption(int num);

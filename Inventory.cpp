@@ -327,21 +327,25 @@ Inventory::_AddCPUsInfo(tinyxml2::XMLElement* parent)
 		tinyxml2::XMLElement* serial = fDocument->NewElement("SERIAL");
 		tinyxml2::XMLElement* speed = fDocument->NewElement("SPEED");
 		tinyxml2::XMLElement* model = fDocument->NewElement("TYPE");
+		tinyxml2::XMLElement* cores = fDocument->NewElement("CORES");
 
 		// TODO: Seems like we should interpretate the vendor_id
 		manufacturer->LinkEndChild(
-		fDocument->NewText(fMachine->ProcessorManufacturer(i).c_str()));
+			fDocument->NewText(fMachine->ProcessorManufacturer(i).c_str()));
 		serial->LinkEndChild(
-		fDocument->NewText(fMachine->ProcessorSerialNumber(i).c_str()));
+			fDocument->NewText(fMachine->ProcessorSerialNumber(i).c_str()));
 		speed->LinkEndChild(
-		fDocument->NewText(fMachine->ProcessorSpeed(i).c_str()));
+			fDocument->NewText(fMachine->ProcessorSpeed(i).c_str()));
 		model->LinkEndChild(
-		fDocument->NewText(fMachine->ProcessorType(i).c_str()));
+			fDocument->NewText(fMachine->ProcessorType(i).c_str()));
+		cores->LinkEndChild(
+			fDocument->NewText(fMachine->ProcessorCores(i).c_str()));
 
 		cpu->LinkEndChild(model);
 		cpu->LinkEndChild(manufacturer);
 		cpu->LinkEndChild(serial);
 		cpu->LinkEndChild(speed);
+		cpu->LinkEndChild(cores);
 
 		parent->LinkEndChild(cpu);
 	}
@@ -412,7 +416,6 @@ Inventory::_AddMemoriesInfo(tinyxml2::XMLElement* parent)
 		tinyxml2::XMLElement* speed = fDocument->NewElement("SPEED");
 		tinyxml2::XMLElement* numSlots = fDocument->NewElement("NUMSLOTS");
 		tinyxml2::XMLElement* serial = fDocument->NewElement("SERIALNUMBER");
-
 
 		description->LinkEndChild(fDocument->NewText(fMachine->MemoryDescription(i).c_str()));
 		memory->LinkEndChild(description);
@@ -654,6 +657,10 @@ Inventory::_AddNetworksInfo(tinyxml2::XMLElement* parent)
 		tinyxml2::XMLElement* type = fDocument->NewElement("TYPE");
 		type->LinkEndChild(fDocument->NewText(interface.Type().c_str()));
 		networks->LinkEndChild(type);
+
+		tinyxml2::XMLElement* speed = fDocument->NewElement("SPEED");
+		speed->LinkEndChild(fDocument->NewText(interface.Speed().c_str()));
+		networks->LinkEndChild(speed);
 
 		tinyxml2::XMLElement* virtualDevice = fDocument->NewElement("VIRTUALDEV");
 		virtualDevice->LinkEndChild(fDocument->NewText(""));

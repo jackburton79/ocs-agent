@@ -22,6 +22,7 @@ public:
 	std::string NetMask() const;
 	std::string BroadcastAddress() const;
 	std::string Type() const;
+	std::string Speed() const;
 	std::string Status() const;
 
 private:

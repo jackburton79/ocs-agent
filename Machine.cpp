@@ -228,6 +228,14 @@ Machine::ProcessorType(int numCpu) const
 }
 
 
+std::string
+Machine::ProcessorCores(int numCpu) const
+{
+	std::string model = fCPUInfo[numCpu].cores;
+	return model;
+}
+
+
 os_info
 Machine::OSInfo() const
 {
@@ -344,6 +352,7 @@ Machine::_ExtractNeededInfo(std::multimap<std::string, std::string> systemInfo)
 	string = GetValueFromMap(systemInfo, "Version", kBIOSInfo);
 	if (string != "" && fBIOSInfo.version == "")
 		fBIOSInfo.version = string;
+		
 	string = GetValueFromMap(systemInfo, "Product Name", kSystemInfo);
 	if (string != "" && fProductInfo.name == "")
 		fProductInfo.name = string;
@@ -405,9 +414,12 @@ Machine::_ExtractNeededInfo(std::multimap<std::string, std::string> systemInfo)
 	for (size_t i = 0; i < values.size(); i++)
 		fVideoInfo.at(i).chipset = values.at(i);
 	
+	values = GetValuesFromMultiMap(systemInfo, "Product Name", "Display");
+	for (size_t i = 0; i < values.size(); i++)
+		fVideoInfo.at(i).name = values.at(i);
+		
 	// Memory slots
-	values = GetValuesFromMultiMap(systemInfo,
-											"Size", kMemoryDevice);
+	values = GetValuesFromMultiMap(systemInfo, "Size", kMemoryDevice);
 	for (size_t i = 0; i < values.size(); i++) {
 		memory_device_info info;
 		info.size = values.at(i);
@@ -432,6 +444,9 @@ Machine::_ExtractNeededInfo(std::multimap<std::string, std::string> systemInfo)
 	values = GetValuesFromMultiMap(systemInfo, "Serial Number", kMemoryDevice);
 	for (size_t i = 0; i < values.size(); i++)
 		fMemoryInfo.at(i).serial = values.at(i);
+	values = GetValuesFromMultiMap(systemInfo, "Purpose", kMemoryDevice);
+	for (size_t i = 0; i < values.size(); i++)
+		fMemoryInfo.at(i).purpose = values.at(i);
 }
 
 
@@ -451,16 +466,28 @@ Machine::_GetLSHWData()
 		// skip initial line
 		std::getline(iStream, line);
 
+		// This code basically maps lshw "contexts" to dmidecode
+		// ones. Yes, it's pretty ugly.
 		while (std::getline(iStream, line)) {
 			trim(line);
 			if (size_t start = line.find("*-") != std::string::npos) {
 				context = line.substr(start + 1, std::string::npos);
+				// lshw adds "UNCLAIMED" if there is no driver for the device
+				size_t unclaimedPos = context.find("UNCLAIMED");
+				if (unclaimedPos != std::string::npos)
+					context.erase(unclaimedPos, context.length());
+
+				trim(context);
+	
 				if (context == "firmware")
 					context = kBIOSInfo;
 				else if (context == "display")
 					context = "Display";
 				// TODO: Map other contexts to dmidecode ones
 				// TODO: Make this better.
+				// 'memory' or 'memory:0, memory:1, etc.'
+				else if (context.find("memory") != std::string::npos)
+					context = kMemoryDevice;
 				continue;
 			}
 			size_t colonPos = line.find(":");
@@ -468,19 +495,29 @@ Machine::_GetLSHWData()
 				continue;
 
 			// TODO: Better mapping of keys
+			
 			std::string key = line.substr(0, colonPos);
 			trim(key);
 			std::string value = line.substr(colonPos + 1, std::string::npos);
 			std::string sysCtx = trimmed(context);
-			if (key == "vendor") {
-				sysCtx.append("Manufacturer");
-			} else if (key == "product") {
-				sysCtx.append("Product Name");
-			} else if (key == "date") {
-				sysCtx.append("Release Date");
-			} else
-				continue;
-				
+			if (sysCtx == kMemoryDevice) {
+				if (key == "size")
+					sysCtx.append("Size");
+				else if (key == "description")
+					sysCtx.append("Purpose");
+				else
+					continue;
+			} else {
+				if (key == "vendor") {
+					sysCtx.append("Manufacturer");
+				} else if (key == "product") {
+					sysCtx.append("Product Name");
+				} else if (key == "date") {
+					sysCtx.append("Release Date");
+				} else
+					continue;
+			}
+			
 			if (systemInfo.find(sysCtx) == systemInfo.end())
 				systemInfo.insert(std::pair<std::string, std::string>(sysCtx, trimmed(value)));		
 		}
@@ -500,21 +537,27 @@ Machine::_GetCPUInfo()
 	ProcReader cpu("/proc/cpuinfo");
 	std::istream iStream(&cpu);
 
+	// First pass: we get every processor info into a map,
+	// based on processor number. Then we examine the map and 
+	// check if some cpu share the physical_id. If so, we merge
+	// them into the same processor (later).
+	std::map<int, processor_info> tmpCPUInfo;
 	std::string string;
 	int processorNum = 0;
 	while (std::getline(iStream, string)) {
 		if (string.find("processor") != std::string::npos) {
-			processor_info newInfo;
-			fCPUInfo.push_back(newInfo);
-
 			// Get the processor number
 			size_t pos = string.find(":");
 			if (pos == std::string::npos)
 				continue;
-
 			std::string valueString = string.substr(pos + 2, std::string::npos);
 			trim(valueString);
 			processorNum = ::strtol(valueString.c_str(), NULL, 10);
+
+			processor_info newInfo;
+			newInfo.physical_id = 0;
+			newInfo.cores = 1;
+			tmpCPUInfo[processorNum] = newInfo;
 		} else {
 			size_t pos = string.find(":");
 			if (pos == std::string::npos)
@@ -523,18 +566,34 @@ Machine::_GetCPUInfo()
 			try {
 				std::string name = string.substr(0, pos);
 				std::string value = string.substr(pos + 1, std::string::npos);
-				name = trim(name);
-				
+				trim(name);
+				trim(value);
 				if (name == "model name")
-					fCPUInfo[processorNum].type = trim(value);
+					tmpCPUInfo[processorNum].type = value;
 				else if (name == "cpu MHz")
-					fCPUInfo[processorNum].speed = trim(value);
+					tmpCPUInfo[processorNum].speed = value;
 				else if (name == "vendor_id")
-					fCPUInfo[processorNum].manufacturer = trim(value);
+					tmpCPUInfo[processorNum].manufacturer = value;
+				else if (name == "cpu cores")
+					tmpCPUInfo[processorNum].cores = value;
+				else if (name == "physical id")
+					tmpCPUInfo[processorNum].physical_id =
+						strtol(value.c_str(), NULL, 0);
 
 			} catch (...) {
 			}
 		}
+	}
+	
+	std::map<int, processor_info>::const_iterator i;	
+	for (i = tmpCPUInfo.begin(); i != tmpCPUInfo.end(); i++) {
+		const processor_info& cpu = i->second;
+		if (size_t(cpu.physical_id) >= fCPUInfo.size())
+			fCPUInfo.resize(cpu.physical_id + 1);
+		fCPUInfo[cpu.physical_id].type = cpu.type;
+		fCPUInfo[cpu.physical_id].speed = cpu.speed;
+		fCPUInfo[cpu.physical_id].cores = cpu.cores;
+		fCPUInfo[cpu.physical_id].manufacturer = cpu.manufacturer;
 	}
 }
 
