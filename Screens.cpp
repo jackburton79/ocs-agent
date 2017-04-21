@@ -16,7 +16,7 @@
 Screens::Screens()
 {
     if (!CommandExists("find"))
-        throw "Missing command \"find\"";
+        return;
 
     popen_streambuf buf("find /sys/devices/ -name edid", "r");
     std::istream stream(&buf);
