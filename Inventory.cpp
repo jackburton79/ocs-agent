@@ -256,6 +256,9 @@ Inventory::Checksum() const
 void
 Inventory::_AddAccountInfo(tinyxml2::XMLElement* parent)
 {
+	std::cerr << "\t";
+	std::cerr << "ACCOUNT" << std::endl;
+	
 	tinyxml2::XMLElement* accountInfo = fDocument->NewElement("ACCOUNTINFO");
 
 	// TODO: ??? We can't store anything
@@ -277,6 +280,9 @@ Inventory::_AddAccountInfo(tinyxml2::XMLElement* parent)
 void
 Inventory::_AddBIOSInfo(tinyxml2::XMLElement* parent)
 {
+	std::cerr << "\t";
+	std::cerr << "BIOS" << std::endl;
+	
 	tinyxml2::XMLElement* bios = fDocument->NewElement("BIOS");
 
 	tinyxml2::XMLElement* assettag = fDocument->NewElement("ASSETTAG");
@@ -323,6 +329,9 @@ Inventory::_AddBIOSInfo(tinyxml2::XMLElement* parent)
 void
 Inventory::_AddCPUsInfo(tinyxml2::XMLElement* parent)
 {
+	std::cerr << "\t";
+	std::cerr << "CPUS" << std::endl;
+	
 	// TODO: Check if the fields name and structure are correct.
 	for (int i = 0; i < fMachine->CountProcessors(); i++) {
 		tinyxml2::XMLElement* cpu = fDocument->NewElement("CPUS");
@@ -358,6 +367,9 @@ Inventory::_AddCPUsInfo(tinyxml2::XMLElement* parent)
 void
 Inventory::_AddStoragesInfo(tinyxml2::XMLElement* parent)
 {
+	std::cerr << "\t";
+	std::cerr << "STORAGES" << std::endl;
+	
 	Storages storages;
 	for (int i = 0; i < storages.Count(); i++) {
 		tinyxml2::XMLElement* storage = fDocument->NewElement("STORAGES");
@@ -409,6 +421,9 @@ Inventory::_AddStoragesInfo(tinyxml2::XMLElement* parent)
 void
 Inventory::_AddMemoriesInfo(tinyxml2::XMLElement* parent)
 {
+	std::cerr << "\t";
+	std::cerr << "MEMORIES" << std::endl;
+	
 	for (int i = 0; i < fMachine->CountMemories(); i++) {
 		tinyxml2::XMLElement* memory = fDocument->NewElement("MEMORIES");
 
@@ -449,6 +464,9 @@ Inventory::_AddMemoriesInfo(tinyxml2::XMLElement* parent)
 void
 Inventory::_AddDrivesInfo(tinyxml2::XMLElement* parent)
 {
+	std::cerr << "\t";
+	std::cerr << "DRIVES" << std::endl;
+	
 	VolumeReader reader;
 	volume_info info;
 	while (reader.GetNext(info)) {
@@ -494,6 +512,9 @@ Inventory::_AddDrivesInfo(tinyxml2::XMLElement* parent)
 void
 Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 {
+	std::cerr << "\t";
+	std::cerr << "HARDWARE" << std::endl;
+	
 	tinyxml2::XMLElement* hardware = fDocument->NewElement("HARDWARE");
 
 	tinyxml2::XMLElement* checksum = fDocument->NewElement("CHECKSUM");
@@ -605,6 +626,9 @@ Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 void
 Inventory::_AddNetworksInfo(tinyxml2::XMLElement* parent)
 {
+	std::cerr << "\t";
+	std::cerr << "NETWORKS" << std::endl;
+	
 	NetworkRoster roster;
 	NetworkInterface interface;
 	unsigned int cookie = 0;
@@ -676,6 +700,9 @@ Inventory::_AddNetworksInfo(tinyxml2::XMLElement* parent)
 void
 Inventory::_AddProcessesInfo(tinyxml2::XMLElement* parent)
 {
+	std::cerr << "\t";
+	std::cerr << "PROCESSES" << std::endl;
+	
 	RunningProcessesList processList;
 	process_info processInfo;
 	while (processList.GetNext(processInfo)) {
@@ -729,6 +756,9 @@ Inventory::_AddSoftwaresInfo(tinyxml2::XMLElement* parent)
 void
 Inventory::_AddUsersInfo(tinyxml2::XMLElement* parent)
 {
+	std::cerr << "\t";
+	std::cerr << "USERS" << std::endl;
+	
 	try {
 		tinyxml2::XMLElement* users = fDocument->NewElement("USERS");
 
@@ -747,6 +777,9 @@ Inventory::_AddUsersInfo(tinyxml2::XMLElement* parent)
 void
 Inventory::_AddVideosInfo(tinyxml2::XMLElement* parent)
 {
+	std::cerr << "\t";
+	std::cerr << "VIDEOS" << std::endl;
+	
 	for (int i = 0; i < fMachine->CountVideos(); i++) {
 		video_info info = fMachine->VideoInfoFor(i);
 
@@ -776,6 +809,9 @@ Inventory::_AddVideosInfo(tinyxml2::XMLElement* parent)
 void
 Inventory::_AddMonitorsInfo(tinyxml2::XMLElement* parent)
 {
+	std::cerr << "\t";
+	std::cerr << "MONITORS" << std::endl;
+	
 	try {
 		Screens screens;
 
