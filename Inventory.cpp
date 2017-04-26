@@ -372,25 +372,25 @@ Inventory::_AddStoragesInfo(tinyxml2::XMLElement* parent)
 		manufacturer->LinkEndChild(fDocument->NewText(info.manufacturer.c_str()));
 
 		tinyxml2::XMLElement* name = fDocument->NewElement("NAME");
-                name->LinkEndChild(fDocument->NewText(info.name.c_str()));
+		name->LinkEndChild(fDocument->NewText(info.name.c_str()));
 		
 		tinyxml2::XMLElement* model = fDocument->NewElement("MODEL");
 		model->LinkEndChild(fDocument->NewText(info.model.c_str()));
 
 		tinyxml2::XMLElement* description = fDocument->NewElement("DESCRIPTION");
-                description->LinkEndChild(fDocument->NewText(info.description.c_str()));
+		description->LinkEndChild(fDocument->NewText(info.description.c_str()));
 
 		tinyxml2::XMLElement* type = fDocument->NewElement("TYPE");
-                type->LinkEndChild(fDocument->NewText(info.type.c_str()));
+		type->LinkEndChild(fDocument->NewText(info.type.c_str()));
 		
 		tinyxml2::XMLElement* diskSize = fDocument->NewElement("DISKSIZE");
-                diskSize->LinkEndChild(fDocument->NewText(info.size.c_str()));
+		diskSize->LinkEndChild(fDocument->NewText(info.size.c_str()));
 
 		tinyxml2::XMLElement* serialNumber = fDocument->NewElement("SERIALNUMBER");
-                serialNumber->LinkEndChild(fDocument->NewText(info.serial_number.c_str()));
+		serialNumber->LinkEndChild(fDocument->NewText(info.serial_number.c_str()));
 		
 		tinyxml2::XMLElement* firmware = fDocument->NewElement("FIRMWARE");
-                firmware->LinkEndChild(fDocument->NewText(info.firmware.c_str()));
+		firmware->LinkEndChild(fDocument->NewText(info.firmware.c_str()));
 		
 		storage->LinkEndChild(manufacturer);
 		storage->LinkEndChild(name);
@@ -522,7 +522,6 @@ Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 
 	tinyxml2::XMLElement* ipAddress = fDocument->NewElement("IPADDR");
 	ipAddress->LinkEndChild(fDocument->NewText(interface.IPAddress().c_str()));
-
 
 	tinyxml2::XMLElement* memory = fDocument->NewElement("MEMORY");
 	memory->LinkEndChild(fDocument->NewText(fMachine->OSInfo().memory.c_str()));
