@@ -257,7 +257,7 @@ void
 Inventory::_AddAccountInfo(tinyxml2::XMLElement* parent)
 {
 	std::cerr << "\t";
-	std::cerr << "ACCOUNT" << std::endl;
+	std::cerr << "ACCOUNT...";
 	
 	tinyxml2::XMLElement* accountInfo = fDocument->NewElement("ACCOUNTINFO");
 
@@ -274,6 +274,7 @@ Inventory::_AddAccountInfo(tinyxml2::XMLElement* parent)
 	}
 
 	parent->LinkEndChild(accountInfo);
+	std::cerr << "OK!" << std::endl;
 }
 
 
@@ -281,7 +282,7 @@ void
 Inventory::_AddBIOSInfo(tinyxml2::XMLElement* parent)
 {
 	std::cerr << "\t";
-	std::cerr << "BIOS" << std::endl;
+	std::cerr << "BIOS...";
 	
 	tinyxml2::XMLElement* bios = fDocument->NewElement("BIOS");
 
@@ -323,6 +324,8 @@ Inventory::_AddBIOSInfo(tinyxml2::XMLElement* parent)
 	bios->LinkEndChild(ssn);
 
 	parent->LinkEndChild(bios);
+	
+	std::cerr << "OK!" << std::endl;
 }
 
 
@@ -330,7 +333,7 @@ void
 Inventory::_AddCPUsInfo(tinyxml2::XMLElement* parent)
 {
 	std::cerr << "\t";
-	std::cerr << "CPUS" << std::endl;
+	std::cerr << "CPUS...";
 	
 	// TODO: Check if the fields name and structure are correct.
 	for (int i = 0; i < fMachine->CountProcessors(); i++) {
@@ -361,6 +364,7 @@ Inventory::_AddCPUsInfo(tinyxml2::XMLElement* parent)
 
 		parent->LinkEndChild(cpu);
 	}
+	std::cerr << "OK!" << std::endl;
 }
 
 
@@ -368,7 +372,7 @@ void
 Inventory::_AddStoragesInfo(tinyxml2::XMLElement* parent)
 {
 	std::cerr << "\t";
-	std::cerr << "STORAGES" << std::endl;
+	std::cerr << "STORAGES...";
 	
 	Storages storages;
 	for (int i = 0; i < storages.Count(); i++) {
@@ -415,6 +419,8 @@ Inventory::_AddStoragesInfo(tinyxml2::XMLElement* parent)
 
 		parent->LinkEndChild(storage);
 	}
+
+	std::cerr << "OK!" << std::endl;
 }
 
 
@@ -422,7 +428,7 @@ void
 Inventory::_AddMemoriesInfo(tinyxml2::XMLElement* parent)
 {
 	std::cerr << "\t";
-	std::cerr << "MEMORIES" << std::endl;
+	std::cerr << "MEMORIES...";
 	
 	for (int i = 0; i < fMachine->CountMemories(); i++) {
 		tinyxml2::XMLElement* memory = fDocument->NewElement("MEMORIES");
@@ -458,6 +464,7 @@ Inventory::_AddMemoriesInfo(tinyxml2::XMLElement* parent)
 
 		parent->LinkEndChild(memory);
 	}
+	std::cerr << "OK!" << std::endl;
 }
 
 
@@ -465,47 +472,52 @@ void
 Inventory::_AddDrivesInfo(tinyxml2::XMLElement* parent)
 {
 	std::cerr << "\t";
-	std::cerr << "DRIVES" << std::endl;
+	std::cerr << "DRIVES...";
 	
-	VolumeReader reader;
-	volume_info info;
-	while (reader.GetNext(info)) {
-		tinyxml2::XMLElement* drive = fDocument->NewElement("DRIVES");
+	try {
+		VolumeReader reader;
+		volume_info info;
+		while (reader.GetNext(info)) {
+			tinyxml2::XMLElement* drive = fDocument->NewElement("DRIVES");
 
-		tinyxml2::XMLElement* createDate = fDocument->NewElement("CREATEDATE");
-		createDate->LinkEndChild(fDocument->NewText(info.create_date.c_str()));
+			tinyxml2::XMLElement* createDate = fDocument->NewElement("CREATEDATE");
+			createDate->LinkEndChild(fDocument->NewText(info.create_date.c_str()));
 
-		tinyxml2::XMLElement* fileSystem = fDocument->NewElement("FILESYSTEM");
-		fileSystem->LinkEndChild(fDocument->NewText(info.filesystem.c_str()));
+			tinyxml2::XMLElement* fileSystem = fDocument->NewElement("FILESYSTEM");
+			fileSystem->LinkEndChild(fDocument->NewText(info.filesystem.c_str()));
 
-		tinyxml2::XMLElement* freeSpace = fDocument->NewElement("FREE");
-		freeSpace->LinkEndChild(fDocument->NewText(int_to_string(info.free).c_str()));
+			tinyxml2::XMLElement* freeSpace = fDocument->NewElement("FREE");
+			freeSpace->LinkEndChild(fDocument->NewText(int_to_string(info.free).c_str()));
 
-		tinyxml2::XMLElement* label = fDocument->NewElement("LABEL");
-		label->LinkEndChild(fDocument->NewText(info.label.c_str()));
+			tinyxml2::XMLElement* label = fDocument->NewElement("LABEL");
+			label->LinkEndChild(fDocument->NewText(info.label.c_str()));
 
-		tinyxml2::XMLElement* serial = fDocument->NewElement("SERIAL");
-		serial->LinkEndChild(fDocument->NewText(info.serial.c_str()));
+			tinyxml2::XMLElement* serial = fDocument->NewElement("SERIAL");
+			serial->LinkEndChild(fDocument->NewText(info.serial.c_str()));
 
-		tinyxml2::XMLElement* total = fDocument->NewElement("TOTAL");
-		total->LinkEndChild(fDocument->NewText(int_to_string(info.total).c_str()));
+			tinyxml2::XMLElement* total = fDocument->NewElement("TOTAL");
+			total->LinkEndChild(fDocument->NewText(int_to_string(info.total).c_str()));
 
-		tinyxml2::XMLElement* type = fDocument->NewElement("TYPE");
-		type->LinkEndChild(fDocument->NewText(info.type.c_str()));
+			tinyxml2::XMLElement* type = fDocument->NewElement("TYPE");
+			type->LinkEndChild(fDocument->NewText(info.type.c_str()));
 
-		tinyxml2::XMLElement* volumeName = fDocument->NewElement("VOLUMN");
-		volumeName->LinkEndChild(fDocument->NewText(info.name.c_str()));
+			tinyxml2::XMLElement* volumeName = fDocument->NewElement("VOLUMN");
+			volumeName->LinkEndChild(fDocument->NewText(info.name.c_str()));
 
-		drive->LinkEndChild(createDate);
-		drive->LinkEndChild(fileSystem);
-		drive->LinkEndChild(freeSpace);
-		drive->LinkEndChild(label);
-		drive->LinkEndChild(serial);
-		drive->LinkEndChild(total);
-		drive->LinkEndChild(type);
-		drive->LinkEndChild(volumeName);
-		parent->LinkEndChild(drive);
+			drive->LinkEndChild(createDate);
+			drive->LinkEndChild(fileSystem);
+			drive->LinkEndChild(freeSpace);
+			drive->LinkEndChild(label);
+			drive->LinkEndChild(serial);
+			drive->LinkEndChild(total);
+			drive->LinkEndChild(type);
+			drive->LinkEndChild(volumeName);
+			parent->LinkEndChild(drive);
+		}
+	} catch (...) {
 	}
+
+	std::cerr << "OK!" << std::endl;
 }
 
 
@@ -513,7 +525,7 @@ void
 Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 {
 	std::cerr << "\t";
-	std::cerr << "HARDWARE" << std::endl;
+	std::cerr << "HARDWARE...";
 	
 	tinyxml2::XMLElement* hardware = fDocument->NewElement("HARDWARE");
 
@@ -620,6 +632,8 @@ Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 	hardware->LinkEndChild(vmSystem);
 	hardware->LinkEndChild(workGroup);
 	parent->LinkEndChild(hardware);
+	
+	std::cerr << "OK!" << std::endl;
 }
 
 
@@ -627,73 +641,77 @@ void
 Inventory::_AddNetworksInfo(tinyxml2::XMLElement* parent)
 {
 	std::cerr << "\t";
-	std::cerr << "NETWORKS" << std::endl;
+	std::cerr << "NETWORKS...";
 	
-	NetworkRoster roster;
-	NetworkInterface interface;
-	unsigned int cookie = 0;
-	while (roster.GetNextInterface(&cookie, interface) == 0) {
-		if (interface.Name() == "lo")
-			continue;
+	try {
+		NetworkRoster roster;
+		NetworkInterface interface;
+		unsigned int cookie = 0;
+		while (roster.GetNextInterface(&cookie, interface) == 0) {
+			if (interface.Name() == "lo")
+				continue;
 
-		tinyxml2::XMLElement* networks = fDocument->NewElement("NETWORKS");
+			tinyxml2::XMLElement* networks = fDocument->NewElement("NETWORKS");
 
-		tinyxml2::XMLElement* description = fDocument->NewElement("DESCRIPTION");
-		description->LinkEndChild(fDocument->NewText(interface.Name().c_str()));
-		networks->LinkEndChild(description);
+			tinyxml2::XMLElement* description = fDocument->NewElement("DESCRIPTION");
+			description->LinkEndChild(fDocument->NewText(interface.Name().c_str()));
+			networks->LinkEndChild(description);
 
-		tinyxml2::XMLElement* driver = fDocument->NewElement("DRIVER");
-		driver->LinkEndChild(fDocument->NewText("pif"));
-		networks->LinkEndChild(driver);
+			tinyxml2::XMLElement* driver = fDocument->NewElement("DRIVER");
+			driver->LinkEndChild(fDocument->NewText("pif"));
+			networks->LinkEndChild(driver);
 
-		tinyxml2::XMLElement* ipAddress = fDocument->NewElement("IPADDRESS");
-		ipAddress->LinkEndChild(fDocument->NewText(interface.IPAddress().c_str()));
-		networks->LinkEndChild(ipAddress);
+			tinyxml2::XMLElement* ipAddress = fDocument->NewElement("IPADDRESS");
+			ipAddress->LinkEndChild(fDocument->NewText(interface.IPAddress().c_str()));
+			networks->LinkEndChild(ipAddress);
 
-		tinyxml2::XMLElement* ipDHCP = fDocument->NewElement("IPDHCP");
-		ipDHCP->LinkEndChild(fDocument->NewText(""));
-		networks->LinkEndChild(ipDHCP);
+			tinyxml2::XMLElement* ipDHCP = fDocument->NewElement("IPDHCP");
+			ipDHCP->LinkEndChild(fDocument->NewText(""));
+			networks->LinkEndChild(ipDHCP);
 
-		tinyxml2::XMLElement* gateway = fDocument->NewElement("IPGATEWAY");
-		std::string gatewayString;
-		roster.GetDefaultGateway(interface.Name().c_str(), gatewayString);
-		gateway->LinkEndChild(fDocument->NewText(gatewayString.c_str()));
-		networks->LinkEndChild(gateway);
+			tinyxml2::XMLElement* gateway = fDocument->NewElement("IPGATEWAY");
+			std::string gatewayString;
+			roster.GetDefaultGateway(interface.Name().c_str(), gatewayString);
+			gateway->LinkEndChild(fDocument->NewText(gatewayString.c_str()));
+			networks->LinkEndChild(gateway);
 
-		tinyxml2::XMLElement* ipMask = fDocument->NewElement("IPMASK");
-		ipMask->LinkEndChild(fDocument->NewText(interface.NetMask().c_str()));
-		networks->LinkEndChild(ipMask);
+			tinyxml2::XMLElement* ipMask = fDocument->NewElement("IPMASK");
+			ipMask->LinkEndChild(fDocument->NewText(interface.NetMask().c_str()));
+			networks->LinkEndChild(ipMask);
 
-		tinyxml2::XMLElement* ipSubnet = fDocument->NewElement("IPSUBNET");
-		ipSubnet->LinkEndChild(fDocument->NewText(interface.BroadcastAddress().c_str()));
-		networks->LinkEndChild(ipSubnet);
+			tinyxml2::XMLElement* ipSubnet = fDocument->NewElement("IPSUBNET");
+			ipSubnet->LinkEndChild(fDocument->NewText(interface.BroadcastAddress().c_str()));
+			networks->LinkEndChild(ipSubnet);
 
-		tinyxml2::XMLElement* mac = fDocument->NewElement("MACADDR");
-		mac->LinkEndChild(fDocument->NewText(interface.HardwareAddress().c_str()));
-		networks->LinkEndChild(mac);
+			tinyxml2::XMLElement* mac = fDocument->NewElement("MACADDR");
+			mac->LinkEndChild(fDocument->NewText(interface.HardwareAddress().c_str()));
+			networks->LinkEndChild(mac);
 
-		tinyxml2::XMLElement* pciSlot = fDocument->NewElement("PCISLOT");
-		pciSlot->LinkEndChild(fDocument->NewText(""));
-		networks->LinkEndChild(pciSlot);
+			tinyxml2::XMLElement* pciSlot = fDocument->NewElement("PCISLOT");
+			pciSlot->LinkEndChild(fDocument->NewText(""));
+			networks->LinkEndChild(pciSlot);
 
-		tinyxml2::XMLElement* status = fDocument->NewElement("STATUS");
-		status->LinkEndChild(fDocument->NewText(interface.Status().c_str()));
-		networks->LinkEndChild(status);
+			tinyxml2::XMLElement* status = fDocument->NewElement("STATUS");
+			status->LinkEndChild(fDocument->NewText(interface.Status().c_str()));
+			networks->LinkEndChild(status);
 
-		tinyxml2::XMLElement* type = fDocument->NewElement("TYPE");
-		type->LinkEndChild(fDocument->NewText(interface.Type().c_str()));
-		networks->LinkEndChild(type);
+			tinyxml2::XMLElement* type = fDocument->NewElement("TYPE");
+			type->LinkEndChild(fDocument->NewText(interface.Type().c_str()));
+			networks->LinkEndChild(type);
 
-		tinyxml2::XMLElement* speed = fDocument->NewElement("SPEED");
-		speed->LinkEndChild(fDocument->NewText(interface.Speed().c_str()));
-		networks->LinkEndChild(speed);
+			tinyxml2::XMLElement* speed = fDocument->NewElement("SPEED");
+			speed->LinkEndChild(fDocument->NewText(interface.Speed().c_str()));
+			networks->LinkEndChild(speed);
 
-		tinyxml2::XMLElement* virtualDevice = fDocument->NewElement("VIRTUALDEV");
-		virtualDevice->LinkEndChild(fDocument->NewText(""));
-		networks->LinkEndChild(virtualDevice);
+			tinyxml2::XMLElement* virtualDevice = fDocument->NewElement("VIRTUALDEV");
+			virtualDevice->LinkEndChild(fDocument->NewText(""));
+			networks->LinkEndChild(virtualDevice);
 
-		parent->LinkEndChild(networks);
+			parent->LinkEndChild(networks);
+		}
+	} catch (...) {
 	}
+	std::cerr << "OK!" << std::endl;
 }
 
 
@@ -701,48 +719,52 @@ void
 Inventory::_AddProcessesInfo(tinyxml2::XMLElement* parent)
 {
 	std::cerr << "\t";
-	std::cerr << "PROCESSES" << std::endl;
-	
-	RunningProcessesList processList;
-	process_info processInfo;
-	while (processList.GetNext(processInfo)) {
-		tinyxml2::XMLElement* process = fDocument->NewElement("PROCESSES");
+	std::cerr << "PROCESSES...";
+	try {
+		RunningProcessesList processList;
+		process_info processInfo;
+		while (processList.GetNext(processInfo)) {
+			tinyxml2::XMLElement* process = fDocument->NewElement("PROCESSES");
 
-		tinyxml2::XMLElement* cmd = fDocument->NewElement("CMD");
-		cmd->LinkEndChild(fDocument->NewText(processInfo.cmdline.c_str()));
+			tinyxml2::XMLElement* cmd = fDocument->NewElement("CMD");
+			cmd->LinkEndChild(fDocument->NewText(processInfo.cmdline.c_str()));
 
-		tinyxml2::XMLElement* cpuUsage = fDocument->NewElement("CPUUSAGE");
-		cpuUsage->LinkEndChild(fDocument->NewText(""));
+			tinyxml2::XMLElement* cpuUsage = fDocument->NewElement("CPUUSAGE");
+			cpuUsage->LinkEndChild(fDocument->NewText(""));
 
-		tinyxml2::XMLElement* mem = fDocument->NewElement("MEM");
-		mem->LinkEndChild(fDocument->NewText(int_to_string(processInfo.memory).c_str()));
+			tinyxml2::XMLElement* mem = fDocument->NewElement("MEM");
+			mem->LinkEndChild(fDocument->NewText(int_to_string(processInfo.memory).c_str()));
 
-		tinyxml2::XMLElement* pid = fDocument->NewElement("PID");
-		pid->LinkEndChild(fDocument->NewText(int_to_string(processInfo.pid).c_str()));
+			tinyxml2::XMLElement* pid = fDocument->NewElement("PID");
+			pid->LinkEndChild(fDocument->NewText(int_to_string(processInfo.pid).c_str()));
 
-		tinyxml2::XMLElement* started = fDocument->NewElement("STARTED");
-		started->LinkEndChild(fDocument->NewText(""));
+			tinyxml2::XMLElement* started = fDocument->NewElement("STARTED");
+			started->LinkEndChild(fDocument->NewText(""));
 
-		tinyxml2::XMLElement* tty = fDocument->NewElement("TTY");
-		tty->LinkEndChild(fDocument->NewText(""));
+			tinyxml2::XMLElement* tty = fDocument->NewElement("TTY");
+			tty->LinkEndChild(fDocument->NewText(""));
 
-		tinyxml2::XMLElement* user = fDocument->NewElement("USER");
-		user->LinkEndChild(fDocument->NewText(processInfo.user.c_str()));
+			tinyxml2::XMLElement* user = fDocument->NewElement("USER");
+			user->LinkEndChild(fDocument->NewText(processInfo.user.c_str()));
 
-		tinyxml2::XMLElement* virtualMem = fDocument->NewElement("VIRTUALMEMORY");
-		virtualMem->LinkEndChild(fDocument->NewText(int_to_string(processInfo.virtualmem).c_str()));
+			tinyxml2::XMLElement* virtualMem = fDocument->NewElement("VIRTUALMEMORY");
+			virtualMem->LinkEndChild(fDocument->NewText(int_to_string(processInfo.virtualmem).c_str()));
 
-		process->LinkEndChild(cmd);
-		process->LinkEndChild(cpuUsage);
-		process->LinkEndChild(mem);
-		process->LinkEndChild(pid);
-		process->LinkEndChild(started);
-		process->LinkEndChild(tty);
-		process->LinkEndChild(user);
-		process->LinkEndChild(virtualMem);
+			process->LinkEndChild(cmd);
+			process->LinkEndChild(cpuUsage);
+			process->LinkEndChild(mem);
+			process->LinkEndChild(pid);
+			process->LinkEndChild(started);
+			process->LinkEndChild(tty);
+			process->LinkEndChild(user);
+			process->LinkEndChild(virtualMem);
 
-		parent->LinkEndChild(process);
+			parent->LinkEndChild(process);
+		}
+	} catch (...) {
 	}
+		
+	std::cerr << "OK!" << std::endl;
 }
 
 
@@ -757,7 +779,7 @@ void
 Inventory::_AddUsersInfo(tinyxml2::XMLElement* parent)
 {
 	std::cerr << "\t";
-	std::cerr << "USERS" << std::endl;
+	std::cerr << "USERS...";
 	
 	try {
 		tinyxml2::XMLElement* users = fDocument->NewElement("USERS");
@@ -771,6 +793,7 @@ Inventory::_AddUsersInfo(tinyxml2::XMLElement* parent)
 		parent->LinkEndChild(users);
 	} catch (...) {
 	}
+	std::cerr << "OK!" << std::endl;
 }
 
 
@@ -778,7 +801,7 @@ void
 Inventory::_AddVideosInfo(tinyxml2::XMLElement* parent)
 {
 	std::cerr << "\t";
-	std::cerr << "VIDEOS" << std::endl;
+	std::cerr << "VIDEOS...";
 	
 	for (int i = 0; i < fMachine->CountVideos(); i++) {
 		video_info info = fMachine->VideoInfoFor(i);
@@ -803,6 +826,7 @@ Inventory::_AddVideosInfo(tinyxml2::XMLElement* parent)
 
 		parent->LinkEndChild(video);
 	}
+	std::cerr << "OK!" << std::endl;
 }
 
 
@@ -810,11 +834,10 @@ void
 Inventory::_AddMonitorsInfo(tinyxml2::XMLElement* parent)
 {
 	std::cerr << "\t";
-	std::cerr << "MONITORS" << std::endl;
+	std::cerr << "MONITORS...";
 	
 	try {
 		Screens screens;
-
 		screen_info info;
 		while (screens.GetNext(info)) {
 			tinyxml2::XMLElement* monitor = fDocument->NewElement("MONITORS");
@@ -839,6 +862,8 @@ Inventory::_AddMonitorsInfo(tinyxml2::XMLElement* parent)
 		}
 	} catch (...) {
 	}
+	
+	std::cerr << "OK!" << std::endl;
 }
 
 
