@@ -89,17 +89,15 @@ Machine::~Machine()
 void
 Machine::_RetrieveData()
 {
-	// Try /sys/devices/virtual/dmi/id tree, then 'dmidecode', then 'lshw'
-	_GetDMIData();
-	_GetDMIDecodeData();
-	_GetLSHWData();
-	
-	_GetCPUInfo();
-
 	try {
+		// Try /sys/devices/virtual/dmi/id tree, then 'dmidecode', then 'lshw'
+		_GetDMIData();
+		_GetDMIDecodeData();
+		_GetLSHWData();
+		_GetCPUInfo();
 		_GetOSInfo();
 	} catch (...) {
-		std::cerr << "Failed to get kernel info." << std::endl;
+		std::cerr << "Failed to get hardware info." << std::endl;
 	}
 }
 
@@ -525,7 +523,11 @@ Machine::_GetLSHWData()
 
 	}
 	
-	_ExtractNeededInfo(systemInfo);
+	try {
+		_ExtractNeededInfo(systemInfo);
+	} catch (...) {
+		return false;
+	}
 	
 	return true;
 }
