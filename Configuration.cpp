@@ -179,6 +179,10 @@ Configuration::_GenerateDeviceID()
 		deviceID = Machine::Get()->HostName();
 	
 	std::string biosDateString = Machine::Get()->BIOSDate();
+	// On some machines, this can be empty. So use an harcoded
+	// value, since we need a correct date for the device id
+	if (biosDateString.length() <= 1)
+		biosDateString = "01/01/2017";
 	struct tm biosDate;
 	strptime(biosDateString.c_str(), "%m/%d/%Y", &biosDate);
 	
