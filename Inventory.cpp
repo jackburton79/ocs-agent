@@ -88,20 +88,23 @@ Inventory::Build(const char* deviceID)
 
 	tinyxml2::XMLElement* content = fContent;
 
-	_AddAccountInfo(content);
-	_AddBIOSInfo(content);
-	_AddCPUsInfo(content);
-	_AddStoragesInfo(content);
-	_AddDrivesInfo(content);
-	_AddMemoriesInfo(content);
-	_AddHardwareInfo(content);
-	_AddNetworksInfo(content);
-	_AddProcessesInfo(content);
-	_AddSoftwaresInfo(content);
-	_AddUsersInfo(content);
-	_AddVideosInfo(content);
-	_AddMonitorsInfo(content);
-
+	try {
+		_AddAccountInfo(content);
+		_AddBIOSInfo(content);
+		_AddCPUsInfo(content);
+		_AddStoragesInfo(content);
+		_AddDrivesInfo(content);
+		_AddMemoriesInfo(content);
+		_AddHardwareInfo(content);
+		_AddNetworksInfo(content);
+		_AddProcessesInfo(content);
+		_AddSoftwaresInfo(content);
+		_AddUsersInfo(content);
+		_AddVideosInfo(content);
+		_AddMonitorsInfo(content);
+	} catch (...) {
+		// Something failed.
+	}
 	std::cerr << "OK!" << std::endl;
 	return true;
 }
