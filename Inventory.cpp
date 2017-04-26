@@ -841,7 +841,6 @@ Inventory::_AddMonitorsInfo(tinyxml2::XMLElement* parent)
 		screen_info info;
 		while (screens.GetNext(info)) {
 			tinyxml2::XMLElement* monitor = fDocument->NewElement("MONITORS");
-			tinyxml2::XMLElement* id = fDocument->NewElement("ID"); 	
 			tinyxml2::XMLElement* caption = fDocument->NewElement("CAPTION");
 			tinyxml2::XMLElement* description = fDocument->NewElement("DESCRIPTION");
 			tinyxml2::XMLElement* manufacturer = fDocument->NewElement("MANUFACTURER");
@@ -851,8 +850,7 @@ Inventory::_AddMonitorsInfo(tinyxml2::XMLElement* parent)
 			description->LinkEndChild(fDocument->NewText(info.description.c_str()));
 			manufacturer->LinkEndChild(fDocument->NewText(info.manufacturer.c_str()));
 			serial->LinkEndChild(fDocument->NewText(info.serial_number.c_str()));
-	
-			monitor->LinkEndChild(id);
+
 			monitor->LinkEndChild(caption);
 			monitor->LinkEndChild(description);
 			monitor->LinkEndChild(manufacturer);
