@@ -22,7 +22,8 @@ public:
 	void SetStatusLine(int code, const std::string text = "",
 			const int majVersion = 1, const int minVersion = 1);
 	int StatusCode() const;
-
+	std::string StatusString() const;
+	
 	virtual std::string ToString() const;
 
 	virtual void Clear();

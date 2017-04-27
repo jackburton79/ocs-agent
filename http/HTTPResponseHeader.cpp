@@ -59,6 +59,13 @@ HTTPResponseHeader::StatusCode() const
 
 
 std::string
+HTTPResponseHeader::StatusString() const
+{
+	return fText;
+}
+
+
+std::string
 HTTPResponseHeader::ToString() const
 {
 	std::string string;
