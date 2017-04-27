@@ -83,7 +83,7 @@ Inventory::Clear()
 bool
 Inventory::Build(const char* deviceID)
 {
-	std::cerr << "Building inventory... ";
+	std::cerr << "Building inventory... " << std::endl;
 	// TODO: Finish this, cleanup.
 
 	tinyxml2::XMLElement* content = fContent;
@@ -105,7 +105,7 @@ Inventory::Build(const char* deviceID)
 	} catch (...) {
 		// Something failed.
 	}
-	std::cerr << "OK!" << std::endl;
+	std::cerr << "Done!" << std::endl;
 	return true;
 }
 
