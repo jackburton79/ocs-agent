@@ -8,7 +8,17 @@
 #ifndef NETWORKINTERFACE_H_
 #define NETWORKINTERFACE_H_
 
+#include <list>
 #include <string>
+#include <net/if.h>
+#include <netinet/in.h>
+
+struct route_info {
+	struct in_addr dstAddr;
+	struct in_addr srcAddr;
+	struct in_addr gateWay;
+	char ifName[IF_NAMESIZE];
+};
 
 class NetworkInterface {
 public:
@@ -16,17 +26,19 @@ public:
 	NetworkInterface(const char* name);
 	~NetworkInterface();
 
+	
 	std::string Name() const;
 	std::string HardwareAddress() const;
 	std::string IPAddress() const;
 	std::string NetMask() const;
 	std::string BroadcastAddress() const;
+	std::string DefaultGateway() const;
 	std::string Type() const;
 	std::string Speed() const;
 	std::string Status() const;
 
 private:
-
+	int _GetRoutes(std::list<route_info>& routeList) const;
 	int _DoRequest(int request, struct ifreq& ifr) const;
 	std::string fName;
 };

@@ -20,8 +20,6 @@ public:
 
 	int CountInterfaces(int family = AF_INET);
 	int GetNextInterface(unsigned int* cookie, NetworkInterface& interface);
-
-	int GetDefaultGateway(const char* interfaceName, std::string& gateway);
 };
 
 #endif /* NETWORKROSTER_H_ */
