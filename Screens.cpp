@@ -31,9 +31,8 @@ Screens::Screens()
 				fItems.push_back(info);
 			}
 		}
-
-		Rewind();
 	}
+	Rewind();
 }
 
 
