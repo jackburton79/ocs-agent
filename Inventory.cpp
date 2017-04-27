@@ -135,10 +135,11 @@ Inventory::Save(const char* name, const char* fileName)
 bool
 Inventory::Send(const char* serverUrl)
 {
-	HTTP httpObject;
+	std::string inventoryUrl(serverUrl);
 
-	// Send Prolog
-	std::cerr << "Inventory::Send(): Prolog... ";
+	// Prepare prolog
+	std::cerr << "Inventory::Send(): server url: " << serverUrl << std::endl;
+	std::cerr << "Inventory::Send(): Preparing Prolog... ";
 	tinyxml2::XMLDocument prolog;
 	_WriteProlog(prolog);
 	char* prologData = NULL;
@@ -147,8 +148,6 @@ Inventory::Send(const char* serverUrl)
 		std::cerr << "error compressing prolog XML" << std::endl;
 		return false;
 	}
-
-	std::string inventoryUrl(serverUrl);
 
 	HTTPRequestHeader requestHeader;
 	requestHeader.SetRequest("POST", inventoryUrl);
@@ -159,6 +158,7 @@ Inventory::Send(const char* serverUrl)
 	requestHeader.SetContentType("application/x-compress");
 	requestHeader.SetContentLength(prologLength);
 	requestHeader.SetUserAgent(USER_AGENT);
+	HTTP httpObject;
 	if (httpObject.Request(requestHeader, prologData, prologLength) != 0) {
 		delete[] prologData;
 		std::cerr << "cannot send prolog: ";
