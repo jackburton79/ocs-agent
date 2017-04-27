@@ -8,18 +8,61 @@
 #include "NetworkInterface.h"
 
 #include <errno.h>
+#include <cstdlib>
 #include <string.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <arpa/inet.h>
+#include <linux/netlink.h>
+#include <linux/rtnetlink.h>
 #include <net/ethernet.h>
-#include <net/if.h>
-#include <netinet/in.h>
+
+
 #include <sys/ioctl.h>
 
 #include <iomanip>
 #include <iostream>
 #include <sstream>
+
+
+const static int kBufSize = 8192;
+
+static bool
+ParseRoutes(struct nlmsghdr* nlHdr, route_info* rtInfo,
+	const char* interfaceName)
+{
+	rtmsg *rtMsg = (rtmsg*)NLMSG_DATA(nlHdr);
+
+	// If the route is not for AF_INET or does not belong to main routing table then return.
+	if ((rtMsg->rtm_family != AF_INET) || (rtMsg->rtm_table != RT_TABLE_MAIN))
+		return false;
+
+	// get the rtattr field
+	rtattr* rtAttr = (rtattr*)RTM_RTA(rtMsg);
+	int rtLen = RTM_PAYLOAD(nlHdr);
+	for(; RTA_OK(rtAttr, rtLen); rtAttr = RTA_NEXT(rtAttr, rtLen)) {
+		switch(rtAttr->rta_type) {
+			case RTA_OIF:
+				if_indextoname(*(int*)RTA_DATA(rtAttr), rtInfo->ifName);
+				break;
+			case RTA_GATEWAY:
+				rtInfo->gateWay = *(in_addr*)RTA_DATA(rtAttr);
+				break;
+			case RTA_PREFSRC:
+				rtInfo->srcAddr = *(in_addr*)RTA_DATA(rtAttr);
+				break;
+			case RTA_DST:
+				rtInfo->dstAddr = *(in_addr*)RTA_DATA(rtAttr);
+				break;
+			default:
+				break;
+		}
+	}
+	
+	// If the route is for a different interface, return false
+	// TODO: Check if we can filter the list beforehand
+	return ::strcmp(interfaceName, rtInfo->ifName) == 0;
+}
 
 
 NetworkInterface::NetworkInterface()
@@ -105,6 +148,23 @@ NetworkInterface::BroadcastAddress() const
 
 
 std::string
+NetworkInterface::DefaultGateway() const
+{
+	std::list<route_info> routeInfo;
+	if (_GetRoutes(routeInfo) <= 0)
+		return "";
+	
+	std::list<route_info>::const_iterator i;
+	for (i = routeInfo.begin(); i != routeInfo.end(); i++) {
+		if (i->dstAddr.s_addr == 0)
+			return (char*)inet_ntoa(i->gateWay);
+	}
+	
+	return "";
+}
+
+
+std::string
 NetworkInterface::Type() const
 {
 	// TODO:
@@ -127,6 +187,91 @@ NetworkInterface::Status() const
 		return "";
 
 	return ifr.ifr_flags & IFF_UP ? "Up" : "Down";
+}
+
+
+
+static int
+ReadRouteInfoFromSocket(int sockFd, char *bufPtr, int seqNum, int pId)
+{
+	nlmsghdr* nlHdr;
+	int readLen = 0;
+	int msgLen = 0;
+	do {
+		// Receive response from the kernel
+		if ((readLen = ::recv(sockFd, bufPtr, kBufSize - msgLen, 0)) < 0){
+			return -1;
+		}
+
+		nlHdr = (nlmsghdr*)bufPtr;
+
+		// Check if the header is valid 
+		if ((NLMSG_OK(nlHdr, readLen) == 0) ||
+				(nlHdr->nlmsg_type == NLMSG_ERROR)) {
+			return -1;
+		}
+
+		// Check if the its the last message
+		if (nlHdr->nlmsg_type == NLMSG_DONE) {
+			break;
+		} else {
+			// Else move the pointer to buffer appropriately 
+			bufPtr += readLen;
+			msgLen += readLen;
+		}
+
+		// Check if its a multi part message
+		if ((nlHdr->nlmsg_flags & NLM_F_MULTI) == 0) {
+			break;
+		}
+	} while(((int)nlHdr->nlmsg_seq != seqNum) || ((int)nlHdr->nlmsg_pid != pId));
+	
+	return msgLen;
+}
+
+
+int
+NetworkInterface::_GetRoutes(std::list<route_info>& routeList) const
+{
+	char msgBuf[kBufSize];
+	int sock = 0;
+	if ((sock = ::socket(PF_NETLINK, SOCK_DGRAM, NETLINK_ROUTE)) < 0)
+		return errno;
+
+	memset(msgBuf, 0, kBufSize);
+	struct nlmsghdr* nlMsg = (struct nlmsghdr*)msgBuf;
+
+	int msgSeq = 0;
+	// Fill in the nlmsg header
+	nlMsg->nlmsg_len = NLMSG_LENGTH(sizeof(struct rtmsg));
+	nlMsg->nlmsg_type = RTM_GETROUTE;
+	nlMsg->nlmsg_flags = NLM_F_DUMP | NLM_F_REQUEST;
+	nlMsg->nlmsg_seq = msgSeq++;
+	nlMsg->nlmsg_pid = getpid();
+
+	if (::send(sock, nlMsg, nlMsg->nlmsg_len, 0) < 0) {
+		::close(sock);
+		return errno;
+	}
+
+	// Read the response
+	int len = 0;
+	if ((len = ReadRouteInfoFromSocket(sock, msgBuf, msgSeq, getpid())) < 0) {
+		::close(sock);
+		return len;
+	}
+	
+	// Parse and add to list	
+	for(; NLMSG_OK(nlMsg, len); nlMsg = NLMSG_NEXT(nlMsg, len)) {
+		route_info rtInfo;
+		memset(&rtInfo, 0, sizeof(rtInfo));
+		if (ParseRoutes(nlMsg, &rtInfo, Name().c_str()))
+			routeList.push_back(rtInfo);
+	}
+	
+	::close(sock);
+	
+	return routeList.size();
 }
 
 

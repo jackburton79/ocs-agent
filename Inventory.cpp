@@ -543,8 +543,7 @@ Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 			break;
 	}
 
-	std::string defaultGateway;
-	roster.GetDefaultGateway(interface.Name().c_str(), defaultGateway);
+	std::string defaultGateway = interface.DefaultGateway();
 	tinyxml2::XMLElement* defaultGW = fDocument->NewElement("DEFAULTGATEWAY");
 	defaultGW->LinkEndChild(fDocument->NewText(defaultGateway.c_str()));
 
@@ -670,8 +669,7 @@ Inventory::_AddNetworksInfo(tinyxml2::XMLElement* parent)
 			networks->LinkEndChild(ipDHCP);
 
 			tinyxml2::XMLElement* gateway = fDocument->NewElement("IPGATEWAY");
-			std::string gatewayString;
-			roster.GetDefaultGateway(interface.Name().c_str(), gatewayString);
+			std::string gatewayString = interface.DefaultGateway();
 			gateway->LinkEndChild(fDocument->NewText(gatewayString.c_str()));
 			networks->LinkEndChild(gateway);
 
