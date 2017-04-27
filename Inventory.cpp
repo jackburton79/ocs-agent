@@ -138,17 +138,19 @@ Inventory::Send(const char* serverUrl)
 	std::string inventoryUrl(serverUrl);
 
 	// Prepare prolog
-	std::cerr << "Inventory::Send(): server url: " << serverUrl << std::endl;
-	std::cerr << "Inventory::Send(): Preparing Prolog... ";
+	std::cerr << "Inventory::Send(): server URL: " << serverUrl << std::endl;
+	std::cerr << "Inventory::Send(): preparing prolog... ";
 	tinyxml2::XMLDocument prolog;
 	_WriteProlog(prolog);
 	char* prologData = NULL;
 	size_t prologLength = 0;
 	if (!XML::Compress(prolog, prologData, prologLength)) {
-		std::cerr << "error compressing prolog XML" << std::endl;
+		std::cerr << "error compressing XML prolog" << std::endl;
 		return false;
 	}
 
+	std::cerr << "OK!" << std::endl;
+	
 	HTTPRequestHeader requestHeader;
 	requestHeader.SetRequest("POST", inventoryUrl);
 	requestHeader.SetValue("Pragma", "no-cache");
@@ -159,9 +161,11 @@ Inventory::Send(const char* serverUrl)
 	requestHeader.SetContentLength(prologLength);
 	requestHeader.SetUserAgent(USER_AGENT);
 	HTTP httpObject;
+	
+	std::cerr << "Inventory::Send(): sending prolog... ";
 	if (httpObject.Request(requestHeader, prologData, prologLength) != 0) {
 		delete[] prologData;
-		std::cerr << "cannot send prolog: ";
+		std::cerr << "failed: ";
 		std::cerr << httpObject.ErrorString() << std::endl;
 		return false;
 	}
@@ -174,7 +178,9 @@ Inventory::Send(const char* serverUrl)
 	const HTTPResponseHeader& responseHeader = httpObject.LastResponse();
 	if (responseHeader.StatusCode() != HTTP_OK
 			|| !responseHeader.HasContentLength()) {
-		std::cout << responseHeader.ToString() << std::endl;
+		std::cerr << responseHeader.StatusString() << std::endl;
+		std::cerr << "Full server reply:" << std::endl;
+		std::cerr << responseHeader.ToString() << std::endl;
 		return false;
 	}
 
