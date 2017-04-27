@@ -20,13 +20,13 @@
 class HTTP {
 public:
 	HTTP();
-	HTTP(const std::string hostName, int port = 80);
+	HTTP(const std::string hostName);
 	~HTTP();
 
 	void Close();
 	void ClearPendingRequests();
 
-	int SetHost(const std::string hostName, int port = 80);
+	int SetHost(const std::string hostName);
 	
 	int Get(const std::string path);
 	int Put(const std::string path, const char* data, const size_t dataLength);
@@ -42,7 +42,7 @@ public:
 	std::string ErrorString() const;
 
 private:
-	bool _HandleConnectionIfNeeded(const std::string host, const int port = 80);
+	bool _HandleConnectionIfNeeded(const std::string host);
 
 	static bool _ReadLineFromSocket(std::string& string, int socket);
 

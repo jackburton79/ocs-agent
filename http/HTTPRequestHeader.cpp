@@ -93,10 +93,13 @@ HTTPRequestHeader::SetRequest(const std::string method,
 {
 	fMethod = method;
 	fPath = path;
-
-	std::string hostName = HostFromConnectionString(path);
-	if (hostName != "")
+	
+	int port = -1;
+	std::string hostName;
+	if (GetHostAndPortFromString(path, hostName, port) == 0
+			&& hostName != "") {
 		fValues["Host"] = hostName;
+	}
 }
 
 

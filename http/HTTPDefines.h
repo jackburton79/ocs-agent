@@ -20,6 +20,7 @@ extern std::string HTTPContentType;
 extern std::string HTTPContentLength;
 extern std::string HTTPUserAgent;
 
-extern std::string HostFromConnectionString(std::string string);
+extern int GetHostAndPortFromString(const std::string& string,
+	std::string& host, int& port);
 
 #endif /* HTTPDEFINES_H_ */

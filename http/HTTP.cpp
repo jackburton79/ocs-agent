@@ -34,15 +34,14 @@ HTTP::HTTP()
 }
 
 
-HTTP::HTTP(const std::string string, int port)
+HTTP::HTTP(const std::string string)
 	:
 	fPort(-1),
 	fFD(-1),
 	fLastError(0)
 {
-	std::string hostName = HostFromConnectionString(string);
-	fHost = hostName;
-	fPort = port;
+	if (GetHostAndPortFromString(string, fHost, fPort) != 0)
+		throw "HTTP Initialize error";
 }
 
 
@@ -97,13 +96,10 @@ HTTP::LastResponse() const
 
 
 int
-HTTP::SetHost(const std::string hostName, int port)
+HTTP::SetHost(const std::string hostName)
 {
-	fHost = HostFromConnectionString(hostName);
-	fPort = port;
-	fLastError = 0;
-
-	return 0;
+	fLastError = GetHostAndPortFromString(hostName, fHost, fPort);
+	return fLastError;
 }
 
 
@@ -206,9 +202,11 @@ HTTP::Request(const HTTPRequestHeader& header, const void* data, const size_t le
 
 
 bool
-HTTP::_HandleConnectionIfNeeded(const std::string string, const int port)
+HTTP::_HandleConnectionIfNeeded(const std::string string)
 {
-	std::string hostName = HostFromConnectionString(string);
+	std::string hostName;
+	int port;
+	GetHostAndPortFromString(string, hostName, port);
 
 #if 0
 	std::cout << "HTTP::_HandleConnectionIfNeeded(" << string << ", ";
