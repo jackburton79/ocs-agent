@@ -12,9 +12,9 @@ when the terminal is powered off, since it's a in-RAM filesystem).
 So I decided to write a small agent in C++ to be able to inventory also those machines which I was not able to do with the official agent.
 The agent is not complete yet, but it can already produce an incomplete inventory of the machine and send it to the 
 OCSInventory server, or save it locally.
-The program weights around 250kb on disk for now, and it only has zlib as dependency, which is already present on any
+The program weights around 300kb on disk for now, and it only has zlib as dependency, which is already present on any
 Thinstation installation.
-It also uses  [tinyxml2](http://www.grinninglizard.com/tinyxml2), a very small and efficient XML parsing/writing library, linked statically into the executable.
+It also uses [tinyxml2](http://www.grinninglizard.com/tinyxml2), a very small and efficient XML parsing/writing library, linked statically into the executable.
 
     Usage:
     -h [--help]         : Print usage
