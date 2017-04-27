@@ -147,7 +147,7 @@ HTTP::Read(void* data,  const size_t& length)
 
 
 int
-HTTP::Request(HTTPRequestHeader& header, const void* data, const size_t length)
+HTTP::Request(const HTTPRequestHeader& header, const void* data, const size_t length)
 {
 	if (!_HandleConnectionIfNeeded(header.Path()))
 		return -1;

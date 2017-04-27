@@ -26,20 +26,20 @@ public:
 	void Close();
 	void ClearPendingRequests();
 
-	HTTPRequestHeader CurrentRequest() const;
-	int Error() const;
-	std::string ErrorString() const;
-	HTTPResponseHeader LastResponse() const;
-
 	int SetHost(const std::string hostName, int port = 80);
+	
 	int Get(const std::string path);
 	int Put(const std::string path, const char* data, const size_t dataLength);
 	int Post(const std::string path, const char* data, const size_t dataLength);
-
-	int Request(HTTPRequestHeader& header, const void* data = NULL,
+	int Request(const HTTPRequestHeader& header, const void* data = NULL,
 			const size_t dataLength = 0);
 
 	int Read(void* data, const size_t& length);
+
+	HTTPRequestHeader CurrentRequest() const;
+	HTTPResponseHeader LastResponse() const;
+	int Error() const;
+	std::string ErrorString() const;
 
 private:
 	bool _HandleConnectionIfNeeded(const std::string host, const int port = 80);
