@@ -16,7 +16,7 @@
 #include <sys/stat.h>
 
 extern const char* __progname;
-const char* version = "1.2";
+const char* version = "1.4";
 
 static
 struct option sLongOptions[] = {
