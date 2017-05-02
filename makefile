@@ -33,6 +33,8 @@ endif
 endif
 
 
+CXXFLAGS=-O2 -Wall -I ./
+
 # Add inputs and outputs from these tool invocations to the build variables 
 
 # All Target
