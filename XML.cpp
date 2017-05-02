@@ -107,7 +107,7 @@ std::string
 XML::GetTextElementValue(const tinyxml2::XMLDocument& document, std::string elementName)
 {
 	ElementFinder responseFinder(elementName);
-        document.Accept(&responseFinder);
+	document.Accept(&responseFinder);
 
 	return responseFinder.Response();
 }
