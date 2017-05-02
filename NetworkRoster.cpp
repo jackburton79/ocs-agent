@@ -48,7 +48,9 @@ NetworkRoster::GetNextInterface(unsigned int* cookie, NetworkInterface& interfac
 		return -1;
 
 	int index = *cookie;
-	
+	if ((size_t)index >= fInterfaces.size())
+		return -1;
+		
 	interface = NetworkInterface(fInterfaces[index].c_str());
 	
 	*cookie = index + 1;
