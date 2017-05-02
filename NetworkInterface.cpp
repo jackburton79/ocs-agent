@@ -40,7 +40,7 @@ ParseRoutes(struct nlmsghdr* nlHdr, route_info* rtInfo,
 	// get the rtattr field
 	rtattr* rtAttr = (rtattr*)RTM_RTA(rtMsg);
 	int rtLen = RTM_PAYLOAD(nlHdr);
-	for(; RTA_OK(rtAttr, rtLen); rtAttr = RTA_NEXT(rtAttr, rtLen)) {
+	for (; RTA_OK(rtAttr, rtLen); rtAttr = RTA_NEXT(rtAttr, rtLen)) {
 		switch(rtAttr->rta_type) {
 			case RTA_OIF:
 				if_indextoname(*(int*)RTA_DATA(rtAttr), rtInfo->ifName);
@@ -262,7 +262,7 @@ NetworkInterface::_GetRoutes(std::list<route_info>& routeList) const
 	}
 	
 	// Parse and add to list	
-	for(; NLMSG_OK(nlMsg, len); nlMsg = NLMSG_NEXT(nlMsg, len)) {
+	for (; NLMSG_OK(nlMsg, len); nlMsg = NLMSG_NEXT(nlMsg, len)) {
 		route_info rtInfo;
 		memset(&rtInfo, 0, sizeof(rtInfo));
 		if (ParseRoutes(nlMsg, &rtInfo, Name().c_str()))
