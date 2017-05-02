@@ -42,8 +42,8 @@ Storages::_ReadStoragesInfo()
 		ProcReader procReader("/proc/scsi/scsi");
 
 		std::istream stream(&procReader);
-        	std::string line;
-        
+		std::string line;
+
 		for (;;) {
 			std::string dummy;
 			if (!std::getline(stream, dummy))
@@ -59,17 +59,17 @@ Storages::_ReadStoragesInfo()
 				break;	
 
 			storage_info info;
-                        info.manufacturer = vendorLine.substr(10, 9);
+			info.manufacturer = vendorLine.substr(10, 9);
 			trim(info.manufacturer);
 			info.model = vendorLine.substr(26, 17); 
-                      	trim(info.model);
+			trim(info.model);
 			// TODO: Name = Model ?
 			info.name = info.model;
 			info.type = typeLine.substr(10, 26);
 			trim(info.type); 
 			fStorages.push_back(info);
-                }
-        } catch (...) {
-        }
+		}
+	} catch (...) {
+	}
 }
 
