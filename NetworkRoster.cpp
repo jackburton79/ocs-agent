@@ -24,6 +24,7 @@
 
 NetworkRoster::NetworkRoster()
 {
+	_RefreshInterfaces();
 }
 
 
@@ -35,6 +36,32 @@ NetworkRoster::~NetworkRoster()
 int
 NetworkRoster::CountInterfaces(int family)
 {
+	_RefreshInterfaces();
+	return fInterfaces.size();
+}
+
+
+int
+NetworkRoster::GetNextInterface(unsigned int* cookie, NetworkInterface& interface)
+{
+	if (cookie == NULL)
+		return -1;
+
+	int index = *cookie;
+	
+	interface = NetworkInterface(fInterfaces[index].c_str());
+	
+	*cookie = index + 1;
+
+	return 0;
+}
+
+
+int
+NetworkRoster::_RefreshInterfaces()
+{
+	fInterfaces.clear();
+	
 	ifaddrs* addrs = NULL;
 	if (getifaddrs(&addrs) != 0)
 		return errno;
@@ -47,36 +74,9 @@ NetworkRoster::CountInterfaces(int family)
 	}
 	freeifaddrs(addrs);
 
-	return interfaces.size();
-}
+	std::set<std::string>::const_iterator i;
+	for (i = interfaces.begin(); i != interfaces.end(); i++)
+		fInterfaces.push_back((*i));
 
-
-int
-NetworkRoster::GetNextInterface(unsigned int* cookie, NetworkInterface& interface)
-{
-	if (cookie == NULL)
-		return -1;
-
-	int index = *cookie;
-	index++;
-
-	ifreq ifr;
-	ifr.ifr_ifindex = index;
-
-	int fd = ::socket(AF_INET, SOCK_DGRAM, 0);
-	if (fd == -1)
-		return errno;
-
-	if (::ioctl(fd, SIOCGIFNAME, &ifr) == -1) {
-		::close(fd);
-		return errno;
-	}
-
-	::close(fd);
-
-	interface = NetworkInterface(ifr.ifr_name);
-
-	*cookie = index;
-
-	return 0;
+	return 0;	
 }

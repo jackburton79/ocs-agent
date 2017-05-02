@@ -11,6 +11,7 @@
 #include <netinet/in.h>
 #include <net/route.h>
 #include <string>
+#include <vector>
 
 class NetworkInterface;
 class NetworkRoster {
@@ -20,6 +21,11 @@ public:
 
 	int CountInterfaces(int family = AF_INET);
 	int GetNextInterface(unsigned int* cookie, NetworkInterface& interface);
+
+private:
+	std::vector<std::string> fInterfaces;
+	
+	int _RefreshInterfaces();
 };
 
 #endif /* NETWORKROSTER_H_ */
