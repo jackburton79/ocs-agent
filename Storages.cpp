@@ -70,7 +70,6 @@ Storages::_ReadStoragesInfo()
 			fStorages.push_back(info);
                 }
         } catch (...) {
-        	std::cout << "No storage info" << std::endl;
         }
 }
 
