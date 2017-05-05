@@ -613,6 +613,14 @@ Machine::_GetOSInfo()
 	fKernelInfo.domain_name = uName.domainname;
 	fKernelInfo.machine = uName.machine;
 
+	//Feed domain name from host name when possible.
+	if (fKernelInfo.domain_name=="" || fKernelInfo.domain_name=="(none)") {
+                size_t dotPos = fKernelInfo.hostname.find('.');
+                if (dotPos != std::string::npos) {
+                        fKernelInfo.domain_name = fKernelInfo.hostname.substr(dotPos+1);
+                }
+        }
+
 	ProcReader proc("/proc/meminfo");
 	std::istream stream(&proc);
 
