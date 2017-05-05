@@ -11,6 +11,7 @@
 #include "Machine.h"
 #include "RunningProcessesList.h"
 #include "Screens.h"
+#include "Softwares.h"
 #include "Storages.h"
 #include "Support.h"
 #include "VolumeReader.h"
@@ -775,6 +776,41 @@ Inventory::_AddProcessesInfo(tinyxml2::XMLElement* parent)
 void
 Inventory::_AddSoftwaresInfo(tinyxml2::XMLElement* parent)
 {
+        std::cerr << "\t";
+        std::cerr << "SOFTWARES...";
+
+        Softwares softwares;
+        for (int i = 0; i < softwares.Count(); i++) {
+                tinyxml2::XMLElement* software = fDocument->NewElement("SOFTWARES");
+                software_info info = softwares.SoftwareAt(i);
+
+                tinyxml2::XMLElement* comments = fDocument->NewElement("COMMENTS");
+                comments->LinkEndChild(fDocument->NewText(info.comments.c_str()));
+
+                tinyxml2::XMLElement* name = fDocument->NewElement("NAME");
+                name->LinkEndChild(fDocument->NewText(info.name.c_str()));
+
+                tinyxml2::XMLElement* size = fDocument->NewElement("FILESIZE");
+                size->LinkEndChild(fDocument->NewText(info.size.c_str()));
+
+                tinyxml2::XMLElement* from = fDocument->NewElement("FROM");
+                from->LinkEndChild(fDocument->NewText(info.from.c_str()));
+
+                tinyxml2::XMLElement* installdate = fDocument->NewElement("INSTALLDATE");
+                installdate->LinkEndChild(fDocument->NewText(info.installdate.c_str()));
+
+                tinyxml2::XMLElement* version = fDocument->NewElement("VERSION");
+                version->LinkEndChild(fDocument->NewText(info.version.c_str()));
+
+                software->LinkEndChild(comments);
+                software->LinkEndChild(name);
+                software->LinkEndChild(size);
+                software->LinkEndChild(from);
+                software->LinkEndChild(installdate);
+                software->LinkEndChild(version);
+
+                parent->LinkEndChild(software);
+        }
 
 }
 
