@@ -14,6 +14,7 @@ CPP_SRCS += \
 ../ProcReader.cpp \
 ../RunningProcessesList.cpp \
 ../Screens.cpp \
+../Softwares.cpp \
 ../Storages.cpp \
 ../Support.cpp \
 ../VolumeReader.cpp \
@@ -32,6 +33,7 @@ OBJS += \
 ./ProcReader.o \
 ./RunningProcessesList.o \
 ./Screens.o \
+./Softwares.o \
 ./Storages.o \
 ./Support.o \
 ./VolumeReader.o \
@@ -51,6 +53,7 @@ CPP_DEPS += \
 ./ProcReader.d \
 ./RunningProcessesList.d \
 ./Screens.d \
+./Sofwares.d \
 ./Storages.d \
 ./Support.d \
 ./VolumeReader.d \
