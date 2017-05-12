@@ -668,8 +668,13 @@ Machine::_OSDescription()
 		// try to identify the system in another way
 		if (::access("/etc/thinstation.global", F_OK) != -1)
 			osDescription = "Thinstation";
-		else
+		else {
+			try {
+                                osDescription = trimmed(ProcReader("/etc/redhat-release").ReadLine());
+                        } catch (...) {
 			osDescription = "Unknown";
+			}
+		}
 	}
 	
 	return osDescription;
