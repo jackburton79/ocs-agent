@@ -18,12 +18,14 @@
 extern const char* __progname;
 const char* version = "1.4";
 
+
 static
 struct option sLongOptions[] = {
 		{ "conf", required_argument, 0, 'c' },
 		{ "server", required_argument, 0, 's' },
-		{ "output", required_argument, 0, 'o' },
+		{ "local", required_argument, 0, 'l' },
 		{ "tag", required_argument, 0, 't' },
+		{ "nosoftware", no_argument, 0, 0 },
 		{ "daemonize", no_argument, 0, 'D' },
 		{ "help", no_argument, 0, 'h' },
 		{ 0, 0, 0, 0 }
@@ -38,11 +40,13 @@ PrintHelpAndExit()
 	std::cout << "-h [--help]         : Print usage" << std::endl;
 	std::cout << "-c [--conf]         : Specify configuration file" << std::endl;
 	std::cout << "-s [--server]       : Specify OCSInventory server url" << std::endl;
-	std::cout << "-o [--output]       : Specify output file name" << std::endl;
+	std::cout << "-l [--local]        : Don't send inventory to the server, save a local copy in the specified file or folder" << std::endl;
 	std::cout << "-t [--tag]          : Specify tag. Will be ignored by server if a value already exists" << std::endl;
+	std::cout << "--nosoftware        : Do not retrieve installed software" << std::endl;
 	std::cout << "-D [--daemonize]    : Detach from running terminal" << std::endl;
-	std::cout << "The -o and -s option are mutually exclusive. If no server or output file is specified, ";
-	std::cout << "either via the -s/-o option or via configuration file (option -c),";
+	std::cout << "The -l and -s option are mutually exclusive." << std::endl;
+	std::cout << "If no server or output file is specified, ";
+	std::cout << "either via the -s/-l option or via configuration file (option -c), ";
 	std::cout << "the program will exit without doing anything." << std::endl;
 	std::cout << "Examples:" << std::endl;
 	std::cout << "    " << __progname;
@@ -50,9 +54,9 @@ PrintHelpAndExit()
 	std::cout << "    " << __progname;
 	std::cout << " --server http://ocsinventory-ng/ocsinventory" << std::endl;
 	std::cout << "    " << __progname;
-	std::cout << " --output /path/to/output/inventoryFile.xml" << std::endl;
+	std::cout << " --local /path/to/output/inventoryFile.xml" << std::endl;
 	std::cout << "    " << __progname;
-	std::cout << " --output /path/to/output/" << std::endl;
+	std::cout << " --local /path/to/output/" << std::endl;
 	
 
 	::exit(0);
@@ -69,7 +73,9 @@ main(int argc, char **argv)
 	int optIndex = 0;
 	int c = 0;
 	bool daemonize = false;
-	while ((c = ::getopt_long(argc, argv, "c:s:Dt:o:h",
+	bool noSoftware = false;
+	
+	while ((c = ::getopt_long(argc, argv, "c:s:Dt:l:h",
 			sLongOptions, &optIndex)) != -1) {
 		switch (c) {
 			case 'c':
@@ -84,11 +90,15 @@ main(int argc, char **argv)
 			case 't':
 				tag = optarg;
 				break;
-			case 'o':
+			case 'l':
 				fullFileName = optarg;
 				break;
 			case 'h':
 				PrintHelpAndExit();
+				break;
+			case 0:
+				if (strcmp(sLongOptions[optIndex].name, "nosoftware") == 0)
+					noSoftware = true;
 				break;
 		}
 	}
@@ -128,9 +138,10 @@ main(int argc, char **argv)
 		
 	if (tag != NULL)
 		Configuration::Get()->SetKeyValue("TAG", tag);
-		
+
 	try {
 		Agent agent;
+		agent.SetNoSoftwareInventory(noSoftware);
 		agent.Run();
 	} catch (std::string& errorString) {
 		std::cerr << errorString << std::endl;

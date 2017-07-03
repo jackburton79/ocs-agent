@@ -13,6 +13,8 @@
 #include <unistd.h>
 
 Agent::Agent()
+	:
+	fNoSoftwareInventory(false)
 {
 	if (geteuid() != 0) {
 		throw std::string("This program needs to be run as root");
@@ -34,7 +36,7 @@ Agent::Run()
 	if (!inventory.Initialize(config->DeviceID().c_str()))
 		throw "Cannot initialize Inventory";
 
-	if (inventory.Build(config->DeviceID().c_str())) {
+	if (inventory.Build(config->DeviceID().c_str(), NoSoftwareInventory())) {
 		if (!config->LocalInventory()) {
 			if (inventory.Send(config->ServerURL().c_str()))
 				return;
@@ -53,3 +55,16 @@ Agent::Run()
 	}
 }
 
+
+bool
+Agent::NoSoftwareInventory() const
+{
+	return fNoSoftwareInventory;
+}
+
+
+void
+Agent::SetNoSoftwareInventory(bool value)
+{
+	fNoSoftwareInventory = value;
+}
