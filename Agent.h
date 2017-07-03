@@ -14,7 +14,7 @@ public:
 	~Agent();
 
 	void Run();
-	
+
 	bool NoSoftwareInventory() const;
 	void SetNoSoftwareInventory(bool value);
 
@@ -23,7 +23,7 @@ private:
 	void _RetrieveInventory();
 	void _PrintInventory();
 	void _SendInventory();
-	
+
 	bool fNoSoftwareInventory;
 };
 
