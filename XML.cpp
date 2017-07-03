@@ -58,6 +58,15 @@ ElementFinder::Response() const
 }
 
 
+std::string
+XML::ToString(const tinyxml2::XMLDocument& document)
+{
+	tinyxml2::XMLPrinter memoryPrinter;
+	document.Print(&memoryPrinter);
+	std::string str = memoryPrinter.CStr();
+	return str;
+}
+
 
 bool
 XML::Compress(const tinyxml2::XMLDocument& document, char*& destination, size_t& destLength)

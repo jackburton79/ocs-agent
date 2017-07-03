@@ -16,6 +16,7 @@ namespace tinyxml2 {
 
 class XML {
 public:
+	static std::string ToString(const tinyxml2::XMLDocument& document);
 	static bool Compress(const tinyxml2::XMLDocument& document, char*& destination, size_t& destLength);
 	static bool Uncompress(const char* source, size_t sourceLen, tinyxml2::XMLDocument& document);
 	static std::string GetTextElementValue(const tinyxml2::XMLDocument& document, std::string elementName);
