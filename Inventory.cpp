@@ -269,16 +269,18 @@ Inventory::_AddAccountInfo(tinyxml2::XMLElement* parent)
 	tinyxml2::XMLElement* accountInfo = fDocument->NewElement("ACCOUNTINFO");
 
 	// TODO: ??? We can't store anything
-	for (int a = 0; a < 1; a++) {
-		tinyxml2::XMLElement* keyName = fDocument->NewElement("KEYNAME");
-		keyName->LinkEndChild(fDocument->NewElement("TAG"));
+	tinyxml2::XMLElement* keyName = fDocument->NewElement("KEYNAME");
+	keyName->LinkEndChild(fDocument->NewText("TAG"));
 
-		tinyxml2::XMLElement* keyValue = fDocument->NewElement("KEYVALUE");
-		keyValue->LinkEndChild(fDocument->NewElement("NA"));
+	std::string tag = Configuration::Get()->KeyValue("TAG");
+	if (tag == "")
+		tag = "NA";
+		
+	tinyxml2::XMLElement* keyValue = fDocument->NewElement("KEYVALUE");
+	keyValue->LinkEndChild(fDocument->NewText(tag.c_str()));
 
-		accountInfo->LinkEndChild(keyName);
-		accountInfo->LinkEndChild(keyValue);
-	}
+	accountInfo->LinkEndChild(keyName);
+	accountInfo->LinkEndChild(keyValue);
 
 	parent->LinkEndChild(accountInfo);
 	std::cerr << "OK!" << std::endl;

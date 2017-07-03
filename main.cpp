@@ -23,6 +23,7 @@ struct option sLongOptions[] = {
 		{ "conf", required_argument, 0, 'c' },
 		{ "server", required_argument, 0, 's' },
 		{ "output", required_argument, 0, 'o' },
+		{ "tag", required_argument, 0, 't' },
 		{ "daemonize", no_argument, 0, 'D' },
 		{ "help", no_argument, 0, 'h' },
 		{ 0, 0, 0, 0 }
@@ -38,6 +39,7 @@ PrintHelpAndExit()
 	std::cout << "-c [--conf]         : Specify configuration file" << std::endl;
 	std::cout << "-s [--server]       : Specify OCSInventory server url" << std::endl;
 	std::cout << "-o [--output]       : Specify output file name" << std::endl;
+	std::cout << "-t [--tag]          : Specify tag. Will be ignored by server if a value already exists" << std::endl;
 	std::cout << "-D [--daemonize]    : Detach from running terminal" << std::endl;
 	std::cout << "The -o and -s option are mutually exclusive. If no server or output file is specified, ";
 	std::cout << "either via the -s/-o option or via configuration file (option -c),";
@@ -63,10 +65,11 @@ main(int argc, char **argv)
 	char* configFile = NULL;
 	char* serverUrl = NULL;
 	char* fullFileName = NULL;
+	char* tag = NULL;
 	int optIndex = 0;
 	int c = 0;
 	bool daemonize = false;
-	while ((c = ::getopt_long(argc, argv, "c:s:Do:h",
+	while ((c = ::getopt_long(argc, argv, "c:s:Dt:o:h",
 			sLongOptions, &optIndex)) != -1) {
 		switch (c) {
 			case 'c':
@@ -77,6 +80,9 @@ main(int argc, char **argv)
 				break;
 			case 'D':
 				daemonize = true;
+				break;
+			case 't':
+				tag = optarg;
 				break;
 			case 'o':
 				fullFileName = optarg;
@@ -115,10 +121,14 @@ main(int argc, char **argv)
 
 	if (configFile != NULL)
 		Configuration::Get()->Load(configFile);
-	else if (serverUrl)
+	else if (serverUrl != NULL)
 		Configuration::Get()->SetServer(serverUrl);
-	else if (fullFileName)
+	else if (fullFileName != NULL)
 		Configuration::Get()->SetOutputFileName(fullFileName);
+		
+	if (tag != NULL)
+		Configuration::Get()->SetKeyValue("TAG", tag);
+		
 	try {
 		Agent agent;
 		agent.Run();
