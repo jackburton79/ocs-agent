@@ -512,7 +512,10 @@ Machine::_GetLSHWData()
 					sysCtx.append("Product Name");
 				} else if (key == "date") {
 					sysCtx.append("Release Date");
-				} else
+				} else if (key == "serial") {
+					sysCtx.append("Serial Number");
+				}
+				else
 					continue;
 			}
 			
