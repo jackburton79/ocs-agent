@@ -12,19 +12,26 @@ when the terminal is powered off, since it's a in-RAM filesystem).
 So I decided to write a small agent in C++ to be able to inventory also those machines which I was not able to do with the official agent.
 The agent is not complete yet, but it can already produce an incomplete inventory of the machine and send it to the 
 OCSInventory server, or save it locally.
-The program weights around 300kb on disk for now, and it only has zlib as dependency, which is already present on any
+The program weights around 300kb on disk for now, and only has zlib as dependency, which is already present on any
 Thinstation installation.
 It also uses [tinyxml2](http://www.grinninglizard.com/tinyxml2), a very small and efficient XML parsing/writing library, linked statically into the executable.
 
-    Usage:
-    -h [--help]         : Print usage
-    -c [--conf]         : Specify configuration file
-    -s [--server]       : Specify OCSInventory server url
-    -o [--output]       : Specify output file name
-    -D [--daemonize]    : Detach from running terminal
-    The -o and -s option are mutually exclusive. If no server or output file is specified, either via the -s/-o option or via configuration file (option -c),the program will exit without doing anything.
-    Examples:
-      ocsinventory-agent --conf /etc/ocsinventory-ng.conf
-      ocsinventory-agent --server http://ocsinventory-ng/ocsinventory
-      ocsinventory-agent --output /path/to/output/inventoryFile.xml
-      ocsinventory-agent --output /path/to/output/
+  ocsinventory-agent 1.5
+  Usage:
+  -h [--help]         : Print usage
+  -c [--conf]         : Specify configuration file
+  -s [--server]       : Specify OCSInventory server url
+  -l [--local]        : Don't send inventory, instead save a local copy in the specified file or folder
+  --stdout            : Don't send inventory, print it to stdout
+  -t [--tag]          : Specify tag. Will be ignored by server if a value already exists
+  --nosoftware        : Do not retrieve installed software
+  -D [--daemonize]    : Detach from running terminal
+  -v [--verbose]      : Verbose mode
+ The -l and -s option are mutually exclusive.
+ If no server or output file is specified, either via the -s/-l option or via configuration file (option -c), the program will exit  without doing anything.
+ Examples:
+    ocsinventory-agent --conf /etc/ocsinventory-ng.conf
+    ocsinventory-agent --server http://ocsinventory-ng/ocsinventory
+    ocsinventory-agent --local /path/to/output/inventoryFile.xml
+    ocsinventory-agent --local /path/to/output/
+    ocsinventory-agent --stdout
