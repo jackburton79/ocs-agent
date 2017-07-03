@@ -22,8 +22,7 @@ public:
 	bool Initialize(const char* deviceID);
 	void Clear();
 
-
-	bool Build(const char* deviceID);
+	bool Build(const char* deviceID, bool noSoftware = false);
 	bool Save(const char* name, const char* filePath);
 	bool Send(const char* serverUrl);
 
