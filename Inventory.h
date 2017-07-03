@@ -25,6 +25,7 @@ public:
 	bool Build(const char* deviceID, bool noSoftware = false);
 	bool Save(const char* name, const char* filePath);
 	bool Send(const char* serverUrl);
+	void Print();
 
 	int Checksum() const;
 

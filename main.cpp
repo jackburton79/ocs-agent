@@ -24,10 +24,12 @@ struct option sLongOptions[] = {
 		{ "conf", required_argument, 0, 'c' },
 		{ "server", required_argument, 0, 's' },
 		{ "local", required_argument, 0, 'l' },
+		{ "stdout", no_argument, 0, 0 },
 		{ "tag", required_argument, 0, 't' },
 		{ "nosoftware", no_argument, 0, 0 },
 		{ "daemonize", no_argument, 0, 'D' },
 		{ "help", no_argument, 0, 'h' },
+		{ "verbose", no_argument, 0, 'v' },
 		{ 0, 0, 0, 0 }
 };
 
@@ -40,10 +42,12 @@ PrintHelpAndExit()
 	std::cout << "-h [--help]         : Print usage" << std::endl;
 	std::cout << "-c [--conf]         : Specify configuration file" << std::endl;
 	std::cout << "-s [--server]       : Specify OCSInventory server url" << std::endl;
-	std::cout << "-l [--local]        : Don't send inventory to the server, save a local copy in the specified file or folder" << std::endl;
+	std::cout << "-l [--local]        : Don't send inventory, instead save a local copy in the specified file or folder" << std::endl;
+	std::cout << "--stdout            : Don't send inventory, print it to stdout" << std::endl;
 	std::cout << "-t [--tag]          : Specify tag. Will be ignored by server if a value already exists" << std::endl;
 	std::cout << "--nosoftware        : Do not retrieve installed software" << std::endl;
 	std::cout << "-D [--daemonize]    : Detach from running terminal" << std::endl;
+	std::cout << "-v [--verbose]      : Verbose mode" << std::endl;
 	std::cout << "The -l and -s option are mutually exclusive." << std::endl;
 	std::cout << "If no server or output file is specified, ";
 	std::cout << "either via the -s/-l option or via configuration file (option -c), ";
@@ -57,7 +61,8 @@ PrintHelpAndExit()
 	std::cout << " --local /path/to/output/inventoryFile.xml" << std::endl;
 	std::cout << "    " << __progname;
 	std::cout << " --local /path/to/output/" << std::endl;
-	
+	std::cout << "    " << __progname;
+	std::cout << " --stdout" << std::endl;
 
 	::exit(0);
 }
@@ -73,9 +78,8 @@ main(int argc, char **argv)
 	int optIndex = 0;
 	int c = 0;
 	bool daemonize = false;
-	bool noSoftware = false;
 	
-	while ((c = ::getopt_long(argc, argv, "c:s:Dt:l:h",
+	while ((c = ::getopt_long(argc, argv, "c:s:Dt:l:hv",
 			sLongOptions, &optIndex)) != -1) {
 		switch (c) {
 			case 'c':
@@ -96,9 +100,14 @@ main(int argc, char **argv)
 			case 'h':
 				PrintHelpAndExit();
 				break;
+			case 'v':
+				Configuration::Get()->SetVolatileKeyValue("verbose", "true");
+				break;
 			case 0:
 				if (strcmp(sLongOptions[optIndex].name, "nosoftware") == 0)
-					noSoftware = true;
+					Configuration::Get()->SetVolatileKeyValue("nosoftware", "true");
+				else if (strcmp(sLongOptions[optIndex].name, "stdout") == 0)
+					Configuration::Get()->SetVolatileKeyValue("stdout", "true");
 				break;
 		}
 	}
@@ -135,13 +144,12 @@ main(int argc, char **argv)
 		Configuration::Get()->SetServer(serverUrl);
 	else if (fullFileName != NULL)
 		Configuration::Get()->SetOutputFileName(fullFileName);
-		
+
 	if (tag != NULL)
-		Configuration::Get()->SetKeyValue("TAG", tag);
+		Configuration::Get()->SetVolatileKeyValue("TAG", tag);
 
 	try {
 		Agent agent;
-		agent.SetNoSoftwareInventory(noSoftware);
 		agent.Run();
 	} catch (std::string& errorString) {
 		std::cerr << errorString << std::endl;

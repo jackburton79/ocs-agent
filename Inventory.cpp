@@ -252,6 +252,13 @@ Inventory::Send(const char* serverUrl)
 }
 
 
+void
+Inventory::Print()
+{
+	std::cout << XML::ToString(*fDocument) << std::endl;
+}
+
+
 int
 Inventory::Checksum() const
 {
