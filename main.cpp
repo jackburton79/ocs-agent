@@ -16,7 +16,7 @@
 #include <sys/stat.h>
 
 extern const char* __progname;
-const char* version = "1.4";
+const char* version = "1.5";
 
 
 static
