@@ -128,8 +128,22 @@ Configuration::KeyValue(const char* key) const
 	if (i != fValues.end())
 		return i->second;
 
+	// Try volatile values
+	i = fVolatileValues.find(key);
+	if (i != fVolatileValues.end())
+		return i->second;
+
 	return "";
 }
+
+
+bool
+Configuration::SetVolatileKeyValue(const char* key, const char* value)
+{
+	fVolatileValues[key] = value;
+	return true;
+}
+
 
 
 std::string

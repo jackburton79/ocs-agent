@@ -26,6 +26,7 @@ public:
 	bool SetOutputFileName(const char* fileName);
 
 	bool SetKeyValue(const char* key, const char* value);
+	bool SetVolatileKeyValue(const char* key, const char* value);
 	std::string KeyValue(const char* key) const;
 	
 	std::string DeviceID() const;	
@@ -38,6 +39,7 @@ private:
 	void _GenerateDeviceID();
 
 	std::map<std::string, std::string> fValues;
+	std::map<std::string, std::string> fVolatileValues;
 	std::string fConfigFileName;
 
 };
