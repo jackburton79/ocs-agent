@@ -112,6 +112,26 @@ Configuration::SetOutputFileName(const char* fileName)
 }
 
 
+bool
+Configuration::SetKeyValue(const char* key, const char* value)
+{
+	fValues[key] = value;
+	return true;
+}
+
+
+std::string
+Configuration::KeyValue(const char* key) const
+{
+	std::map<std::string, std::string>::const_iterator i;
+	i = fValues.find(key);
+	if (i != fValues.end())
+		return i->second;
+
+	return "";
+}
+
+
 std::string
 Configuration::DeviceID() const
 {
