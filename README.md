@@ -16,20 +16,19 @@ The program weights around 300kb on disk for now, and only has zlib as dependenc
 Thinstation installation.
 It also uses [tinyxml2](http://www.grinninglizard.com/tinyxml2), a very small and efficient XML parsing/writing library, linked statically into the executable.
 
-  ocsinventory-agent 1.5
-  Usage:
-   -h [--help]         : Print usage
-   -c [--conf]         : Specify configuration file
-   -s [--server]       : Specify OCSInventory server url
-   -l [--local]        : Don't send inventory, instead save a local copy in the specified file or folder
-   --stdout            : Don't send inventory, print it to stdout
-   -t [--tag]          : Specify tag. Will be ignored by server if a value already exists
-   --nosoftware        : Do not retrieve installed software
-   -D [--daemonize]    : Detach from running terminal
-   -v [--verbose]      : Verbose mode
-  The -l and -s option are mutually exclusive.
-  If no server or output file is specified, either via the -s/-l option or via configuration file (option -c), the program will exit   without doing anything.
-  Examples:
+    Usage:
+    -h [--help]         : Print usage
+    -c [--conf]         : Specify configuration file
+    -s [--server]       : Specify OCSInventory server url
+    -l [--local]        : Don't send inventory, instead save a local copy in the specified file or folder
+    --stdout            : Don't send inventory, print it to stdout
+    -t [--tag]          : Specify tag. Will be ignored by server if a value already exists
+    --nosoftware        : Do not retrieve installed software
+    -D [--daemonize]    : Detach from running terminal
+    -v [--verbose]      : Verbose mode
+    The -l and -s option are mutually exclusive.
+    If no server or output file is specified, either via the -s/-l option or via configuration file (option -c), the program will exit   without doing anything.
+    Examples:
     ocsinventory-agent --conf /etc/ocsinventory-ng.conf
     ocsinventory-agent --server http://ocsinventory-ng/ocsinventory
     ocsinventory-agent --local /path/to/output/inventoryFile.xml
