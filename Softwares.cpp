@@ -12,11 +12,11 @@
 #include <istream>
 
 
-
 Softwares::Softwares()
 {
 	_ReadSoftwaresInfo();	
 }
+
 
 Softwares::~Softwares()
 {
@@ -41,8 +41,9 @@ void
 Softwares::_ReadSoftwaresInfo()
 {
 	try {
-		/*if (!CommandExists("rpm"))
-			return;*/
+		if (!CommandExists("rpm"))
+			return;
+
 		popen_streambuf rpms("rpm -qai", "r");
 		std::istream iStreamRpms(&rpms);
 		std::string string;
@@ -110,6 +111,6 @@ Softwares::_ReadSoftwaresInfo()
 		}
          
 	} catch (...) {
-		std::cout << "No software info" << std::endl;
+		std::cerr << "No software info" << std::endl;
 	}
 }
