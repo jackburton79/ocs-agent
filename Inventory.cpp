@@ -122,7 +122,7 @@ Inventory::Save(const char* name, const char* fileName)
 	
 	std::cerr << fileName << "... ";
 	
-	bool result = fDocument->SaveFile(fileName) == tinyxml2::XML_NO_ERROR;
+	bool result = fDocument->SaveFile(fileName) == tinyxml2::XML_SUCCESS;
 	if (result)
 		std::cerr << "OK!";
 	else
