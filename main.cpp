@@ -27,7 +27,7 @@ struct option sLongOptions[] = {
 		{ "stdout", no_argument, 0, 0 },
 		{ "tag", required_argument, 0, 't' },
 		{ "nosoftware", no_argument, 0, 0 },
-		{ "daemonize", no_argument, 0, 'D' },
+		{ "daemonize", no_argument, 0, 'd' },
 		{ "wait", required_argument, 0, 'w' },
 		{ "help", no_argument, 0, 'h' },
 		{ "verbose", no_argument, 0, 'v' },
@@ -47,7 +47,8 @@ PrintHelpAndExit()
 	std::cout << "      --stdout                       Don't send inventory, print it to stdout" << std::endl;
 	std::cout << "  -t, --tag <TAG>                    Specify tag. Will be ignored by server if a value already exists" << std::endl;
 	std::cout << "      --nosoftware                   Do not retrieve installed software" << std::endl;
-	std::cout << "  -D, --daemonize                    Detach from running terminal" << std::endl;
+	std::cout << "  -D                                 DEPRECATED, use -d instead " << std::endl;
+	std::cout << "  -d, --daemonize                    Detach from running terminal" << std::endl;
 	std::cout << "  -w, --wait <s>                     Wait for the specified amount of seconds before contacting the server" << std::endl;
 	std::cout << "  -v, --verbose                      Verbose mode" << std::endl;
 	std::cout << "The -l and -s option are mutually exclusive." << std::endl;
@@ -81,7 +82,7 @@ main(int argc, char **argv)
 	int c = 0;
 	bool daemonize = false;
 	
-	while ((c = ::getopt_long(argc, argv, "c:s:Dt:l:hvw:",
+	while ((c = ::getopt_long(argc, argv, "c:s:dDt:l:hvw:",
 			sLongOptions, &optIndex)) != -1) {
 		switch (c) {
 			case 'c':
@@ -91,7 +92,11 @@ main(int argc, char **argv)
 				serverUrl = optarg;
 				break;
 			case 'D':
+			case 'd':
 				daemonize = true;
+				// TODO: Added this mostly for debugging. Daemonize mode
+				// doesn't seem to work most of the time.
+				Configuration::Get()->SetVolatileKeyValue("waittime", "5");
 				break;
 			case 't':
 				tag = optarg;
@@ -111,7 +116,7 @@ main(int argc, char **argv)
 			case 0:
 				if (strcmp(sLongOptions[optIndex].name, "nosoftware") == 0)
 					Configuration::Get()->SetVolatileKeyValue("nosoftware", "true");
-				else if (strcmp(sLongOptions[optIndex].name, "stdout") == 0)
+				else if (strcmp(sLongOptions[optIndex].name, "stdout") == 0 && !daemonize)
 					Configuration::Get()->SetVolatileKeyValue("stdout", "true");
 				break;
 		}
