@@ -9,6 +9,7 @@
 #include "Configuration.h"
 #include "Inventory.h"
 
+#include <cstdlib>
 #include <iostream>
 #include <unistd.h>
 
@@ -39,6 +40,10 @@ Agent::Run()
 		if (config->KeyValue("stdout") == "true")
 			inventory.Print();
 		else if (!config->LocalInventory()) {
+			unsigned int secondsToWait = ::strtoul(
+				config->KeyValue("waittime").c_str(), NULL, 10);
+			std::cerr << "Waiting " << secondsToWait << " seconds..." << std::endl;
+			::sleep(secondsToWait);
 			if (inventory.Send(config->ServerURL().c_str()))
 				return;
 

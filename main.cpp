@@ -28,6 +28,7 @@ struct option sLongOptions[] = {
 		{ "tag", required_argument, 0, 't' },
 		{ "nosoftware", no_argument, 0, 0 },
 		{ "daemonize", no_argument, 0, 'D' },
+		{ "wait", required_argument, 0, 'w' },
 		{ "help", no_argument, 0, 'h' },
 		{ "verbose", no_argument, 0, 'v' },
 		{ 0, 0, 0, 0 }
@@ -39,15 +40,16 @@ PrintHelpAndExit()
 {
 	std::cout << __progname << " " << version << std::endl;
 	std::cout << "Usage:" << std::endl;
-	std::cout << "-h [--help]         : Print usage" << std::endl;
-	std::cout << "-c [--conf]         : Specify configuration file" << std::endl;
-	std::cout << "-s [--server]       : Specify OCSInventory server url" << std::endl;
-	std::cout << "-l [--local]        : Don't send inventory, instead save a local copy in the specified file or folder" << std::endl;
-	std::cout << "--stdout            : Don't send inventory, print it to stdout" << std::endl;
-	std::cout << "-t [--tag]          : Specify tag. Will be ignored by server if a value already exists" << std::endl;
-	std::cout << "--nosoftware        : Do not retrieve installed software" << std::endl;
-	std::cout << "-D [--daemonize]    : Detach from running terminal" << std::endl;
-	std::cout << "-v [--verbose]      : Verbose mode" << std::endl;
+	std::cout << "  -h, --help                         Print usage" << std::endl;
+	std::cout << "  -c, --conf <config_file>           Specify configuration file" << std::endl;
+	std::cout << "  -s, --server <server>              Specify OCSInventory server url" << std::endl;
+	std::cout << "  -l, --local <folder>               Don't send inventory, instead save a local copy in the specified file or folder" << std::endl;
+	std::cout << "      --stdout                       Don't send inventory, print it to stdout" << std::endl;
+	std::cout << "  -t, --tag <TAG>                    Specify tag. Will be ignored by server if a value already exists" << std::endl;
+	std::cout << "      --nosoftware                   Do not retrieve installed software" << std::endl;
+	std::cout << "  -D, --daemonize                    Detach from running terminal" << std::endl;
+	std::cout << "  -w, --wait <s>                     Wait for the specified amount of seconds before contacting the server" << std::endl;
+	std::cout << "  -v, --verbose                      Verbose mode" << std::endl;
 	std::cout << "The -l and -s option are mutually exclusive." << std::endl;
 	std::cout << "If no server or output file is specified, ";
 	std::cout << "either via the -s/-l option or via configuration file (option -c), ";
@@ -79,7 +81,7 @@ main(int argc, char **argv)
 	int c = 0;
 	bool daemonize = false;
 	
-	while ((c = ::getopt_long(argc, argv, "c:s:Dt:l:hv",
+	while ((c = ::getopt_long(argc, argv, "c:s:Dt:l:hvw:",
 			sLongOptions, &optIndex)) != -1) {
 		switch (c) {
 			case 'c':
@@ -102,6 +104,9 @@ main(int argc, char **argv)
 				break;
 			case 'v':
 				Configuration::Get()->SetVolatileKeyValue("verbose", "true");
+				break;
+			case 'w':
+				Configuration::Get()->SetVolatileKeyValue("waittime", optarg);
 				break;
 			case 0:
 				if (strcmp(sLongOptions[optIndex].name, "nosoftware") == 0)
