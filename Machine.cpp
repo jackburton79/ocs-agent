@@ -669,13 +669,18 @@ Machine::_OSDescription()
 	} else {
 		// there is no lsb_release command.
 		// try to identify the system in another way
-		if (::access("/etc/thinstation.global", F_OK) != -1)
+		if (::access("/etc/thinstation.global", F_OK) != -1) {
 			osDescription = "Thinstation";
-		else {
+			char* tsVersion = ::getenv("TS_VERSION");
+			if (tsVersion != NULL) {
+				osDescription += " ";
+				osDescription += tsVersion;
+			}
+		} else {
 			try {
-                                osDescription = trimmed(ProcReader("/etc/redhat-release").ReadLine());
-                        } catch (...) {
-			osDescription = "Unknown";
+				osDescription = trimmed(ProcReader("/etc/redhat-release").ReadLine());
+			} catch (...) {
+				osDescription = "Unknown";
 			}
 		}
 	}
