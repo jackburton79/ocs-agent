@@ -1,4 +1,4 @@
-TinyXML-2
+TinyXML-2 [![TravisCI Status](https://travis-ci.org/leethomason/tinyxml2.svg?branch=master)](https://travis-ci.org/leethomason/tinyxml2) [![AppVeyor Status](https://ci.appveyor.com/api/projects/status/github/leethomason/tinyxml2?branch=master&svg=true)](https://ci.appveyor.com/project/leethomason/tinyxml2)
 =========
 ![TinyXML-2 Logo](http://www.grinninglizard.com/tinyxml2/TinyXML2_small.png)
 
@@ -88,9 +88,8 @@ Advantages of TinyXML-2
 
 Advantages of TinyXML-1
 
-1.  Can report the location of parsing errors.
-2.  Support for some C++ STL conventions: streams and strings
-3.  Very mature and well debugged code base.
+1.  Support for some C++ STL conventions: streams and strings
+2.  Very mature and well debugged code base.
 
 Features
 --------
@@ -111,7 +110,7 @@ by the Document. When the Document is deleted, so are all the nodes it contains.
 
 Microsoft has an excellent article on white space: http://msdn.microsoft.com/en-us/library/ms256097.aspx
 
-By default, TinyXML-2 preserves white space in a (hopefully) sane way that is almost complient with the
+By default, TinyXML-2 preserves white space in a (hopefully) sane way that is almost compliant with the
 spec. (TinyXML-1 used a completely different model, much more similar to 'collapse', below.)
 
 As a first step, all newlines / carriage-returns / line-feeds are normalized to a
@@ -157,6 +156,15 @@ However, you may also use COLLAPSE_WHITESPACE, which will:
 Note that (currently) there is a performance impact for using COLLAPSE_WHITESPACE.
 It essentially causes the XML to be parsed twice.
 
+#### Error Reporting
+
+TinyXML-2 reports the line number of any errors in an XML document that
+cannot be parsed correctly. In addition, all nodes (elements, declarations,
+text, comments etc.) and attributes have a line number recorded as they are parsed.
+This allows an application that performs additional validation of the parsed
+XML document (e.g. application-implemented DTD validation) to report
+line number information in it's errors.
+
 ### Entities
 
 TinyXML-2 recognizes the pre-defined "character entities", meaning special
@@ -177,7 +185,7 @@ will have the Value() of "Far & Away" when queried from the XMLText object,
 and will be written back to the XML stream/file as an ampersand. 
 
 Additionally, any character can be specified by its Unicode code point:
-The syntax "&#xA0;" or "&#160;" are both to the non-breaking space characher. 
+The syntax `&#xA0;` or `&#160;` are both to the non-breaking space character. 
 This is called a 'numeric character reference'. Any numeric character reference
 that isn't one of the special entities above, will be read, but written as a
 regular code point. The output is correct, but the entity syntax isn't preserved.
@@ -264,8 +272,8 @@ There are 2 files in TinyXML-2:
 And additionally a test file:
 * xmltest.cpp
 
-Simply compile and run. There is a visual studio 2010 project included, a simple Makefile, 
-an XCode project, a Code::Blocks project, and a cmake CMakeLists.txt included to help you. 
+Simply compile and run. There is a visual studio 2015 project included, a simple Makefile, 
+an Xcode project, a Code::Blocks project, and a cmake CMakeLists.txt included to help you. 
 The top of tinyxml.h even has a simple g++ command line if you are are *nix and don't want 
 to use a build system.
 
