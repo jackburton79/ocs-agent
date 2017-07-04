@@ -17,15 +17,18 @@ Thinstation installation.
 It also uses [tinyxml2](http://www.grinninglizard.com/tinyxml2), a very small and efficient XML parsing/writing library, linked statically into the executable.
 
     Usage:
-    -h [--help]         : Print usage
-    -c [--conf]         : Specify configuration file
-    -s [--server]       : Specify OCSInventory server url
-    -l [--local]        : Don't send inventory, instead save a local copy in the specified file or folder
-    --stdout            : Don't send inventory, print it to stdout
-    -t [--tag]          : Specify tag. Will be ignored by server if a value already exists
-    --nosoftware        : Do not retrieve installed software
-    -D [--daemonize]    : Detach from running terminal
-    -v [--verbose]      : Verbose mode
+    -h, --help                         Print usage
+    -c, --conf <config_file>           Specify configuration file
+    -s, --server <server>              Specify OCSInventory server url
+    -l, --local <folder>               Don't send inventory, instead save a local copy in the specified file or folder
+        --stdout                       Don't send inventory, print it to stdout
+    -t, --tag <TAG>                    Specify tag. Will be ignored by server if a value already exists
+        --nosoftware                   Do not retrieve installed software
+    -D                                 DEPRECATED, use -d instead 
+    -d, --daemonize                    Detach from running terminal
+    -w, --wait <s>                     Wait for the specified amount of seconds before contacting the server
+    -v, --verbose                      Verbose mode
+    
     The -l and -s option are mutually exclusive.
     If no server or output file is specified, either via the -s/-l option or via configuration file (option -c), the program will exit   without doing anything.
     Examples:
