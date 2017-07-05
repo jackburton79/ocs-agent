@@ -1,4 +1,4 @@
-Unofficial Linux agent for OCS Inventory NG
+Unofficial OCS Inventory NG agent for Thinstation
 =====
 A couple of years ago, where I work, we started using [OCS Inventory NG](http://www.ocsinventory-ng.org), which
 is a really useful application in enterprises. It allows system administrators to inventory servers and workstations,
