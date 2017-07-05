@@ -13,6 +13,7 @@
 #include <getopt.h>
 #include <iostream>
 #include <unistd.h>
+#include <syslog.h>
 #include <sys/stat.h>
 
 extern const char* __progname;
@@ -51,10 +52,12 @@ PrintHelpAndExit()
 	std::cout << "  -d, --daemonize                    Detach from running terminal" << std::endl;
 	std::cout << "  -w, --wait <s>                     Wait for the specified amount of seconds before contacting the server" << std::endl;
 	std::cout << "  -v, --verbose                      Verbose mode" << std::endl;
+	std::cout << std::endl;
 	std::cout << "The -l and -s option are mutually exclusive." << std::endl;
 	std::cout << "If no server or output file is specified, ";
 	std::cout << "either via the -s/-l option or via configuration file (option -c), ";
 	std::cout << "the program will exit without doing anything." << std::endl;
+	std::cout << std::endl;
 	std::cout << "Examples:" << std::endl;
 	std::cout << "    " << __progname;
 	std::cout << " --conf /etc/ocsinventory-ng.conf" << std::endl;
@@ -122,10 +125,12 @@ main(int argc, char **argv)
 		}
 	}
 
+	::openlog(__progname, LOG_PID|LOG_CONS, LOG_USER);
+
 	if (daemonize) {
 		pid_t processID = fork();
 		if (processID < 0) {
-			std::cerr << "Failed to daemonize. Exiting..." << std::endl;
+			syslog(LOG_ERR, "Failed to daemonize. Exiting...");
 			// Return failure in exit status
 			exit(1);
 		}
@@ -162,21 +167,23 @@ main(int argc, char **argv)
 		Agent agent;
 		agent.Run();
 	} catch (std::string& errorString) {
-		std::cerr << errorString << std::endl;
+		syslog(LOG_ERR, errorString.c_str());
 		return 1;
 	} catch (const char* string) {
-		std::cerr << string << std::endl;
+		syslog(LOG_ERR, string);
 		return 1;
 	} catch (int error) {
-		std::cerr << strerror(error) << std::endl;
+		syslog(LOG_ERR, strerror(error));
 		return 1;
 	} catch (...) {
-		std::cerr << "Unhandled exception." << std::endl;
+		syslog(LOG_ERR, "Unhandled exception.");
 		return 1;
 	}
 
 	if (configFile != NULL)
 		Configuration::Get()->Save();
+
+	::closelog();
 
 	return 0;
 }
