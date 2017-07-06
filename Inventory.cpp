@@ -209,11 +209,11 @@ Inventory::Send(const char* serverUrl)
 		
 	std::string serverResponse = XML::GetTextElementValue(document, "RESPONSE");
 	if (serverResponse != "SEND") {
-		logger.LogFormat(LOG_ERR, "Server not ready to accept inventory: %s", serverResponse);
+		logger.LogFormat(LOG_ERR, "Server not ready to accept inventory: %s", serverResponse.c_str());
 		return false;
 	}
 	
-	logger.LogFormat(LOG_INFO, "Inventory::Send(): server replied %s", serverResponse);
+	logger.LogFormat(LOG_INFO, "Inventory::Send(): server replied %s", serverResponse.c_str());
 
 	std::cerr << "Inventory::Send(): Compressing XML inventory data... ";
 	char* compressedData = NULL;
