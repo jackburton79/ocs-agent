@@ -33,7 +33,7 @@ endif
 endif
 
 
-CXXFLAGS=-O2 -Wall -I ./
+CXXFLAGS=-Wno-format-security -O2 -Wall -I ./
 
 # Add inputs and outputs from these tool invocations to the build variables 
 
