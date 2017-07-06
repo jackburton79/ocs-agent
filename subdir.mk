@@ -7,6 +7,7 @@ CPP_SRCS += \
 ../Agent.cpp \
 ../Configuration.cpp \
 ../Inventory.cpp \
+../Logger.cpp \
 ../LoggedUsers.cpp \
 ../Machine.cpp \
 ../NetworkInterface.cpp \
@@ -26,6 +27,7 @@ OBJS += \
 ./Agent.o \
 ./Configuration.o \
 ./Inventory.o \
+./Logger.o \
 ./LoggedUsers.o \
 ./Machine.o \
 ./NetworkInterface.o \
@@ -46,6 +48,7 @@ CPP_DEPS += \
 ./Configuration.d \
 ./Drives.d \
 ./Inventory.d \
+./Logger.d \
 ./LoggedUsers.d \
 ./Machine.d \
 ./NetworkInterface.d \

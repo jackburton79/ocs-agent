@@ -7,13 +7,13 @@
 
 #include "Agent.h"
 #include "Configuration.h"
+#include "Logger.h"
 
 #include <cstdlib>
 #include <cstring>
 #include <getopt.h>
 #include <iostream>
 #include <unistd.h>
-#include <syslog.h>
 #include <sys/stat.h>
 
 extern const char* __progname;
@@ -83,6 +83,7 @@ main(int argc, char **argv)
 	char* tag = NULL;
 	int optIndex = 0;
 	int c = 0;
+	bool verbose = false;
 	bool daemonize = false;
 	
 	while ((c = ::getopt_long(argc, argv, "c:s:dDt:l:hvw:",
@@ -111,7 +112,7 @@ main(int argc, char **argv)
 				PrintHelpAndExit();
 				break;
 			case 'v':
-				Configuration::Get()->SetVolatileKeyValue("verbose", "true");
+				verbose = true;
 				break;
 			case 'w':
 				Configuration::Get()->SetVolatileKeyValue("waittime", optarg);
@@ -124,13 +125,14 @@ main(int argc, char **argv)
 				break;
 		}
 	}
-
-	::openlog(__progname, LOG_PID|LOG_CONS, LOG_USER);
+	Logger& logger = Logger::GetDefault();
+	if (verbose)
+		logger.SetConsoleLogging(true);
 
 	if (daemonize) {
 		pid_t processID = fork();
 		if (processID < 0) {
-			syslog(LOG_ERR, "Failed to daemonize. Exiting...");
+			logger.Log(LOG_ERR, "Failed to daemonize. Exiting...");
 			// Return failure in exit status
 			exit(1);
 		}
@@ -167,23 +169,21 @@ main(int argc, char **argv)
 		Agent agent;
 		agent.Run();
 	} catch (std::string& errorString) {
-		syslog(LOG_ERR, errorString.c_str());
+		logger.Log(LOG_ERR, errorString.c_str());
 		return 1;
 	} catch (const char* string) {
-		syslog(LOG_ERR, string);
+		logger.Log(LOG_ERR, string);
 		return 1;
 	} catch (int error) {
-		syslog(LOG_ERR, strerror(error));
+		logger.Log(LOG_ERR, strerror(error));
 		return 1;
 	} catch (...) {
-		syslog(LOG_ERR, "Unhandled exception.");
+		logger.Log(LOG_ERR, "Unhandled exception.");
 		return 1;
 	}
 
 	if (configFile != NULL)
 		Configuration::Get()->Save();
-
-	::closelog();
 
 	return 0;
 }

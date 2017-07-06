@@ -7,6 +7,7 @@
 
 #include "Configuration.h"
 #include "Inventory.h"
+#include "Logger.h"
 #include "LoggedUsers.h"
 #include "Machine.h"
 #include "RunningProcessesList.h"
@@ -50,8 +51,11 @@ Inventory::~Inventory()
 bool
 Inventory::Initialize(const char* deviceID)
 {
+	Logger& logger = Logger::GetDefault();
+
 	Clear();
-	std::cerr << "Inventory::Initialize(): Device ID: " << deviceID << "...";
+
+	logger.LogFormat(LOG_INFO, "Inventory::Initialize(): Device ID: %s...", deviceID);
 	tinyxml2::XMLDeclaration* declaration = fDocument->NewDeclaration();
 	tinyxml2::XMLElement* request = fDocument->NewElement("REQUEST");
 	fDocument->LinkEndChild(declaration);
@@ -69,7 +73,8 @@ Inventory::Initialize(const char* deviceID)
 
 	request->LinkEndChild(deviceId);
 
-	std::cerr << "OK!" << std::endl;
+	logger.LogFormat(LOG_INFO, "Inventory::Initialize(): Device ID: %s... OK!", deviceID);
+
 	return true;
 }
 
@@ -84,7 +89,10 @@ Inventory::Clear()
 bool
 Inventory::Build(const char* deviceID, bool noSoftware)
 {
-	std::cerr << "Building inventory... " << std::endl;
+	Logger& logger = Logger::GetDefault();
+
+	logger.Log(LOG_INFO, "Building inventory...");
+
 	// TODO: Finish this, cleanup.
 
 	tinyxml2::XMLElement* content = fContent;
@@ -107,7 +115,7 @@ Inventory::Build(const char* deviceID, bool noSoftware)
 	} catch (...) {
 		// Something failed.
 	}
-	std::cerr << "Done!" << std::endl;
+	logger.Log(LOG_INFO, "Building inventory... Done!");
 	return true;
 }
 
@@ -118,17 +126,15 @@ Inventory::Save(const char* name, const char* fileName)
 	if (name == NULL || fileName == NULL)
 		return false;
 		
-	std::cerr << "Saving " << name << " inventory as ";
+	Logger& logger = Logger::GetDefault();
 	
-	std::cerr << fileName << "... ";
-	
+	logger.LogFormat(LOG_INFO, "Saving %s inventory as %s", name, fileName);
+
 	bool result = fDocument->SaveFile(fileName) == tinyxml2::XML_SUCCESS;
 	if (result)
-		std::cerr << "OK!";
+		logger.Log(LOG_INFO, "Inventory saved correctly!");
 	else
-		std::cerr << "Failed!";
-
-	std::cerr << std::endl;
+		logger.Log(LOG_INFO, "Failed to save inventory!");
 
 	return result;
 }
@@ -139,20 +145,19 @@ Inventory::Send(const char* serverUrl)
 {
 	std::string inventoryUrl(serverUrl);
 
+	Logger& logger = Logger::GetDefault();
+
 	// Prepare prolog
-	std::cerr << "Inventory::Send(): server URL: " << serverUrl << std::endl;
-	std::cerr << "Inventory::Send(): preparing prolog... ";
+	logger.LogFormat(LOG_INFO, "Inventory::Send(): server URL: %s", serverUrl);
 	tinyxml2::XMLDocument prolog;
 	_WriteProlog(prolog);
 	char* prologData = NULL;
 	size_t prologLength = 0;
 	if (!XML::Compress(prolog, prologData, prologLength)) {
-		std::cerr << "error compressing XML prolog" << std::endl;
+		logger.Log(LOG_ERR, "Error while compressing XML prolog!");
 		return false;
 	}
 
-	std::cerr << "OK!" << std::endl;
-	
 	HTTPRequestHeader requestHeader;
 	requestHeader.SetRequest("POST", inventoryUrl);
 	requestHeader.SetValue("Pragma", "no-cache");
@@ -164,25 +169,22 @@ Inventory::Send(const char* serverUrl)
 	requestHeader.SetUserAgent(USER_AGENT);
 	HTTP httpObject;
 	
-	std::cerr << "Inventory::Send(): sending prolog... ";
+	logger.Log(LOG_INFO, "Inventory::Send(): Prolog prepared!");
 	if (httpObject.Request(requestHeader, prologData, prologLength) != 0) {
 		delete[] prologData;
-		std::cerr << "failed: ";
-		std::cerr << httpObject.ErrorString() << std::endl;
+		logger.LogFormat(LOG_INFO, "Inventory::Send(): Failed to send prolog: %s",
+					httpObject.ErrorString());
 		return false;
 	}
 
 	delete[] prologData;
 
-	std::cerr << "OK!" << std::endl;
-
-	std::cerr << "Inventory::Send(): waiting for server response... ";
+	logger.Log(LOG_INFO, "Inventory::Send(): Prolog Sent!");
 	const HTTPResponseHeader& responseHeader = httpObject.LastResponse();
 	if (responseHeader.StatusCode() != HTTP_OK
 			|| !responseHeader.HasContentLength()) {
-		std::cerr << responseHeader.StatusString() << std::endl;
-		std::cerr << "Full server reply:" << std::endl;
-		std::cerr << responseHeader.ToString() << std::endl;
+		logger.LogFormat(LOG_ERR, "Server replied %s", responseHeader.StatusString());
+		logger.LogFormat(LOG_ERR, "%s", responseHeader.ToString());
 		return false;
 	}
 
@@ -190,44 +192,37 @@ Inventory::Send(const char* serverUrl)
 	char* resultData = new char[contentLength];
 	if (httpObject.Read(resultData, contentLength) < (int)contentLength) {
 		delete[] resultData;
-		std::cerr << "failed to read XML response: ";
-		std::cerr << httpObject.ErrorString() << std::endl;
+		logger.LogFormat(LOG_ERR, "Inventory::Send(): failed to read XML response: %s",
+				httpObject.ErrorString());
+
 		return false;
 	}
 
-	std::cerr << "OK!" << std::endl;
-
-	std::cerr << "Inventory::Send(): Decompressing XML... ";
+	logger.Log(LOG_INFO, "Inventory::Send(): Decompressing XML... ");
 	tinyxml2::XMLDocument document;
 	bool uncompress = XML::Uncompress(resultData, contentLength, document);
 	delete[] resultData;
 	if (!uncompress) {
-		std::cerr << "failed to decompress XML" << std::endl;
+		logger.Log(LOG_ERR, "failed to decompress XML");
 		return false;
 	}
 		
-	std::cerr << "OK!" << std::endl;
-
 	std::string serverResponse = XML::GetTextElementValue(document, "RESPONSE");
-	std::cerr << "Inventory::Send(): server replied " << serverResponse;
 	if (serverResponse != "SEND") {
-		std::cerr << ": server not ready to accept inventory" << std::endl;
+		logger.LogFormat(LOG_ERR, "Server not ready to accept inventory: %s", serverResponse);
 		return false;
 	}
 	
-	std::cerr << ": OK!" << std::endl;
+	logger.LogFormat(LOG_INFO, "Inventory::Send(): server replied %s", serverResponse);
 
 	std::cerr << "Inventory::Send(): Compressing XML inventory data... ";
 	char* compressedData = NULL;
 	size_t compressedSize;
 	if (!XML::Compress(*fDocument, compressedData, compressedSize)) {
-		std::cerr << "error compressing inventory XML" << std::endl;
+		logger.Log(LOG_ERR, "Inventory::Send(): error while compressing inventory XML data!");
 		return false;
 	}
 
-	std::cerr << "OK!" << std::endl;
-
-	std::cerr << "Inventory::Send(): Sending inventory...";
 	requestHeader.Clear();
 	requestHeader.SetRequest("POST", inventoryUrl);
 	requestHeader.SetValue("Pragma", "no-cache");
@@ -239,12 +234,12 @@ Inventory::Send(const char* serverUrl)
 	requestHeader.SetUserAgent(USER_AGENT);
 	if (httpObject.Request(requestHeader, compressedData, compressedSize) != 0) {
 		delete[] compressedData;
-		std::cerr << "cannot send inventory: ";
-		std::cerr << httpObject.ErrorString() << std::endl;
+		logger.LogFormat(LOG_ERR, "Inventory::Send(): error while sending inventory: %s",
+				httpObject.ErrorString());
 		return false;
 	}
 
-	std::cerr << "OK!" << std::endl;
+	logger.Log(LOG_INFO, "Inventory::Send(): Inventory sent correctly!");
 
 	delete[] compressedData;
 
@@ -271,8 +266,8 @@ Inventory::Checksum() const
 void
 Inventory::_AddAccountInfo(tinyxml2::XMLElement* parent)
 {
-	std::cerr << "\t";
-	std::cerr << "ACCOUNT...";
+	Logger& logger = Logger::GetDefault();
+	logger.Log(LOG_INFO, "\tAdding Account Info...");
 	
 	tinyxml2::XMLElement* accountInfo = fDocument->NewElement("ACCOUNTINFO");
 
@@ -291,15 +286,15 @@ Inventory::_AddAccountInfo(tinyxml2::XMLElement* parent)
 	accountInfo->LinkEndChild(keyValue);
 
 	parent->LinkEndChild(accountInfo);
-	std::cerr << "OK!" << std::endl;
+	logger.Log(LOG_INFO, "\tDone adding Account Info!");
 }
 
 
 void
 Inventory::_AddBIOSInfo(tinyxml2::XMLElement* parent)
 {
-	std::cerr << "\t";
-	std::cerr << "BIOS...";
+	Logger& logger = Logger::GetDefault();
+	logger.Log(LOG_INFO, "\tAdding BIOS Info...");
 	
 	tinyxml2::XMLElement* bios = fDocument->NewElement("BIOS");
 
@@ -342,15 +337,15 @@ Inventory::_AddBIOSInfo(tinyxml2::XMLElement* parent)
 
 	parent->LinkEndChild(bios);
 	
-	std::cerr << "OK!" << std::endl;
+	logger.Log(LOG_INFO, "\tDone adding BIOS Info!");
 }
 
 
 void
 Inventory::_AddCPUsInfo(tinyxml2::XMLElement* parent)
 {
-	std::cerr << "\t";
-	std::cerr << "CPUS...";
+	Logger& logger = Logger::GetDefault();
+	logger.Log(LOG_INFO, "\tAdding CPUs Info...");
 	
 	// TODO: Check if the fields name and structure are correct.
 	for (int i = 0; i < fMachine->CountProcessors(); i++) {
@@ -381,15 +376,15 @@ Inventory::_AddCPUsInfo(tinyxml2::XMLElement* parent)
 
 		parent->LinkEndChild(cpu);
 	}
-	std::cerr << "OK!" << std::endl;
+	logger.Log(LOG_INFO, "\tDone adding CPUs Info!");
 }
 
 
 void
 Inventory::_AddStoragesInfo(tinyxml2::XMLElement* parent)
 {
-	std::cerr << "\t";
-	std::cerr << "STORAGES...";
+	Logger& logger = Logger::GetDefault();
+	logger.Log(LOG_INFO, "\tAdding Storages Info...");
 	
 	Storages storages;
 	for (int i = 0; i < storages.Count(); i++) {
@@ -437,16 +432,16 @@ Inventory::_AddStoragesInfo(tinyxml2::XMLElement* parent)
 		parent->LinkEndChild(storage);
 	}
 
-	std::cerr << "OK!" << std::endl;
+	logger.Log(LOG_INFO, "\tDone adding Storages Info!");
 }
 
 
 void
 Inventory::_AddMemoriesInfo(tinyxml2::XMLElement* parent)
 {
-	std::cerr << "\t";
-	std::cerr << "MEMORIES...";
-	
+	Logger& logger = Logger::GetDefault();
+	logger.Log(LOG_INFO, "\tAdding Memory Info...");
+
 	for (int i = 0; i < fMachine->CountMemories(); i++) {
 		tinyxml2::XMLElement* memory = fDocument->NewElement("MEMORIES");
 
@@ -481,15 +476,15 @@ Inventory::_AddMemoriesInfo(tinyxml2::XMLElement* parent)
 
 		parent->LinkEndChild(memory);
 	}
-	std::cerr << "OK!" << std::endl;
+	logger.Log(LOG_INFO, "\tDone adding Memory Info!");
 }
 
 
 void
 Inventory::_AddDrivesInfo(tinyxml2::XMLElement* parent)
 {
-	std::cerr << "\t";
-	std::cerr << "DRIVES...";
+	Logger& logger = Logger::GetDefault();
+	logger.Log(LOG_INFO, "\tAdding Drives info...");
 	
 	try {
 		VolumeReader reader;
@@ -533,16 +528,15 @@ Inventory::_AddDrivesInfo(tinyxml2::XMLElement* parent)
 		}
 	} catch (...) {
 	}
-
-	std::cerr << "OK!" << std::endl;
+	logger.Log(LOG_INFO, "\tDone adding Drives info!");
 }
 
 
 void
 Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 {
-	std::cerr << "\t";
-	std::cerr << "HARDWARE...";
+	Logger& logger = Logger::GetDefault();
+	logger.Log(LOG_INFO, "\tAdding Hardware info...");
 	
 	tinyxml2::XMLElement* hardware = fDocument->NewElement("HARDWARE");
 
@@ -649,15 +643,15 @@ Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 	hardware->LinkEndChild(workGroup);
 	parent->LinkEndChild(hardware);
 	
-	std::cerr << "OK!" << std::endl;
+	logger.Log(LOG_INFO, "\tDone adding Hardware info!");
 }
 
 
 void
 Inventory::_AddNetworksInfo(tinyxml2::XMLElement* parent)
 {
-	std::cerr << "\t";
-	std::cerr << "NETWORKS...";
+	Logger& logger = Logger::GetDefault();
+	logger.Log(LOG_INFO, "\tAdding Networks info...");
 	
 	try {
 		NetworkRoster roster;
@@ -726,15 +720,16 @@ Inventory::_AddNetworksInfo(tinyxml2::XMLElement* parent)
 		}
 	} catch (...) {
 	}
-	std::cerr << "OK!" << std::endl;
+	logger.Log(LOG_INFO, "\tDone adding Networks info!");
 }
 
 
 void
 Inventory::_AddProcessesInfo(tinyxml2::XMLElement* parent)
 {
-	std::cerr << "\t";
-	std::cerr << "PROCESSES...";
+	Logger& logger = Logger::GetDefault();
+	logger.Log(LOG_INFO, "\tAdding Processes list...");
+
 	try {
 		RunningProcessesList processList;
 		process_info processInfo;
@@ -779,15 +774,15 @@ Inventory::_AddProcessesInfo(tinyxml2::XMLElement* parent)
 	} catch (...) {
 	}
 		
-	std::cerr << "OK!" << std::endl;
+	logger.Log(LOG_INFO, "\tDone adding Processes list!");
 }
 
 
 void
 Inventory::_AddSoftwaresInfo(tinyxml2::XMLElement* parent)
 {
-	std::cerr << "\t";
-	std::cerr << "SOFTWARES...";
+	Logger& logger = Logger::GetDefault();
+	logger.Log(LOG_INFO, "\tAdding Software list...");
 
 	Softwares softwares;
 	for (int i = 0; i < softwares.Count(); i++) {
@@ -821,15 +816,15 @@ Inventory::_AddSoftwaresInfo(tinyxml2::XMLElement* parent)
 
 		parent->LinkEndChild(software);
 	}
-	std::cerr << "OK!" << std::endl;
+	logger.Log(LOG_INFO, "\tDone adding Software list!");
 }
 
 
 void
 Inventory::_AddUsersInfo(tinyxml2::XMLElement* parent)
 {
-	std::cerr << "\t";
-	std::cerr << "USERS...";
+	Logger& logger = Logger::GetDefault();
+	logger.Log(LOG_INFO, "\tAdding Users info...");
 	
 	try {
 		tinyxml2::XMLElement* users = fDocument->NewElement("USERS");
@@ -843,16 +838,16 @@ Inventory::_AddUsersInfo(tinyxml2::XMLElement* parent)
 		parent->LinkEndChild(users);
 	} catch (...) {
 	}
-	std::cerr << "OK!" << std::endl;
+	logger.Log(LOG_INFO, "\tDone adding User info!");
 }
 
 
 void
 Inventory::_AddVideosInfo(tinyxml2::XMLElement* parent)
 {
-	std::cerr << "\t";
-	std::cerr << "VIDEOS...";
-	
+	Logger& logger = Logger::GetDefault();
+	logger.Log(LOG_INFO, "\tAdding Video info...");
+
 	for (int i = 0; i < fMachine->CountVideos(); i++) {
 		video_info info = fMachine->VideoInfoFor(i);
 
@@ -876,15 +871,15 @@ Inventory::_AddVideosInfo(tinyxml2::XMLElement* parent)
 
 		parent->LinkEndChild(video);
 	}
-	std::cerr << "OK!" << std::endl;
+	logger.Log(LOG_INFO, "\tDone adding Video info!");
 }
 
 
 void
 Inventory::_AddMonitorsInfo(tinyxml2::XMLElement* parent)
 {
-	std::cerr << "\t";
-	std::cerr << "MONITORS...";
+	Logger& logger = Logger::GetDefault();
+	logger.Log(LOG_INFO, "\tAdding Display info...");
 	
 	try {
 		Screens screens;
@@ -911,7 +906,7 @@ Inventory::_AddMonitorsInfo(tinyxml2::XMLElement* parent)
 	} catch (...) {
 	}
 	
-	std::cerr << "OK!" << std::endl;
+	logger.Log(LOG_INFO, "\tDone adding Display info!");
 }
 
 
