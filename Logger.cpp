@@ -2,15 +2,16 @@
  * Logger.cpp
  *
  *  Created on: 05/lug/2017
- *      Author: stefano
+ *      Author: Stefano Ceccherini
  */
 
 #include "Logger.h"
 
-#include <syslog.h>
 
 #include <iostream>
 #include <stdarg.h>
+#include <stdio.h>
+#include <syslog.h>
 
 extern const char* __progname;
 
