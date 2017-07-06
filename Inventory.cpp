@@ -173,7 +173,7 @@ Inventory::Send(const char* serverUrl)
 	if (httpObject.Request(requestHeader, prologData, prologLength) != 0) {
 		delete[] prologData;
 		logger.LogFormat(LOG_INFO, "Inventory::Send(): Failed to send prolog: %s",
-					httpObject.ErrorString());
+					httpObject.ErrorString().c_str());
 		return false;
 	}
 
@@ -183,8 +183,8 @@ Inventory::Send(const char* serverUrl)
 	const HTTPResponseHeader& responseHeader = httpObject.LastResponse();
 	if (responseHeader.StatusCode() != HTTP_OK
 			|| !responseHeader.HasContentLength()) {
-		logger.LogFormat(LOG_ERR, "Server replied %s", responseHeader.StatusString());
-		logger.LogFormat(LOG_ERR, "%s", responseHeader.ToString());
+		logger.LogFormat(LOG_ERR, "Server replied %s", responseHeader.StatusString().c_str());
+		logger.LogFormat(LOG_ERR, "%s", responseHeader.ToString().c_str());
 		return false;
 	}
 
@@ -193,7 +193,7 @@ Inventory::Send(const char* serverUrl)
 	if (httpObject.Read(resultData, contentLength) < (int)contentLength) {
 		delete[] resultData;
 		logger.LogFormat(LOG_ERR, "Inventory::Send(): failed to read XML response: %s",
-				httpObject.ErrorString());
+				httpObject.ErrorString().c_str());
 
 		return false;
 	}
@@ -235,7 +235,7 @@ Inventory::Send(const char* serverUrl)
 	if (httpObject.Request(requestHeader, compressedData, compressedSize) != 0) {
 		delete[] compressedData;
 		logger.LogFormat(LOG_ERR, "Inventory::Send(): error while sending inventory: %s",
-				httpObject.ErrorString());
+				httpObject.ErrorString().c_str());
 		return false;
 	}
 
