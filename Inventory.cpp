@@ -355,8 +355,9 @@ Inventory::_AddCPUsInfo(tinyxml2::XMLElement* parent)
 		tinyxml2::XMLElement* speed = fDocument->NewElement("SPEED");
 		tinyxml2::XMLElement* model = fDocument->NewElement("TYPE");
 		tinyxml2::XMLElement* cores = fDocument->NewElement("CORES");
+		tinyxml2::XMLElement* cacheSize = fDocument->NewElement("L2CACHESIZE");
 
-		// TODO: Seems like we should interpretate the vendor_id
+		// TODO: Seems like we should interpretate the vendor_id ?
 		manufacturer->LinkEndChild(
 			fDocument->NewText(fMachine->ProcessorManufacturer(i).c_str()));
 		serial->LinkEndChild(
@@ -367,12 +368,15 @@ Inventory::_AddCPUsInfo(tinyxml2::XMLElement* parent)
 			fDocument->NewText(fMachine->ProcessorType(i).c_str()));
 		cores->LinkEndChild(
 			fDocument->NewText(fMachine->ProcessorCores(i).c_str()));
+		cacheSize->LinkEndChild(
+			fDocument->NewText(fMachine->ProcessorCacheSize(i).c_str()));
 
 		cpu->LinkEndChild(model);
 		cpu->LinkEndChild(manufacturer);
 		cpu->LinkEndChild(serial);
 		cpu->LinkEndChild(speed);
 		cpu->LinkEndChild(cores);
+		cpu->LinkEndChild(cacheSize);
 
 		parent->LinkEndChild(cpu);
 	}

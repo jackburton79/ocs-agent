@@ -234,6 +234,14 @@ Machine::ProcessorCores(int numCpu) const
 }
 
 
+std::string
+Machine::ProcessorCacheSize(int numCpu) const
+{
+	std::string cacheSize = fCPUInfo[numCpu].cache_size;
+	return cacheSize;
+}
+
+
 os_info
 Machine::OSInfo() const
 {
@@ -584,6 +592,8 @@ Machine::_GetCPUInfo()
 				else if (name == "physical id")
 					tmpCPUInfo[processorNum].physical_id =
 						strtol(value.c_str(), NULL, 0);
+				else if (name == "cache size")
+					tmpCPUInfo[processorNum].cache_size = value;
 
 			} catch (...) {
 			}
@@ -599,6 +609,7 @@ Machine::_GetCPUInfo()
 		fCPUInfo[cpu.physical_id].speed = cpu.speed;
 		fCPUInfo[cpu.physical_id].cores = cpu.cores;
 		fCPUInfo[cpu.physical_id].manufacturer = cpu.manufacturer;
+		fCPUInfo[cpu.physical_id].cache_size = cpu.cache_size;
 	}
 }
 
@@ -618,11 +629,11 @@ Machine::_GetOSInfo()
 
 	//Feed domain name from host name when possible.
 	if (fKernelInfo.domain_name=="" || fKernelInfo.domain_name=="(none)") {
-                size_t dotPos = fKernelInfo.hostname.find('.');
-                if (dotPos != std::string::npos) {
-                        fKernelInfo.domain_name = fKernelInfo.hostname.substr(dotPos+1);
-                }
-        }
+		size_t dotPos = fKernelInfo.hostname.find('.');
+		if (dotPos != std::string::npos) {
+			fKernelInfo.domain_name = fKernelInfo.hostname.substr(dotPos + 1);
+		}
+	}
 
 	ProcReader proc("/proc/meminfo");
 	std::istream stream(&proc);
