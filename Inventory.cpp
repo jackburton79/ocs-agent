@@ -214,8 +214,7 @@ Inventory::Send(const char* serverUrl)
 	}
 	
 	logger.LogFormat(LOG_INFO, "Inventory::Send(): server replied %s", serverResponse.c_str());
-
-	std::cerr << "Inventory::Send(): Compressing XML inventory data... ";
+	logger.Log(LOG_INFO, "Inventory::Send(): Compressing XML inventory data... ");
 	char* compressedData = NULL;
 	size_t compressedSize;
 	if (!XML::Compress(*fDocument, compressedData, compressedSize)) {
