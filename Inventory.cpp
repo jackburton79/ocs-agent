@@ -593,6 +593,9 @@ Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 	tinyxml2::XMLElement* processorT = fDocument->NewElement("PROCESSORT");
 	processorT->LinkEndChild(fDocument->NewText(fMachine->ProcessorType(0).c_str()));
 
+	tinyxml2::XMLElement* arch = fDocument->NewElement("ARCH");
+	arch->LinkEndChild(fDocument->NewText(fMachine->Architecture().c_str()));
+
 	tinyxml2::XMLElement* swap = fDocument->NewElement("SWAP");
 	swap->LinkEndChild(fDocument->NewText(fMachine->OSInfo().swap.c_str()));
 
@@ -631,6 +634,7 @@ Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 		// Not a big issue, after all.
 	}
 
+	hardware->LinkEndChild(arch);
 	hardware->LinkEndChild(memory);
 	hardware->LinkEndChild(name);
 	hardware->LinkEndChild(osComments);
@@ -644,6 +648,7 @@ Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 	hardware->LinkEndChild(uuid);
 	hardware->LinkEndChild(vmSystem);
 	hardware->LinkEndChild(workGroup);
+
 	parent->LinkEndChild(hardware);
 	
 	logger.Log(LOG_INFO, "\tDone adding Hardware info!");
