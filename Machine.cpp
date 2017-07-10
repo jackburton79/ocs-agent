@@ -138,6 +138,13 @@ Machine::SystemManufacturer() const
 
 
 std::string
+Machine::Architecture() const
+{
+	return fKernelInfo.machine;
+}
+
+
+std::string
 Machine::HostName() const
 {
 	struct ::utsname utsName;
@@ -628,7 +635,7 @@ Machine::_GetOSInfo()
 	fKernelInfo.machine = uName.machine;
 
 	//Feed domain name from host name when possible.
-	if (fKernelInfo.domain_name=="" || fKernelInfo.domain_name=="(none)") {
+	if (fKernelInfo.domain_name == "" || fKernelInfo.domain_name == "(none)") {
 		size_t dotPos = fKernelInfo.hostname.find('.');
 		if (dotPos != std::string::npos) {
 			fKernelInfo.domain_name = fKernelInfo.hostname.substr(dotPos + 1);

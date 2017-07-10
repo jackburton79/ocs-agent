@@ -109,6 +109,7 @@ public:
 	std::string SystemUUID() const;
 	std::string SystemManufacturer() const;
 
+	std::string Architecture() const;
 	std::string HostName() const;
 
 	int CountProcessors() const;
