@@ -435,7 +435,8 @@ Machine::_ExtractNeededInfo(std::multimap<std::string, std::string> systemInfo)
 	values = GetValuesFromMultiMap(systemInfo, "Size", kMemoryDevice);
 	for (size_t i = 0; i < values.size(); i++) {
 		memory_device_info info;
-		info.size = values.at(i);
+		int memorySize = ::strtol(values.at(i).c_str(), NULL, 10);
+		info.size = int_to_string(memorySize);
 		fMemoryInfo.push_back(info);
 	}
 
