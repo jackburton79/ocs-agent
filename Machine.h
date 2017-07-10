@@ -57,6 +57,7 @@ struct processor_info {
 	std::string type;
 	std::string speed;
 	std::string cores;
+	std::string cache_size;
 };
 
 
@@ -116,6 +117,7 @@ public:
 	std::string ProcessorSerialNumber(int numCpu) const;
 	std::string ProcessorType(int numCpu) const;
 	std::string ProcessorCores(int numCpu) const;
+	std::string ProcessorCacheSize(int numCpu) const;
 
 	int CountMemories();
 	std::string MemoryCaption(int num);
