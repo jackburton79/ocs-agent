@@ -93,8 +93,6 @@ Inventory::Build(const char* deviceID, bool noSoftware)
 
 	logger.Log(LOG_INFO, "Building inventory...");
 
-	// TODO: Finish this, cleanup.
-
 	tinyxml2::XMLElement* content = fContent;
 
 	try {
@@ -270,7 +268,6 @@ Inventory::_AddAccountInfo(tinyxml2::XMLElement* parent)
 	
 	tinyxml2::XMLElement* accountInfo = fDocument->NewElement("ACCOUNTINFO");
 
-	// TODO: ??? We can't store anything
 	tinyxml2::XMLElement* keyName = fDocument->NewElement("KEYNAME");
 	keyName->LinkEndChild(fDocument->NewText("TAG"));
 
