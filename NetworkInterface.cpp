@@ -25,46 +25,6 @@
 #include <sstream>
 
 
-const static int kBufSize = 8192;
-
-static bool
-ParseRoutes(struct nlmsghdr* nlHdr, route_info* rtInfo,
-	const char* interfaceName)
-{
-	rtmsg *rtMsg = (rtmsg*)NLMSG_DATA(nlHdr);
-
-	// If the route is not for AF_INET or does not belong to main routing table then return.
-	if ((rtMsg->rtm_family != AF_INET) || (rtMsg->rtm_table != RT_TABLE_MAIN))
-		return false;
-
-	// get the rtattr field
-	rtattr* rtAttr = (rtattr*)RTM_RTA(rtMsg);
-	int rtLen = RTM_PAYLOAD(nlHdr);
-	for (; RTA_OK(rtAttr, rtLen); rtAttr = RTA_NEXT(rtAttr, rtLen)) {
-		switch(rtAttr->rta_type) {
-			case RTA_OIF:
-				if_indextoname(*(int*)RTA_DATA(rtAttr), rtInfo->ifName);
-				break;
-			case RTA_GATEWAY:
-				rtInfo->gateWay = *(in_addr*)RTA_DATA(rtAttr);
-				break;
-			case RTA_PREFSRC:
-				rtInfo->srcAddr = *(in_addr*)RTA_DATA(rtAttr);
-				break;
-			case RTA_DST:
-				rtInfo->dstAddr = *(in_addr*)RTA_DATA(rtAttr);
-				break;
-			default:
-				break;
-		}
-	}
-	
-	// If the route is for a different interface, return false
-	// TODO: Check if we can filter the list beforehand
-	return ::strcmp(interfaceName, rtInfo->ifName) == 0;
-}
-
-
 NetworkInterface::NetworkInterface()
 {
 }
@@ -190,18 +150,77 @@ NetworkInterface::Status() const
 }
 
 
+int
+NetworkInterface::_DoRequest(int request, struct ifreq& ifr)  const
+{
+	size_t ifNameLen = fName.size();
+	::memcpy(ifr.ifr_name, fName.c_str(), ifNameLen);
+	ifr.ifr_name[ifNameLen] = 0;
+
+	int fd = ::socket(AF_INET, SOCK_DGRAM, 0);
+	if (fd == -1)
+		return errno;
+
+	int status = 0;
+	if (ioctl(fd, request, &ifr) == -1)
+		status = errno;
+
+	::close(fd);
+
+	return status;
+}
+
+
+const static int kBufSize = 8192;
+
+static bool
+ParseRoutes(struct nlmsghdr* nlHdr, route_info* rtInfo,
+	const char* interfaceName)
+{
+	rtmsg* rtMsg = (rtmsg*)NLMSG_DATA(nlHdr);
+
+	// If the route is not for AF_INET or does not belong to main routing table then return.
+	if ((rtMsg->rtm_family != AF_INET) || (rtMsg->rtm_table != RT_TABLE_MAIN))
+		return false;
+
+	int rtLen = RTM_PAYLOAD(nlHdr);
+	for (rtattr* rtAttr = (rtattr*)RTM_RTA(rtMsg);
+			RTA_OK(rtAttr, rtLen);
+			rtAttr = RTA_NEXT(rtAttr, rtLen)) {
+		switch (rtAttr->rta_type) {
+			case RTA_OIF:
+				if_indextoname(*(int*)RTA_DATA(rtAttr), rtInfo->ifName);
+				break;
+			case RTA_GATEWAY:
+				rtInfo->gateWay = *(in_addr*)RTA_DATA(rtAttr);
+				break;
+			case RTA_PREFSRC:
+				rtInfo->srcAddr = *(in_addr*)RTA_DATA(rtAttr);
+				break;
+			case RTA_DST:
+				rtInfo->dstAddr = *(in_addr*)RTA_DATA(rtAttr);
+				break;
+			default:
+				break;
+		}
+	}
+
+	// If the route is for a different interface, return false
+	// TODO: Check if we can filter the list beforehand
+	return ::strcmp(interfaceName, rtInfo->ifName) == 0;
+}
+
 
 static int
 ReadRouteInfoFromSocket(int sockFd, char *bufPtr, int seqNum, int pId)
 {
-	nlmsghdr* nlHdr;
-	int readLen = 0;
+	nlmsghdr* nlHdr = NULL;
 	int msgLen = 0;
 	do {
 		// Receive response from the kernel
-		if ((readLen = ::recv(sockFd, bufPtr, kBufSize - msgLen, 0)) < 0){
+		int readLen = 0;
+		if ((readLen = ::recv(sockFd, bufPtr, kBufSize - msgLen, 0)) < 0)
 			return -1;
-		}
 
 		nlHdr = (nlmsghdr*)bufPtr;
 
@@ -221,9 +240,9 @@ ReadRouteInfoFromSocket(int sockFd, char *bufPtr, int seqNum, int pId)
 		}
 
 		// Check if its a multi part message
-		if ((nlHdr->nlmsg_flags & NLM_F_MULTI) == 0) {
+		if ((nlHdr->nlmsg_flags & NLM_F_MULTI) == 0)
 			break;
-		}
+
 	} while(((int)nlHdr->nlmsg_seq != seqNum) || ((int)nlHdr->nlmsg_pid != pId));
 	
 	return msgLen;
@@ -233,11 +252,11 @@ ReadRouteInfoFromSocket(int sockFd, char *bufPtr, int seqNum, int pId)
 int
 NetworkInterface::_GetRoutes(std::list<route_info>& routeList) const
 {
-	char msgBuf[kBufSize];
 	int sock = 0;
 	if ((sock = ::socket(PF_NETLINK, SOCK_DGRAM, NETLINK_ROUTE)) < 0)
 		return errno;
 
+	char msgBuf[kBufSize];
 	memset(msgBuf, 0, kBufSize);
 	struct nlmsghdr* nlMsg = (struct nlmsghdr*)msgBuf;
 
@@ -268,29 +287,8 @@ NetworkInterface::_GetRoutes(std::list<route_info>& routeList) const
 		if (ParseRoutes(nlMsg, &rtInfo, Name().c_str()))
 			routeList.push_back(rtInfo);
 	}
-	
+
 	::close(sock);
-	
+
 	return routeList.size();
-}
-
-
-int
-NetworkInterface::_DoRequest(int request, struct ifreq& ifr)  const
-{
-	size_t ifNameLen = fName.size();
-	::memcpy(ifr.ifr_name, fName.c_str(), ifNameLen);
-	ifr.ifr_name[ifNameLen] = 0;
-
-	int fd = ::socket(AF_INET, SOCK_DGRAM, 0);
-	if (fd == -1)
-		return errno;
-
-	int status = 0;
-	if (ioctl(fd, request, &ifr) == -1)
-		status = errno;
-
-	::close(fd);
-
-	return status;
 }
