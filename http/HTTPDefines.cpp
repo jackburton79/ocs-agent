@@ -7,6 +7,7 @@
 
 
 #include "HTTPDefines.h"
+#include "URL.h"
 
 #include <cstdlib>
 #include <iostream>
@@ -23,24 +24,9 @@ GetHostAndPortFromString(const std::string& string, std::string& host,
 	int& port)
 {
 	try {
-		// TODO: Remove port if specified
-		std::string result = string;
-		size_t prefixPos = string.find(HTTPProtocolPrefix);	
-		if (prefixPos != std::string::npos) {
-			// Remove protocol part (HTTP://)
-			size_t slashPos = string.find('/', HTTPProtocolPrefix.length());
-			result = string.substr(HTTPProtocolPrefix.length(),
-					slashPos - HTTPProtocolPrefix.length());		
-		}
-		size_t portPos = result.find(":");
-		if (portPos != std::string::npos) {
-			host = result.substr(0, portPos);
-			port = ::strtol(result.substr(portPos + 1, result.length()).c_str(),
-				NULL, 10);
-		} else {
-			host = result;
-			port = 80;
-		}		
+		URL url(string.c_str());
+		host = url.Host();
+		port = url.Port();
 	} catch (...) {
 		return -1;
 	}

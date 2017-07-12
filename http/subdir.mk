@@ -8,21 +8,24 @@ CPP_SRCS += \
 ../http/HTTPDefines.cpp \
 ../http/HTTPHeader.cpp \
 ../http/HTTPRequestHeader.cpp \
-../http/HTTPResponseHeader.cpp 
+../http/HTTPResponseHeader.cpp \
+../http/URL.cpp
 
 OBJS += \
 ./http/HTTP.o \
 ./http/HTTPDefines.o \
 ./http/HTTPHeader.o \
 ./http/HTTPRequestHeader.o \
-./http/HTTPResponseHeader.o 
+./http/HTTPResponseHeader.o \
+./http/URL.o
 
 CPP_DEPS += \
 ./http/HTTP.d \
 ./http/HTTPDefines.d \
 ./http/HTTPHeader.d \
 ./http/HTTPRequestHeader.d \
-./http/HTTPResponseHeader.d 
+./http/HTTPResponseHeader.d \
+./http/URL.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
