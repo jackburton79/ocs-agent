@@ -45,12 +45,10 @@ Logger::Log(int level, const char* const string)
 void
 Logger::LogFormat(int level, const char* fmtString, ...)
 {
-	char logString[512];
+	char logString[1024];
 	va_list argp;
 	va_start(argp, fmtString);
-
-	vsprintf(logString, fmtString, argp);
-
+	vsnprintf(logString, sizeof(logString), fmtString, argp);
 	va_end(argp);
 	::syslog(level, (const char* const)logString);
 	if (fVerbose)
