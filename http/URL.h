@@ -25,6 +25,8 @@ public:
 	std::string Username() const;
 	std::string Password() const;
 
+	bool IsRelative() const;
+
 private:
 	void _DecodeURLString(const char* urlString);
 

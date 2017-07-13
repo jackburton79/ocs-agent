@@ -102,6 +102,13 @@ URL::Password() const
 }
 
 
+bool
+URL::IsRelative() const
+{
+	return fURLString.length() > 0 && fURLString[0] == '/';
+}
+
+
 void
 URL::_DecodeURLString(const char* url)
 {
