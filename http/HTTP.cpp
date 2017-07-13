@@ -239,6 +239,13 @@ bool
 HTTP::_HandleConnectionIfNeeded(const std::string string)
 {
 	URL url(string.c_str());
+	if (url.Protocol() != "" && url.Protocol() != "http") {
+		std::string errorString("HTTP: unsupported protocol: ");
+		errorString.append(url.Protocol());
+		throw std::runtime_error(errorString);
+		return false;
+	}
+
 	std::string hostName = url.Host();
 	int port = url.Port();
 

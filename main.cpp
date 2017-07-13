@@ -177,6 +177,9 @@ main(int argc, char **argv)
 	} catch (int error) {
 		logger.Log(LOG_ERR, strerror(error));
 		return 1;
+	} catch (std::exception& ex) {
+		logger.Log(LOG_ERR, ex.what());
+		return 1;
 	} catch (...) {
 		logger.Log(LOG_ERR, "Unhandled exception.");
 		return 1;
