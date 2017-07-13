@@ -12,6 +12,17 @@ const static char* kProtocolSuffix = "://";
 
 #include "URL.h"
 
+URL::URL()
+    :
+    fURLString(""),
+    fProtocol(""),
+    fHost(""),
+    fPort(-1),
+    fPath("")
+{
+}
+
+
 URL::URL(const char* url)
     :
     fURLString(url),
@@ -27,7 +38,11 @@ URL::URL(const char* url)
 void
 URL::SetTo(const char* url)
 {
-    fURLString = url;
+	fURLString = url;
+	fProtocol = "";
+	fHost = "";
+	fPort = -1;
+	fPath = "";
     _DecodeURLString(url);
 }
 
@@ -35,7 +50,7 @@ URL::SetTo(const char* url)
 std::string
 URL::URLString() const
 {
-	return fURLString;	
+	return fURLString;
 }
 
 

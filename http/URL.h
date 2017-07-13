@@ -13,6 +13,7 @@
 
 class URL {
 public:
+    URL();
     URL(const char* url);
     void SetTo(const char* url);
     
