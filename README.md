@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/jackburton79/agent.svg?branch=master)](https://travis-ci.org/jackburton79/agent)
+
 Unofficial OCS Inventory NG agent for Thinstation
 =====
 A couple of years ago, where I work, we started using [OCS Inventory NG](http://www.ocsinventory-ng.org), which
