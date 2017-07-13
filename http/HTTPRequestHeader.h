@@ -24,7 +24,7 @@ public:
 	void SetUserAgent(const std::string agent);
 
 	std::string Method() const;
-	std::string Path() const;
+	std::string URL() const;
 
 	virtual std::string ToString() const;
 
@@ -39,7 +39,7 @@ private:
 	void _Init();
 
 	std::string fMethod;
-	std::string fPath;
+	std::string fURL;
 	std::string fUserAgent;
 };
 

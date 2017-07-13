@@ -25,10 +25,10 @@ HTTPRequestHeader::HTTPRequestHeader(const HTTPRequestHeader& header)
 
 
 HTTPRequestHeader::HTTPRequestHeader(const std::string method,
-		const std::string path, int majorVer, int minorVer)
+		const std::string url, int majorVer, int minorVer)
 {
 	_Init();
-	SetRequest(method, path);
+	SetRequest(method, url);
 }
 
 
@@ -59,9 +59,9 @@ HTTPRequestHeader::Method() const
 
 
 std::string
-HTTPRequestHeader::Path() const
+HTTPRequestHeader::URL() const
 {
-	return fPath;
+	return fURL;
 }
 
 
@@ -69,13 +69,13 @@ std::string
 HTTPRequestHeader::ToString() const
 {
 	std::string string;
-	std::string host = fPath;
+	std::string host = fURL;
 	std::string resource = "/";
-	size_t pos = fPath.find("//");
-	pos = fPath.find("/", pos + 2);
+	size_t pos = fURL.find("//");
+	pos = fURL.find("/", pos + 2);
 	if (pos != std::string::npos) {
-		host = fPath.substr(0, pos);
-		resource = fPath.substr(pos, std::string::npos);
+		host = fURL.substr(0, pos);
+		resource = fURL.substr(pos, std::string::npos);
 	}
 	string.append(fMethod).append(" ");
 	string.append(resource).append(" ");
@@ -91,12 +91,12 @@ HTTPRequestHeader::ToString() const
 
 void
 HTTPRequestHeader::SetRequest(const std::string method,
-		const std::string path, int majorVer, int minorVer)
+		const std::string url, int majorVer, int minorVer)
 {
 	fMethod = method;
-	fPath = path;
+	fURL = url;
 	
-	std::string hostName = URL(path.c_str()).Host();
+	std::string hostName = ::URL(url.c_str()).Host();
 	if (hostName != "")
 		fValues["Host"] = hostName;
 }
@@ -109,7 +109,7 @@ HTTPRequestHeader::Clear()
 {
 	HTTPHeader::Clear();
 	fMethod = "";
-	fPath = "";
+	fURL = "";
 
 	_Init();
 }
@@ -120,7 +120,7 @@ HTTPRequestHeader::operator=(const HTTPRequestHeader& header)
 {
 	HTTPHeader::operator=(header);
 
-	SetRequest(header.fMethod, header.fPath);
+	SetRequest(header.fMethod, header.fURL);
 	fUserAgent = header.fUserAgent;
 	return *this;
 }

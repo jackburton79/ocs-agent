@@ -154,11 +154,11 @@ HTTP::Read(void* data,  const size_t& length)
 int
 HTTP::Request(const HTTPRequestHeader& header, const void* data, const size_t length)
 {
-	if (!_HandleConnectionIfNeeded(header.Path()))
+	if (!_HandleConnectionIfNeeded(header.URL()))
 		return -1;
 
 	fCurrentRequest = header;
-	if (fCurrentRequest.Path() == "")
+	if (fCurrentRequest.URL() == "")
 		fCurrentRequest.SetValue(HTTPHost, fHost);
 
 	std::string string = fCurrentRequest.ToString().append(CRLF);
@@ -226,9 +226,7 @@ HTTP::Base64Encode(std::string string)
 
 	size_t encodedSize = pointer->length;
 	std::string encoded(encodedSize + 1, '\0');
-
 	memcpy(&encoded[0], pointer->data, encodedSize);
-
 	encoded.resize(encodedSize);
 
 	BIO_free_all(buffer);
