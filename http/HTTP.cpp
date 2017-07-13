@@ -239,6 +239,17 @@ bool
 HTTP::_HandleConnectionIfNeeded(const std::string string)
 {
 	URL url(string.c_str());
+	std::string hostName = url.Host();
+	int port = url.Port();
+	if (url.IsRelative()) {
+		// url is relative, reuse the old host/port
+		hostName = fHost;
+		port = fPort;
+	}
+
+	if (hostName == "")
+		return false;
+
 	if (url.Protocol() != "" && url.Protocol() != "http") {
 		std::string errorString("HTTP: unsupported protocol: ");
 		errorString.append(url.Protocol());
@@ -246,28 +257,24 @@ HTTP::_HandleConnectionIfNeeded(const std::string string)
 		return false;
 	}
 
-	std::string hostName = url.Host();
-	int port = url.Port();
-
 	// Check if we are already connected to this server,
 	// so we can reuse the existing connection
 	if (fFD >= 0) {
-		if (hostName == "" || (hostName == fHost && port == fPort)) {
+		if (hostName == fHost && port == fPort) {
 			// But not if the server closed it from its side
 			HTTPResponseHeader lastResponse = LastResponse();
 			if (!lastResponse.HasKey("connection")
-				|| lastResponse.Value("connection") != "close") 
-		 		return true;
+				|| lastResponse.Value("connection") != "close") {
+				return true;
+			}
 		}
 		// Different server, or same server, but connection closed
 		::close(fFD);
 		fFD = -1;
 	}
 
-	if (hostName != "") {
-		fHost = hostName;
-		fPort = port;
-	}
+	fHost = hostName;
+	fPort = port;
 
 	struct hostent* hostEnt = ::gethostbyname(fHost.c_str());
 	if (hostEnt == NULL) {
