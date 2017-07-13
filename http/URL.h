@@ -22,6 +22,8 @@ public:
 	std::string Host() const;
 	int Port() const;
 	std::string Path() const;
+	std::string Username() const;
+	std::string Password() const;
 
 private:
 	void _DecodeURLString(const char* urlString);
@@ -31,6 +33,8 @@ private:
 	std::string fHost;
 	int fPort;
 	std::string fPath;
+	std::string fUsername;
+	std::string fPassword;
 };
 
 #endif // URL_H

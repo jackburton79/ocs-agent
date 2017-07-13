@@ -8,6 +8,8 @@ const char* urls[] = {
     "https://differentURL.com/part/of/path/end.xml",
     "www.withoutproto.com",
     "/pathonly/run.php",
+    "user:pass@server/directory/file.xml",
+    "http://user:password@server:81/directory/",
     NULL
 };
 
@@ -23,5 +25,7 @@ int main()
         std::cout << "\t" << "host: " << url.Host() << std::endl;
         std::cout << "\t" << "port: " << url.Port() << std::endl;
         std::cout << "\t" << "path: " << url.Path() << std::endl;
+        std::cout << "\t" << "username: " << url.Username() << std::endl;
+        std::cout << "\t" << "password: " << url.Password() << std::endl;
     }
 }

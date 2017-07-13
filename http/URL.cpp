@@ -18,7 +18,9 @@ URL::URL()
 	fProtocol(""),
 	fHost(""),
 	fPort(-1),
-	fPath("")
+	fPath(""),
+	fUsername(""),
+	fPassword("")
 {
 }
 
@@ -29,7 +31,9 @@ URL::URL(const char* url)
 	fProtocol(""),
 	fHost(""),
 	fPort(-1),
-	fPath("")
+	fPath(""),
+	fUsername(""),
+	fPassword("")
 {
 	_DecodeURLString(url);
 }
@@ -43,6 +47,8 @@ URL::SetTo(const char* url)
 	fHost = "";
 	fPort = -1;
 	fPath = "";
+	fUsername = "";
+	fPassword = "";
 	_DecodeURLString(url);
 }
 
@@ -82,6 +88,20 @@ URL::Path() const
 }
 
 
+std::string
+URL::Username() const
+{
+	return fUsername;
+}
+
+
+std::string
+URL::Password() const
+{
+	return fPassword;
+}
+
+
 void
 URL::_DecodeURLString(const char* url)
 {
@@ -94,13 +114,23 @@ URL::_DecodeURLString(const char* url)
 		fProtocol = string.substr(0, suffixPos);
 		result = string.substr(suffixPos + strlen(kProtocolSuffix), -1);
 	}
+	// User/Password
+	size_t authPos = result.find("@");
+	if (authPos != std::string::npos) {
+		size_t passPos = result.find(":");
+		if (passPos != std::string::npos) {
+			size_t passLen = authPos - passPos - 1;
+			fUsername = result.substr(0, passPos);
+			fPassword = result.substr(passPos + 1, passLen);
+		}
+		result = result.substr(authPos + 1, -1);
+	}
 	size_t portPos = result.find(":");
 	if (portPos != std::string::npos) {
 		fHost = result.substr(0, portPos);
 		size_t slashPos = result.find("/", portPos);
 		if (slashPos != std::string::npos)
 			fPath = result.substr(slashPos, -1);
-		
 		fPort = ::strtol(result.substr(portPos + 1, result.length()).c_str(),
 			NULL, 10);
 	} else {
