@@ -13,25 +13,25 @@ const static char* kProtocolSuffix = "://";
 #include "URL.h"
 
 URL::URL()
-    :
-    fURLString(""),
-    fProtocol(""),
-    fHost(""),
-    fPort(-1),
-    fPath("")
+	:
+	fURLString(""),
+	fProtocol(""),
+	fHost(""),
+	fPort(-1),
+	fPath("")
 {
 }
 
 
 URL::URL(const char* url)
-    :
-    fURLString(url),
-    fProtocol(""),
-    fHost(""),
-    fPort(-1),
-    fPath("")
+	:
+	fURLString(url),
+	fProtocol(""),
+	fHost(""),
+	fPort(-1),
+	fPath("")
 {
-    _DecodeURLString(url);
+	_DecodeURLString(url);
 }
 
 
@@ -43,7 +43,7 @@ URL::SetTo(const char* url)
 	fHost = "";
 	fPort = -1;
 	fPath = "";
-    _DecodeURLString(url);
+	_DecodeURLString(url);
 }
 
 
@@ -57,28 +57,28 @@ URL::URLString() const
 std::string
 URL::Protocol() const
 {
-    return fProtocol;
+	return fProtocol;
 }
 
 
 std::string
 URL::Host() const
 {
-    return fHost;
+	return fHost;
 }
 
 
 int
 URL::Port() const
 {
-    return fPort;
+	return fPort;
 }
-    
-    
+
+
 std::string
 URL::Path() const
 {
-    return fPath;
+	return fPath;
 }
 
 
@@ -92,7 +92,7 @@ URL::_DecodeURLString(const char* url)
 	if (suffixPos != std::string::npos) {
 		// Remove protocol part (<proto>://)
 		fProtocol = string.substr(0, suffixPos);
-		result = string.substr(suffixPos + strlen(kProtocolSuffix), -1);		
+		result = string.substr(suffixPos + strlen(kProtocolSuffix), -1);
 	}
 	size_t portPos = result.find(":");
 	if (portPos != std::string::npos) {
