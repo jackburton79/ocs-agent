@@ -45,10 +45,11 @@ Logger::Log(int level, const char* const string)
 void
 Logger::LogFormat(int level, const char* fmtString, ...)
 {
-	char logString[512];
+	char logString[1024];
 	va_list argp;
 	va_start(argp, fmtString);
-
+	// TODO: Use vsnprintf. This can crash the stack if fmtString
+	// is too big
 	vsprintf(logString, fmtString, argp);
 
 	va_end(argp);
