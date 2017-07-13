@@ -7,6 +7,7 @@ const char* urls[] = {
     "http://www.test2.it",
     "https://differentURL.com/part/of/path/end.xml",
     "www.withoutproto.com",
+    "/pathonly/run.php",
     NULL
 };
 
