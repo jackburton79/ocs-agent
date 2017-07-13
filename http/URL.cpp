@@ -112,7 +112,7 @@ URL::_DecodeURLString(const char* url)
 	if (suffixPos != std::string::npos) {
 		// Remove protocol part (<proto>://)
 		fProtocol = string.substr(0, suffixPos);
-		result = string.substr(suffixPos + strlen(kProtocolSuffix), -1);
+		result = string.substr(suffixPos + strlen(kProtocolSuffix), std::string::npos);
 	}
 	// User/Password
 	size_t authPos = result.find("@");
@@ -130,7 +130,7 @@ URL::_DecodeURLString(const char* url)
 		fHost = result.substr(0, portPos);
 		size_t slashPos = result.find("/", portPos);
 		if (slashPos != std::string::npos)
-			fPath = result.substr(slashPos, -1);
+			fPath = result.substr(slashPos, std::string::npos);
 		fPort = ::strtol(result.substr(portPos + 1, result.length()).c_str(),
 			NULL, 10);
 	} else {
@@ -138,7 +138,7 @@ URL::_DecodeURLString(const char* url)
 		size_t slashPos = result.find("/");
 		if (slashPos != std::string::npos) {
 			fHost = result.substr(0, slashPos);
-			fPath = result.substr(slashPos, -1);
+			fPath = result.substr(slashPos, std::string::npos);
 		} else
 			fHost = result;
 	}
