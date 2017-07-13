@@ -5,6 +5,7 @@
  *  Copyright 2017 Stefano Ceccherini (stefano.ceccherini@gmail.com)
  */
 
+#include <algorithm>
 #include <cstdlib>
 #include <cstring>
 
@@ -119,6 +120,9 @@ URL::_DecodeURLString(const char* url)
 	if (suffixPos != std::string::npos) {
 		// Remove protocol part (<proto>://)
 		fProtocol = string.substr(0, suffixPos);
+		// convert to lowercase
+		std::transform(fProtocol.begin(), fProtocol.end(),
+				fProtocol.begin(), ::tolower);
 		result = string.substr(suffixPos + strlen(kProtocolSuffix), std::string::npos);
 	}
 	// User/Password

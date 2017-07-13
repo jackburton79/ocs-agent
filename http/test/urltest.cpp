@@ -10,6 +10,7 @@ const char* urls[] = {
     "/pathonly/run.php",
     "user:pass@server/directory/file.xml",
     "http://user:password@server:81/directory/",
+	"HTTP://user:password@server:81/directory/",
     NULL
 };
 
