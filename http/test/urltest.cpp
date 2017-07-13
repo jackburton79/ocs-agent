@@ -13,10 +13,10 @@ const char* urls[] = {
 
 int main()
 {
-    char* urlString = NULL;
     size_t i = 0;
-    for (; (urlString = (char*)urls[i]) != NULL; i++) {
-        URL url(urlString);
+    URL url;
+    for (char* urlString = NULL; (urlString = (char*)urls[i]) != NULL; i++) {
+        url.SetTo(urlString);
         std::cout << "url: " << url.URLString() << std::endl;
         std::cout << "\t" << "protocol: " << url.Protocol() << std::endl;
         std::cout << "\t" << "host: " << url.Host() << std::endl;
