@@ -21,6 +21,7 @@ int main()
     for (char* urlString = NULL; (urlString = (char*)urls[i]) != NULL; i++) {
         url.SetTo(urlString);
         std::cout << "url: " << url.URLString() << std::endl;
+        std::cout << "\t" << "relative: " << (url.IsRelative() ? "yes" : "no") << std::endl;
         std::cout << "\t" << "protocol: " << url.Protocol() << std::endl;
         std::cout << "\t" << "host: " << url.Host() << std::endl;
         std::cout << "\t" << "port: " << url.Port() << std::endl;
