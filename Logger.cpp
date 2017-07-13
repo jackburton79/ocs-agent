@@ -48,10 +48,7 @@ Logger::LogFormat(int level, const char* fmtString, ...)
 	char logString[1024];
 	va_list argp;
 	va_start(argp, fmtString);
-	// TODO: Use vsnprintf. This can crash the stack if fmtString
-	// is too big
-	vsprintf(logString, fmtString, argp);
-
+	vsnprintf(logString, sizeof(logString), fmtString, argp);
 	va_end(argp);
 	::syslog(level, (const char* const)logString);
 	if (fVerbose)
