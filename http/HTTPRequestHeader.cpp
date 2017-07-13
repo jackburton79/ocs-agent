@@ -2,13 +2,15 @@
  * HTTPRequestHeader.cpp
  *
  *  Created on: 23/lug/2013
- *  Copyright 2013-2014 Stefano Ceccherini (stefano.ceccherini@gmail.com)
+ *  Copyright 2013-2017 Stefano Ceccherini (stefano.ceccherini@gmail.com)
  */
 
 #include "HTTPDefines.h"
 #include "HTTPRequestHeader.h"
+#include "URL.h"
 
 #include <iostream>
+
 
 HTTPRequestHeader::HTTPRequestHeader()
 {
@@ -94,12 +96,9 @@ HTTPRequestHeader::SetRequest(const std::string method,
 	fMethod = method;
 	fPath = path;
 	
-	int port = -1;
-	std::string hostName;
-	if (GetHostAndPortFromString(path, hostName, port) == 0
-			&& hostName != "") {
+	std::string hostName = URL(path.c_str()).Host();
+	if (hostName != "")
 		fValues["Host"] = hostName;
-	}
 }
 
 

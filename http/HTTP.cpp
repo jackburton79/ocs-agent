@@ -10,6 +10,7 @@
 #include "HTTPRequestHeader.h"
 #include "HTTPResponseHeader.h"
 #include "Support.h"
+#include "URL.h"
 
 #include <arpa/inet.h>
 #include <sys/socket.h>
@@ -40,8 +41,9 @@ HTTP::HTTP(const std::string string)
 	fFD(-1),
 	fLastError(0)
 {
-	if (GetHostAndPortFromString(string, fHost, fPort) != 0)
-		throw "HTTP Initialize error";
+	URL url(string.c_str());
+	fHost = url.Host();
+	fPort = url.Port();
 }
 
 
@@ -98,7 +100,14 @@ HTTP::LastResponse() const
 int
 HTTP::SetHost(const std::string hostName)
 {
-	fLastError = GetHostAndPortFromString(hostName, fHost, fPort);
+	try {
+		URL url(hostName.c_str());
+		fHost = url.Host();
+		fPort = url.Port();
+		fLastError = 0;
+	} catch (...) {
+		fLastError = -1;
+	}
 	return fLastError;
 }
 
@@ -107,7 +116,6 @@ int
 HTTP::Get(const std::string path)
 {
 	HTTPRequestHeader requestHeader("GET", path);
-
 	return Request(requestHeader);
 }
 
@@ -116,7 +124,6 @@ int
 HTTP::Put(const std::string path, const char* data, const size_t dataLength)
 {
 	HTTPRequestHeader requestHeader("PUT", path);
-
 	return Request(requestHeader, data, dataLength);
 }
 
@@ -125,7 +132,6 @@ int
 HTTP::Post(const std::string path, const char* data, const size_t dataLength)
 {
 	HTTPRequestHeader requestHeader("POST", path);
-
 	return Request(requestHeader, data, dataLength);
 }
 
@@ -154,9 +160,6 @@ HTTP::Request(const HTTPRequestHeader& header, const void* data, const size_t le
 
 	std::string string = fCurrentRequest.ToString().append(CRLF);
 
-#if 0
-	std::cout << string << std::endl;
-#endif
 	if (::write(fFD, string.c_str(), string.length())
 			!= (int)string.length()) {
 		fLastError = errno;
@@ -169,7 +172,7 @@ HTTP::Request(const HTTPRequestHeader& header, const void* data, const size_t le
 			return errno;
 		}
 	}
-	
+
 	std::string replyString;
 	try {
 		_ReadLineFromSocket(replyString, fFD);
@@ -204,23 +207,21 @@ HTTP::Request(const HTTPRequestHeader& header, const void* data, const size_t le
 bool
 HTTP::_HandleConnectionIfNeeded(const std::string string)
 {
-	std::string hostName;
-	int port;
-	GetHostAndPortFromString(string, hostName, port);
+	URL url(string.c_str());
+	std::string hostName = url.Host();
+	int port = url.Port();
 
-#if 0
-	std::cout << "HTTP::_HandleConnectionIfNeeded(" << string << ", ";
-	std::cout << port << ")" << std::endl;
-#endif
+	// Check if we are already connected to this server,
+	// so we can reuse the existing connection
 	if (fFD >= 0) {
 		if (hostName == "" || (hostName == fHost && port == fPort)) {
-			// we can reuse the existing connection,
-			// unless the server closed it already.
+			// But not if the server closed it from its side
 			HTTPResponseHeader lastResponse = LastResponse();
 			if (!lastResponse.HasKey("connection")
 				|| lastResponse.Value("connection") != "close") 
 		 		return true;
 		}
+		// Different server, or same server, but connection closed
 		::close(fFD);
 		fFD = -1;
 	}
@@ -248,7 +249,7 @@ HTTP::_HandleConnectionIfNeeded(const std::string string)
 	::setsockopt(fFD, SOL_SOCKET, SO_KEEPALIVE, 0, 0);
 	::setsockopt(fFD, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv,sizeof(struct timeval));
 	::setsockopt(fFD, SOL_SOCKET, SO_SNDTIMEO, (char *)&tv,sizeof(struct timeval));
-	
+
 	struct sockaddr_in serverAddr;
 	::memset((char*)&serverAddr, 0, sizeof(serverAddr));
 	::memcpy((char*)&serverAddr.sin_addr, hostEnt->h_addr, hostEnt->h_length);
