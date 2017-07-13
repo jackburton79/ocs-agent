@@ -16,6 +16,9 @@
 
 #include <zlib.h>
 
+#include <tinyxml2/tinyxml2.h>
+
+
 class ElementFinder : public tinyxml2::XMLVisitor {
 public:
 	ElementFinder(std::string elementName);
