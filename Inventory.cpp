@@ -19,6 +19,7 @@
 #include "XML.h"
 
 #include "http/HTTP.h"
+#include "http/URL.h"
 
 #include <cstdlib>
 #include <iostream>
@@ -141,7 +142,7 @@ Inventory::Save(const char* name, const char* fileName)
 bool
 Inventory::Send(const char* serverUrl)
 {
-	std::string inventoryUrl(serverUrl);
+	URL inventoryUrl(serverUrl);
 
 	Logger& logger = Logger::GetDefault();
 
@@ -157,7 +158,7 @@ Inventory::Send(const char* serverUrl)
 	}
 
 	HTTPRequestHeader requestHeader;
-	requestHeader.SetRequest("POST", inventoryUrl);
+	requestHeader.SetRequest("POST", inventoryUrl.URLString());
 	requestHeader.SetValue("Pragma", "no-cache");
 	requestHeader.SetValue("Keep-Alive", "300");
 	requestHeader.SetValue("Connection", "Keep-Alive, TE");
@@ -165,8 +166,19 @@ Inventory::Send(const char* serverUrl)
 	requestHeader.SetContentType("application/x-compress");
 	requestHeader.SetContentLength(prologLength);
 	requestHeader.SetUserAgent(USER_AGENT);
+
+	// TODO: Improve.
+	if (inventoryUrl.Username() != "") {
+		std::string auth("Basic ");
+		std::string authString;
+		authString.append(inventoryUrl.Username()).append(":");
+		authString.append(inventoryUrl.Password());
+		authString = HTTP::Base64Encode(authString);
+		auth.append(authString);
+		requestHeader.SetValue("Authorization", auth.c_str());
+	}
+
 	HTTP httpObject;
-	
 	logger.Log(LOG_INFO, "Inventory::Send(): Prolog prepared!");
 	if (httpObject.Request(requestHeader, prologData, prologLength) != 0) {
 		delete[] prologData;
@@ -221,7 +233,7 @@ Inventory::Send(const char* serverUrl)
 	}
 
 	requestHeader.Clear();
-	requestHeader.SetRequest("POST", inventoryUrl);
+	requestHeader.SetRequest("POST", inventoryUrl.URLString());
 	requestHeader.SetValue("Pragma", "no-cache");
 	requestHeader.SetValue("Keep-Alive", "300");
 	requestHeader.SetValue("Connection", "Keep-Alive, TE");
