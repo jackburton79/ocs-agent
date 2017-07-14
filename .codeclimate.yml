@@ -1,0 +1,14 @@
+engines:
+  cppcheck:
+    enabled: true
+    config:
+      check: all
+      language: c++
+      stds:
+        - c++11
+      platform: unix64   
+      includes:
+      - http/
+      inconclusive: false
+  fixme:
+    enabled: true
