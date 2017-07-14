@@ -124,9 +124,9 @@ Inventory::Save(const char* name, const char* fileName)
 {
 	if (name == NULL || fileName == NULL)
 		return false;
-		
+
 	Logger& logger = Logger::GetDefault();
-	
+
 	logger.LogFormat(LOG_INFO, "Saving %s inventory as %s", name, fileName);
 
 	bool result = fDocument->SaveFile(fileName) == tinyxml2::XML_SUCCESS;
@@ -216,13 +216,13 @@ Inventory::Send(const char* serverUrl)
 		logger.Log(LOG_ERR, "failed to decompress XML");
 		return false;
 	}
-		
+
 	std::string serverResponse = XML::GetTextElementValue(document, "RESPONSE");
 	if (serverResponse != "SEND") {
 		logger.LogFormat(LOG_ERR, "Server not ready to accept inventory: %s", serverResponse.c_str());
 		return false;
 	}
-	
+
 	logger.LogFormat(LOG_INFO, "Inventory::Send(): server replied %s", serverResponse.c_str());
 	logger.Log(LOG_INFO, "Inventory::Send(): Compressing XML inventory data... ");
 	char* compressedData = NULL;
@@ -277,7 +277,7 @@ Inventory::_AddAccountInfo(tinyxml2::XMLElement* parent)
 {
 	Logger& logger = Logger::GetDefault();
 	logger.Log(LOG_INFO, "\tAdding Account Info...");
-	
+
 	tinyxml2::XMLElement* accountInfo = fDocument->NewElement("ACCOUNTINFO");
 
 	tinyxml2::XMLElement* keyName = fDocument->NewElement("KEYNAME");
@@ -286,7 +286,7 @@ Inventory::_AddAccountInfo(tinyxml2::XMLElement* parent)
 	std::string tag = Configuration::Get()->KeyValue("TAG");
 	if (tag == "")
 		tag = "NA";
-		
+
 	tinyxml2::XMLElement* keyValue = fDocument->NewElement("KEYVALUE");
 	keyValue->LinkEndChild(fDocument->NewText(tag.c_str()));
 
@@ -303,7 +303,7 @@ Inventory::_AddBIOSInfo(tinyxml2::XMLElement* parent)
 {
 	Logger& logger = Logger::GetDefault();
 	logger.Log(LOG_INFO, "\tAdding BIOS Info...");
-	
+
 	tinyxml2::XMLElement* bios = fDocument->NewElement("BIOS");
 
 	tinyxml2::XMLElement* assettag = fDocument->NewElement("ASSETTAG");
@@ -344,7 +344,7 @@ Inventory::_AddBIOSInfo(tinyxml2::XMLElement* parent)
 	bios->LinkEndChild(ssn);
 
 	parent->LinkEndChild(bios);
-	
+
 	logger.Log(LOG_INFO, "\tDone adding BIOS Info!");
 }
 
@@ -354,7 +354,7 @@ Inventory::_AddCPUsInfo(tinyxml2::XMLElement* parent)
 {
 	Logger& logger = Logger::GetDefault();
 	logger.Log(LOG_INFO, "\tAdding CPUs Info...");
-	
+
 	// TODO: Check if the fields name and structure are correct.
 	for (int i = 0; i < fMachine->CountProcessors(); i++) {
 		tinyxml2::XMLElement* cpu = fDocument->NewElement("CPUS");
@@ -397,23 +397,18 @@ Inventory::_AddStoragesInfo(tinyxml2::XMLElement* parent)
 {
 	Logger& logger = Logger::GetDefault();
 	logger.Log(LOG_INFO, "\tAdding Storages Info...");
-	
+
 	Storages storages;
 	for (int i = 0; i < storages.Count(); i++) {
 		tinyxml2::XMLElement* storage = fDocument->NewElement("STORAGES");
 		storage_info info = storages.StorageAt(i);
-#if 0		
-		std::cout << std::endl;
-		std::cout << "Storage number " << i << std::endl;
-		std::cout << "manufacturer: " << info.manufacturer << std::endl;
-		std::cout << "model: " << info.model << std::endl;
-#endif
+
 		tinyxml2::XMLElement* manufacturer = fDocument->NewElement("MANUFACTURER");
 		manufacturer->LinkEndChild(fDocument->NewText(info.manufacturer.c_str()));
 
 		tinyxml2::XMLElement* name = fDocument->NewElement("NAME");
 		name->LinkEndChild(fDocument->NewText(info.name.c_str()));
-		
+
 		tinyxml2::XMLElement* model = fDocument->NewElement("MODEL");
 		model->LinkEndChild(fDocument->NewText(info.model.c_str()));
 
@@ -428,10 +423,10 @@ Inventory::_AddStoragesInfo(tinyxml2::XMLElement* parent)
 
 		tinyxml2::XMLElement* serialNumber = fDocument->NewElement("SERIALNUMBER");
 		serialNumber->LinkEndChild(fDocument->NewText(info.serial_number.c_str()));
-		
+
 		tinyxml2::XMLElement* firmware = fDocument->NewElement("FIRMWARE");
 		firmware->LinkEndChild(fDocument->NewText(info.firmware.c_str()));
-		
+
 		storage->LinkEndChild(manufacturer);
 		storage->LinkEndChild(name);
 		storage->LinkEndChild(model);
@@ -497,7 +492,7 @@ Inventory::_AddDrivesInfo(tinyxml2::XMLElement* parent)
 {
 	Logger& logger = Logger::GetDefault();
 	logger.Log(LOG_INFO, "\tAdding Drives info...");
-	
+
 	try {
 		VolumeReader reader;
 		volume_info info;
@@ -549,7 +544,7 @@ Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 {
 	Logger& logger = Logger::GetDefault();
 	logger.Log(LOG_INFO, "\tAdding Hardware info...");
-	
+
 	tinyxml2::XMLElement* hardware = fDocument->NewElement("HARDWARE");
 
 	tinyxml2::XMLElement* checksum = fDocument->NewElement("CHECKSUM");
@@ -609,9 +604,9 @@ Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 	swap->LinkEndChild(fDocument->NewText(fMachine->OSInfo().swap.c_str()));
 
 	tinyxml2::XMLElement* userID = fDocument->NewElement("USERID");
-	// TODO: Fix this
+
+	// TODO: Fix this. Use the process user ?
 	userID->LinkEndChild(fDocument->NewText("root"));
-	//<USERID>root</USERID>
 
 	tinyxml2::XMLElement* uuid = fDocument->NewElement("UUID");
 	uuid->LinkEndChild(fDocument->NewText(fMachine->SystemUUID().c_str()));
@@ -659,7 +654,7 @@ Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 	hardware->LinkEndChild(workGroup);
 
 	parent->LinkEndChild(hardware);
-	
+
 	logger.Log(LOG_INFO, "\tDone adding Hardware info!");
 }
 
@@ -669,7 +664,7 @@ Inventory::_AddNetworksInfo(tinyxml2::XMLElement* parent)
 {
 	Logger& logger = Logger::GetDefault();
 	logger.Log(LOG_INFO, "\tAdding Networks info...");
-	
+
 	try {
 		NetworkRoster roster;
 		NetworkInterface interface;
@@ -842,7 +837,7 @@ Inventory::_AddUsersInfo(tinyxml2::XMLElement* parent)
 {
 	Logger& logger = Logger::GetDefault();
 	logger.Log(LOG_INFO, "\tAdding Users info...");
-	
+
 	try {
 		tinyxml2::XMLElement* users = fDocument->NewElement("USERS");
 
@@ -922,7 +917,7 @@ Inventory::_AddMonitorsInfo(tinyxml2::XMLElement* parent)
 		}
 	} catch (...) {
 	}
-	
+
 	logger.Log(LOG_INFO, "\tDone adding Display info!");
 }
 
