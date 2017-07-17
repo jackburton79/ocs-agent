@@ -10,6 +10,7 @@
 #include "HTTPRequestHeader.h"
 #include "HTTPResponseHeader.h"
 #include "Socket.h"
+#include "SSLSocket.h"
 #include "Support.h"
 #include "URL.h"
 
@@ -37,7 +38,6 @@ HTTP::HTTP()
 	fSocket(NULL),
 	fLastError(0)
 {
-	fSocket = new Socket();
 }
 
 
@@ -50,7 +50,6 @@ HTTP::HTTP(const std::string string)
 	URL url(string.c_str());
 	fHost = url.Host();
 	fPort = url.Port();
-	fSocket = new Socket();
 }
 
 
@@ -64,8 +63,11 @@ HTTP::~HTTP()
 void
 HTTP::Close()
 {
-	if (fSocket->IsOpened())
+	if (fSocket != NULL) {
 		fSocket->Close();
+		delete fSocket;
+		fSocket = NULL;
+	}
 }
 
 
@@ -253,16 +255,9 @@ HTTP::_HandleConnectionIfNeeded(const std::string string)
 	if (hostName == "")
 		return false;
 
-	if (url.Protocol() != "" && url.Protocol() != "http") {
-		std::string errorString("HTTP: unsupported protocol: ");
-		errorString.append(url.Protocol());
-		throw std::runtime_error(errorString);
-		return false;
-	}
-
 	// Check if we are already connected to this server,
 	// so we can reuse the existing connection
-	if (fSocket->IsOpened()) {
+	if (fSocket != NULL && fSocket->IsOpened()) {
 		if (hostName == fHost && port == fPort) {
 			// But not if the server closed it from its side
 			HTTPResponseHeader lastResponse = LastResponse();
@@ -272,7 +267,8 @@ HTTP::_HandleConnectionIfNeeded(const std::string string)
 			}
 		}
 		// Different server, or same server, but connection closed
-		fSocket->Close();
+		delete fSocket;
+		fSocket = NULL;
 	}
 
 	fHost = hostName;
@@ -284,6 +280,14 @@ HTTP::_HandleConnectionIfNeeded(const std::string string)
 		return false;
 	}
 
+	if (url.Protocol() == "https")
+		fSocket = new SSLSocket();
+	else
+		fSocket = new Socket();
+	
+	if (fSocket == NULL)
+		return false;
+	
 	if ((fSocket->Open(AF_INET, SOCK_STREAM, 0)) < 0) {
 		fLastError = errno;
 		return false;
