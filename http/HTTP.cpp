@@ -10,16 +10,12 @@
 #include "HTTPRequestHeader.h"
 #include "HTTPResponseHeader.h"
 #include "Socket.h"
-#include "SSLSocket.h"
+#include "SocketGetter.h"
 #include "Support.h"
 #include "URL.h"
 
 #include <arpa/inet.h>
 #include <sys/socket.h>
-
-#include <openssl/bio.h>
-#include <openssl/buffer.h>
-#include <openssl/evp.h>
 
 #include <errno.h>
 #include <netdb.h>
@@ -211,34 +207,6 @@ HTTP::Request(const HTTPRequestHeader& header, const void* data, const size_t le
 }
 
 
-/* static */
-std::string
-HTTP::Base64Encode(std::string string)
-{
-	// TODO: Error checking
-	BIO* b64f = BIO_new(BIO_f_base64());
-	BIO* buffer = BIO_new(BIO_s_mem());
-	buffer = BIO_push(b64f, buffer);
-
-	BIO_set_flags(buffer, BIO_FLAGS_BASE64_NO_NL);
-	BIO_set_close(buffer, BIO_CLOSE);
-	BIO_write(buffer, string.c_str(), string.length());
-	BIO_flush(buffer);
-
-	BUF_MEM *pointer;
-	BIO_get_mem_ptr(buffer, &pointer);
-
-	size_t encodedSize = pointer->length;
-	std::string encoded(encodedSize + 1, '\0');
-	memcpy(&encoded[0], pointer->data, encodedSize);
-	encoded.resize(encodedSize);
-
-	BIO_free_all(buffer);
-
-	return encoded;
-}
-
-
 bool
 HTTP::_HandleConnectionIfNeeded(const std::string string)
 {
@@ -274,10 +242,7 @@ HTTP::_HandleConnectionIfNeeded(const std::string string)
 	fPort = port;
 
 	try {
-		if (url.Protocol() == "https")
-			fSocket = new SSLSocket();
-		else
-			fSocket = new Socket();
+		fSocket = SocketGetter().GetSocket(url.Protocol());
 	} catch (...) {
 		return false;
 	}
@@ -294,8 +259,8 @@ HTTP::_HandleConnectionIfNeeded(const std::string string)
 	tv.tv_usec = 0;
 
 	fSocket->SetOption(SOL_SOCKET, SO_KEEPALIVE, 0, 0);
-	fSocket->SetOption(SOL_SOCKET, SO_RCVTIMEO, (char *)&tv, sizeof(struct timeval));
-	fSocket->SetOption(SOL_SOCKET, SO_SNDTIMEO, (char *)&tv, sizeof(struct timeval));
+	fSocket->SetOption(SOL_SOCKET, SO_RCVTIMEO, (char*)&tv, sizeof(struct timeval));
+	fSocket->SetOption(SOL_SOCKET, SO_SNDTIMEO, (char*)&tv, sizeof(struct timeval));
 
 	if (fSocket->Connect(fHost.c_str(), fPort) < 0) {
 		fLastError = errno;

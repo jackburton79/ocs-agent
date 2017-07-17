@@ -10,6 +10,8 @@
 #include "Logger.h"
 #include "LoggedUsers.h"
 #include "Machine.h"
+#include "NetworkInterface.h"
+#include "NetworkRoster.h"
 #include "RunningProcessesList.h"
 #include "Screens.h"
 #include "Softwares.h"
@@ -20,14 +22,13 @@
 
 #include "http/HTTP.h"
 #include "http/URL.h"
+#include "http/Utils.h"
 
 #include <cstdlib>
 #include <iostream>
 #include <memory>
 #include <unistd.h>
 
-#include "NetworkInterface.h"
-#include "NetworkRoster.h"
 #include "tinyxml2/tinyxml2.h"
 
 #define USER_AGENT "OCS-NG_unified_unix_agent_v"
@@ -173,7 +174,7 @@ Inventory::Send(const char* serverUrl)
 		std::string authString;
 		authString.append(inventoryUrl.Username()).append(":");
 		authString.append(inventoryUrl.Password());
-		authString = HTTP::Base64Encode(authString);
+		authString = Base64Encode(authString);
 		auth.append(authString);
 		requestHeader.SetValue("Authorization", auth.c_str());
 	}

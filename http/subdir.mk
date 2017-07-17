@@ -10,8 +10,10 @@ CPP_SRCS += \
 ../http/HTTPRequestHeader.cpp \
 ../http/HTTPResponseHeader.cpp \
 ../http/Socket.cpp \
+../http/SocketGetter.cpp \
 ../http/SSLSocket.cpp \
-../http/URL.cpp
+../http/URL.cpp \
+../http/Utils.cpp 
 
 OBJS += \
 ./http/HTTP.o \
@@ -20,8 +22,10 @@ OBJS += \
 ./http/HTTPRequestHeader.o \
 ./http/HTTPResponseHeader.o \
 ./http/Socket.o \
+./http/SocketGetter.o \
 ./http/SSLSocket.o \
-./http/URL.o
+./http/URL.o \
+./http/Utils.o 
 
 CPP_DEPS += \
 ./http/HTTP.d \
@@ -30,8 +34,10 @@ CPP_DEPS += \
 ./http/HTTPRequestHeader.d \
 ./http/HTTPResponseHeader.d \
 ./http/Socket.d \
+./http/SocketGetter.d \
 ./http/SSLSocket.d \
-./http/URL.d 
+./http/URL.d \
+./http/Utils.d
 
 
 # Each subdirectory must supply rules for building sources it contributes
