@@ -274,12 +274,9 @@ HTTP::_HandleConnectionIfNeeded(const std::string string)
 	fPort = port;
 
 	try {
-		if (url.Protocol() == "https") {
-			// TODO: Handle this differently
-			if (fPort == 80)
-				fPort = 443;
+		if (url.Protocol() == "https")
 			fSocket = new SSLSocket();
-		} else
+		else
 			fSocket = new Socket();
 	} catch (...) {
 		return false;

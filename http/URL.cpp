@@ -145,7 +145,10 @@ URL::_DecodeURLString(const char* url)
 		fPort = ::strtol(result.substr(portPos + 1, result.length()).c_str(),
 			NULL, 10);
 	} else {
-		fPort = 80;
+		if (fProtocol == "https")
+			fPort = 443;
+		else
+			fPort = 80;
 		size_t slashPos = result.find("/");
 		if (slashPos != std::string::npos) {
 			fHost = result.substr(0, slashPos);
