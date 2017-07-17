@@ -81,6 +81,31 @@ Socket::Connect(const struct sockaddr *address, socklen_t addrLen)
 
 
 int
+Socket::Connect(const struct hostent* hostEnt, const int port)
+{
+	struct sockaddr_in serverAddr;
+	::memset((char*)&serverAddr, 0, sizeof(serverAddr));
+	::memcpy((char*)&serverAddr.sin_addr, hostEnt->h_addr, hostEnt->h_length);
+	serverAddr.sin_family = hostEnt->h_addrtype;
+	serverAddr.sin_port = (unsigned short)htons(port);
+	
+	return Connect((const struct sockaddr*)&serverAddr,
+			sizeof(serverAddr));
+}
+
+
+int
+Socket::Connect(const char* hostName, const int port)
+{
+	struct hostent* hostEnt = ::gethostbyname(hostName);
+	if (hostEnt == NULL)
+		return h_errno;
+
+	return Connect(hostEnt, port);
+}
+
+
+int
 Socket::Read(void* data, const size_t& length)
 {
 	return ::read(fFD, data, length);
