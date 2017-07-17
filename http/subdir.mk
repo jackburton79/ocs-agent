@@ -9,6 +9,7 @@ CPP_SRCS += \
 ../http/HTTPHeader.cpp \
 ../http/HTTPRequestHeader.cpp \
 ../http/HTTPResponseHeader.cpp \
+../http/Socket.cpp \
 ../http/URL.cpp
 
 OBJS += \
@@ -17,6 +18,7 @@ OBJS += \
 ./http/HTTPHeader.o \
 ./http/HTTPRequestHeader.o \
 ./http/HTTPResponseHeader.o \
+./http/Socket.o \
 ./http/URL.o
 
 CPP_DEPS += \
@@ -25,6 +27,7 @@ CPP_DEPS += \
 ./http/HTTPHeader.d \
 ./http/HTTPRequestHeader.d \
 ./http/HTTPResponseHeader.d \
+./http/Socket.d \
 ./http/URL.d 
 
 

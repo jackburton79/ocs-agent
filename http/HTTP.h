@@ -17,6 +17,7 @@
 #include "HTTPRequestHeader.h"
 #include "HTTPResponseHeader.h"
 
+class Socket;
 class HTTP {
 public:
 	HTTP();
@@ -46,11 +47,11 @@ public:
 private:
 	bool _HandleConnectionIfNeeded(const std::string host);
 
-	static bool _ReadLineFromSocket(std::string& string, int socket);
+	static bool _ReadLineFromSocket(std::string& string, Socket* socket);
 
 	std::string fHost;
 	int fPort;
-	int fFD;
+	Socket* fSocket;
 	int fLastError;
 
 	HTTPRequestHeader fCurrentRequest;

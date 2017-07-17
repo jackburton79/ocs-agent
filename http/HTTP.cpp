@@ -9,6 +9,7 @@
 #include "HTTPDefines.h"
 #include "HTTPRequestHeader.h"
 #include "HTTPResponseHeader.h"
+#include "Socket.h"
 #include "Support.h"
 #include "URL.h"
 
@@ -33,37 +34,38 @@
 HTTP::HTTP()
 	:
 	fPort(-1),
-	fFD(-1),
+	fSocket(NULL),
 	fLastError(0)
 {
+	fSocket = new Socket();
 }
 
 
 HTTP::HTTP(const std::string string)
 	:
 	fPort(-1),
-	fFD(-1),
+	fSocket(NULL),
 	fLastError(0)
 {
 	URL url(string.c_str());
 	fHost = url.Host();
 	fPort = url.Port();
+	fSocket = new Socket();
 }
 
 
 HTTP::~HTTP()
 {
 	Close();
+	delete fSocket;
 }
 
 
 void
 HTTP::Close()
 {
-	if (fFD > 0) {
-		::close(fFD);
-		fFD = -1;
-	}
+	if (fSocket->IsOpened())
+		fSocket->Close();
 }
 
 
@@ -143,7 +145,7 @@ HTTP::Post(const std::string path, const char* data, const size_t dataLength)
 int
 HTTP::Read(void* data,  const size_t& length)
 {
-	if (::read(fFD, data, length) != (int)length) {
+	if (fSocket->Read(data, length) != (int)length) {
 		fLastError = errno;
 		return errno;
 	}
@@ -164,14 +166,14 @@ HTTP::Request(const HTTPRequestHeader& header, const void* data, const size_t le
 
 	std::string string = fCurrentRequest.ToString().append(CRLF);
 
-	if (::write(fFD, string.c_str(), string.length())
+	if (fSocket->Write(string.c_str(), string.length())
 			!= (int)string.length()) {
 		fLastError = errno;
 		return errno;
 	}
 
 	if (data != NULL && length != 0) {
-		if (::write(fFD, data, length) != (int)length) {
+		if (fSocket->Write(data, length) != (int)length) {
 			fLastError = errno;
 			return errno;
 		}
@@ -179,7 +181,7 @@ HTTP::Request(const HTTPRequestHeader& header, const void* data, const size_t le
 
 	std::string replyString;
 	try {
-		_ReadLineFromSocket(replyString, fFD);
+		_ReadLineFromSocket(replyString, fSocket);
 	} catch (int error) {
 		fLastError = error;
 		return error;
@@ -191,7 +193,7 @@ HTTP::Request(const HTTPRequestHeader& header, const void* data, const size_t le
 	try {
 		fLastResponse.Clear();
 		fLastResponse.SetStatusLine(code, statusLine.c_str());
-		while (_ReadLineFromSocket(replyString, fFD)) {
+		while (_ReadLineFromSocket(replyString, fSocket)) {
 			size_t pos = replyString.find(":");
 			std::string value = replyString.substr(pos + 1, std::string::npos);
 			trim(value);
@@ -260,7 +262,7 @@ HTTP::_HandleConnectionIfNeeded(const std::string string)
 
 	// Check if we are already connected to this server,
 	// so we can reuse the existing connection
-	if (fFD >= 0) {
+	if (fSocket->IsOpened()) {
 		if (hostName == fHost && port == fPort) {
 			// But not if the server closed it from its side
 			HTTPResponseHeader lastResponse = LastResponse();
@@ -270,8 +272,7 @@ HTTP::_HandleConnectionIfNeeded(const std::string string)
 			}
 		}
 		// Different server, or same server, but connection closed
-		::close(fFD);
-		fFD = -1;
+		fSocket->Close();
 	}
 
 	fHost = hostName;
@@ -283,7 +284,7 @@ HTTP::_HandleConnectionIfNeeded(const std::string string)
 		return false;
 	}
 
-	if ((fFD = ::socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+	if ((fSocket->Open(AF_INET, SOCK_STREAM, 0)) < 0) {
 		fLastError = errno;
 		return false;
 	}
@@ -292,9 +293,9 @@ HTTP::_HandleConnectionIfNeeded(const std::string string)
 	tv.tv_sec = 15;
 	tv.tv_usec = 0;
 
-	::setsockopt(fFD, SOL_SOCKET, SO_KEEPALIVE, 0, 0);
-	::setsockopt(fFD, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv,sizeof(struct timeval));
-	::setsockopt(fFD, SOL_SOCKET, SO_SNDTIMEO, (char *)&tv,sizeof(struct timeval));
+	fSocket->SetOption(SOL_SOCKET, SO_KEEPALIVE, 0, 0);
+	fSocket->SetOption(SOL_SOCKET, SO_RCVTIMEO, (char *)&tv,sizeof(struct timeval));
+	fSocket->SetOption(SOL_SOCKET, SO_SNDTIMEO, (char *)&tv,sizeof(struct timeval));
 
 	struct sockaddr_in serverAddr;
 	::memset((char*)&serverAddr, 0, sizeof(serverAddr));
@@ -302,7 +303,7 @@ HTTP::_HandleConnectionIfNeeded(const std::string string)
 	serverAddr.sin_family = hostEnt->h_addrtype;
 	serverAddr.sin_port = (unsigned short)htons(fPort);
 
-	if (::connect(fFD, (const struct sockaddr*)&serverAddr,
+	if (fSocket->Connect((const struct sockaddr*)&serverAddr,
 			sizeof(serverAddr)) < 0) {
 		fLastError = errno;
 		return false;
@@ -316,12 +317,12 @@ HTTP::_HandleConnectionIfNeeded(const std::string string)
 
 /* static */
 bool
-HTTP::_ReadLineFromSocket(std::string& string, int socket)
+HTTP::_ReadLineFromSocket(std::string& string, Socket* socket)
 {
 	std::ostringstream s;
 	char byte;
 	int sizeRead = 0;
-	while ((sizeRead = ::read(socket, &byte, 1)) > 0) {
+	while ((sizeRead = socket->Read(&byte, 1)) > 0) {
 		if (byte == '\012')
 			break;
 		if (byte != '\015')
