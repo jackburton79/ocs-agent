@@ -7,15 +7,9 @@
  
 #include "SSLSocket.h"
  
-#include <arpa/inet.h>
-#include <sys/socket.h>
-
 #include <openssl/ssl.h>
 
-#include <netinet/in.h>
-
 #include <errno.h>
-#include <netdb.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
@@ -64,13 +58,14 @@ SSLSocket::Connect(const struct sockaddr *address, socklen_t addrLen)
 	int status = Socket::Connect(address, addrLen);
 	if (status != 0)
 		return status;
-		
+
 	fSSLConnection = SSL_new(sSSLContext);
 	if (fSSLConnection != NULL) {
 		SSL_set_fd(fSSLConnection, FD());
-		return SSL_connect(fSSLConnection);
+		status = SSL_connect(fSSLConnection);
+		return status;
 	}
-	
+
 	// TODO: delete connection
 	return -1;
 }
@@ -93,9 +88,10 @@ SSLSocket::Write(const void* data, const size_t& length)
 int
 SSLSocket::SSLInit()
 {
-	if (sSSLContext != NULL) {
+	if (sSSLContext == NULL) {
 		SSL_load_error_strings();
 		SSL_library_init();
 		sSSLContext = SSL_CTX_new(SSLv23_client_method());
 	}
+	return sSSLContext != NULL ? 0 : -1;
 }
