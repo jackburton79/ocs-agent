@@ -16,7 +16,6 @@
 
 #include <arpa/inet.h>
 #include <sys/socket.h>
-#include <netinet/in.h>
 
 #include <openssl/bio.h>
 #include <openssl/buffer.h>
@@ -274,20 +273,13 @@ HTTP::_HandleConnectionIfNeeded(const std::string string)
 	fHost = hostName;
 	fPort = port;
 
-	struct hostent* hostEnt = ::gethostbyname(fHost.c_str());
-	if (hostEnt == NULL) {
-		fLastError = h_errno;
-		return false;
-	}
-
 	try {
 		if (url.Protocol() == "https") {
 			// TODO: Handle this differently
 			if (fPort == 80)
 				fPort = 443;
 			fSocket = new SSLSocket();
-		}
-		else
+		} else
 			fSocket = new Socket();
 	} catch (...) {
 		return false;
@@ -305,17 +297,10 @@ HTTP::_HandleConnectionIfNeeded(const std::string string)
 	tv.tv_usec = 0;
 
 	fSocket->SetOption(SOL_SOCKET, SO_KEEPALIVE, 0, 0);
-	fSocket->SetOption(SOL_SOCKET, SO_RCVTIMEO, (char *)&tv,sizeof(struct timeval));
-	fSocket->SetOption(SOL_SOCKET, SO_SNDTIMEO, (char *)&tv,sizeof(struct timeval));
+	fSocket->SetOption(SOL_SOCKET, SO_RCVTIMEO, (char *)&tv, sizeof(struct timeval));
+	fSocket->SetOption(SOL_SOCKET, SO_SNDTIMEO, (char *)&tv, sizeof(struct timeval));
 
-	struct sockaddr_in serverAddr;
-	::memset((char*)&serverAddr, 0, sizeof(serverAddr));
-	::memcpy((char*)&serverAddr.sin_addr, hostEnt->h_addr, hostEnt->h_length);
-	serverAddr.sin_family = hostEnt->h_addrtype;
-	serverAddr.sin_port = (unsigned short)htons(fPort);
-
-	if (fSocket->Connect((const struct sockaddr*)&serverAddr,
-			sizeof(serverAddr)) < 0) {
+	if (fSocket->Connect(fHost.c_str(), fPort) < 0) {
 		fLastError = errno;
 		return false;
 	}
