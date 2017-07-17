@@ -184,12 +184,11 @@ HTTP::Request(const HTTPRequestHeader& header, const void* data, const size_t le
 		return error;
 	}
 
-	std::string statusLine = replyString;
 	int code;
-	::sscanf(statusLine.c_str(), "HTTP/1.%*d %03d", (int*)&code);
+	::sscanf(replyString.c_str(), "HTTP/1.%*d %03d", (int*)&code);
 	try {
 		fLastResponse.Clear();
-		fLastResponse.SetStatusLine(code, statusLine.c_str());
+		fLastResponse.SetStatusLine(code, replyString.c_str());
 		while (_ReadLineFromSocket(replyString, fSocket)) {
 			size_t pos = replyString.find(":");
 			std::string value = replyString.substr(pos + 1, std::string::npos);
