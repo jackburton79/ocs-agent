@@ -134,7 +134,7 @@ URL::_DecodeURLString(const char* url)
 			fUsername = result.substr(0, passPos);
 			fPassword = result.substr(passPos + 1, passLen);
 		}
-		result = result.substr(authPos + 1, -1);
+		result = result.substr(authPos + 1, std::string::npos);
 	}
 	size_t portPos = result.find(":");
 	if (portPos != std::string::npos) {
