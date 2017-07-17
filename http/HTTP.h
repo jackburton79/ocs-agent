@@ -41,8 +41,6 @@ public:
 	HTTPResponseHeader LastResponse() const;
 	int Error() const;
 	std::string ErrorString() const;
-
-	static std::string Base64Encode(std::string string);
 	
 private:
 	bool _HandleConnectionIfNeeded(const std::string host);
