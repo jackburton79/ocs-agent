@@ -9,9 +9,10 @@
  
 #include <openssl/ssl.h>
 
-#include <errno.h>
-#include <stdio.h>
-#include <string.h>
+#include <cerrno>
+#include <cstdio>
+#include <cstring>
+#include <stdexcept>
 #include <unistd.h>
 
 
@@ -85,13 +86,14 @@ SSLSocket::Write(const void* data, const size_t& length)
 }
 
 
-int
+void
 SSLSocket::SSLInit()
 {
 	if (sSSLContext == NULL) {
 		SSL_load_error_strings();
 		SSL_library_init();
 		sSSLContext = SSL_CTX_new(SSLv23_client_method());
+		if (sSSLContext == NULL)
+			throw std::runtime_error("SSL: can't initialize SSL Library");
 	}
-	return sSSLContext != NULL ? 0 : -1;
 }

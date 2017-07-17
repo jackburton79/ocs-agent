@@ -27,7 +27,7 @@ public:
 	virtual int Write(const void* data, const size_t& length);
 
 private:
-	int SSLInit();
+	void SSLInit();
 
 	SSL* fSSLConnection;
 };
