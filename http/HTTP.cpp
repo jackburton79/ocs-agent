@@ -280,16 +280,23 @@ HTTP::_HandleConnectionIfNeeded(const std::string string)
 		return false;
 	}
 
-	if (url.Protocol() == "https")
-		fSocket = new SSLSocket();
-	else
-		fSocket = new Socket();
-	
-	if (fSocket == NULL)
+	try {
+		if (url.Protocol() == "https") {
+			// TODO: Handle this differently
+			if (fPort == 80)
+				fPort = 443;
+			fSocket = new SSLSocket();
+		}
+		else
+			fSocket = new Socket();
+	} catch (...) {
 		return false;
+	}
 	
 	if ((fSocket->Open(AF_INET, SOCK_STREAM, 0)) < 0) {
 		fLastError = errno;
+		delete fSocket;
+		fSocket = NULL;
 		return false;
 	}
 
