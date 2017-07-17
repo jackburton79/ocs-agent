@@ -52,6 +52,13 @@ Socket::Close()
 }
 
 
+int
+Socket::FD() const
+{
+	return fFD;
+}
+
+
 bool
 Socket::IsOpened() const
 {
