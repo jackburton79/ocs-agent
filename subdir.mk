@@ -20,8 +20,7 @@ CPP_SRCS += \
 ../Support.cpp \
 ../VolumeReader.cpp \
 ../XML.cpp \
-../edid-decode.c 	\
-../main.cpp 
+../edid-decode.c
 
 OBJS += \
 ./Agent.o \
@@ -40,8 +39,7 @@ OBJS += \
 ./Support.o \
 ./VolumeReader.o \
 ./XML.o \
-./edid-decode.o \
-./main.o 
+./edid-decode.o 
 
 CPP_DEPS += \
 ./Agent.d \
@@ -61,8 +59,7 @@ CPP_DEPS += \
 ./Support.d \
 ./VolumeReader.d \
 ./XML.d \
-./edid-decode.d \
-./main.d 
+./edid-decode.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

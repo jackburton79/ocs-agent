@@ -33,24 +33,29 @@ endif
 endif
 
 
-CXXFLAGS=-Wno-format-security -O2 -Wall -I ./
-
 # Add inputs and outputs from these tool invocations to the build variables 
 
 # All Target
-all: OcsInventory-ng-agent
+all: OcsInventory-ng-agent urltest
 
 # Tool invocations
-OcsInventory-ng-agent: $(OBJS) $(USER_OBJS)
+OcsInventory-ng-agent: $(OBJS) $(USER_OBJS) main.o
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C++ Linker'
-	g++  -o "ocsinventory-agent" $(OBJS) $(USER_OBJS) $(LDFLAGS) $(LIBS)
+	g++  -o "ocsinventory-agent" $(OBJS) $(USER_OBJS) main.o $(LDFLAGS) $(LIBS)
+	@echo 'Finished building target: $@'
+	@echo ' '
+
+urltest: $(OBJS) $(USER_OBJS) test/urltest.o
+	@echo 'Building target: $@'
+	@echo 'Invoking: GCC C++ Linker'
+	g++  -o "test/urltest" $(OBJS) $(USER_OBJS) test/urltest.o $(LDFLAGS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) $(OBJS)$(C++_DEPS)$(C_DEPS)$(CC_DEPS)$(CPP_DEPS)$(EXECUTABLES)$(CXX_DEPS)$(C_UPPER_DEPS) OcsInventory-ng-agent
+	-$(RM) $(OBJS)$(C++_DEPS)$(C_DEPS)$(CC_DEPS)$(CPP_DEPS)$(EXECUTABLES)$(CXX_DEPS)$(C_UPPER_DEPS) main.o test/urltest.o ocsinventory-agent test/urltest
 	-@echo ' '
 
 .PHONY: all clean dependents
