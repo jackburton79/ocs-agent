@@ -38,7 +38,7 @@ Agent::Run()
 		throw "Cannot initialize Inventory";
 
 	bool noSoftware = (config->KeyValue("nosoftware") == "true");
-	if (!inventory.Build(deviceID.c_str(), noSoftware))
+	if (!inventory.Build(noSoftware))
 		return;
 
 	if (config->KeyValue("stdout") == "true")
@@ -48,7 +48,7 @@ Agent::Run()
 		if (!fullFileName.empty()) {
 			if (fullFileName[fullFileName.length() - 1] == '/')
 				fullFileName.append(deviceID).append(".xml");
-			inventory.Save(deviceID.c_str(), fullFileName.c_str());
+			inventory.Save(fullFileName.c_str());
 		} else
 			std::cerr << "No path/filename specified." << std::endl;
 	} else {

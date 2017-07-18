@@ -8,6 +8,8 @@
 #ifndef INVENTORY_H_
 #define INVENTORY_H_
 
+#include <string>
+
 namespace tinyxml2 {
     class XMLDocument;
     class XMLElement;
@@ -19,11 +21,11 @@ public:
 	Inventory();
 	~Inventory();
 
-	bool Initialize(const char* deviceID);
+	bool Initialize(std::string deviceID);
 	void Clear();
 
-	bool Build(const char* deviceID, bool noSoftware = false);
-	bool Save(const char* name, const char* filePath);
+	bool Build(bool noSoftware = false);
+	bool Save(const char* filePath);
 	bool Send(const char* serverUrl);
 	void Print();
 
@@ -50,6 +52,7 @@ private:
     tinyxml2::XMLDocument* fDocument;
     tinyxml2::XMLElement* fContent;
 	Machine* fMachine;
+	std::string fDeviceID;
 };
 
 #endif /* INVENTORY_H_ */
