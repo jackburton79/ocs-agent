@@ -1,6 +1,5 @@
 language: cpp
 compiler:
-  - clang
   - gcc
 before_install:
   - git clone --depth 1 https://github.com/rizsotto/Bear.git
