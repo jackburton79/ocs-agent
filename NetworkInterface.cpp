@@ -127,7 +127,7 @@ NetworkInterface::DefaultGateway() const
 std::string
 NetworkInterface::Type() const
 {
-	// TODO:
+	// TODO: Implement 
 	return "";
 }
 
@@ -147,6 +147,17 @@ NetworkInterface::Status() const
 		return "";
 
 	return ifr.ifr_flags & IFF_UP ? "Up" : "Down";
+}
+
+
+bool
+NetworkInterface::IsLoopback() const
+{
+	struct ifreq ifr;
+	if (_DoRequest(SIOCGIFFLAGS, ifr) != 0)
+		return "";
+
+	return ifr.ifr_flags & IFF_LOOPBACK;
 }
 
 

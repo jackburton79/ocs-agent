@@ -26,7 +26,6 @@ public:
 	NetworkInterface(const char* name);
 	~NetworkInterface();
 
-	
 	std::string Name() const;
 	std::string HardwareAddress() const;
 	std::string IPAddress() const;
@@ -37,9 +36,12 @@ public:
 	std::string Speed() const;
 	std::string Status() const;
 
+	bool IsLoopback() const;
+
 private:
 	int _GetRoutes(std::list<route_info>& routeList) const;
 	int _DoRequest(int request, struct ifreq& ifr) const;
+
 	std::string fName;
 };
 
