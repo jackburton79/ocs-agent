@@ -9,7 +9,6 @@
 #include "Support.h"
 
 #include <ctime>
-#include <istream>
 
 #include <utmpx.h>
 

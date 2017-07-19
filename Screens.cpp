@@ -11,11 +11,10 @@
 
 #include <iostream>
 #include <string>
-#include <vector>
 
 Screens::Screens()
 {
-    if (CommandExists("find")) {        
+	if (CommandExists("find")) {        
 		popen_streambuf buf("find /sys/devices/ -name edid", "r");
 		std::istream stream(&buf);
 		std::string line;
