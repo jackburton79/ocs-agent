@@ -200,7 +200,7 @@ Configuration::_GenerateDeviceID()
 		NetworkInterface interface;
 		unsigned int cookie = 0;
 		while (roster.GetNextInterface(&cookie, interface) == 0) {
-			if (interface.Name() != "lo") {
+			if (!interface.IsLoopback()) {
 				deviceID = interface.HardwareAddress();
 				deviceID.erase(std::remove(deviceID.begin(), deviceID.end(), ':'),
 						deviceID.end());

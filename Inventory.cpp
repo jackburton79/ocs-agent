@@ -551,7 +551,7 @@ Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 	NetworkInterface interface;
 	unsigned int cookie = 0;
 	while (roster.GetNextInterface(&cookie, interface) == 0) {
-		if (interface.Name() != "lo" && interface.IPAddress() != ""
+		if (!interface.IsLoopback() && interface.IPAddress() != ""
 				&& interface.IPAddress() != "0.0.0.0")
 			break;
 	}
@@ -659,7 +659,7 @@ Inventory::_AddNetworksInfo(tinyxml2::XMLElement* parent)
 	NetworkInterface interface;
 	unsigned int cookie = 0;
 	while (roster.GetNextInterface(&cookie, interface) == 0) {
-		if (interface.Name() == "lo")
+		if (interface.IsLoopback())
 			continue;
 
 		tinyxml2::XMLElement* networks = fDocument->NewElement("NETWORKS");
