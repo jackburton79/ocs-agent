@@ -32,7 +32,7 @@ Remember, this is not the official OCSInventory NG agent, which can be found her
     -v, --verbose                      Verbose mode
     
     The -l and -s option are mutually exclusive.
-    If no server or output file is specified, either via the -s/-l option or via configuration file (option -c), the program will exit   without doing anything.
+    If no server or output file is specified, either via the -s/-l option or via configuration file (option -c), the program will exit without doing anything.
     Examples:
     ocsinventory-agent --conf /etc/ocsinventory-ng.conf
     ocsinventory-agent --server http://ocsinventory-ng/ocsinventory
