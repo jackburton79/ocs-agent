@@ -22,9 +22,9 @@ Base64Encode(std::string string)
 	buffer = BIO_push(b64f, buffer);
 
 	BIO_set_flags(buffer, BIO_FLAGS_BASE64_NO_NL);
-	BIO_set_close(buffer, BIO_CLOSE);
+	(void)BIO_set_close(buffer, BIO_CLOSE);
 	BIO_write(buffer, string.c_str(), string.length());
-	BIO_flush(buffer);
+	(void)BIO_flush(buffer);
 
 	BUF_MEM *pointer;
 	BIO_get_mem_ptr(buffer, &pointer);
