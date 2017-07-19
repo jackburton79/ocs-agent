@@ -819,7 +819,6 @@ void
 Inventory::_AddUsersInfo(tinyxml2::XMLElement* parent)
 {
 	Logger& logger = Logger::GetDefault();
-	logger.Log(LOG_INFO, "\tAdding Users info...");
 
 	tinyxml2::XMLElement* users = fDocument->NewElement("USERS");
 
@@ -831,7 +830,7 @@ Inventory::_AddUsersInfo(tinyxml2::XMLElement* parent)
 	}
 	parent->LinkEndChild(users);
 
-	logger.Log(LOG_INFO, "\tDone adding User info!");
+	logger.Log(LOG_INFO, "\tAdded User info!");
 }
 
 
@@ -894,7 +893,7 @@ Inventory::_AddMonitorsInfo(tinyxml2::XMLElement* parent)
 		parent->LinkEndChild(monitor);
 	}
 
-	logger.Log(LOG_INFO, "Added Display info!");
+	logger.Log(LOG_INFO, "\tAdded Display info!");
 }
 
 
