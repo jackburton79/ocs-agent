@@ -14,7 +14,7 @@
 
 Softwares::Softwares()
 {
-	_ReadSoftwaresInfo();	
+	_ReadSoftwaresInfo();
 }
 
 
