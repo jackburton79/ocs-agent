@@ -225,7 +225,7 @@ ReadRouteInfoFromSocket(int sockFd, char *bufPtr, int seqNum, int pId)
 		nlHdr = (nlmsghdr*)bufPtr;
 
 		// Check if the header is valid 
-		if ((NLMSG_OK(nlHdr, readLen) == 0) ||
+		if ((NLMSG_OK(nlHdr, readLen) == (int)0) ||
 				(nlHdr->nlmsg_type == NLMSG_ERROR)) {
 			return -1;
 		}
@@ -281,7 +281,7 @@ NetworkInterface::_GetRoutes(std::list<route_info>& routeList) const
 	}
 	
 	// Parse and add to list	
-	for (; NLMSG_OK(nlMsg, len); nlMsg = NLMSG_NEXT(nlMsg, len)) {
+	for (; NLMSG_OK(nlMsg, len) != (int)0; nlMsg = NLMSG_NEXT(nlMsg, len)) {
 		route_info rtInfo;
 		memset(&rtInfo, 0, sizeof(rtInfo));
 		if (ParseRoutes(nlMsg, &rtInfo, Name().c_str()))
