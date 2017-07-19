@@ -2,7 +2,7 @@
  * HTTP.cpp
  *
  *  Created on: 23/lug/2013
- *  Copyright 2013-2014 Stefano Ceccherini (stefano.ceccherini@gmail.com)
+ *  Copyright 2013-2017 Stefano Ceccherini (stefano.ceccherini@gmail.com)
  */
 
 #include "HTTP.h"
@@ -154,7 +154,7 @@ HTTP::Read(void* data,  const size_t& length)
 int
 HTTP::Request(const HTTPRequestHeader& header, const void* data, const size_t length)
 {
-	if (!_HandleConnectionIfNeeded(header.URL()))
+	if (!_HandleConnection(header.URL()))
 		return -1;
 
 	fCurrentRequest = header;
@@ -199,6 +199,7 @@ HTTP::Request(const HTTPRequestHeader& header, const void* data, const size_t le
 		fLastError = error;
 		return error;
 	} catch (...) {
+		fLastError = -1;
 		return -1;
 	}
 
@@ -207,7 +208,7 @@ HTTP::Request(const HTTPRequestHeader& header, const void* data, const size_t le
 
 
 bool
-HTTP::_HandleConnectionIfNeeded(const std::string string)
+HTTP::_HandleConnection(const std::string string)
 {
 	URL url(string.c_str());
 	std::string hostName = url.Host();
@@ -263,6 +264,8 @@ HTTP::_HandleConnectionIfNeeded(const std::string string)
 
 	if (fSocket->Connect(fHost.c_str(), fPort) < 0) {
 		fLastError = errno;
+		delete fSocket;
+		fSocket = NULL;
 		return false;
 	}
 

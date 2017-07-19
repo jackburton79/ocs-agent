@@ -43,7 +43,7 @@ public:
 	std::string ErrorString() const;
 	
 private:
-	bool _HandleConnectionIfNeeded(const std::string host);
+	bool _HandleConnection(const std::string host);
 
 	static bool _ReadLineFromSocket(std::string& string, Socket* socket);
 
