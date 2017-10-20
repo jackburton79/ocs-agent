@@ -315,11 +315,14 @@ Machine::_GetDMIDecodeData()
 		std::istream iStream(&dmi);
 		std::string string;
 		std::multimap<std::string, std::string> systemInfo;
+		std::string handle;
 		while (std::getline(iStream, string)) {
-			// Skip the line with "Handle" in it.
-			if (string.find("Handle") == std::string::npos) {
-				std::string handle = string;
-				trim(handle);
+			if (string.find("Handle") != std::string::npos) {
+				handle = string;
+				std::cout << handle << std::endl;
+			} else {
+				std::string context = string;
+				trim(context);
 				size_t pos = 0;
 				while (std::getline(iStream, string)) {
 					if (string == "")
@@ -332,7 +335,7 @@ Machine::_GetDMIDecodeData()
 					try {
 						std::string name = string.substr(0, pos);
 						trim(name);
-						std::string fullString = handle;
+						std::string fullString = context;
 						fullString.append(name);
 						std::string value = string.substr(pos + 2, std::string::npos);
 
