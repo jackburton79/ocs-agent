@@ -12,6 +12,7 @@
 #include <string>
 #include <vector>
 
+typedef std::map<int, std::map<std::string, std::string> > dmi_db;
 
 struct system_info {
 	std::string vendor;
@@ -145,7 +146,7 @@ private:
 	bool _GetLSHWData();
 	void _GetCPUInfo();
 	void _GetOSInfo();
-	void _ExtractNeededInfo(std::multimap<std::string, std::string>);
+	void _ExtractDataFromDMIDB(dmi_db dmiDb);
 	
 	std::string _OSDescription();
 	

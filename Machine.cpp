@@ -24,6 +24,7 @@
 #include <sstream>
 #include <vector>
 
+
 const char* kBIOSInfo = "BIOS Information";
 const char* kSystemInfo = "System Information";
 const char* kProcessorInfo = "Processor Info";
@@ -32,13 +33,72 @@ const char* kMemoryDevice = "Memory Device";
 static Machine* sMachine = NULL;
 
 
-static std::string
-GetValueFromMap(std::multimap<std::string, std::string> &map, std::string string, std::string header)
+// TODO: This class is very inefficient:
+// It iterates the full dmi_db for every call of CountEntries() or ExtractEntry()
+class DMIExtractor {
+public:
+	DMIExtractor(dmi_db db);
+	int CountEntries(std::string context) const;
+	std::vector<std::map<std::string, std::string> > ExtractEntry(std::string context) const;
+private:
+	dmi_db fDMIDB;
+};
+
+
+DMIExtractor::DMIExtractor(dmi_db db)
+	:
+	fDMIDB(db)
 {
+}
+
+
+int
+DMIExtractor::CountEntries(std::string context) const
+{
+	dmi_db::const_iterator dbIterator;
+	int count = 0;
+	const std::map<std::string, std::string> entry;
+	for (dbIterator = fDMIDB.begin(); dbIterator != fDMIDB.end(); dbIterator++) {
+		const std::string str = (*(*dbIterator).second.find("NAME")).second;
+		if (str == context) {
+			count++;
+		}
+	}
+
+	return count;
+}
+
+
+std::vector<std::map<std::string, std::string> >
+DMIExtractor::ExtractEntry(std::string context) const
+{
+	dmi_db::const_iterator dbIterator;
+	std::map<std::string, std::string> entry;
+	std::vector<std::map<std::string, std::string> > entries;
+	for (dbIterator = fDMIDB.begin(); dbIterator != fDMIDB.end(); dbIterator++) {
+		entry = (*dbIterator).second;
+		std::map<std::string, std::string>::const_iterator i = entry.find("NAME");
+		if (i != entry.end() && i->second == context)
+			entries.push_back(entry);
+	}
+
+	return entries;
+}
+
+
+static std::string
+GetValueFromMap(dmi_db &db, std::string string, std::string context)
+{
+	DMIExtractor extractor(db);
+	if (extractor.CountEntries(context) <= 0)
+		return "";
+
+	std::vector<std::map<std::string, std::string> > entryVector
+		= extractor.ExtractEntry(context);
+	std::map<std::string, std::string> &map = entryVector[0];
+
 	std::map<std::string, std::string>::const_iterator i;
-	std::string fullString = header;
-	fullString.append(string);
-	i = map.find(fullString);
+	i = map.find(string);
 	if (i != map.end())
 		return i->second;
 
@@ -47,21 +107,20 @@ GetValueFromMap(std::multimap<std::string, std::string> &map, std::string string
 
 
 static std::vector<std::string>
-GetValuesFromMultiMap(std::multimap<std::string, std::string> &multiMap,
-	std::string string, std::string header)
+GetValuesFromMultiMap(dmi_db &db,
+	std::string key, std::string context)
 {
-	std::vector<std::string> stringList;
-	std::pair <std::multimap<std::string, std::string>::const_iterator,
-		std::multimap<std::string, std::string>::const_iterator> result;
-  
-	std::string fullString = header;
-	fullString.append(string);
-	result = multiMap.equal_range(fullString);
-	for (std::multimap<std::string, std::string>::const_iterator i = result.first;
-			i != result.second; i++) {
-		stringList.push_back(i->second);
+	DMIExtractor extractor(db);
+	std::vector<std::map<std::string, std::string> > entryVector
+		= extractor.ExtractEntry(context);
+
+	std::vector<std::string> resultList;
+	std::vector<std::map<std::string, std::string> >::const_iterator i;
+	for (i = entryVector.begin();
+			i != entryVector.end(); i++) {
+		resultList.push_back(i->find(key)->second);
 	}
-	return stringList;
+	return resultList;
 }
 
 
@@ -91,7 +150,7 @@ Machine::_RetrieveData()
 {
 	try {
 		// Try /sys/devices/virtual/dmi/id tree, then 'dmidecode', then 'lshw'
-		_GetDMIData();
+		//_GetDMIData();
 		_GetDMIDecodeData();
 		_GetLSHWData();
 		_GetCPUInfo();
@@ -314,39 +373,57 @@ Machine::_GetDMIDecodeData()
 		popen_streambuf dmi("dmidecode", "r");
 		std::istream iStream(&dmi);
 		std::string string;
-		std::multimap<std::string, std::string> systemInfo;
-		std::string handle;
+		dmi_db dmiDatabase;
+
+		int numericHandle = 0;
+		bool insideHandle = false;
 		while (std::getline(iStream, string)) {
-			if (string.find("Handle") != std::string::npos) {
-				handle = string;
-				std::cout << handle << std::endl;
-			} else {
-				std::string context = string;
-				trim(context);
-				size_t pos = 0;
-				while (std::getline(iStream, string)) {
-					if (string == "")
-						break;
+			if (string.find("Handle") == 0) {
+				size_t numStart = string.find_first_of(" 0");
+				size_t numEnd = string.find_first_of(",", numStart);
+				std::string handle = string.substr(numStart + 1, numEnd - numStart - 1);
 
-					pos = string.find(":");
-					if (pos == std::string::npos)
-						continue;
+				numericHandle = strtol(handle.c_str(), NULL, 16);
 
-					try {
-						std::string name = string.substr(0, pos);
-						trim(name);
-						std::string fullString = context;
-						fullString.append(name);
-						std::string value = string.substr(pos + 2, std::string::npos);
+				std::string name;
+				std::getline(iStream, name);
 
-						systemInfo.insert(std::pair<std::string, std::string>(trim(fullString), trim(value)));
-					} catch (...) {
+				std::map<std::string, std::string> dbEntry;
+				dbEntry["DMIHANDLE"] = handle;
+				dbEntry["NAME"] = trimmed(name);
 
-					}
+				dmiDatabase[(int)numericHandle] = dbEntry;
+				insideHandle = true;
+
+			} else if (insideHandle) {
+				if (string.empty() || string == "") {
+					insideHandle = false;
+					continue;
+				}
+
+				size_t pos = string.find(":");
+				if (pos == std::string::npos)
+					continue;
+				try {
+					std::string name = trimmed(string.substr(0, pos));
+					std::string value = trimmed(string.substr(pos + 2, std::string::npos));
+					dmiDatabase[numericHandle][name] = value;
+				} catch (...) {
+
 				}
 			}
 		}
-		_ExtractNeededInfo(systemInfo);
+
+		/*std::map<int, std::map<std::string, std::string> >::const_iterator i;
+		for (i = dmiDatabase.begin(); i != dmiDatabase.end(); i++) {
+			std::cout << i->first << std::endl;
+			std::map<std::string, std::string> map = i->second;
+			std::map<std::string, std::string>::const_iterator m;
+			for (m = map.begin(); m != map.end(); m++) {
+				std::cout << m->first << "=" << m->second << std::endl;
+			}
+		}*/
+		_ExtractDataFromDMIDB(dmiDatabase);
 	} catch (...) {
 		return false;
 	}
@@ -356,7 +433,7 @@ Machine::_GetDMIDecodeData()
 
 
 void
-Machine::_ExtractNeededInfo(std::multimap<std::string, std::string> systemInfo)
+Machine::_ExtractDataFromDMIDB(dmi_db systemInfo)
 {
 	std::string string;
 	string = GetValueFromMap(systemInfo, "Release Date", kBIOSInfo);
@@ -433,7 +510,7 @@ Machine::_ExtractNeededInfo(std::multimap<std::string, std::string> systemInfo)
 	values = GetValuesFromMultiMap(systemInfo, "Product Name", "Display");
 	for (size_t i = 0; i < values.size(); i++)
 		fVideoInfo.at(i).name = values.at(i);
-		
+
 	// Memory slots
 	values = GetValuesFromMultiMap(systemInfo, "Size", kMemoryDevice);
 	for (size_t i = 0; i < values.size(); i++) {
@@ -473,7 +550,7 @@ Machine::_GetLSHWData()
 	if (!CommandExists("lshw"))
 		return false;
 
-	popen_streambuf lshw("lshw", "r");
+	/*popen_streambuf lshw("lshw", "r");
 	std::istream iStream(&lshw);
 	
 	std::multimap<std::string, std::string> systemInfo;
@@ -550,7 +627,7 @@ Machine::_GetLSHWData()
 	} catch (...) {
 		return false;
 	}
-	
+	*/
 	return true;
 }
 
