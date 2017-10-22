@@ -98,8 +98,8 @@ main(int argc, char **argv)
 			case 'D':
 			case 'd':
 				daemonize = true;
-				// TODO: Added this mostly for debugging. Daemonize mode
-				// doesn't seem to work most of the time.
+				// TODO: Added this mostly for debugging. Without this,
+				// Daemonize mode doesn't seem to work most of the time.
 				Configuration::Get()->SetVolatileKeyValue("waittime", "5");
 				break;
 			case 't':
