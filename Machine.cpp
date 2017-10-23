@@ -25,6 +25,8 @@
 #include <vector>
 
 
+typedef std::map<std::string, std::string> string_map;
+
 const char* kBIOSInfo = "BIOS Information";
 const char* kSystemInfo = "System Information";
 const char* kProcessorInfo = "Processor Info";
@@ -39,7 +41,8 @@ class DMIExtractor {
 public:
 	DMIExtractor(dmi_db db);
 	int CountEntries(std::string context) const;
-	std::vector<std::map<std::string, std::string> > ExtractEntry(std::string context) const;
+	std::vector<string_map> ExtractEntry(std::string context) const;
+	string_map ExtractHandle(std::string handle) const;
 private:
 	dmi_db fDMIDB;
 };
@@ -57,7 +60,7 @@ DMIExtractor::CountEntries(std::string context) const
 {
 	dmi_db::const_iterator dbIterator;
 	int count = 0;
-	const std::map<std::string, std::string> entry;
+	const string_map entry;
 	for (dbIterator = fDMIDB.begin(); dbIterator != fDMIDB.end(); dbIterator++) {
 		const std::string str = (*(*dbIterator).second.find("NAME")).second;
 		if (str == context) {
@@ -69,15 +72,15 @@ DMIExtractor::CountEntries(std::string context) const
 }
 
 
-std::vector<std::map<std::string, std::string> >
+std::vector<string_map>
 DMIExtractor::ExtractEntry(std::string context) const
 {
 	dmi_db::const_iterator dbIterator;
-	std::map<std::string, std::string> entry;
-	std::vector<std::map<std::string, std::string> > entries;
+	string_map entry;
+	std::vector<string_map> entries;
 	for (dbIterator = fDMIDB.begin(); dbIterator != fDMIDB.end(); dbIterator++) {
 		entry = (*dbIterator).second;
-		std::map<std::string, std::string>::const_iterator i = entry.find("NAME");
+		string_map::const_iterator i = entry.find("NAME");
 		if (i != entry.end() && i->second == context)
 			entries.push_back(entry);
 	}
@@ -86,41 +89,30 @@ DMIExtractor::ExtractEntry(std::string context) const
 }
 
 
+string_map
+DMIExtractor::ExtractHandle(std::string handle) const
+{
+	int numericHandle = strtol(handle.c_str(), NULL, 16);
+	return (*(fDMIDB.find(numericHandle))).second;
+}
+
+
 static std::string
-GetValueFromMap(dmi_db &db, std::string string, std::string context)
+GetValueFromMap(dmi_db &db, std::string key, std::string context)
 {
 	DMIExtractor extractor(db);
 	if (extractor.CountEntries(context) <= 0)
 		return "";
 
-	std::vector<std::map<std::string, std::string> > entryVector
+	std::vector<string_map> entryVector
 		= extractor.ExtractEntry(context);
-	std::map<std::string, std::string> &map = entryVector[0];
-
-	std::map<std::string, std::string>::const_iterator i;
-	i = map.find(string);
+	string_map &map = entryVector[0];
+	string_map::const_iterator i;
+	i = map.find(key);
 	if (i != map.end())
 		return i->second;
 
 	return "";
-}
-
-
-static std::vector<std::string>
-GetValuesFromMultiMap(dmi_db &db,
-	std::string key, std::string context)
-{
-	DMIExtractor extractor(db);
-	std::vector<std::map<std::string, std::string> > entryVector
-		= extractor.ExtractEntry(context);
-
-	std::vector<std::string> resultList;
-	std::vector<std::map<std::string, std::string> >::const_iterator i;
-	for (i = entryVector.begin();
-			i != entryVector.end(); i++) {
-		resultList.push_back(i->find(key)->second);
-	}
-	return resultList;
 }
 
 
@@ -414,11 +406,11 @@ Machine::_GetDMIDecodeData()
 			}
 		}
 
-		/*std::map<int, std::map<std::string, std::string> >::const_iterator i;
+		/*std::map<int, string_map>::const_iterator i;
 		for (i = dmiDatabase.begin(); i != dmiDatabase.end(); i++) {
 			std::cout << i->first << std::endl;
-			std::map<std::string, std::string> map = i->second;
-			std::map<std::string, std::string>::const_iterator m;
+			string_map map = i->second;
+			string_map::const_iterator m;
 			for (m = map.begin(); m != map.end(); m++) {
 				std::cout << m->first << "=" << m->second << std::endl;
 			}
@@ -496,7 +488,7 @@ Machine::_ExtractDataFromDMIDB(dmi_db systemInfo)
 		fSystemInfo.vendor = string;
 
 	// Graphics cards
-	std::vector<std::string> values = GetValuesFromMultiMap(systemInfo,
+/*	std::vector<std::string> values = GetValuesFromMultiMap(systemInfo,
 											"Manufacturer", "Display");
 	for (size_t i = 0; i < values.size(); i++) {
 		video_info info;
@@ -510,37 +502,33 @@ Machine::_ExtractDataFromDMIDB(dmi_db systemInfo)
 	values = GetValuesFromMultiMap(systemInfo, "Product Name", "Display");
 	for (size_t i = 0; i < values.size(); i++)
 		fVideoInfo.at(i).name = values.at(i);
-
+*/
 	// Memory slots
-	values = GetValuesFromMultiMap(systemInfo, "Size", kMemoryDevice);
-	for (size_t i = 0; i < values.size(); i++) {
+	std::cout << "Memory Slots:" << std::endl;
+	std::vector<string_map> valuesVector;
+	DMIExtractor dmiExtractor(systemInfo);
+	valuesVector = dmiExtractor.ExtractEntry(kMemoryDevice);
+	std::vector<string_map>::iterator i;
+	for (i = valuesVector.begin(); i != valuesVector.end(); i++) {
+		std::cout << "entry found" << std::endl;
+		string_map& entry = *i;
 		memory_device_info info;
-		int memorySize = ::strtol(values.at(i).c_str(), NULL, 10);
+		std::cout << "starting " << std::endl;
+		string_map::const_iterator m;
+		const int memorySize = ::strtol((*entry.find("Size")).second.c_str(), NULL, 10);
 		info.size = int_to_string(memorySize);
-		fMemoryInfo.push_back(info);
-	}
+		info.type = (*entry.find("Type")).second;
+		//info.speed = (*entry.find("Speed")).second;
+		//info.vendor = (*entry.find("Manufacturer")).second;
+		//info.purpose = (*entry.find("Purpose")).second;
 
-	values = GetValuesFromMultiMap(systemInfo, "Bank Locator", kMemoryDevice);
-	for (size_t i = 0; i < values.size(); i++)
-		fMemoryInfo.at(i).description = values.at(i);
-	values = GetValuesFromMultiMap(systemInfo, "Type", kMemoryDevice);
-	for (size_t i = 0; i < values.size(); i++)
-		fMemoryInfo.at(i).type = values.at(i);
-	values = GetValuesFromMultiMap(systemInfo, "Speed", kMemoryDevice);
-	for (size_t i = 0; i < values.size(); i++)
-		fMemoryInfo.at(i).speed = values.at(i);
-	values = GetValuesFromMultiMap(systemInfo, "Manufacturer", kMemoryDevice);
-	for (size_t i = 0; i < values.size(); i++)
-		fMemoryInfo.at(i).vendor = values.at(i);
-	values = GetValuesFromMultiMap(systemInfo, "Asset Tag", kMemoryDevice);
-	for (size_t i = 0; i < values.size(); i++)
-		fMemoryInfo.at(i).asset_tag = values.at(i);
-	values = GetValuesFromMultiMap(systemInfo, "Serial Number", kMemoryDevice);
-	for (size_t i = 0; i < values.size(); i++)
-		fMemoryInfo.at(i).serial = values.at(i);
-	values = GetValuesFromMultiMap(systemInfo, "Purpose", kMemoryDevice);
-	for (size_t i = 0; i < values.size(); i++)
-		fMemoryInfo.at(i).purpose = values.at(i);
+		std::string parentHandle = (*entry.find("Array Handle")).second;
+		string_map arrayHandle = dmiExtractor.ExtractHandle(parentHandle);
+		info.purpose = (*arrayHandle.find("Use")).second;
+		info.caption = (*arrayHandle.find("Use")).second;
+		fMemoryInfo.push_back(info);
+
+	}
 }
 
 
