@@ -514,10 +514,9 @@ Machine::_ExtractDataFromDMIDB(dmi_db systemInfo)
 				int memorySize = ::strtol(mapIter->second.c_str(), &memoryUnit, 10);
 				if (::strcasecmp(memoryUnit, "KB") == 0)
 					memorySize /= 1024;
-				else if (::strcasecmp(memoryUnit, "KB") == 0)
+				else if (::strcasecmp(memoryUnit, "GB") == 0
+					 || ::strcasecmp(memoryUnit, "GiB") == 0)
 					memorySize *= 1024;
-				else if (::strcasecmp(memoryUnit, "GiB") == 0)
-					memorySize *= 1024 * 1024;
 				
 				info.size = int_to_string(memorySize);
 			}
@@ -534,7 +533,7 @@ Machine::_ExtractDataFromDMIDB(dmi_db systemInfo)
 			mapIter = entry.find("Asset Tag");
 			if (mapIter != entry.end())
 				info.asset_tag = mapIter->second;
-				mapIter = entry.find("Serial Number");
+			mapIter = entry.find("Serial Number");
 			if (mapIter != entry.end())
 				info.serial= mapIter->second;
 			
