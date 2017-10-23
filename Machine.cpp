@@ -498,14 +498,11 @@ Machine::_ExtractDataFromDMIDB(dmi_db systemInfo)
 		fVideoInfo.at(i).name = values.at(i);
 */
 	// Memory slots
-	
-	//return;
 	std::vector<string_map> valuesVector;
 	DMIExtractor dmiExtractor(systemInfo);
 	valuesVector = dmiExtractor.ExtractEntry(kMemoryDevice);
 	std::vector<string_map>::iterator i;
 	
-	std::cout << "Starting iteration" << std::endl;
 	for (i = valuesVector.begin(); i != valuesVector.end(); i++) {
 		string_map& entry = *i;
 		memory_device_info info;
