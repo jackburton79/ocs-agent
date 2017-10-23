@@ -505,66 +505,57 @@ Machine::_ExtractDataFromDMIDB(dmi_db systemInfo)
 	valuesVector = dmiExtractor.ExtractEntry(kMemoryDevice);
 	std::vector<string_map>::iterator i;
 	
-	//std::cout << "Starting iteration" << std::endl;
+	std::cout << "Starting iteration" << std::endl;
 	for (i = valuesVector.begin(); i != valuesVector.end(); i++) {
 		string_map& entry = *i;
-
 		memory_device_info info;
 		try {
-			char *memoryUnit = NULL;
-			int memorySize = ::strtol((*entry.find("Size")).second.c_str(), &memoryUnit, 10);
-			if (::strcasecmp(memoryUnit, "KB") == 0)
-				memorySize /= 1024;
-			else if (::strcasecmp(memoryUnit, "KB") == 0)
-				memorySize *= 1024;
-			info.size = int_to_string(memorySize);
+			string_map::const_iterator mapIter;
+			mapIter = entry.find("Size");
+			if (mapIter != entry.end()) {
+				char *memoryUnit = NULL;
+				int memorySize = ::strtol(mapIter->second.c_str(), &memoryUnit, 10);
+				if (::strcasecmp(memoryUnit, "KB") == 0)
+					memorySize /= 1024;
+				else if (::strcasecmp(memoryUnit, "KB") == 0)
+					memorySize *= 1024;
+				else if (::strcasecmp(memoryUnit, "GiB") == 0)
+					memorySize *= 1024 * 1024;
+				
+				info.size = int_to_string(memorySize);
+			}
+			
+			mapIter = entry.find("Type");
+			if (mapIter != entry.end())
+				info.type = mapIter->second;
+			mapIter = entry.find("Speed");
+			if (mapIter != entry.end())
+				info.speed = mapIter->second;
+			mapIter = entry.find("Manufacturer");
+			if (mapIter != entry.end())
+				info.vendor = mapIter->second;
+			mapIter = entry.find("Asset Tag");
+			if (mapIter != entry.end())
+				info.asset_tag = mapIter->second;
+				mapIter = entry.find("Serial Number");
+			if (mapIter != entry.end())
+				info.serial= mapIter->second;
+			
+			mapIter = entry.find("Array Handle");
+			if (mapIter != entry.end()) {
+				std::string parentHandle = mapIter->second;
+				string_map arrayHandle = dmiExtractor.ExtractHandle(parentHandle);
+				mapIter = arrayHandle.find("Use");
+				if (mapIter != entry.end())
+					info.purpose = mapIter->second;
+				mapIter = arrayHandle.find("Use");
+				if (mapIter != entry.end())
+					info.caption = mapIter->second;
+			}
 		} catch (...) {
 
 		}
 
-		try {
-			info.type = (*entry.find("Type")).second;
-		} catch (...) {
-
-		}
-
-		try {
-			info.speed = (*entry.find("Speed")).second;
-		} catch (...) {
-
-		}
-		try {
-			info.vendor = (*entry.find("Manufacturer")).second;
-		} catch (...) {
-
-		}
-
-		std::string parentHandle = (*entry.find("Array Handle")).second;
-		string_map arrayHandle = dmiExtractor.ExtractHandle(parentHandle);
-		try {
-			info.purpose = (*arrayHandle.find("Use")).second;
-		} catch (...) {
-		}
-
-		try {
-			info.caption = (*arrayHandle.find("Use")).second;
-		} catch (...) {
-		}
-
-		try {
-			info.vendor = (*arrayHandle.find("Manufacturer")).second;
-		} catch (...) {
-		}
-
-		try {
-			info.asset_tag = (*arrayHandle.find("Asset Tag")).second;
-		} catch (...) {
-		}
-
-		try {
-			info.serial = (*arrayHandle.find("Serial Number")).second;
-		} catch (...) {
-		}
 		fMemoryInfo.push_back(info);
 	}
 }
