@@ -16,8 +16,10 @@
 #include <unistd.h>
 #include <sys/stat.h>
 
+#include <string>
+
 extern const char* __progname;
-const char* version = "1.5";
+const char* version = "1.6";
 
 
 static
@@ -86,6 +88,8 @@ main(int argc, char **argv)
 	bool verbose = false;
 	bool daemonize = false;
 	
+	Configuration* config = Configuration::Get();
+
 	while ((c = ::getopt_long(argc, argv, "c:s:dDt:l:hvw:",
 			sLongOptions, &optIndex)) != -1) {
 		switch (c) {
@@ -100,7 +104,7 @@ main(int argc, char **argv)
 				daemonize = true;
 				// TODO: Added this mostly for debugging. Without this,
 				// Daemonize mode doesn't seem to work most of the time.
-				Configuration::Get()->SetVolatileKeyValue("waittime", "5");
+				config->SetVolatileKeyValue("waittime", "5");
 				break;
 			case 't':
 				tag = optarg;
@@ -115,19 +119,27 @@ main(int argc, char **argv)
 				verbose = true;
 				break;
 			case 'w':
-				Configuration::Get()->SetVolatileKeyValue("waittime", optarg);
+				config->SetVolatileKeyValue("waittime", optarg);
 				break;
 			case 0:
 				if (strcmp(sLongOptions[optIndex].name, "nosoftware") == 0)
-					Configuration::Get()->SetVolatileKeyValue("nosoftware", "true");
+					config->SetVolatileKeyValue("nosoftware", "true");
 				else if (strcmp(sLongOptions[optIndex].name, "stdout") == 0 && !daemonize)
-					Configuration::Get()->SetVolatileKeyValue("stdout", "true");
+					config->SetVolatileKeyValue("stdout", "true");
 				break;
 		}
 	}
 	Logger& logger = Logger::GetDefault();
 	if (verbose)
 		logger.SetConsoleLogging(true);
+
+	bool local = config->LocalInventory();
+	bool stdout = config->KeyValue("stdout") == "true";
+	if (!stdout && serverUrl == NULL
+		&& configFile == NULL
+		&& local && fullFileName == NULL) {
+		PrintHelpAndExit();
+	}
 
 	if (daemonize) {
 		pid_t processID = fork();

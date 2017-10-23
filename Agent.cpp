@@ -32,6 +32,8 @@ Agent::Run()
 	// TODO: Either use Logger or just throw.
 	// Don't log directly to stdout/stderr.
 	Configuration* config = Configuration::Get();
+	// Fail early if needed, before building inventory
+
 	std::string deviceID = config->DeviceID();
 	Inventory inventory;
 	if (!inventory.Initialize(deviceID.c_str()))
@@ -45,12 +47,9 @@ Agent::Run()
 		inventory.Print();
 	else if (config->LocalInventory()) {
 		std::string fullFileName = config->OutputFileName();
-		if (!fullFileName.empty()) {
-			if (fullFileName[fullFileName.length() - 1] == '/')
-				fullFileName.append(deviceID).append(".xml");
-			inventory.Save(fullFileName.c_str());
-		} else
-			std::cerr << "No path/filename specified." << std::endl;
+		if (fullFileName[fullFileName.length() - 1] == '/')
+			fullFileName.append(deviceID).append(".xml");
+		inventory.Save(fullFileName.c_str());
 	} else {
 		unsigned int waitSeconds = ::strtoul(
 			config->KeyValue("waittime").c_str(), NULL, 10);
