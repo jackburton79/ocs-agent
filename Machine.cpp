@@ -503,24 +503,62 @@ Machine::_ExtractDataFromDMIDB(dmi_db systemInfo)
 	for (i = valuesVector.begin(); i != valuesVector.end(); i++) {
 		string_map& entry = *i;
 
-		char *memoryUnit = NULL;
-		int memorySize = ::strtol((*entry.find("Size")).second.c_str(), &memoryUnit, 10);
-		if (::strcasecmp(memoryUnit, "KB") == 0)
-			memorySize /= 10;
-		else if (::strcasecmp(memoryUnit, "KB") == 0)
-			memorySize *= 10;
-
 		memory_device_info info;
-		info.size = int_to_string(memorySize);
+		try {
+			char *memoryUnit = NULL;
+			int memorySize = ::strtol((*entry.find("Size")).second.c_str(), &memoryUnit, 10);
+			if (::strcasecmp(memoryUnit, "KB") == 0)
+				memorySize /= 10;
+			else if (::strcasecmp(memoryUnit, "KB") == 0)
+				memorySize *= 10;
+			info.size = int_to_string(memorySize);
+		} catch (...) {
 
-		info.type = (*entry.find("Type")).second;
-		//info.speed = (*entry.find("Speed")).second;
-		//info.vendor = (*entry.find("Manufacturer")).second;
+		}
+
+		try {
+			info.type = (*entry.find("Type")).second;
+		} catch (...) {
+
+		}
+
+		try {
+			info.speed = (*entry.find("Speed")).second;
+		} catch (...) {
+
+		}
+		try {
+			info.vendor = (*entry.find("Manufacturer")).second;
+		} catch (...) {
+
+		}
 
 		std::string parentHandle = (*entry.find("Array Handle")).second;
 		string_map arrayHandle = dmiExtractor.ExtractHandle(parentHandle);
-		info.purpose = (*arrayHandle.find("Use")).second;
-		info.caption = (*arrayHandle.find("Use")).second;
+		try {
+			info.purpose = (*arrayHandle.find("Use")).second;
+		} catch (...) {
+		}
+
+		try {
+			info.caption = (*arrayHandle.find("Use")).second;
+		} catch (...) {
+		}
+
+		try {
+			info.vendor = (*arrayHandle.find("Manufacturer")).second;
+		} catch (...) {
+		}
+
+		try {
+			info.asset_tag = (*arrayHandle.find("Asset Tag")).second;
+		} catch (...) {
+		}
+
+		try {
+			info.serial = (*arrayHandle.find("Serial Number")).second;
+		} catch (...) {
+		}
 		fMemoryInfo.push_back(info);
 	}
 }
