@@ -498,11 +498,13 @@ Machine::_ExtractDataFromDMIDB(dmi_db systemInfo)
 		fVideoInfo.at(i).name = values.at(i);
 */
 	// Memory slots
+	if (fMemoryInfo.size() > 0)
+		return;
+
 	std::vector<string_map> valuesVector;
 	DMIExtractor dmiExtractor(systemInfo);
 	valuesVector = dmiExtractor.ExtractEntry(kMemoryDevice);
 	std::vector<string_map>::iterator i;
-	
 	for (i = valuesVector.begin(); i != valuesVector.end(); i++) {
 		string_map& entry = *i;
 		memory_device_info info;
@@ -517,7 +519,6 @@ Machine::_ExtractDataFromDMIDB(dmi_db systemInfo)
 				else if (::strcasecmp(memoryUnit, "GB") == 0
 					 || ::strcasecmp(memoryUnit, "GiB") == 0)
 					memorySize *= 1024;
-				
 				info.size = int_to_string(memorySize);
 			}
 			
