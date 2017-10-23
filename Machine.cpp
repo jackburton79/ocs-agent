@@ -14,6 +14,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include <sys/utsname.h>
 
@@ -142,7 +143,7 @@ Machine::_RetrieveData()
 {
 	try {
 		// Try /sys/devices/virtual/dmi/id tree, then 'dmidecode', then 'lshw'
-		//_GetDMIData();
+		_GetDMIData();
 		_GetDMIDecodeData();
 		_GetLSHWData();
 		_GetCPUInfo();
@@ -406,15 +407,6 @@ Machine::_GetDMIDecodeData()
 			}
 		}
 
-		/*std::map<int, string_map>::const_iterator i;
-		for (i = dmiDatabase.begin(); i != dmiDatabase.end(); i++) {
-			std::cout << i->first << std::endl;
-			string_map map = i->second;
-			string_map::const_iterator m;
-			for (m = map.begin(); m != map.end(); m++) {
-				std::cout << m->first << "=" << m->second << std::endl;
-			}
-		}*/
 		_ExtractDataFromDMIDB(dmiDatabase);
 	} catch (...) {
 		return false;
@@ -504,30 +496,32 @@ Machine::_ExtractDataFromDMIDB(dmi_db systemInfo)
 		fVideoInfo.at(i).name = values.at(i);
 */
 	// Memory slots
-	std::cout << "Memory Slots:" << std::endl;
 	std::vector<string_map> valuesVector;
 	DMIExtractor dmiExtractor(systemInfo);
 	valuesVector = dmiExtractor.ExtractEntry(kMemoryDevice);
 	std::vector<string_map>::iterator i;
 	for (i = valuesVector.begin(); i != valuesVector.end(); i++) {
-		std::cout << "entry found" << std::endl;
 		string_map& entry = *i;
+
+		char *memoryUnit = NULL;
+		int memorySize = ::strtol((*entry.find("Size")).second.c_str(), &memoryUnit, 10);
+		if (::strcasecmp(memoryUnit, "KB") == 0)
+			memorySize /= 10;
+		else if (::strcasecmp(memoryUnit, "KB") == 0)
+			memorySize *= 10;
+
 		memory_device_info info;
-		std::cout << "starting " << std::endl;
-		string_map::const_iterator m;
-		const int memorySize = ::strtol((*entry.find("Size")).second.c_str(), NULL, 10);
 		info.size = int_to_string(memorySize);
+
 		info.type = (*entry.find("Type")).second;
 		//info.speed = (*entry.find("Speed")).second;
 		//info.vendor = (*entry.find("Manufacturer")).second;
-		//info.purpose = (*entry.find("Purpose")).second;
 
 		std::string parentHandle = (*entry.find("Array Handle")).second;
 		string_map arrayHandle = dmiExtractor.ExtractHandle(parentHandle);
 		info.purpose = (*arrayHandle.find("Use")).second;
 		info.caption = (*arrayHandle.find("Use")).second;
 		fMemoryInfo.push_back(info);
-
 	}
 }
 
