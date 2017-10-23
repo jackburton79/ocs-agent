@@ -63,8 +63,9 @@ DMIExtractor::CountEntries(std::string context) const
 	int count = 0;
 	const string_map entry;
 	for (dbIterator = fDMIDB.begin(); dbIterator != fDMIDB.end(); dbIterator++) {
-		const std::string str = (*(*dbIterator).second.find("NAME")).second;
-		if (str == context) {
+		string_map entry = (*dbIterator).second;
+		string_map::const_iterator i = entry.find("NAME");
+		if (i != entry.end() && i->second == context) {
 			count++;
 		}
 	}
@@ -107,6 +108,7 @@ GetValueFromMap(dmi_db &db, std::string key, std::string context)
 
 	std::vector<string_map> entryVector
 		= extractor.ExtractEntry(context);
+
 	string_map &map = entryVector[0];
 	string_map::const_iterator i;
 	i = map.find(key);
@@ -382,10 +384,10 @@ Machine::_GetDMIDecodeData()
 				std::getline(iStream, name);
 
 				std::map<std::string, std::string> dbEntry;
-				dbEntry["DMIHANDLE"] = handle;
+				dbEntry["DMIHANDLE"] = trimmed(handle);
 				dbEntry["NAME"] = trimmed(name);
 
-				dmiDatabase[(int)numericHandle] = dbEntry;
+				dmiDatabase[numericHandle] = dbEntry;
 				insideHandle = true;
 
 			} else if (insideHandle) {
@@ -429,7 +431,7 @@ Machine::_ExtractDataFromDMIDB(dmi_db systemInfo)
 	string = GetValueFromMap(systemInfo, "Version", kBIOSInfo);
 	if (string != "" && fBIOSInfo.version == "")
 		fBIOSInfo.version = string;
-		
+
 	string = GetValueFromMap(systemInfo, "Product Name", kSystemInfo);
 	if (string != "" && fProductInfo.name == "")
 		fProductInfo.name = string;
@@ -570,13 +572,14 @@ Machine::_GetLSHWData()
 	if (!CommandExists("lshw"))
 		return false;
 
-	/*popen_streambuf lshw("lshw", "r");
+	popen_streambuf lshw("lshw", "r");
 	std::istream iStream(&lshw);
 	
-	std::multimap<std::string, std::string> systemInfo;
+	dmi_db systemInfo;
 	try {
 		std::string line;
 		std::string context = kSystemInfo;
+		int numericContext = 0;
 		// skip initial line
 		std::getline(iStream, line);
 
@@ -585,6 +588,7 @@ Machine::_GetLSHWData()
 		while (std::getline(iStream, line)) {
 			trim(line);
 			if (size_t start = line.find("*-") != std::string::npos) {
+				// Init Context
 				context = line.substr(start + 1, std::string::npos);
 				// lshw adds "UNCLAIMED" if there is no driver for the device
 				size_t unclaimedPos = context.find("UNCLAIMED");
@@ -592,7 +596,6 @@ Machine::_GetLSHWData()
 					context.erase(unclaimedPos, context.length());
 
 				trim(context);
-	
 				if (context == "firmware")
 					context = kBIOSInfo;
 				else if (context == "display")
@@ -602,52 +605,65 @@ Machine::_GetLSHWData()
 				// 'memory' or 'memory:0, memory:1, etc.'
 				else if (context.find("memory") != std::string::npos)
 					context = kMemoryDevice;
+
+				numericContext += 1;
+
+				trim(context);
+				string_map dbEntry;
+				dbEntry["DMIHANDLE"] = int_to_string(numericContext);
+				dbEntry["NAME"] = context;
+				systemInfo[numericContext] = dbEntry;
+
 				continue;
 			}
+			if (numericContext == 0)
+				continue;
+
 			size_t colonPos = line.find(":");
 			if (colonPos == std::string::npos)
 				continue;
 
 			// TODO: Better mapping of keys
-			
 			std::string key = line.substr(0, colonPos);
 			trim(key);
 			std::string value = line.substr(colonPos + 1, std::string::npos);
-			std::string sysCtx = trimmed(context);
-			if (sysCtx == kMemoryDevice) {
+
+			if (context == kBIOSInfo) {
+				if (key == "vendor")
+					key = "Vendor";
+			} else if (context == kMemoryDevice) {
 				if (key == "size")
-					sysCtx.append("Size");
+					key = "Size";
 				else if (key == "description")
-					sysCtx.append("Purpose");
-				else
-					continue;
+					key = "Purpose";
 			} else {
-				if (key == "vendor") {
-					sysCtx.append("Manufacturer");
-				} else if (key == "product") {
-					sysCtx.append("Product Name");
-				} else if (key == "date") {
-					sysCtx.append("Release Date");
-				} else if (key == "serial") {
-					sysCtx.append("Serial Number");
-				}
-				else
-					continue;
+				if (key == "vendor")
+					key = "Manufacturer";
 			}
 			
-			if (systemInfo.find(sysCtx) == systemInfo.end())
-				systemInfo.insert(std::pair<std::string, std::string>(sysCtx, trimmed(value)));		
+			if (key == "product")
+				key = "Product Name";
+			else if (key == "date")
+				key = "Release Date";
+			else if (key == "serial")
+				key = "Serial Number";
+
+			dmi_db::const_iterator i = systemInfo.find(numericContext);
+			if (i != systemInfo.end()) {
+				if (systemInfo[numericContext].find(key) == systemInfo[numericContext].end())
+					systemInfo[numericContext][key] = trimmed(value);
+			}
 		}
 	} catch (...) {
 
 	}
 	
 	try {
-		_ExtractNeededInfo(systemInfo);
+		_ExtractDataFromDMIDB(systemInfo);
 	} catch (...) {
 		return false;
 	}
-	*/
+
 	return true;
 }
 
