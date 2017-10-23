@@ -481,30 +481,39 @@ Machine::_ExtractDataFromDMIDB(dmi_db systemInfo)
 	if (string != "" && fSystemInfo.vendor == "")
 		fSystemInfo.vendor = string;
 
+	std::vector<string_map> valuesVector;
+	DMIExtractor dmiExtractor(systemInfo);
+	std::vector<string_map>::iterator i;
+
 	// Graphics cards
-/*	std::vector<std::string> values = GetValuesFromMultiMap(systemInfo,
-											"Manufacturer", "Display");
-	for (size_t i = 0; i < values.size(); i++) {
-		video_info info;
-		info.vendor = values.at(i);
-		fVideoInfo.push_back(info);
-	}	
-	values = GetValuesFromMultiMap(systemInfo, "description", "Display");
-	for (size_t i = 0; i < values.size(); i++)
-		fVideoInfo.at(i).chipset = values.at(i);
+	if (fVideoInfo.size() == 0) {
+		valuesVector = dmiExtractor.ExtractEntry("Display");
+		for (i = valuesVector.begin(); i != valuesVector.end(); i++) {
+			string_map& entry = *i;
+			video_info info;
+			try {
+				string_map::const_iterator mapIter;
+				mapIter = entry.find("Manufacturer");
+				if (mapIter != entry.end())
+					info.vendor = mapIter->second;
+				mapIter = entry.find("Product Name");
+				if (mapIter != entry.end())
+					info.name = mapIter->second;
+				mapIter = entry.find("description");
+				if (mapIter != entry.end())
+					info.chipset = mapIter->second;
+				fVideoInfo.push_back(info);
+			} catch (...) {
+
+			}
+		}
+	}
 	
-	values = GetValuesFromMultiMap(systemInfo, "Product Name", "Display");
-	for (size_t i = 0; i < values.size(); i++)
-		fVideoInfo.at(i).name = values.at(i);
-*/
 	// Memory slots
 	if (fMemoryInfo.size() > 0)
 		return;
 
-	std::vector<string_map> valuesVector;
-	DMIExtractor dmiExtractor(systemInfo);
 	valuesVector = dmiExtractor.ExtractEntry(kMemoryDevice);
-	std::vector<string_map>::iterator i;
 	for (i = valuesVector.begin(); i != valuesVector.end(); i++) {
 		string_map& entry = *i;
 		memory_device_info info;
