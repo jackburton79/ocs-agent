@@ -452,6 +452,7 @@ Inventory::_AddMemoriesInfo(tinyxml2::XMLElement* parent)
 		tinyxml2::XMLElement* memory = fDocument->NewElement("MEMORIES");
 
 		tinyxml2::XMLElement* description = fDocument->NewElement("DESCRIPTION");
+		tinyxml2::XMLElement* caption = fDocument->NewElement("CAPTION");
 		tinyxml2::XMLElement* capacity = fDocument->NewElement("CAPACITY");
 		tinyxml2::XMLElement* purpose = fDocument->NewElement("PURPOSE");
 		tinyxml2::XMLElement* type = fDocument->NewElement("TYPE");
@@ -461,6 +462,9 @@ Inventory::_AddMemoriesInfo(tinyxml2::XMLElement* parent)
 
 		description->LinkEndChild(fDocument->NewText(fMachine->MemoryDescription(i).c_str()));
 		memory->LinkEndChild(description);
+
+		caption->LinkEndChild(fDocument->NewText(fMachine->MemoryCaption(i).c_str()));
+		memory->LinkEndChild(caption);
 
 		capacity->LinkEndChild(fDocument->NewText(fMachine->MemoryCapacity(i).c_str()));
 		memory->LinkEndChild(capacity);

@@ -786,7 +786,7 @@ Machine::CountMemories()
 std::string
 Machine::MemoryCaption(int num)
 {
-	return "";
+	return fMemoryInfo.at(num).caption;
 }
 
 
