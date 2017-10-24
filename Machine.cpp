@@ -324,6 +324,69 @@ Machine::VideoInfoFor(int numVideo) const
 }
 
 
+int
+Machine::CountMemories()
+{
+	return fMemoryInfo.size();
+}
+
+
+std::string
+Machine::MemoryCaption(int num)
+{
+	return fMemoryInfo.at(num).caption;
+}
+
+
+std::string
+Machine::MemoryDescription(int num)
+{
+	return fMemoryInfo.at(num).description;
+}
+
+
+std::string
+Machine::MemoryCapacity(int num)
+{
+	return fMemoryInfo.at(num).size;
+}
+
+
+std::string
+Machine::MemoryPurpose(int num)
+{
+	return fMemoryInfo.at(num).purpose;
+}
+
+
+std::string
+Machine::MemoryType(int num)
+{
+	return fMemoryInfo.at(num).type;
+}
+
+
+std::string
+Machine::MemorySpeed(int num)
+{
+	return fMemoryInfo.at(num).speed;
+}
+
+
+std::string
+Machine::MemoryNumSlot(int num)
+{
+	return int_to_string(num);
+}
+
+
+std::string
+Machine::MemorySerialNumber(int num)
+{
+	return fMemoryInfo.at(num).serial;
+}
+
+
 // private
 bool
 Machine::_GetDMIData()
@@ -415,155 +478,6 @@ Machine::_GetDMIDecodeData()
 	}
 
 	return true;
-}
-
-
-void
-Machine::_ExtractDataFromDMIDB(dmi_db systemInfo)
-{
-	std::string string;
-	string = GetValueFromMap(systemInfo, "Release Date", kBIOSInfo);
-	if (string != "" && fBIOSInfo.release_date == "")
-		fBIOSInfo.release_date = string;
-	string = GetValueFromMap(systemInfo, "Vendor", kBIOSInfo);
-	if (string != "" && fBIOSInfo.vendor == "")
-		fBIOSInfo.vendor = string;
-	string = GetValueFromMap(systemInfo, "Version", kBIOSInfo);
-	if (string != "" && fBIOSInfo.version == "")
-		fBIOSInfo.version = string;
-
-	string = GetValueFromMap(systemInfo, "Product Name", kSystemInfo);
-	if (string != "" && fProductInfo.name == "")
-		fProductInfo.name = string;
-	string = GetValueFromMap(systemInfo, "Version", kSystemInfo);
-	if (string != "" && fProductInfo.version == "")
-		fProductInfo.version = string;
-	string = GetValueFromMap(systemInfo, "UUID", kSystemInfo);
-	if (string != "" && fProductInfo.uuid == "")
-		fProductInfo.uuid = string;
-	string = GetValueFromMap(systemInfo, "Serial Number", kSystemInfo);
-	if (string != "" && fProductInfo.serial == "")
-		fProductInfo.serial = string;
-		
-	string = GetValueFromMap(systemInfo, "Asset Tag", "Chassis Information");
-	if (string != "" && fChassisInfo.asset_tag == "")
-		fChassisInfo.asset_tag = string;
-	string = GetValueFromMap(systemInfo, "Serial Number", "Chassis Information");
-	if (string != "" && fChassisInfo.serial == "")
-		fChassisInfo.serial = string;
-	string = GetValueFromMap(systemInfo, "Type", "Chassis Information");
-	if (string != "" && fChassisInfo.type == "")
-		fChassisInfo.type = string;
-	string = GetValueFromMap(systemInfo, "Manufacturer", "Chassis Information");
-	if (string != "" && fChassisInfo.vendor == "")
-		fChassisInfo.vendor = string;
-	string = GetValueFromMap(systemInfo, "Version",  "Chassis Information");
-	if (string != "" && fChassisInfo.version == "")
-		fChassisInfo.version = string;
-
-	string = GetValueFromMap(systemInfo, "Asset Tag", "Base Board Information");
-	if (string != "" && fBoardInfo.asset_tag == "")
-		fBoardInfo.asset_tag = string;
-	string = GetValueFromMap(systemInfo, "Product Name", "Base Board Information");
-	if (string != "" && fBoardInfo.name == "")
-		fBoardInfo.name = string;
-	string = GetValueFromMap(systemInfo, "Manufacturer", "Base Board Information");
-	if (string != "" && fBoardInfo.vendor == "")
-		fBoardInfo.vendor = string;
-	string = GetValueFromMap(systemInfo, "Version", "Base Board Information");
-	if (string != "" && fBoardInfo.version == "")
-		fBoardInfo.version = string;
-	string = GetValueFromMap(systemInfo, "Serial Number", "Base Board Information");
-	if (string != "" && fBoardInfo.serial == "")
-		fBoardInfo.serial = string;
-
-	string = GetValueFromMap(systemInfo, "Manufacturer", kSystemInfo);
-	if (string != "" && fSystemInfo.vendor == "")
-		fSystemInfo.vendor = string;
-
-	std::vector<string_map> valuesVector;
-	DMIExtractor dmiExtractor(systemInfo);
-	std::vector<string_map>::iterator i;
-
-	// Graphics cards
-	if (fVideoInfo.size() == 0) {
-		valuesVector = dmiExtractor.ExtractEntry("Display");
-		for (i = valuesVector.begin(); i != valuesVector.end(); i++) {
-			string_map& entry = *i;
-			video_info info;
-			try {
-				string_map::const_iterator mapIter;
-				mapIter = entry.find("Manufacturer");
-				if (mapIter != entry.end())
-					info.vendor = mapIter->second;
-				mapIter = entry.find("Product Name");
-				if (mapIter != entry.end())
-					info.name = mapIter->second;
-				mapIter = entry.find("description");
-				if (mapIter != entry.end())
-					info.chipset = mapIter->second;
-				fVideoInfo.push_back(info);
-			} catch (...) {
-
-			}
-		}
-	}
-	
-	// Memory slots
-	if (fMemoryInfo.size() > 0)
-		return;
-
-	valuesVector = dmiExtractor.ExtractEntry(kMemoryDevice);
-	for (i = valuesVector.begin(); i != valuesVector.end(); i++) {
-		string_map& entry = *i;
-		memory_device_info info;
-		try {
-			string_map::const_iterator mapIter;
-			mapIter = entry.find("Size");
-			if (mapIter != entry.end()) {
-				char *memoryUnit = NULL;
-				int memorySize = ::strtol(mapIter->second.c_str(), &memoryUnit, 10);
-				if (::strcasecmp(memoryUnit, "KB") == 0)
-					memorySize /= 1024;
-				else if (::strcasecmp(memoryUnit, "GB") == 0
-					 || ::strcasecmp(memoryUnit, "GiB") == 0)
-					memorySize *= 1024;
-				info.size = int_to_string(memorySize);
-			}
-			
-			mapIter = entry.find("Type");
-			if (mapIter != entry.end())
-				info.type = mapIter->second;
-			mapIter = entry.find("Speed");
-			if (mapIter != entry.end())
-				info.speed = mapIter->second;
-			mapIter = entry.find("Manufacturer");
-			if (mapIter != entry.end())
-				info.vendor = mapIter->second;
-			mapIter = entry.find("Asset Tag");
-			if (mapIter != entry.end())
-				info.asset_tag = mapIter->second;
-			mapIter = entry.find("Serial Number");
-			if (mapIter != entry.end())
-				info.serial= mapIter->second;
-			
-			mapIter = entry.find("Array Handle");
-			if (mapIter != entry.end()) {
-				std::string parentHandle = mapIter->second;
-				string_map arrayHandle = dmiExtractor.ExtractHandle(parentHandle);
-				mapIter = arrayHandle.find("Use");
-				if (mapIter != entry.end())
-					info.purpose = mapIter->second;
-				mapIter = arrayHandle.find("Use");
-				if (mapIter != entry.end())
-					info.caption = mapIter->second;
-			}
-		} catch (...) {
-
-		}
-
-		fMemoryInfo.push_back(info);
-	}
 }
 
 
@@ -825,64 +739,150 @@ Machine::_OSDescription()
 }
 
 
-int
-Machine::CountMemories()
+void
+Machine::_ExtractDataFromDMIDB(dmi_db systemInfo)
 {
-	return fMemoryInfo.size();
-}
+	std::string string;
+	string = GetValueFromMap(systemInfo, "Release Date", kBIOSInfo);
+	if (string != "" && fBIOSInfo.release_date == "")
+		fBIOSInfo.release_date = string;
+	string = GetValueFromMap(systemInfo, "Vendor", kBIOSInfo);
+	if (string != "" && fBIOSInfo.vendor == "")
+		fBIOSInfo.vendor = string;
+	string = GetValueFromMap(systemInfo, "Version", kBIOSInfo);
+	if (string != "" && fBIOSInfo.version == "")
+		fBIOSInfo.version = string;
 
+	string = GetValueFromMap(systemInfo, "Product Name", kSystemInfo);
+	if (string != "" && fProductInfo.name == "")
+		fProductInfo.name = string;
+	string = GetValueFromMap(systemInfo, "Version", kSystemInfo);
+	if (string != "" && fProductInfo.version == "")
+		fProductInfo.version = string;
+	string = GetValueFromMap(systemInfo, "UUID", kSystemInfo);
+	if (string != "" && fProductInfo.uuid == "")
+		fProductInfo.uuid = string;
+	string = GetValueFromMap(systemInfo, "Serial Number", kSystemInfo);
+	if (string != "" && fProductInfo.serial == "")
+		fProductInfo.serial = string;
+		
+	string = GetValueFromMap(systemInfo, "Asset Tag", "Chassis Information");
+	if (string != "" && fChassisInfo.asset_tag == "")
+		fChassisInfo.asset_tag = string;
+	string = GetValueFromMap(systemInfo, "Serial Number", "Chassis Information");
+	if (string != "" && fChassisInfo.serial == "")
+		fChassisInfo.serial = string;
+	string = GetValueFromMap(systemInfo, "Type", "Chassis Information");
+	if (string != "" && fChassisInfo.type == "")
+		fChassisInfo.type = string;
+	string = GetValueFromMap(systemInfo, "Manufacturer", "Chassis Information");
+	if (string != "" && fChassisInfo.vendor == "")
+		fChassisInfo.vendor = string;
+	string = GetValueFromMap(systemInfo, "Version",  "Chassis Information");
+	if (string != "" && fChassisInfo.version == "")
+		fChassisInfo.version = string;
 
-std::string
-Machine::MemoryCaption(int num)
-{
-	return fMemoryInfo.at(num).caption;
-}
+	string = GetValueFromMap(systemInfo, "Asset Tag", "Base Board Information");
+	if (string != "" && fBoardInfo.asset_tag == "")
+		fBoardInfo.asset_tag = string;
+	string = GetValueFromMap(systemInfo, "Product Name", "Base Board Information");
+	if (string != "" && fBoardInfo.name == "")
+		fBoardInfo.name = string;
+	string = GetValueFromMap(systemInfo, "Manufacturer", "Base Board Information");
+	if (string != "" && fBoardInfo.vendor == "")
+		fBoardInfo.vendor = string;
+	string = GetValueFromMap(systemInfo, "Version", "Base Board Information");
+	if (string != "" && fBoardInfo.version == "")
+		fBoardInfo.version = string;
+	string = GetValueFromMap(systemInfo, "Serial Number", "Base Board Information");
+	if (string != "" && fBoardInfo.serial == "")
+		fBoardInfo.serial = string;
 
+	string = GetValueFromMap(systemInfo, "Manufacturer", kSystemInfo);
+	if (string != "" && fSystemInfo.vendor == "")
+		fSystemInfo.vendor = string;
 
-std::string
-Machine::MemoryDescription(int num)
-{
-	return fMemoryInfo.at(num).description;
-}
+	std::vector<string_map> valuesVector;
+	DMIExtractor dmiExtractor(systemInfo);
+	std::vector<string_map>::iterator i;
 
+	// Graphics cards
+	if (fVideoInfo.size() == 0) {
+		valuesVector = dmiExtractor.ExtractEntry("Display");
+		for (i = valuesVector.begin(); i != valuesVector.end(); i++) {
+			string_map& entry = *i;
+			video_info info;
+			try {
+				string_map::const_iterator mapIter;
+				mapIter = entry.find("Manufacturer");
+				if (mapIter != entry.end())
+					info.vendor = mapIter->second;
+				mapIter = entry.find("Product Name");
+				if (mapIter != entry.end())
+					info.name = mapIter->second;
+				mapIter = entry.find("description");
+				if (mapIter != entry.end())
+					info.chipset = mapIter->second;
+				fVideoInfo.push_back(info);
+			} catch (...) {
 
-std::string
-Machine::MemoryCapacity(int num)
-{
-	return fMemoryInfo.at(num).size;
-}
+			}
+		}
+	}
+	
+	// Memory slots
+	if (fMemoryInfo.size() > 0)
+		return;
 
+	valuesVector = dmiExtractor.ExtractEntry(kMemoryDevice);
+	for (i = valuesVector.begin(); i != valuesVector.end(); i++) {
+		string_map& entry = *i;
+		memory_device_info info;
+		try {
+			string_map::const_iterator mapIter;
+			mapIter = entry.find("Size");
+			if (mapIter != entry.end()) {
+				char *memoryUnit = NULL;
+				int memorySize = ::strtol(mapIter->second.c_str(), &memoryUnit, 10);
+				if (::strcasecmp(memoryUnit, "KB") == 0)
+					memorySize /= 1024;
+				else if (::strcasecmp(memoryUnit, "GB") == 0
+					 || ::strcasecmp(memoryUnit, "GiB") == 0)
+					memorySize *= 1024;
+				info.size = int_to_string(memorySize);
+			}
+			
+			mapIter = entry.find("Type");
+			if (mapIter != entry.end())
+				info.type = mapIter->second;
+			mapIter = entry.find("Speed");
+			if (mapIter != entry.end())
+				info.speed = mapIter->second;
+			mapIter = entry.find("Manufacturer");
+			if (mapIter != entry.end())
+				info.vendor = mapIter->second;
+			mapIter = entry.find("Asset Tag");
+			if (mapIter != entry.end())
+				info.asset_tag = mapIter->second;
+			mapIter = entry.find("Serial Number");
+			if (mapIter != entry.end())
+				info.serial= mapIter->second;
+			
+			mapIter = entry.find("Array Handle");
+			if (mapIter != entry.end()) {
+				std::string parentHandle = mapIter->second;
+				string_map arrayHandle = dmiExtractor.ExtractHandle(parentHandle);
+				mapIter = arrayHandle.find("Use");
+				if (mapIter != entry.end())
+					info.purpose = mapIter->second;
+				mapIter = arrayHandle.find("Use");
+				if (mapIter != entry.end())
+					info.caption = mapIter->second;
+			}
+		} catch (...) {
 
-std::string
-Machine::MemoryPurpose(int num)
-{
-	return fMemoryInfo.at(num).purpose;
-}
+		}
 
-
-std::string
-Machine::MemoryType(int num)
-{
-	return fMemoryInfo.at(num).type;
-}
-
-
-std::string
-Machine::MemorySpeed(int num)
-{
-	return fMemoryInfo.at(num).speed;
-}
-
-
-std::string
-Machine::MemoryNumSlot(int num)
-{
-	return int_to_string(num);
-}
-
-
-std::string
-Machine::MemorySerialNumber(int num)
-{
-	return fMemoryInfo.at(num).serial;
+		fMemoryInfo.push_back(info);
+	}
 }
