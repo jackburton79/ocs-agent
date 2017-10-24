@@ -535,9 +535,7 @@ Machine::_GetLSHWData()
 
 				continue;
 			}
-			/*if (numericContext == 0)
-				continue;
-*/
+
 			size_t colonPos = line.find(":");
 			if (colonPos == std::string::npos)
 				continue;
@@ -552,6 +550,8 @@ Machine::_GetLSHWData()
 			if (context == kBIOSInfo) {
 				if (key == "vendor")
 					key = "Vendor";
+				else if (key == "version")
+					key = "Version";
 			} else if (context == kMemoryDevice) {
 				if (key == "size")
 					key = "Size";
