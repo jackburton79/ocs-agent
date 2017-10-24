@@ -81,7 +81,7 @@ DMIExtractor::ExtractEntry(std::string context) const
 	string_map entry;
 	std::vector<string_map> entries;
 	for (dbIterator = fDMIDB.begin(); dbIterator != fDMIDB.end(); dbIterator++) {
-		entry = (*dbIterator).second;
+		entry = dbIterator->second;
 		string_map::const_iterator i = entry.find("NAME");
 		if (i != entry.end() && i->second == context)
 			entries.push_back(entry);
@@ -95,7 +95,10 @@ string_map
 DMIExtractor::ExtractHandle(std::string handle) const
 {
 	int numericHandle = strtol(handle.c_str(), NULL, 0);
-	return (*(fDMIDB.find(numericHandle))).second;
+	dmi_db::const_iterator i = fDMIDB.find(numericHandle);
+	if (i == fDMIDB.end())
+		throw -1;
+	return i->second;
 }
 
 
@@ -744,22 +747,18 @@ Machine::_OSDescription()
 				}
 			}
 		}
+	} else if (::access("/etc/thinstation.global", F_OK) != -1) {
+		osDescription = "Thinstation";
+		char* tsVersion = ::getenv("TS_VERSION");
+		if (tsVersion != NULL) {
+			osDescription += " ";
+			osDescription += tsVersion;
+		}
 	} else {
-		// there is no lsb_release command.
-		// try to identify the system in another way
-		if (::access("/etc/thinstation.global", F_OK) != -1) {
-			osDescription = "Thinstation";
-			char* tsVersion = ::getenv("TS_VERSION");
-			if (tsVersion != NULL) {
-				osDescription += " ";
-				osDescription += tsVersion;
-			}
-		} else {
-			try {
-				osDescription = trimmed(ProcReader("/etc/redhat-release").ReadLine());
-			} catch (...) {
-				osDescription = "Unknown";
-			}
+		try {
+			osDescription = trimmed(ProcReader("/etc/redhat-release").ReadLine());
+		} catch (...) {
+			osDescription = "Unknown";
 		}
 	}
 	
