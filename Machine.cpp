@@ -588,7 +588,7 @@ Machine::_GetLSHWData()
 	}
 	
 	try {
-		std::map<int, std::map<std::string, std::string> >::const_iterator i;
+		/*std::map<int, std::map<std::string, std::string> >::const_iterator i;
 		for (i = systemInfo.begin(); i != systemInfo.end(); i++) {
 			std::cout << i->first << std::endl;
 			std::map<std::string, std::string> map = i->second;
@@ -596,7 +596,7 @@ Machine::_GetLSHWData()
 			for (m = map.begin(); m != map.end(); m++) {
 				std::cout << m->first << "=" << m->second << std::endl;
 			}
-		}
+		}*/
 		_ExtractDataFromDMIDB(systemInfo);
 	} catch (...) {
 		return false;
