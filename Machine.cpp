@@ -500,6 +500,10 @@ Machine::_GetLSHWData()
 
 		// This code basically maps lshw "contexts" to dmidecode
 		// ones. Yes, it's pretty ugly.
+		string_map dbEntry;
+		dbEntry["DMIHANDLE"] = int_to_string(numericContext);
+		dbEntry["NAME"] = context;
+		systemInfo[numericContext] = dbEntry;
 		while (std::getline(iStream, line)) {
 			trim(line);
 			if (size_t start = line.find("*-") != std::string::npos) {
@@ -531,9 +535,9 @@ Machine::_GetLSHWData()
 
 				continue;
 			}
-			if (numericContext == 0)
+			/*if (numericContext == 0)
 				continue;
-
+*/
 			size_t colonPos = line.find(":");
 			if (colonPos == std::string::npos)
 				continue;
