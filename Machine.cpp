@@ -94,7 +94,7 @@ DMIExtractor::ExtractEntry(std::string context) const
 string_map
 DMIExtractor::ExtractHandle(std::string handle) const
 {
-	int numericHandle = strtol(handle.c_str(), NULL, 16);
+	int numericHandle = strtol(handle.c_str(), NULL, 0);
 	return (*(fDMIDB.find(numericHandle))).second;
 }
 
@@ -538,19 +538,33 @@ Machine::_GetLSHWData()
 			if (colonPos == std::string::npos)
 				continue;
 
+			// Save these, we could overwrite them later
+			int currentNumericContext = numericContext;
+
 			// TODO: Better mapping of keys
 			std::string key = line.substr(0, colonPos);
 			trim(key);
 			std::string value = line.substr(colonPos + 1, std::string::npos);
-
 			if (context == kBIOSInfo) {
 				if (key == "vendor")
 					key = "Vendor";
 			} else if (context == kMemoryDevice) {
 				if (key == "size")
 					key = "Size";
-				else if (key == "description")
-					key = "Purpose";
+				else if (key == "description") {
+					// In dmi_db, this field is in the "Physical Memory Array" context,
+					// so we change the context "on the fly" to be able to put the key
+					// in the correct context. This is very hacky.
+					currentNumericContext += 4096;
+					systemInfo[numericContext]["Array Handle"] = int_to_string(currentNumericContext);
+					std::string tempContext = "Physical Memory Array";
+
+					string_map dbEntry;
+					dbEntry["DMIHANDLE"] = int_to_string(currentNumericContext);
+					dbEntry["NAME"] = tempContext;
+					systemInfo[currentNumericContext] = dbEntry;
+					key = "Use";
+				}
 			} else {
 				if (key == "vendor")
 					key = "Manufacturer";
@@ -563,10 +577,10 @@ Machine::_GetLSHWData()
 			else if (key == "serial")
 				key = "Serial Number";
 
-			dmi_db::const_iterator i = systemInfo.find(numericContext);
+			dmi_db::const_iterator i = systemInfo.find(currentNumericContext);
 			if (i != systemInfo.end()) {
-				if (systemInfo[numericContext].find(key) == systemInfo[numericContext].end())
-					systemInfo[numericContext][key] = trimmed(value);
+				if (systemInfo[currentNumericContext].find(key) == systemInfo[currentNumericContext].end())
+					systemInfo[currentNumericContext][key] = trimmed(value);
 			}
 		}
 	} catch (...) {
@@ -574,6 +588,15 @@ Machine::_GetLSHWData()
 	}
 	
 	try {
+		std::map<int, std::map<std::string, std::string> >::const_iterator i;
+		for (i = systemInfo.begin(); i != systemInfo.end(); i++) {
+			std::cout << i->first << std::endl;
+			std::map<std::string, std::string> map = i->second;
+			std::map<std::string, std::string>::const_iterator m;
+			for (m = map.begin(); m != map.end(); m++) {
+				std::cout << m->first << "=" << m->second << std::endl;
+			}
+		}
 		_ExtractDataFromDMIDB(systemInfo);
 	} catch (...) {
 		return false;
