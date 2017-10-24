@@ -522,7 +522,8 @@ Machine::_GetLSHWData()
 				// TODO: Map other contexts to dmidecode ones
 				// TODO: Make this better.
 				// 'memory' or 'memory:0, memory:1, etc.'
-				else if (context.find("memory") != std::string::npos)
+				else if (context.find("memory") != std::string::npos
+					|| context.find("bank") != std::string::npos)
 					context = kMemoryDevice;
 
 				numericContext += 1;
@@ -877,7 +878,8 @@ Machine::_ExtractDataFromDMIDB(dmi_db systemInfo)
 					 || ::strcasecmp(memoryUnit, "GiB") == 0)
 					memorySize *= 1024;
 				info.size = int_to_string(memorySize);
-			}
+			} else
+				info.size = int_to_string(0);
 			
 			mapIter = entry.find("Type");
 			if (mapIter != entry.end())
