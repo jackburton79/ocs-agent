@@ -872,7 +872,8 @@ Machine::_ExtractDataFromDMIDB(dmi_db systemInfo)
 			if (mapIter != entry.end()) {
 				char *memoryUnit = NULL;
 				int memorySize = ::strtol(mapIter->second.c_str(), &memoryUnit, 10);
-				if (::strcasecmp(memoryUnit, "KB") == 0)
+				if (::strcasecmp(memoryUnit, "KB") == 0
+					|| ::strcasecmp(memoryUnit, "KiB") == 0)
 					memorySize /= 1024;
 				else if (::strcasecmp(memoryUnit, "GB") == 0
 					 || ::strcasecmp(memoryUnit, "GiB") == 0)
@@ -911,7 +912,9 @@ Machine::_ExtractDataFromDMIDB(dmi_db systemInfo)
 		} catch (...) {
 
 		}
-
+		// Make sure we have at least some valid info
+		if (info.caption != "" || info.purpose != ""
+			|| info.type != "" || info.serial != "" || info.speed != "")
 		fMemoryInfo.push_back(info);
 	}
 }
