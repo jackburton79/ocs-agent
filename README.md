@@ -19,23 +19,38 @@ It also uses [tinyxml2](http://www.grinninglizard.com/tinyxml2), a very small an
 Remember, this is not the official OCSInventory NG agent, which can be found here: https://github.com/OCSInventory-NG/UnixAgent
 
     Usage:
-    -h, --help                         Print usage
-    -c, --conf <config_file>           Specify configuration file
-    -s, --server <server>              Specify OCSInventory server url
-    -l, --local <folder>               Don't send inventory, instead save a local copy in the specified file or folder
-        --stdout                       Don't send inventory, print it to stdout
-    -t, --tag <TAG>                    Specify tag. Will be ignored by server if a value already exists
-        --nosoftware                   Do not retrieve installed software
-    -D                                 DEPRECATED, use -d instead 
-    -d, --daemonize                    Detach from running terminal
-    -w, --wait <s>                     Wait for the specified amount of seconds before contacting the server
-    -v, --verbose                      Verbose mode
-    
+      -h, --help                         Print usage
+      -c, --conf <config_file>           Specify configuration file
+      -s, --server <server>              Specify OCSInventory server url
+                                         If the server needs authentication, use the standard syntax <user>:<password>@<host>
+      -l, --local <folder>               Don't send inventory, instead save a local copy in the specified file or folder
+          --stdout                       Don't send inventory, print it to stdout
+      -t, --tag <TAG>                    Specify tag. Will be ignored by server if a value already exists
+          --nosoftware                   Do not retrieve installed software
+      -D                                 DEPRECATED, use -d instead 
+      -d, --daemonize                    Detach from running terminal
+      -w, --wait <s>                     Wait for the specified amount of seconds before contacting the server
+      -v, --verbose                      Verbose mode
+
     The -l and -s option are mutually exclusive.
     If no server or output file is specified, either via the -s/-l option or via configuration file (option -c), the program will exit without doing anything.
+    Any warning/error will be written to the system logging facility. To print them to standard error, use the option '-v (--verbose)'.
+
     Examples:
-    ocsinventory-agent --conf /etc/ocsinventory-ng.conf
-    ocsinventory-agent --server http://ocsinventory-ng/ocsinventory
-    ocsinventory-agent --local /path/to/output/inventoryFile.xml
-    ocsinventory-agent --local /path/to/output/
-    ocsinventory-agent --stdout
+      Use the configuration file /etc/ocsinventory-ng.conf :
+        ocsinventory-agent --conf /etc/ocsinventory-ng.conf
+
+      Send inventory to server http://ocsinventory-ng/ocsinventory :
+        ocsinventory-agent --server http://ocsinventory-ng/ocsinventory
+
+      Send inventory to server https://ocsinventory-ng/ocsinventory which requires http basic authentication :
+        ocsinventory-agent --server https://user:password@ocsinventory-ng/ocsinventory
+
+      Save a local inventory to /var/tmp/inventoryFile.xml :
+        ocsinventory-agent --local /var/tmp/inventoryFile.xml
+
+      Save a local inventory to /var/tmp/<device_id>.xml :
+        ocsinventory-agent --local /var/tmp/
+
+      Print inventory to standard output :
+        ocsinventory-agent --stdout
