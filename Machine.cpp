@@ -122,6 +122,26 @@ GetValueFromMap(dmi_db &db, std::string key, std::string context)
 }
 
 
+// Returns a string containing the size, in MBytes,
+// starting from a string like '3GB' or '1024 KB'
+std::string
+convert_to_MBytes(std::string string)
+{
+	char *memoryUnit = NULL;
+	int memorySize = ::strtol(string.c_str(), &memoryUnit, 10);
+	std::string unit = memoryUnit;
+	trim(unit);
+	if (::strcasecmp(unit.c_str(), "KB") == 0
+		|| ::strcasecmp(unit.c_str(), "KiB") == 0)
+		memorySize /= 1024;
+	else if (::strcasecmp(unit.c_str(), "GB") == 0
+		 || ::strcasecmp(unit.c_str(), "GiB") == 0)
+		memorySize *= 1024;
+	return int_to_string(memorySize);
+}
+
+
+// Machine
 /* static */
 Machine*
 Machine::Get()
@@ -869,18 +889,10 @@ Machine::_ExtractDataFromDMIDB(dmi_db systemInfo)
 			string_map::const_iterator mapIter;
 			mapIter = entry.find("Size");
 			if (mapIter != entry.end()) {
-				char *memoryUnit = NULL;
-				int memorySize = ::strtol(mapIter->second.c_str(), &memoryUnit, 10);
-				if (::strcasecmp(memoryUnit, "KB") == 0
-					|| ::strcasecmp(memoryUnit, "KiB") == 0)
-					memorySize /= 1024;
-				else if (::strcasecmp(memoryUnit, "GB") == 0
-					 || ::strcasecmp(memoryUnit, "GiB") == 0)
-					memorySize *= 1024;
-				info.size = int_to_string(memorySize);
+				info.size = convert_to_MBytes(mapIter->second);
 			} else
 				info.size = int_to_string(0);
-			
+
 			mapIter = entry.find("Type");
 			if (mapIter != entry.end())
 				info.type = mapIter->second;
