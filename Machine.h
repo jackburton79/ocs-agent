@@ -143,6 +143,7 @@ private:
 
 	void _RetrieveData();
 	bool _GetDMIData();
+	bool _GetGraphicsCardInfo();
 	bool _GetDMIDecodeData();
 	bool _GetLSHWData();
 	void _GetCPUInfo();
