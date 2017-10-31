@@ -625,7 +625,9 @@ Machine::_GetLSHWData()
 			if (tmpElement != NULL)
 				memoryCaption = tmpElement->GetText();
 			const tinyxml2::XMLElement* childElement
-				= XML::GetElementByAttribute(*element, "id", "bank");
+				= XML::GetElementByAttribute(*element, "class", "memory");
+			// The child element could be called "bank" or "bank:n" where n is
+			// the bank number, so we search for the attribute "class"="memory"
 			if (childElement == NULL) {
 				// In some cases (VMs for example), there is no "bank" element
 				memory_device_info info;
@@ -648,6 +650,13 @@ Machine::_GetLSHWData()
 					tmpElement = element->FirstChildElement("serial");
 					if (tmpElement != NULL)
 						info.serial = tmpElement->GetText();
+
+					tmpElement = element->FirstChildElement("clock");
+					if (tmpElement != NULL) {
+						// In Hz, usually, but we should check the unit
+						unsigned int speed = strtol(tmpElement->GetText(), NULL, 10);
+						info.speed = int_to_string(speed / (1000 * 1000));
+					}
 					tmpElement = element->FirstChildElement("size");
 					if (tmpElement != NULL) {
 						unsigned int numBytes = strtol(tmpElement->GetText(), NULL, 10);
