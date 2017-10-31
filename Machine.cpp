@@ -548,7 +548,7 @@ Machine::_GetLSHWData()
 		if (fBIOSInfo.vendor.empty())
 			fBIOSInfo.vendor = element->FirstChildElement("vendor")->GetText();
 		if (fBIOSInfo.version.empty())
-		fBIOSInfo.version = element->FirstChildElement("version")->GetText();
+			fBIOSInfo.version = element->FirstChildElement("version")->GetText();
 	}
 
 	element = XML::GetElementByAttribute(doc, "class", "system");
@@ -559,7 +559,6 @@ Machine::_GetLSHWData()
 			fProductInfo.version = element->FirstChildElement("version")->GetText();
 		if (fSystemInfo.vendor.empty())
 			fSystemInfo.vendor = element->FirstChildElement("vendor")->GetText();
-
 	}
 
 	if (fVideoInfo.size() == 0) {
@@ -584,8 +583,8 @@ Machine::_GetLSHWData()
 				memory_device_info info;
 				info.description = memoryDescription;
 				info.purpose = info.description;
-				int numBytes = strtol(childElement->FirstChildElement("size")->GetText(), NULL, 10);
-				info.size = int_to_string(numBytes / 1024);
+				int numBytes = strtol(element->FirstChildElement("size")->GetText(), NULL, 10);
+				info.size = int_to_string(numBytes / 1024 / 1024);
 				fMemoryInfo.push_back(info);
 			} else {
 				while (childElement != NULL) {
@@ -593,7 +592,7 @@ Machine::_GetLSHWData()
 					info.description = memoryDescription;
 					info.purpose = info.description;
 					int numBytes = strtol(childElement->FirstChildElement("size")->GetText(), NULL, 10);
-					info.size = int_to_string(numBytes / 1024);
+					info.size = int_to_string(numBytes / 1024 / 1024);
 					fMemoryInfo.push_back(info);
 
 					childElement = childElement->NextSiblingElement();
