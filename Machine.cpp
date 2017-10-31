@@ -551,6 +551,17 @@ Machine::_GetLSHWData()
 		fBIOSInfo.version = element->FirstChildElement("version")->GetText();
 	}
 
+	element = XML::GetElementByAttribute(doc, "class", "system");
+	if (element != NULL) {
+		if (fProductInfo.name.empty())
+			fProductInfo.name = element->FirstChildElement("product")->GetText();
+		if (fProductInfo.version.empty())
+			fProductInfo.version = element->FirstChildElement("version")->GetText();
+		if (fSystemInfo.vendor.empty())
+			fSystemInfo.vendor = element->FirstChildElement("vendor")->GetText();
+
+	}
+
 	if (fVideoInfo.size() == 0) {
 		element = XML::GetElementByAttribute(doc, "id", "display");
 		if (element != NULL) {
