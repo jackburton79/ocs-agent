@@ -541,34 +541,62 @@ Machine::_GetLSHWData()
 	if (doc.Parse(string.c_str(), string.size()) != tinyxml2::XML_SUCCESS)
 		return false;
 
+	const tinyxml2::XMLElement* tmpElement = NULL;
 	const tinyxml2::XMLElement* element = XML::GetElementByAttribute(doc, "id", "firmware");
 	if (element != NULL) {
-		if (fBIOSInfo.release_date.empty())
-			fBIOSInfo.release_date = element->FirstChildElement("date")->GetText();
-		if (fBIOSInfo.vendor.empty())
-			fBIOSInfo.vendor = element->FirstChildElement("vendor")->GetText();
-		if (fBIOSInfo.version.empty())
-			fBIOSInfo.version = element->FirstChildElement("version")->GetText();
+		if (fBIOSInfo.release_date.empty()) {
+			tmpElement = element->FirstChildElement("date");
+			if (tmpElement != NULL)
+				fBIOSInfo.release_date = tmpElement->GetText();
+		}
+		if (fBIOSInfo.vendor.empty()) {
+			tmpElement = element->FirstChildElement("vendor");
+			if (tmpElement != NULL)
+				fBIOSInfo.vendor = tmpElement->GetText();
+		}
+		if (fBIOSInfo.version.empty()) {
+			tmpElement = element->FirstChildElement("version");
+			if (tmpElement != NULL)
+				fBIOSInfo.version = tmpElement->GetText();
+		}
 	}
 
 	element = XML::GetElementByAttribute(doc, "class", "system");
 	if (element != NULL) {
-		if (fProductInfo.name.empty())
-			fProductInfo.name = element->FirstChildElement("product")->GetText();
-		if (fProductInfo.version.empty())
-			fProductInfo.version = element->FirstChildElement("version")->GetText();
-		if (fSystemInfo.vendor.empty())
-			fSystemInfo.vendor = element->FirstChildElement("vendor")->GetText();
+		if (fProductInfo.name.empty()) {
+			tmpElement = element->FirstChildElement("product");
+			if (tmpElement != NULL)
+				fProductInfo.name = tmpElement->GetText();
+		}
+		if (fProductInfo.version.empty()) {
+			tmpElement = element->FirstChildElement("version");
+			if (tmpElement != NULL)
+				fProductInfo.version = tmpElement->GetText();
+		}
+		if (fSystemInfo.vendor.empty()) {
+			tmpElement = element->FirstChildElement("vendor");
+			if (tmpElement != NULL)
+				fSystemInfo.vendor = tmpElement->GetText();
+		}
 	}
 
 	element = XML::GetElementByAttribute(doc, "id", "core");
 	if (element != NULL) {
-		if (fBoardInfo.name.empty())
-			fBoardInfo.name = element->FirstChildElement("product")->GetText();
-		if (fBoardInfo.vendor.empty())
-			fBoardInfo.vendor = element->FirstChildElement("vendor")->GetText();
-		if (fBoardInfo.serial.empty())
-			fBoardInfo.serial = element->FirstChildElement("serial")->GetText();
+		if (fBoardInfo.name.empty()) {
+			tmpElement = element->FirstChildElement("product");
+			if (tmpElement != NULL)
+				fBoardInfo.name = tmpElement->GetText();
+		}
+		if (fBoardInfo.vendor.empty()) {
+			tmpElement = element->FirstChildElement("vendor");
+			if (tmpElement != NULL)
+				fBoardInfo.vendor = tmpElement->GetText();
+		}
+		if (fBoardInfo.serial.empty()) {
+			tmpElement = element->FirstChildElement("serial");
+			if (tmpElement != NULL)
+				fBoardInfo.serial = tmpElement->GetText();
+		}
 	}
 
 	if (fVideoInfo.size() == 0) {
@@ -576,9 +604,15 @@ Machine::_GetLSHWData()
 		if (element != NULL) {
 			// TODO: there could be multiple displays
 			video_info info;
-			info.name = element->FirstChildElement("description")->GetText();
-			info.vendor = element->FirstChildElement("vendor")->GetText();
-			info.chipset = element->FirstChildElement("product")->GetText();
+			tmpElement = element->FirstChildElement("description"); 
+			if (tmpElement != NULL)
+				info.name = tmpElement->GetText();
+			tmpElement = element->FirstChildElement("vendor");
+			if (tmpElement != NULL)
+				info.vendor = tmpElement->GetText();
+			tmpElement = element->FirstChildElement("product");
+			if (tmpElement != NULL)
+				info.chipset = tmpElement->GetText();
 			fVideoInfo.push_back(info);
 		}
 	}
@@ -586,7 +620,10 @@ Machine::_GetLSHWData()
 	if (fMemoryInfo.size() == 0) {
 		element = XML::GetElementByAttribute(doc, "id", "memory");
 		if (element != NULL) {
-			std::string memoryDescription = element->FirstChildElement("description")->GetText();
+			std::string memoryDescription;
+			tmpElement = element->FirstChildElement("description");
+			if (tmpElement != NULL)
+				memoryDescription = tmpElement->GetText();
 			const tinyxml2::XMLElement* childElement
 				= XML::GetElementByAttribute(*element, "id", "bank");
 			if (childElement == NULL) {
@@ -594,18 +631,23 @@ Machine::_GetLSHWData()
 				memory_device_info info;
 				info.description = memoryDescription;
 				info.purpose = info.description;
-				int numBytes = strtol(element->FirstChildElement("size")->GetText(), NULL, 10);
-				info.size = int_to_string(numBytes / 1024 / 1024);
-				fMemoryInfo.push_back(info);
+				tmpElement = element->FirstChildElement("size");
+				if (tmpElement != NULL) {
+					int numBytes = strtol(tmpElement->GetText(), NULL, 10);
+					info.size = int_to_string(numBytes / 1024 / 1024);
+					fMemoryInfo.push_back(info);
+				}
 			} else {
 				while (childElement != NULL) {
 					memory_device_info info;
 					info.description = memoryDescription;
 					info.purpose = info.description;
-					int numBytes = strtol(childElement->FirstChildElement("size")->GetText(), NULL, 10);
-					info.size = int_to_string(numBytes / 1024 / 1024);
-					fMemoryInfo.push_back(info);
-
+					tmpElement = element->FirstChildElement("size");
+					if (tmpElement != NULL) {
+						int numBytes = strtol(tmpElement->GetText(), NULL, 10);
+						info.size = int_to_string(numBytes / 1024 / 1024);
+						fMemoryInfo.push_back(info);
+					}
 					childElement = childElement->NextSiblingElement();
 				}
 			}
