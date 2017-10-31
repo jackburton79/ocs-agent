@@ -561,6 +561,16 @@ Machine::_GetLSHWData()
 			fSystemInfo.vendor = element->FirstChildElement("vendor")->GetText();
 	}
 
+	element = XML::GetElementByAttribute(doc, "id", "core");
+	if (element != NULL) {
+		if (fBoardInfo.name.empty())
+			fBoardInfo.name = element->FirstChildElement("product")->GetText();
+		if (fBoardInfo.vendor.empty())
+			fBoardInfo.vendor = element->FirstChildElement("vendor")->GetText();
+		if (fBoardInfo.serial.empty())
+			fBoardInfo.serial = element->FirstChildElement("serial")->GetText();
+	}
+
 	if (fVideoInfo.size() == 0) {
 		element = XML::GetElementByAttribute(doc, "id", "display");
 		if (element != NULL) {
@@ -572,6 +582,7 @@ Machine::_GetLSHWData()
 			fVideoInfo.push_back(info);
 		}
 	}
+
 	if (fMemoryInfo.size() == 0) {
 		element = XML::GetElementByAttribute(doc, "id", "memory");
 		if (element != NULL) {
