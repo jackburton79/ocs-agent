@@ -171,9 +171,9 @@ Machine::_RetrieveData()
 {
 	try {
 		// Try /sys/devices/virtual/dmi/id tree, then 'dmidecode', then 'lshw'
-		//_GetDMIData();
-		//_GetGraphicsCardInfo();
-		//_GetDMIDecodeData();
+		_GetDMIData();
+		_GetGraphicsCardInfo();
+		_GetDMIDecodeData();
 		_GetLSHWData();
 		_GetCPUInfo();
 		_GetOSInfo();
@@ -543,43 +543,50 @@ Machine::_GetLSHWData()
 
 	const tinyxml2::XMLElement* element = XML::GetElementByAttribute(doc, "id", "firmware");
 	if (element != NULL) {
-		fBIOSInfo.release_date = element->FirstChildElement("date")->GetText();
-		fBIOSInfo.vendor = element->FirstChildElement("vendor")->GetText();
+		if (fBIOSInfo.release_date.empty())
+			fBIOSInfo.release_date = element->FirstChildElement("date")->GetText();
+		if (fBIOSInfo.vendor.empty())
+			fBIOSInfo.vendor = element->FirstChildElement("vendor")->GetText();
+		if (fBIOSInfo.version.empty())
 		fBIOSInfo.version = element->FirstChildElement("version")->GetText();
 	}
 
-	element = XML::GetElementByAttribute(doc, "id", "display");
-	if (element != NULL) {
-		// TODO: there could be multiple displays
-		video_info info;
-		info.name = element->FirstChildElement("description")->GetText();
-		info.vendor = element->FirstChildElement("vendor")->GetText();
-		info.chipset = element->FirstChildElement("product")->GetText();
-		fVideoInfo.push_back(info);
+	if (fVideoInfo.size() == 0) {
+		element = XML::GetElementByAttribute(doc, "id", "display");
+		if (element != NULL) {
+			// TODO: there could be multiple displays
+			video_info info;
+			info.name = element->FirstChildElement("description")->GetText();
+			info.vendor = element->FirstChildElement("vendor")->GetText();
+			info.chipset = element->FirstChildElement("product")->GetText();
+			fVideoInfo.push_back(info);
+		}
 	}
-	element = XML::GetElementByAttribute(doc, "id", "memory");
-	if (element != NULL) {
-		std::string memoryDescription = element->FirstChildElement("description")->GetText();
-		const tinyxml2::XMLElement* childElement
-			= XML::GetElementByAttribute(*element, "id", "bank");
-		if (childElement == NULL) {
-			// In some cases (VMs for example), there is no "bank" element
-			memory_device_info info;
-			info.description = memoryDescription;
-			info.purpose = info.description;
-			int numBytes = strtol(childElement->FirstChildElement("size")->GetText(), NULL, 10);
-			info.size = int_to_string(numBytes / 1024);
-			fMemoryInfo.push_back(info);
-		} else {
-			while (childElement != NULL) {
+	if (fMemoryInfo.size() == 0) {
+		element = XML::GetElementByAttribute(doc, "id", "memory");
+		if (element != NULL) {
+			std::string memoryDescription = element->FirstChildElement("description")->GetText();
+			const tinyxml2::XMLElement* childElement
+				= XML::GetElementByAttribute(*element, "id", "bank");
+			if (childElement == NULL) {
+				// In some cases (VMs for example), there is no "bank" element
 				memory_device_info info;
 				info.description = memoryDescription;
 				info.purpose = info.description;
 				int numBytes = strtol(childElement->FirstChildElement("size")->GetText(), NULL, 10);
 				info.size = int_to_string(numBytes / 1024);
 				fMemoryInfo.push_back(info);
+			} else {
+				while (childElement != NULL) {
+					memory_device_info info;
+					info.description = memoryDescription;
+					info.purpose = info.description;
+					int numBytes = strtol(childElement->FirstChildElement("size")->GetText(), NULL, 10);
+					info.size = int_to_string(numBytes / 1024);
+					fMemoryInfo.push_back(info);
 
-				childElement = childElement->NextSiblingElement();
+					childElement = childElement->NextSiblingElement();
+				}
 			}
 		}
 	}
