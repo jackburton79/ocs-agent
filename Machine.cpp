@@ -25,6 +25,9 @@
 #include <sstream>
 #include <vector>
 
+#include <tinyxml2/tinyxml2.h>
+
+#include <XML.h>
 
 typedef std::map<std::string, std::string> string_map;
 
@@ -168,9 +171,9 @@ Machine::_RetrieveData()
 {
 	try {
 		// Try /sys/devices/virtual/dmi/id tree, then 'dmidecode', then 'lshw'
-		_GetDMIData();
-		_GetGraphicsCardInfo();
-		_GetDMIDecodeData();
+		//_GetDMIData();
+		//_GetGraphicsCardInfo();
+		//_GetDMIDecodeData();
 		_GetLSHWData();
 		_GetCPUInfo();
 		_GetOSInfo();
@@ -528,126 +531,59 @@ Machine::_GetLSHWData()
 	if (!CommandExists("lshw"))
 		return false;
 
-	popen_streambuf lshw("lshw", "r");
+	// Load command output into "string"
+	popen_streambuf lshw("lshw -xml", "r");
 	std::istream iStream(&lshw);
-	
-	dmi_db systemInfo;
-	try {
-		std::string line;
-		std::string context = kSystemInfo;
-		int numericContext = 0;
-		// skip initial line
-		std::getline(iStream, line);
+	std::istreambuf_iterator<char> eos;
+	std::string string(std::istreambuf_iterator<char>(iStream), eos);
 
-		// This code basically maps lshw "contexts" to dmidecode
-		// ones. Yes, it's pretty ugly.
-		string_map dbEntry;
-		dbEntry["DMIHANDLE"] = int_to_string(numericContext);
-		dbEntry["NAME"] = context;
-		systemInfo[numericContext] = dbEntry;
-		while (std::getline(iStream, line)) {
-			trim(line);
-			if (size_t start = line.find("*-") != std::string::npos) {
-				// Init Context
-				context = line.substr(start + 1, std::string::npos);
-				// lshw adds "UNCLAIMED" if there is no driver for the device
-				size_t unclaimedPos = context.find("UNCLAIMED");
-				if (unclaimedPos != std::string::npos)
-					context.erase(unclaimedPos, context.length());
+	tinyxml2::XMLDocument doc;
+	if (doc.Parse(string.c_str(), string.size()) != tinyxml2::XML_SUCCESS)
+		return false;
 
-				trim(context);
-				if (context == "firmware")
-					context = kBIOSInfo;
-				else if (context == "display")
-					context = "Display";
-				// TODO: Map other contexts to dmidecode ones
-				// TODO: Make this better.
-				// 'memory' or 'memory:0, memory:1, etc.'
-				else if (context.find("memory") != std::string::npos
-					|| context.find("bank") != std::string::npos)
-					context = kMemoryDevice;
+	const tinyxml2::XMLElement* element = XML::GetElementByAttribute(doc, "id", "firmware");
+	if (element != NULL) {
+		fBIOSInfo.release_date = element->FirstChildElement("date")->GetText();
+		fBIOSInfo.vendor = element->FirstChildElement("vendor")->GetText();
+		fBIOSInfo.version = element->FirstChildElement("version")->GetText();
+	}
 
-				numericContext += 1;
+	element = XML::GetElementByAttribute(doc, "id", "display");
+	if (element != NULL) {
+		// TODO: there could be multiple displays
+		video_info info;
+		info.name = element->FirstChildElement("description")->GetText();
+		info.vendor = element->FirstChildElement("vendor")->GetText();
+		info.chipset = element->FirstChildElement("product")->GetText();
+		fVideoInfo.push_back(info);
+	}
+	element = XML::GetElementByAttribute(doc, "id", "memory");
+	if (element != NULL) {
+		std::string memoryDescription = element->FirstChildElement("description")->GetText();
+		const tinyxml2::XMLElement* childElement
+			= XML::GetElementByAttribute(*element, "id", "bank");
+		if (childElement == NULL) {
+			// In some cases (VMs for example), there is no "bank" element
+			memory_device_info info;
+			info.description = memoryDescription;
+			info.purpose = info.description;
+			int numBytes = strtol(childElement->FirstChildElement("size")->GetText(), NULL, 10);
+			info.size = int_to_string(numBytes / 1024);
+			fMemoryInfo.push_back(info);
+		} else {
+			while (childElement != NULL) {
+				memory_device_info info;
+				info.description = memoryDescription;
+				info.purpose = info.description;
+				int numBytes = strtol(childElement->FirstChildElement("size")->GetText(), NULL, 10);
+				info.size = int_to_string(numBytes / 1024);
+				fMemoryInfo.push_back(info);
 
-				trim(context);
-				string_map dbEntry;
-				dbEntry["DMIHANDLE"] = int_to_string(numericContext);
-				dbEntry["NAME"] = context;
-				systemInfo[numericContext] = dbEntry;
-
-				continue;
-			}
-
-			size_t colonPos = line.find(":");
-			if (colonPos == std::string::npos)
-				continue;
-
-			// Save these, we could overwrite them later
-			int currentNumericContext = numericContext;
-
-			// TODO: Better mapping of keys
-			std::string key = line.substr(0, colonPos);
-			trim(key);
-			std::string value = line.substr(colonPos + 1, std::string::npos);
-			if (context == kBIOSInfo) {
-				if (key == "vendor")
-					key = "Vendor";
-				else if (key == "version")
-					key = "Version";
-			} else if (context == kMemoryDevice) {
-				if (key == "size")
-					key = "Size";
-				else if (key == "description") {
-					// In dmi_db, this field is in the "Physical Memory Array" context,
-					// so we change the context "on the fly" to be able to put the key
-					// in the correct context. This is very hacky.
-					currentNumericContext += 4096;
-					systemInfo[numericContext]["Array Handle"] = int_to_string(currentNumericContext);
-					std::string tempContext = "Physical Memory Array";
-
-					string_map dbEntry;
-					dbEntry["DMIHANDLE"] = int_to_string(currentNumericContext);
-					dbEntry["NAME"] = tempContext;
-					systemInfo[currentNumericContext] = dbEntry;
-					key = "Use";
-				}
-			} else {
-				if (key == "vendor")
-					key = "Manufacturer";
-			}
-			
-			if (key == "product")
-				key = "Product Name";
-			else if (key == "date")
-				key = "Release Date";
-			else if (key == "serial")
-				key = "Serial Number";
-
-			dmi_db::const_iterator i = systemInfo.find(currentNumericContext);
-			if (i != systemInfo.end()) {
-				if (systemInfo[currentNumericContext].find(key) == systemInfo[currentNumericContext].end())
-					systemInfo[currentNumericContext][key] = trimmed(value);
+				childElement = childElement->NextSiblingElement();
 			}
 		}
-	} catch (...) {
-
 	}
 	
-	try {
-		/*std::map<int, std::map<std::string, std::string> >::const_iterator i;
-		for (i = systemInfo.begin(); i != systemInfo.end(); i++) {
-			std::cout << i->first << std::endl;
-			std::map<std::string, std::string> map = i->second;
-			std::map<std::string, std::string>::const_iterator m;
-			for (m = map.begin(); m != map.end(); m++) {
-				std::cout << m->first << "=" << m->second << std::endl;
-			}
-		}*/
-		_ExtractDataFromDMIDB(systemInfo);
-	} catch (...) {
-		return false;
-	}
-
 	return true;
 }
 
