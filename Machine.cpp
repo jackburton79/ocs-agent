@@ -628,13 +628,13 @@ Machine::_GetLSHWData()
 				= XML::GetElementByAttribute(*element, "id", "bank");
 			if (childElement == NULL) {
 				// In some cases (VMs for example), there is no "bank" element
-				memory_device_info info;
-				info.description = memoryDescription;
-				info.purpose = info.description;
 				tmpElement = element->FirstChildElement("size");
 				if (tmpElement != NULL) {
-					int numBytes = strtol(tmpElement->GetText(), NULL, 10);
-					info.size = int_to_string(numBytes / 1024 / 1024);
+					memory_device_info info;
+					info.description = memoryDescription;
+					info.purpose = info.description;
+					unsigned int numBytes = strtol(tmpElement->GetText(), NULL, 10);
+					info.size = int_to_string(numBytes / (1024 * 1024));
 					fMemoryInfo.push_back(info);
 				}
 			} else {
@@ -644,8 +644,8 @@ Machine::_GetLSHWData()
 					info.purpose = info.description;
 					tmpElement = element->FirstChildElement("size");
 					if (tmpElement != NULL) {
-						int numBytes = strtol(tmpElement->GetText(), NULL, 10);
-						info.size = int_to_string(numBytes / 1024 / 1024);
+						unsigned int numBytes = strtol(tmpElement->GetText(), NULL, 10);
+						info.size = int_to_string(numBytes / (1024 * 1024));
 						fMemoryInfo.push_back(info);
 					}
 					childElement = childElement->NextSiblingElement();
