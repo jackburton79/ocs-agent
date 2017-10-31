@@ -620,19 +620,22 @@ Machine::_GetLSHWData()
 	if (fMemoryInfo.size() == 0) {
 		element = XML::GetElementByAttribute(doc, "id", "memory");
 		if (element != NULL) {
-			std::string memoryDescription;
+			std::string memoryCaption;
 			tmpElement = element->FirstChildElement("description");
 			if (tmpElement != NULL)
-				memoryDescription = tmpElement->GetText();
+				memoryCaption = tmpElement->GetText();
 			const tinyxml2::XMLElement* childElement
 				= XML::GetElementByAttribute(*element, "id", "bank");
 			if (childElement == NULL) {
 				// In some cases (VMs for example), there is no "bank" element
+				memory_device_info info;
+				info.caption = memoryCaption;
+				info.purpose = info.caption;
 				tmpElement = element->FirstChildElement("size");
 				if (tmpElement != NULL) {
 					memory_device_info info;
-					info.description = memoryDescription;
-					info.purpose = info.description;
+					info.caption = memoryCaption;
+					info.purpose = info.caption;
 					unsigned int numBytes = strtol(tmpElement->GetText(), NULL, 10);
 					info.size = int_to_string(numBytes / (1024 * 1024));
 					fMemoryInfo.push_back(info);
@@ -640,8 +643,11 @@ Machine::_GetLSHWData()
 			} else {
 				while (childElement != NULL) {
 					memory_device_info info;
-					info.description = memoryDescription;
-					info.purpose = info.description;
+					info.caption = memoryCaption;
+					info.purpose = info.caption;
+					tmpElement = element->FirstChildElement("serial");
+					if (tmpElement != NULL)
+						info.serial = tmpElement->GetText();
 					tmpElement = element->FirstChildElement("size");
 					if (tmpElement != NULL) {
 						unsigned int numBytes = strtol(tmpElement->GetText(), NULL, 10);
