@@ -19,48 +19,32 @@
 #include <tinyxml2/tinyxml2.h>
 
 
-class ElementFinder : public tinyxml2::XMLVisitor {
+class ElementFinderByName : public tinyxml2::XMLVisitor {
 public:
-	ElementFinder(std::string elementName);
+	ElementFinderByName(std::string elementName);
 	virtual bool VisitEnter(const tinyxml2::XMLElement& element, const tinyxml2::XMLAttribute* attr);
 
-	std::string Response() const;
+	std::string Value() const;
 private:
 	std::string fElementName;
-	std::string fResponse;
+	std::string fElementValue;
 };
 
 
-ElementFinder::ElementFinder(std::string elementName)
-	:
-	XMLVisitor(),
-	fElementName(elementName),
-	fResponse("")
-{
-}
+class ElementFinderByAttribute : public tinyxml2::XMLVisitor {
+public:
+	ElementFinderByAttribute(std::string attributeName, std::string attributeValue);
+	virtual bool VisitEnter(const tinyxml2::XMLElement& element, const tinyxml2::XMLAttribute* attr);
+
+	const tinyxml2::XMLElement* Element() const;
+private:
+	std::string fAttributeName;
+	std::string fAttributeValue;
+	const tinyxml2::XMLElement* fElement;
+};
 
 
-/* virtual */
-bool
-ElementFinder::VisitEnter(const tinyxml2::XMLElement& element, const tinyxml2::XMLAttribute*)
-{
-	if (fElementName.compare(element.Name()) == 0) {
-		fResponse = element.GetText();
-		return false;
-	}
-	
-	return true;
-}
-
-
-
-std::string
-ElementFinder::Response() const
-{
-	return fResponse;
-}
-
-
+// XML
 std::string
 XML::ToString(const tinyxml2::XMLDocument& document)
 {
@@ -118,9 +102,96 @@ XML::Uncompress(const char* source, size_t sourceLen, tinyxml2::XMLDocument& doc
 std::string
 XML::GetTextElementValue(const tinyxml2::XMLDocument& document, std::string elementName)
 {
-	ElementFinder responseFinder(elementName);
-	document.Accept(&responseFinder);
+	ElementFinderByName textFinder(elementName);
+	document.Accept(&textFinder);
 
-	return responseFinder.Response();
+	return textFinder.Value();
 }
 
+
+const tinyxml2::XMLElement*
+XML::GetElementByAttribute(const tinyxml2::XMLNode& node,
+							std::string attributeName, std::string attributeValue)
+{
+	ElementFinderByAttribute attributeFinder(attributeName, attributeValue);
+	node.Accept(&attributeFinder);
+
+	return attributeFinder.Element();
+}
+
+
+// ElementFinderByName
+ElementFinderByName::ElementFinderByName(std::string elementName)
+	:
+	XMLVisitor(),
+	fElementName(elementName),
+	fElementValue("")
+{
+}
+
+
+/* virtual */
+bool
+ElementFinderByName::VisitEnter(const tinyxml2::XMLElement& element, const tinyxml2::XMLAttribute*)
+{
+	if (fElementName.compare(element.Name()) == 0) {
+		fElementValue = element.GetText();
+		return false;
+	}
+
+	return true;
+}
+
+
+
+std::string
+ElementFinderByName::Value() const
+{
+	return fElementValue;
+}
+
+
+// ElementFinderByAttribute
+ElementFinderByAttribute::ElementFinderByAttribute(std::string attributeName, std::string attributeValue)
+	:
+	XMLVisitor(),
+	fAttributeName(attributeName),
+	fAttributeValue(attributeValue),
+	fElement(NULL)
+{
+}
+
+
+/* virtual */
+bool
+ElementFinderByAttribute::VisitEnter(const tinyxml2::XMLElement& element, const tinyxml2::XMLAttribute* attr)
+{
+	if (attr == NULL)
+		return true;
+
+	const tinyxml2::XMLAttribute* next = attr;
+	while (next != NULL) {
+		if (fAttributeName.compare(next->Name()) == 0
+				&& fAttributeValue.compare(next->Value()) == 0) {
+			fElement = &element;
+			return false;
+		}
+		//std::cout << "attr: " << next->Name() << ":" << next->Value() << std::endl;
+		next = next->Next();
+	}
+	/*if (fAttributeName.compare(attr->Name()) == 0 && fAttributeValue.compare(attr->Value()) == 0) {
+
+		fElement = &element;
+		return false;
+	}*/
+
+	return true;
+}
+
+
+
+const tinyxml2::XMLElement*
+ElementFinderByAttribute::Element() const
+{
+	return fElement;
+}
