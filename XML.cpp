@@ -24,10 +24,10 @@ public:
 	ElementFinderByName(std::string elementName);
 	virtual bool VisitEnter(const tinyxml2::XMLElement& element, const tinyxml2::XMLAttribute* attr);
 
-	std::string Value() const;
+	const tinyxml2::XMLElement* Element() const;
 private:
 	std::string fElementName;
-	std::string fElementValue;
+	const tinyxml2::XMLElement* fElement;
 };
 
 
@@ -100,12 +100,23 @@ XML::Uncompress(const char* source, size_t sourceLen, tinyxml2::XMLDocument& doc
 
 
 std::string
-XML::GetTextElementValue(const tinyxml2::XMLDocument& document, std::string elementName)
+XML::GetElementText(const tinyxml2::XMLNode& node, std::string elementName)
+{
+	std::string result;
+	const tinyxml2::XMLElement* element = GetElementByName(node, elementName);
+	if (element != NULL)
+		result = element->GetText();
+	return result;
+}
+
+
+const tinyxml2::XMLElement*
+XML::GetElementByName(const tinyxml2::XMLNode& node, std::string elementName)
 {
 	ElementFinderByName textFinder(elementName);
-	document.Accept(&textFinder);
+	node.Accept(&textFinder);
 
-	return textFinder.Value();
+	return textFinder.Element();
 }
 
 
@@ -125,7 +136,7 @@ ElementFinderByName::ElementFinderByName(std::string elementName)
 	:
 	XMLVisitor(),
 	fElementName(elementName),
-	fElementValue("")
+	fElement(NULL)
 {
 }
 
@@ -135,7 +146,7 @@ bool
 ElementFinderByName::VisitEnter(const tinyxml2::XMLElement& element, const tinyxml2::XMLAttribute*)
 {
 	if (fElementName.compare(element.Name()) == 0) {
-		fElementValue = element.GetText();
+		fElement = &element;
 		return false;
 	}
 
@@ -144,10 +155,10 @@ ElementFinderByName::VisitEnter(const tinyxml2::XMLElement& element, const tinyx
 
 
 
-std::string
-ElementFinderByName::Value() const
+const tinyxml2::XMLElement*
+ElementFinderByName::Element() const
 {
-	return fElementValue;
+	return fElement;
 }
 
 
@@ -176,14 +187,8 @@ ElementFinderByAttribute::VisitEnter(const tinyxml2::XMLElement& element, const 
 			fElement = &element;
 			return false;
 		}
-		//std::cout << "attr: " << next->Name() << ":" << next->Value() << std::endl;
 		next = next->Next();
 	}
-	/*if (fAttributeName.compare(attr->Name()) == 0 && fAttributeValue.compare(attr->Value()) == 0) {
-
-		fElement = &element;
-		return false;
-	}*/
 
 	return true;
 }

@@ -221,7 +221,7 @@ Inventory::Send(const char* serverUrl)
 		return false;
 	}
 
-	std::string serverResponse = XML::GetTextElementValue(document, "RESPONSE");
+	std::string serverResponse = XML::GetElementText(document, "RESPONSE");
 	if (serverResponse != "SEND") {
 		logger.LogFormat(LOG_ERR, "Server not ready to accept inventory: %s", serverResponse.c_str());
 		return false;
