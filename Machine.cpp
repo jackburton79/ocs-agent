@@ -573,6 +573,11 @@ Machine::_GetLSHWData()
 			if (tmpElement != NULL)
 				fProductInfo.version = tmpElement->GetText();
 		}
+		if (fProductInfo.serial.empty()) {
+			tmpElement = element->FirstChildElement("serial");
+			if (tmpElement != NULL)
+				fProductInfo.serial = tmpElement->GetText();
+		}
 		if (fSystemInfo.vendor.empty()) {
 			tmpElement = element->FirstChildElement("vendor");
 			if (tmpElement != NULL)
