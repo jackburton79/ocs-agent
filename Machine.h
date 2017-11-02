@@ -14,10 +14,6 @@
 
 typedef std::map<int, std::map<std::string, std::string> > dmi_db;
 
-struct system_info {
-	std::string vendor;
-};
-
 
 struct bios_info {
 	std::string vendor;
@@ -26,8 +22,9 @@ struct bios_info {
 };
 
 
-struct product_info {
+struct system_info {
 	std::string name;
+	std::string vendor;
 	std::string serial;
 	std::string version;
 	std::string uuid;
@@ -158,7 +155,6 @@ private:
 	bios_info fBIOSInfo;
 	chassis_info fChassisInfo;
 	board_info fBoardInfo;
-	product_info fProductInfo;
 	os_info fKernelInfo;
 	system_info fSystemInfo;
 

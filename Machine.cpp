@@ -239,21 +239,21 @@ Machine::HostName() const
 std::string
 Machine::SystemModel() const
 {
-	return fProductInfo.name;
+	return fSystemInfo.name;
 }
 
 
 std::string
 Machine::SystemSerialNumber() const
 {
-	return fProductInfo.serial;
+	return fSystemInfo.serial;
 }
 
 
 std::string
 Machine::SystemUUID() const
 {
-	return fProductInfo.uuid;
+	return fSystemInfo.uuid;
 }
 
 
@@ -423,10 +423,10 @@ Machine::_GetDMIData()
 		fBIOSInfo.vendor = trimmed(ProcReader("/sys/devices/virtual/dmi/id/bios_vendor").ReadLine());
 		fBIOSInfo.version = trimmed(ProcReader("/sys/devices/virtual/dmi/id/bios_version").ReadLine());
 		
-		fProductInfo.name = trimmed(ProcReader("/sys/devices/virtual/dmi/id/product_name").ReadLine());
-		fProductInfo.version = trimmed(ProcReader("/sys/devices/virtual/dmi/id/product_version").ReadLine());
-		fProductInfo.uuid = trimmed(ProcReader("/sys/devices/virtual/dmi/id/product_uuid").ReadLine());
-		fProductInfo.serial = trimmed(ProcReader("/sys/devices/virtual/dmi/id/product_serial").ReadLine());
+		fSystemInfo.name = trimmed(ProcReader("/sys/devices/virtual/dmi/id/product_name").ReadLine());
+		fSystemInfo.version = trimmed(ProcReader("/sys/devices/virtual/dmi/id/product_version").ReadLine());
+		fSystemInfo.uuid = trimmed(ProcReader("/sys/devices/virtual/dmi/id/product_uuid").ReadLine());
+		fSystemInfo.serial = trimmed(ProcReader("/sys/devices/virtual/dmi/id/product_serial").ReadLine());
 		
 		fChassisInfo.asset_tag = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_asset_tag").ReadLine());
 		fChassisInfo.serial = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_serial").ReadLine());
@@ -563,20 +563,20 @@ Machine::_GetLSHWData()
 
 	element = XML::GetElementByAttribute(doc, "class", "system");
 	if (element != NULL) {
-		if (fProductInfo.name.empty()) {
+		if (fSystemInfo.name.empty()) {
 			tmpElement = element->FirstChildElement("product");
 			if (tmpElement != NULL)
-				fProductInfo.name = tmpElement->GetText();
+				fSystemInfo.name = tmpElement->GetText();
 		}
-		if (fProductInfo.version.empty()) {
+		if (fSystemInfo.version.empty()) {
 			tmpElement = element->FirstChildElement("version");
 			if (tmpElement != NULL)
-				fProductInfo.version = tmpElement->GetText();
+				fSystemInfo.version = tmpElement->GetText();
 		}
-		if (fProductInfo.serial.empty()) {
+		if (fSystemInfo.serial.empty()) {
 			tmpElement = element->FirstChildElement("serial");
 			if (tmpElement != NULL)
-				fProductInfo.serial = tmpElement->GetText();
+				fSystemInfo.serial = tmpElement->GetText();
 		}
 		if (fSystemInfo.vendor.empty()) {
 			tmpElement = element->FirstChildElement("vendor");
@@ -845,17 +845,17 @@ Machine::_ExtractDataFromDMIDB(dmi_db systemInfo)
 		fBIOSInfo.version = string;
 
 	string = GetValueFromMap(systemInfo, "Product Name", kSystemInfo);
-	if (string != "" && fProductInfo.name == "")
-		fProductInfo.name = string;
+	if (string != "" && fSystemInfo.name == "")
+		fSystemInfo.name = string;
 	string = GetValueFromMap(systemInfo, "Version", kSystemInfo);
-	if (string != "" && fProductInfo.version == "")
-		fProductInfo.version = string;
+	if (string != "" && fSystemInfo.version == "")
+		fSystemInfo.version = string;
 	string = GetValueFromMap(systemInfo, "UUID", kSystemInfo);
-	if (string != "" && fProductInfo.uuid == "")
-		fProductInfo.uuid = string;
+	if (string != "" && fSystemInfo.uuid == "")
+		fSystemInfo.uuid = string;
 	string = GetValueFromMap(systemInfo, "Serial Number", kSystemInfo);
-	if (string != "" && fProductInfo.serial == "")
-		fProductInfo.serial = string;
+	if (string != "" && fSystemInfo.serial == "")
+		fSystemInfo.serial = string;
 		
 	string = GetValueFromMap(systemInfo, "Asset Tag", "Chassis Information");
 	if (string != "" && fChassisInfo.asset_tag == "")
