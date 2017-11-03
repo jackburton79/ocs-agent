@@ -630,7 +630,7 @@ Machine::_GetLSHWData()
 	}
 
 	if (fMemoryInfo.size() == 0) {
-		element = XML::GetElementByAttribute(doc, "id", "memory");
+		element = XML::GetElementByAttribute(doc, "id", "memory", false);
 		if (element != NULL) {
 			std::string memoryCaption;
 			tmpElement = element->FirstChildElement("description");
