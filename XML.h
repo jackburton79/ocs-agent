@@ -25,10 +25,12 @@ public:
 	static std::string GetElementText(const tinyxml2::XMLNode& node, std::string elementName);
 
 	static const tinyxml2::XMLElement* GetElementByName(const tinyxml2::XMLNode& node,
-														std::string elementName);
+														std::string elementName, bool onlyFullName = true);
+														
 	static const tinyxml2::XMLElement* GetElementByAttribute(const tinyxml2::XMLNode& node,
 													std::string attributeName,
-													std::string attributeValue);
+													std::string attributeValue,
+													bool onlyFullValue = true);
 };
 
 #endif /* XML_H_ */

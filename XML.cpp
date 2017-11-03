@@ -21,19 +21,22 @@
 
 class ElementFinderByName : public tinyxml2::XMLVisitor {
 public:
-	ElementFinderByName(std::string elementName);
+	ElementFinderByName(std::string elementName, bool onlyFullName);
 	virtual bool VisitEnter(const tinyxml2::XMLElement& element, const tinyxml2::XMLAttribute* attr);
 
 	const tinyxml2::XMLElement* Element() const;
 private:
 	std::string fElementName;
 	const tinyxml2::XMLElement* fElement;
+	bool fFull;
 };
 
 
 class ElementFinderByAttribute : public tinyxml2::XMLVisitor {
 public:
-	ElementFinderByAttribute(std::string attributeName, std::string attributeValue);
+	ElementFinderByAttribute(std::string attributeName,
+							std::string attributeValue,
+							bool onlyFullValue);
 	virtual bool VisitEnter(const tinyxml2::XMLElement& element, const tinyxml2::XMLAttribute* attr);
 
 	const tinyxml2::XMLElement* Element() const;
@@ -41,6 +44,7 @@ private:
 	std::string fAttributeName;
 	std::string fAttributeValue;
 	const tinyxml2::XMLElement* fElement;
+	bool fFull;
 };
 
 
@@ -111,9 +115,11 @@ XML::GetElementText(const tinyxml2::XMLNode& node, std::string elementName)
 
 
 const tinyxml2::XMLElement*
-XML::GetElementByName(const tinyxml2::XMLNode& node, std::string elementName)
+XML::GetElementByName(const tinyxml2::XMLNode& node,
+						std::string elementName,
+						bool onlyFullName)
 {
-	ElementFinderByName textFinder(elementName);
+	ElementFinderByName textFinder(elementName, onlyFullName);
 	node.Accept(&textFinder);
 
 	return textFinder.Element();
@@ -122,9 +128,11 @@ XML::GetElementByName(const tinyxml2::XMLNode& node, std::string elementName)
 
 const tinyxml2::XMLElement*
 XML::GetElementByAttribute(const tinyxml2::XMLNode& node,
-							std::string attributeName, std::string attributeValue)
+							std::string attributeName,
+							std::string attributeValue,
+							bool onlyFullValue)
 {
-	ElementFinderByAttribute attributeFinder(attributeName, attributeValue);
+	ElementFinderByAttribute attributeFinder(attributeName, attributeValue, onlyFullValue);
 	node.Accept(&attributeFinder);
 
 	return attributeFinder.Element();
@@ -132,11 +140,12 @@ XML::GetElementByAttribute(const tinyxml2::XMLNode& node,
 
 
 // ElementFinderByName
-ElementFinderByName::ElementFinderByName(std::string elementName)
+ElementFinderByName::ElementFinderByName(std::string elementName, bool onlyFullName)
 	:
 	XMLVisitor(),
 	fElementName(elementName),
-	fElement(NULL)
+	fElement(NULL),
+	fFull(onlyFullName)
 {
 }
 
@@ -145,9 +154,16 @@ ElementFinderByName::ElementFinderByName(std::string elementName)
 bool
 ElementFinderByName::VisitEnter(const tinyxml2::XMLElement& element, const tinyxml2::XMLAttribute*)
 {
-	if (fElementName.compare(element.Name()) == 0) {
-		fElement = &element;
-		return false;
+	if (fFull) {
+		if (fElementName.compare(element.Name()) == 0) {
+			fElement = &element;
+			return false;
+		}
+	} else {
+		if (fElementName.compare(0, fElementName.length(), element.Name(), fElementName.length())) {
+			fElement = &element;
+			return false;
+		}
 	}
 
 	return true;
@@ -163,12 +179,15 @@ ElementFinderByName::Element() const
 
 
 // ElementFinderByAttribute
-ElementFinderByAttribute::ElementFinderByAttribute(std::string attributeName, std::string attributeValue)
+ElementFinderByAttribute::ElementFinderByAttribute(std::string attributeName,
+											std::string attributeValue,
+											bool onlyFullValue)
 	:
 	XMLVisitor(),
 	fAttributeName(attributeName),
 	fAttributeValue(attributeValue),
-	fElement(NULL)
+	fElement(NULL),
+	fFull(onlyFullValue)
 {
 }
 
@@ -182,10 +201,19 @@ ElementFinderByAttribute::VisitEnter(const tinyxml2::XMLElement& element, const 
 
 	const tinyxml2::XMLAttribute* next = attr;
 	while (next != NULL) {
-		if (fAttributeName.compare(next->Name()) == 0
-				&& fAttributeValue.compare(next->Value()) == 0) {
-			fElement = &element;
-			return false;
+		if (fFull) {
+			if (fAttributeName.compare(next->Name()) == 0
+					&& fAttributeValue.compare(next->Value()) == 0) {
+				fElement = &element;
+				return false;
+			}
+		} else {
+			if (fAttributeName.compare(next->Name()) == 0
+					&& fAttributeValue.compare(0, fAttributeValue.length(),
+						next->Value(), fAttributeValue.length()) == 0) {
+				fElement = &element;
+				return false;
+			}
 		}
 		next = next->Next();
 	}
