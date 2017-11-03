@@ -107,6 +107,7 @@ public:
 	std::string SystemSerialNumber() const;
 	std::string SystemUUID() const;
 	std::string SystemManufacturer() const;
+	std::string SystemType() const;
 
 	std::string Architecture() const;
 	std::string HostName() const;

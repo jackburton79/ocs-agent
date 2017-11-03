@@ -335,6 +335,9 @@ Inventory::_AddBIOSInfo(tinyxml2::XMLElement* parent)
 	tinyxml2::XMLElement* ssn = fDocument->NewElement("SSN");
 	ssn->LinkEndChild(fDocument->NewText(fMachine->SystemSerialNumber().c_str()));
 
+	tinyxml2::XMLElement* type = fDocument->NewElement("TYPE");
+	type->LinkEndChild(fDocument->NewText(fMachine->SystemType().c_str()));
+
 	bios->LinkEndChild(assettag);
 	bios->LinkEndChild(bdate);
 	bios->LinkEndChild(bmanufacturer);
@@ -344,6 +347,7 @@ Inventory::_AddBIOSInfo(tinyxml2::XMLElement* parent)
 	bios->LinkEndChild(sManufacturer);
 	bios->LinkEndChild(systemModel);
 	bios->LinkEndChild(ssn);
+	bios->LinkEndChild(type);
 
 	parent->LinkEndChild(bios);
 

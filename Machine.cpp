@@ -258,6 +258,13 @@ Machine::SystemUUID() const
 
 
 std::string
+Machine::SystemType() const
+{
+	return fChassisInfo.type;
+}
+
+
+std::string
 Machine::MachineSerialNumber() const
 {
 	return fBoardInfo.serial;
@@ -430,7 +437,7 @@ Machine::_GetDMIData()
 		
 		fChassisInfo.asset_tag = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_asset_tag").ReadLine());
 		fChassisInfo.serial = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_serial").ReadLine());
-		fChassisInfo.type = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_type").ReadLine());
+		//fChassisInfo.type = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_type").ReadLine());
 		fChassisInfo.vendor = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_vendor").ReadLine());
 		fChassisInfo.version = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_version").ReadLine());
 		
