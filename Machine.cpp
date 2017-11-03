@@ -590,6 +590,12 @@ Machine::_GetLSHWData()
 			if (tmpElement != NULL)
 				fSystemInfo.vendor = tmpElement->GetText();
 		}
+		// TODO: Check if this is always correct
+		if (fChassisInfo.type.empty()) {
+			tmpElement = element->FirstChildElement("description");
+			if (tmpElement != NULL)
+				fChassisInfo.type = tmpElement->GetText();
+		}
 	}
 
 	element = XML::GetElementByAttribute(doc, "id", "core");
