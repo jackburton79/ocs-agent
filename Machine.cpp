@@ -316,24 +316,21 @@ Machine::ProcessorSerialNumber(int numCpu) const
 std::string
 Machine::ProcessorType(int numCpu) const
 {
-	std::string model = fCPUInfo[numCpu].type;
-	return model;
+	return fCPUInfo[numCpu].type;
 }
 
 
 std::string
 Machine::ProcessorCores(int numCpu) const
 {
-	std::string model = fCPUInfo[numCpu].cores;
-	return model;
+	return fCPUInfo[numCpu].cores;
 }
 
 
 std::string
 Machine::ProcessorCacheSize(int numCpu) const
 {
-	std::string cacheSize = fCPUInfo[numCpu].cache_size;
-	return cacheSize;
+	return fCPUInfo[numCpu].cache_size;
 }
 
 
