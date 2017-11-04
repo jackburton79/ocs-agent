@@ -56,6 +56,7 @@ struct processor_info {
 	std::string speed;
 	std::string cores;
 	std::string cache_size;
+	std::string serial;
 };
 
 

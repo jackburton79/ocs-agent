@@ -309,7 +309,7 @@ Machine::ProcessorSpeed(int numCpu) const
 std::string
 Machine::ProcessorSerialNumber(int numCpu) const
 {
-	return "";
+	return fCPUInfo[numCpu].serial;
 }
 
 
