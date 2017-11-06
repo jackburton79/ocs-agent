@@ -642,11 +642,11 @@ Machine::_GetLSHWData()
 			tmpElement = element->FirstChildElement("description");
 			if (tmpElement != NULL)
 				memoryCaption = tmpElement->GetText();
-			const tinyxml2::XMLElement* childElement
-				= XML::GetElementByAttribute(*element, "class", "memory");
+			const tinyxml2::XMLElement* bankElement
+				= XML::GetElementByAttribute(*element, "id", "bank", false);
 			// The child element could be called "bank" or "bank:n" where n is
 			// the bank number, so we search for the attribute "class"="memory"
-			if (childElement == NULL) {
+			if (bankElement == NULL) {
 				// In some cases (VMs for example), there is no "bank" element
 				memory_device_info info;
 				info.caption = memoryCaption;
@@ -661,33 +661,36 @@ Machine::_GetLSHWData()
 					fMemoryInfo.push_back(info);
 				}
 			} else {
-				while (childElement != NULL) {
+				while (bankElement != NULL) {
 					memory_device_info info;
 					info.caption = memoryCaption;
 					info.purpose = info.caption;
-					tmpElement = element->FirstChildElement("serial");
-					if (tmpElement != NULL)
+					tmpElement = bankElement->FirstChildElement("serial");
+					if (tmpElement != NULL) {
 						info.serial = tmpElement->GetText();
+					}
 
-					tmpElement = element->FirstChildElement("clock");
+					tmpElement = bankElement->FirstChildElement("clock");
 					if (tmpElement != NULL) {
 						// In Hz, usually, but we should check the unit
 						unsigned int speed = strtol(tmpElement->GetText(), NULL, 10);
 						info.speed = int_to_string(speed / (1000 * 1000));
 					}
-					tmpElement = element->FirstChildElement("size");
+					tmpElement = bankElement->FirstChildElement("size");
 					if (tmpElement != NULL) {
 						unsigned int numBytes = strtol(tmpElement->GetText(), NULL, 10);
 						info.size = int_to_string(numBytes / (1024 * 1024));
 						fMemoryInfo.push_back(info);
 					}
-					childElement = childElement->NextSiblingElement();
+					bankElement = bankElement->NextSiblingElement();
 				}
 			}
 
 			element = element->NextSiblingElement();
-			if (::strncasecmp(element->Attribute("id"), "memory", strlen("memory")) != 0)
-				break;
+			if (element != NULL) {
+				if (::strncasecmp(element->Attribute("id"), "memory", strlen("memory")) != 0)
+					break;
+			}
 		}
 		
 	}
