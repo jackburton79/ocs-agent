@@ -25,6 +25,9 @@
 #include <sstream>
 #include <vector>
 
+#include <tinyxml2/tinyxml2.h>
+
+#include <XML.h>
 
 typedef std::map<std::string, std::string> string_map;
 
@@ -169,6 +172,7 @@ Machine::_RetrieveData()
 	try {
 		// Try /sys/devices/virtual/dmi/id tree, then 'dmidecode', then 'lshw'
 		_GetDMIData();
+		_GetGraphicsCardInfo();
 		_GetDMIDecodeData();
 		_GetLSHWData();
 		_GetCPUInfo();
@@ -235,21 +239,28 @@ Machine::HostName() const
 std::string
 Machine::SystemModel() const
 {
-	return fProductInfo.name;
+	return fSystemInfo.name;
 }
 
 
 std::string
 Machine::SystemSerialNumber() const
 {
-	return fProductInfo.serial;
+	return fSystemInfo.serial;
 }
 
 
 std::string
 Machine::SystemUUID() const
 {
-	return fProductInfo.uuid;
+	return fSystemInfo.uuid;
+}
+
+
+std::string
+Machine::SystemType() const
+{
+	return fChassisInfo.type;
 }
 
 
@@ -419,14 +430,14 @@ Machine::_GetDMIData()
 		fBIOSInfo.vendor = trimmed(ProcReader("/sys/devices/virtual/dmi/id/bios_vendor").ReadLine());
 		fBIOSInfo.version = trimmed(ProcReader("/sys/devices/virtual/dmi/id/bios_version").ReadLine());
 		
-		fProductInfo.name = trimmed(ProcReader("/sys/devices/virtual/dmi/id/product_name").ReadLine());
-		fProductInfo.version = trimmed(ProcReader("/sys/devices/virtual/dmi/id/product_version").ReadLine());
-		fProductInfo.uuid = trimmed(ProcReader("/sys/devices/virtual/dmi/id/product_uuid").ReadLine());
-		fProductInfo.serial = trimmed(ProcReader("/sys/devices/virtual/dmi/id/product_serial").ReadLine());
+		fSystemInfo.name = trimmed(ProcReader("/sys/devices/virtual/dmi/id/product_name").ReadLine());
+		fSystemInfo.version = trimmed(ProcReader("/sys/devices/virtual/dmi/id/product_version").ReadLine());
+		fSystemInfo.uuid = trimmed(ProcReader("/sys/devices/virtual/dmi/id/product_uuid").ReadLine());
+		fSystemInfo.serial = trimmed(ProcReader("/sys/devices/virtual/dmi/id/product_serial").ReadLine());
 		
 		fChassisInfo.asset_tag = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_asset_tag").ReadLine());
 		fChassisInfo.serial = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_serial").ReadLine());
-		fChassisInfo.type = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_type").ReadLine());
+		//fChassisInfo.type = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_type").ReadLine());
 		fChassisInfo.vendor = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_vendor").ReadLine());
 		fChassisInfo.version = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_version").ReadLine());
 		
@@ -440,6 +451,23 @@ Machine::_GetDMIData()
 	} catch (...) {
 		return false;
 	}
+	return true;
+}
+
+
+bool
+Machine::_GetGraphicsCardInfo()
+{
+	try {
+		struct video_info videoInfo;
+		videoInfo.name = trimmed(ProcReader("/sys/class/graphics/fb0/device/oem_product_name").ReadLine());
+		videoInfo.vendor = trimmed(ProcReader("/sys/class/graphics/fb0/device/oem_vendor").ReadLine());
+		videoInfo.resolution = trimmed(ProcReader("/sys/class/graphics/fb0/virtual_size").ReadLine());
+		fVideoInfo.push_back(videoInfo);
+	} catch (...) {
+		return false;
+	}
+
 	return true;
 }
 
@@ -510,126 +538,163 @@ Machine::_GetLSHWData()
 	if (!CommandExists("lshw"))
 		return false;
 
-	popen_streambuf lshw("lshw", "r");
+	// Load command output into "string"
+	popen_streambuf lshw("lshw -xml", "r");
 	std::istream iStream(&lshw);
-	
-	dmi_db systemInfo;
-	try {
-		std::string line;
-		std::string context = kSystemInfo;
-		int numericContext = 0;
-		// skip initial line
-		std::getline(iStream, line);
+	std::istreambuf_iterator<char> eos;
+	std::string string(std::istreambuf_iterator<char>(iStream), eos);
 
-		// This code basically maps lshw "contexts" to dmidecode
-		// ones. Yes, it's pretty ugly.
-		string_map dbEntry;
-		dbEntry["DMIHANDLE"] = int_to_string(numericContext);
-		dbEntry["NAME"] = context;
-		systemInfo[numericContext] = dbEntry;
-		while (std::getline(iStream, line)) {
-			trim(line);
-			if (size_t start = line.find("*-") != std::string::npos) {
-				// Init Context
-				context = line.substr(start + 1, std::string::npos);
-				// lshw adds "UNCLAIMED" if there is no driver for the device
-				size_t unclaimedPos = context.find("UNCLAIMED");
-				if (unclaimedPos != std::string::npos)
-					context.erase(unclaimedPos, context.length());
+	tinyxml2::XMLDocument doc;
+	if (doc.Parse(string.c_str(), string.size()) != tinyxml2::XML_SUCCESS)
+		return false;
 
-				trim(context);
-				if (context == "firmware")
-					context = kBIOSInfo;
-				else if (context == "display")
-					context = "Display";
-				// TODO: Map other contexts to dmidecode ones
-				// TODO: Make this better.
-				// 'memory' or 'memory:0, memory:1, etc.'
-				else if (context.find("memory") != std::string::npos
-					|| context.find("bank") != std::string::npos)
-					context = kMemoryDevice;
+	const tinyxml2::XMLElement* tmpElement = NULL;
+	const tinyxml2::XMLElement* element = XML::GetElementByAttribute(doc, "id", "firmware");
+	if (element != NULL) {
+		if (fBIOSInfo.release_date.empty()) {
+			tmpElement = element->FirstChildElement("date");
+			if (tmpElement != NULL)
+				fBIOSInfo.release_date = tmpElement->GetText();
+		}
+		if (fBIOSInfo.vendor.empty()) {
+			tmpElement = element->FirstChildElement("vendor");
+			if (tmpElement != NULL)
+				fBIOSInfo.vendor = tmpElement->GetText();
+		}
+		if (fBIOSInfo.version.empty()) {
+			tmpElement = element->FirstChildElement("version");
+			if (tmpElement != NULL)
+				fBIOSInfo.version = tmpElement->GetText();
+		}
+	}
 
-				numericContext += 1;
+	element = XML::GetElementByAttribute(doc, "class", "system");
+	if (element != NULL) {
+		if (fSystemInfo.name.empty()) {
+			tmpElement = element->FirstChildElement("product");
+			if (tmpElement != NULL)
+				fSystemInfo.name = tmpElement->GetText();
+		}
+		if (fSystemInfo.version.empty()) {
+			tmpElement = element->FirstChildElement("version");
+			if (tmpElement != NULL)
+				fSystemInfo.version = tmpElement->GetText();
+		}
+		if (fSystemInfo.serial.empty()) {
+			tmpElement = element->FirstChildElement("serial");
+			if (tmpElement != NULL)
+				fSystemInfo.serial = tmpElement->GetText();
+		}
+		if (fSystemInfo.vendor.empty()) {
+			tmpElement = element->FirstChildElement("vendor");
+			if (tmpElement != NULL)
+				fSystemInfo.vendor = tmpElement->GetText();
+		}
+		// TODO: Check if this is always correct
+		if (fChassisInfo.type.empty()) {
+			tmpElement = element->FirstChildElement("description");
+			if (tmpElement != NULL)
+				fChassisInfo.type = tmpElement->GetText();
+		}
+	}
 
-				trim(context);
-				string_map dbEntry;
-				dbEntry["DMIHANDLE"] = int_to_string(numericContext);
-				dbEntry["NAME"] = context;
-				systemInfo[numericContext] = dbEntry;
+	element = XML::GetElementByAttribute(doc, "id", "core");
+	if (element != NULL) {
+		if (fBoardInfo.name.empty()) {
+			tmpElement = element->FirstChildElement("product");
+			if (tmpElement != NULL)
+				fBoardInfo.name = tmpElement->GetText();
+		}
+		if (fBoardInfo.vendor.empty()) {
+			tmpElement = element->FirstChildElement("vendor");
+			if (tmpElement != NULL)
+				fBoardInfo.vendor = tmpElement->GetText();
+		}
+		if (fBoardInfo.serial.empty()) {
+			tmpElement = element->FirstChildElement("serial");
+			if (tmpElement != NULL)
+				fBoardInfo.serial = tmpElement->GetText();
+		}
+	}
 
-				continue;
-			}
+	if (fVideoInfo.size() == 0) {
+		element = XML::GetElementByAttribute(doc, "id", "display");
+		if (element != NULL) {
+			// TODO: there could be multiple displays
+			video_info info;
+			tmpElement = element->FirstChildElement("description"); 
+			if (tmpElement != NULL)
+				info.name = tmpElement->GetText();
+			tmpElement = element->FirstChildElement("vendor");
+			if (tmpElement != NULL)
+				info.vendor = tmpElement->GetText();
+			tmpElement = element->FirstChildElement("product");
+			if (tmpElement != NULL)
+				info.chipset = tmpElement->GetText();
+			fVideoInfo.push_back(info);
+		}
+	}
 
-			size_t colonPos = line.find(":");
-			if (colonPos == std::string::npos)
-				continue;
-
-			// Save these, we could overwrite them later
-			int currentNumericContext = numericContext;
-
-			// TODO: Better mapping of keys
-			std::string key = line.substr(0, colonPos);
-			trim(key);
-			std::string value = line.substr(colonPos + 1, std::string::npos);
-			if (context == kBIOSInfo) {
-				if (key == "vendor")
-					key = "Vendor";
-				else if (key == "version")
-					key = "Version";
-			} else if (context == kMemoryDevice) {
-				if (key == "size")
-					key = "Size";
-				else if (key == "description") {
-					// In dmi_db, this field is in the "Physical Memory Array" context,
-					// so we change the context "on the fly" to be able to put the key
-					// in the correct context. This is very hacky.
-					currentNumericContext += 4096;
-					systemInfo[numericContext]["Array Handle"] = int_to_string(currentNumericContext);
-					std::string tempContext = "Physical Memory Array";
-
-					string_map dbEntry;
-					dbEntry["DMIHANDLE"] = int_to_string(currentNumericContext);
-					dbEntry["NAME"] = tempContext;
-					systemInfo[currentNumericContext] = dbEntry;
-					key = "Use";
+	if (fMemoryInfo.size() == 0) {
+		element = XML::GetElementByAttribute(doc, "id", "memory", false);
+		while (element != NULL) {
+			std::string memoryCaption;
+			tmpElement = element->FirstChildElement("description");
+			if (tmpElement != NULL)
+				memoryCaption = tmpElement->GetText();
+			const tinyxml2::XMLElement* bankElement
+				= XML::GetElementByAttribute(*element, "id", "bank", false);
+			// The child element could be called "bank" or "bank:n" where n is
+			// the bank number, so we search for the attribute "class"="memory"
+			if (bankElement == NULL) {
+				// In some cases (VMs for example), there is no "bank" element
+				memory_device_info info;
+				info.caption = memoryCaption;
+				info.purpose = info.caption;
+				tmpElement = element->FirstChildElement("size");
+				if (tmpElement != NULL) {
+					memory_device_info info;
+					info.caption = memoryCaption;
+					info.purpose = info.caption;
+					unsigned int numBytes = strtol(tmpElement->GetText(), NULL, 10);
+					info.size = int_to_string(numBytes / (1024 * 1024));
+					fMemoryInfo.push_back(info);
 				}
 			} else {
-				if (key == "vendor")
-					key = "Manufacturer";
-			}
-			
-			if (key == "product")
-				key = "Product Name";
-			else if (key == "date")
-				key = "Release Date";
-			else if (key == "serial")
-				key = "Serial Number";
+				while (bankElement != NULL) {
+					memory_device_info info;
+					info.caption = memoryCaption;
+					info.purpose = info.caption;
+					tmpElement = bankElement->FirstChildElement("serial");
+					if (tmpElement != NULL) {
+						info.serial = tmpElement->GetText();
+					}
 
-			dmi_db::const_iterator i = systemInfo.find(currentNumericContext);
-			if (i != systemInfo.end()) {
-				if (systemInfo[currentNumericContext].find(key) == systemInfo[currentNumericContext].end())
-					systemInfo[currentNumericContext][key] = trimmed(value);
+					tmpElement = bankElement->FirstChildElement("clock");
+					if (tmpElement != NULL) {
+						// In Hz, usually, but we should check the unit
+						unsigned int speed = strtol(tmpElement->GetText(), NULL, 10);
+						info.speed = int_to_string(speed / (1000 * 1000));
+					}
+					tmpElement = bankElement->FirstChildElement("size");
+					if (tmpElement != NULL) {
+						unsigned int numBytes = strtol(tmpElement->GetText(), NULL, 10);
+						info.size = int_to_string(numBytes / (1024 * 1024));
+						fMemoryInfo.push_back(info);
+					}
+					bankElement = bankElement->NextSiblingElement();
+				}
+			}
+
+			element = element->NextSiblingElement();
+			if (element != NULL) {
+				if (::strncasecmp(element->Attribute("id"), "memory", strlen("memory")) != 0)
+					break;
 			}
 		}
-	} catch (...) {
-
+		
 	}
 	
-	try {
-		/*std::map<int, std::map<std::string, std::string> >::const_iterator i;
-		for (i = systemInfo.begin(); i != systemInfo.end(); i++) {
-			std::cout << i->first << std::endl;
-			std::map<std::string, std::string> map = i->second;
-			std::map<std::string, std::string>::const_iterator m;
-			for (m = map.begin(); m != map.end(); m++) {
-				std::cout << m->first << "=" << m->second << std::endl;
-			}
-		}*/
-		_ExtractDataFromDMIDB(systemInfo);
-	} catch (...) {
-		return false;
-	}
-
 	return true;
 }
 
@@ -801,17 +866,17 @@ Machine::_ExtractDataFromDMIDB(dmi_db systemInfo)
 		fBIOSInfo.version = string;
 
 	string = GetValueFromMap(systemInfo, "Product Name", kSystemInfo);
-	if (string != "" && fProductInfo.name == "")
-		fProductInfo.name = string;
+	if (string != "" && fSystemInfo.name == "")
+		fSystemInfo.name = string;
 	string = GetValueFromMap(systemInfo, "Version", kSystemInfo);
-	if (string != "" && fProductInfo.version == "")
-		fProductInfo.version = string;
+	if (string != "" && fSystemInfo.version == "")
+		fSystemInfo.version = string;
 	string = GetValueFromMap(systemInfo, "UUID", kSystemInfo);
-	if (string != "" && fProductInfo.uuid == "")
-		fProductInfo.uuid = string;
+	if (string != "" && fSystemInfo.uuid == "")
+		fSystemInfo.uuid = string;
 	string = GetValueFromMap(systemInfo, "Serial Number", kSystemInfo);
-	if (string != "" && fProductInfo.serial == "")
-		fProductInfo.serial = string;
+	if (string != "" && fSystemInfo.serial == "")
+		fSystemInfo.serial = string;
 		
 	string = GetValueFromMap(systemInfo, "Asset Tag", "Chassis Information");
 	if (string != "" && fChassisInfo.asset_tag == "")
