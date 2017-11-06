@@ -154,13 +154,16 @@ ElementFinderByName::ElementFinderByName(std::string elementName, bool onlyFullN
 bool
 ElementFinderByName::VisitEnter(const tinyxml2::XMLElement& element, const tinyxml2::XMLAttribute*)
 {
+	if (fElement != NULL)
+		return false;
+
 	if (fFull) {
 		if (fElementName.compare(element.Name()) == 0) {
 			fElement = &element;
 			return false;
 		}
 	} else {
-		if (fElementName.compare(0, fElementName.length(), element.Name(), fElementName.length())) {
+		if (fElementName.compare(0, fElementName.length(), element.Name(), fElementName.length()) == 0) {
 			fElement = &element;
 			return false;
 		}
@@ -196,6 +199,9 @@ ElementFinderByAttribute::ElementFinderByAttribute(std::string attributeName,
 bool
 ElementFinderByAttribute::VisitEnter(const tinyxml2::XMLElement& element, const tinyxml2::XMLAttribute* attr)
 {
+	if (fElement != NULL)
+		return false;
+
 	if (attr == NULL)
 		return true;
 
