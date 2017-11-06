@@ -641,8 +641,6 @@ Machine::_GetLSHWData()
 				memoryCaption = tmpElement->GetText();
 			const tinyxml2::XMLElement* bankElement
 				= XML::GetElementByAttribute(*element, "id", "bank", false);
-			// The child element could be called "bank" or "bank:n" where n is
-			// the bank number, so we search for the attribute "class"="memory"
 			if (bankElement == NULL) {
 				// In some cases (VMs for example), there is no "bank" element
 				memory_device_info info;
@@ -662,6 +660,18 @@ Machine::_GetLSHWData()
 					memory_device_info info;
 					info.caption = memoryCaption;
 					info.purpose = info.caption;
+					tmpElement = bankElement->FirstChildElement("description");
+					if (tmpElement != NULL) {
+						info.description = tmpElement->GetText();
+						// TODO: Not the cleanest approach, but lshw doesn't
+						// seem to return this in any other field
+						if (info.description.find("SDRAM") != std::string::npos)
+							info.type = "SDRAM";
+						else if (info.description.find("FLASH") != std::string::npos)
+							info.type = "FLASH";
+
+						// TODO: Yeah, and DDR2 ? DDR3 ?
+					}
 					tmpElement = bankElement->FirstChildElement("serial");
 					if (tmpElement != NULL) {
 						info.serial = tmpElement->GetText();
