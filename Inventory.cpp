@@ -333,7 +333,10 @@ Inventory::_AddBIOSInfo(tinyxml2::XMLElement* parent)
 	systemModel->LinkEndChild(fDocument->NewText(fMachine->SystemModel().c_str()));
 
 	tinyxml2::XMLElement* ssn = fDocument->NewElement("SSN");
-	ssn->LinkEndChild(fDocument->NewText(fMachine->SystemSerialNumber().c_str()));
+	if (Configuration::Get()->UseBaseBoardSerialNumber())
+		ssn->LinkEndChild(fDocument->NewText(fMachine->MachineSerialNumber().c_str()));
+	else
+		ssn->LinkEndChild(fDocument->NewText(fMachine->SystemSerialNumber().c_str()));
 
 	tinyxml2::XMLElement* type = fDocument->NewElement("TYPE");
 	type->LinkEndChild(fDocument->NewText(fMachine->SystemType().c_str()));
@@ -851,14 +854,16 @@ Inventory::_AddVideosInfo(tinyxml2::XMLElement* parent)
 		video_info info = fMachine->VideoInfoFor(i);
 
 		tinyxml2::XMLElement* video = fDocument->NewElement("VIDEOS");
+
+		// OCSInventory uses the name as chipset, and the chipset as name
 		tinyxml2::XMLElement* chipset = fDocument->NewElement("CHIPSET");
-		chipset->LinkEndChild(fDocument->NewText(info.chipset.c_str()));
+		chipset->LinkEndChild(fDocument->NewText(info.name.c_str()));
 
 		tinyxml2::XMLElement* memory = fDocument->NewElement("MEMORY");
 		memory->LinkEndChild(fDocument->NewText(info.memory.c_str()));
 
 		tinyxml2::XMLElement* name = fDocument->NewElement("NAME");
-		name->LinkEndChild(fDocument->NewText(info.name.c_str()));
+		name->LinkEndChild(fDocument->NewText(info.chipset.c_str()));
 
 		tinyxml2::XMLElement* resolution = fDocument->NewElement("RESOLUTION");
 		resolution->LinkEndChild(fDocument->NewText(info.resolution.c_str()));

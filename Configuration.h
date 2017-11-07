@@ -32,6 +32,11 @@ public:
 	std::string DeviceID() const;	
 	bool LocalInventory() const;
 
+	void SetUseCurrentTimeInDeviceID(bool use);
+	bool UseCurrentTimeInDeviceID() const;
+
+	void SetUseBaseBoardSerialNumber(bool use);
+	bool UseBaseBoardSerialNumber() const;
 private:
 	Configuration();
 	~Configuration();
