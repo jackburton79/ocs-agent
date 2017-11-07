@@ -32,6 +32,8 @@ public:
 	std::string DeviceID() const;	
 	bool LocalInventory() const;
 
+	void SetUseCurrentTimeInDeviceID(bool use);
+	bool UseCurrentTimeInDeviceID() const;
 private:
 	Configuration();
 	~Configuration();

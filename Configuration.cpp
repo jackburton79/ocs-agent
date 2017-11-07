@@ -22,7 +22,7 @@
 const static char* kServer = "server";
 const static char* kDeviceID = "deviceID";
 const static char* kOutputFileName = "outputFileName";
-
+const static char* kUseCurrentTimeInDeviceID = "currentTimeInDeviceID";
 
 static Configuration* sConfiguration;
 
@@ -191,6 +191,25 @@ Configuration::OutputFileName() const
 }
 
 
+bool
+Configuration::UseCurrentTimeInDeviceID() const
+{
+	std::map<std::string, std::string>::const_iterator i;
+	i = fValues.find(kUseCurrentTimeInDeviceID);
+	if (i == fValues.end())
+		return false;
+
+	return i->second.compare("yes") == 0;
+}
+
+
+void
+Configuration::SetUseCurrentTimeInDeviceID(bool use)
+{
+	fValues[kUseCurrentTimeInDeviceID] = use ? "yes" : "no";
+}
+
+
 void
 Configuration::_GenerateDeviceID()
 {
@@ -212,18 +231,24 @@ Configuration::_GenerateDeviceID()
 	if (deviceID == "")
 		deviceID = Machine::Get()->HostName();
 	
-	std::string biosDateString = Machine::Get()->BIOSDate();
-	// On some machines, this can be empty. So use an harcoded
-	// value, since we need a correct date for the device id
-	if (biosDateString.length() <= 1)
-		biosDateString = "01/01/2017";
-	struct tm biosDate;
-	strptime(biosDateString.c_str(), "%m/%d/%Y", &biosDate);
-	
 	// DeviceID needs to have a date appended in this very format,
 	// otherwise OCSInventoryNG will reject the inventory
 	char targetString[128];
-	strftime(targetString, sizeof(targetString), "-%Y-%m-%d-00-00-00", &biosDate);
+	if (UseCurrentTimeInDeviceID()) {
+		time_t rawtime = time(NULL);
+		struct tm* timeinfo = localtime(&rawtime);
+		strftime(targetString, sizeof(targetString), "-%Y-%m-%d-%H-%M-%S", timeinfo);
+	} else {
+		std::string biosDateString = Machine::Get()->BIOSDate();
+		// On some machines, this can be empty. So use an harcoded
+		// value, since we need a correct date for the device id
+		if (biosDateString.length() <= 1)
+			biosDateString = "01/01/2017";
+		struct tm biosDate;
+		strptime(biosDateString.c_str(), "%m/%d/%Y", &biosDate);
+		strftime(targetString, sizeof(targetString), "-%Y-%m-%d-00-00-00", &biosDate);
+	}
+
     deviceID.append(targetString);
 
 	fValues[kDeviceID] = deviceID;
