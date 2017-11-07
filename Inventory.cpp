@@ -851,14 +851,16 @@ Inventory::_AddVideosInfo(tinyxml2::XMLElement* parent)
 		video_info info = fMachine->VideoInfoFor(i);
 
 		tinyxml2::XMLElement* video = fDocument->NewElement("VIDEOS");
+
+		// OCSInventory uses the name as chipset, and the chipset as name
 		tinyxml2::XMLElement* chipset = fDocument->NewElement("CHIPSET");
-		chipset->LinkEndChild(fDocument->NewText(info.chipset.c_str()));
+		chipset->LinkEndChild(fDocument->NewText(info.name.c_str()));
 
 		tinyxml2::XMLElement* memory = fDocument->NewElement("MEMORY");
 		memory->LinkEndChild(fDocument->NewText(info.memory.c_str()));
 
 		tinyxml2::XMLElement* name = fDocument->NewElement("NAME");
-		name->LinkEndChild(fDocument->NewText(info.name.c_str()));
+		name->LinkEndChild(fDocument->NewText(info.chipset.c_str()));
 
 		tinyxml2::XMLElement* resolution = fDocument->NewElement("RESOLUTION");
 		resolution->LinkEndChild(fDocument->NewText(info.resolution.c_str()));
