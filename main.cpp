@@ -19,7 +19,7 @@
 #include <string>
 
 extern const char* __progname;
-const char* version = "1.6";
+const char* version = "1.6.3";
 
 
 static
@@ -44,6 +44,10 @@ static void
 PrintHelpAndExit()
 {
 	std::cout << __progname << " " << version << std::endl;
+	if (geteuid() != 0) {
+		std::cout << "WARNING: This program needs to be run as root." << std::endl;
+		std::cout << std::endl;
+	}
 	std::cout << "Usage:" << std::endl;
 	std::cout << "  -h, --help                         Print usage" << std::endl;
 	std::cout << "  -c, --conf <config_file>           Specify configuration file" << std::endl;
