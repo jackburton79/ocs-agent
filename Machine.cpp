@@ -669,7 +669,8 @@ Machine::_GetLSHWData()
 							info.type = "SDRAM";
 						else if (info.description.find("FLASH") != std::string::npos)
 							info.type = "FLASH";
-
+						else if (info.description.find("DDR") != std::string::npos)
+							info.type = "DDR";
 						// TODO: Yeah, and DDR2 ? DDR3 ?
 					}
 					tmpElement = bankElement->FirstChildElement("serial");
