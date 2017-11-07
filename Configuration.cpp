@@ -23,6 +23,7 @@ const static char* kServer = "server";
 const static char* kDeviceID = "deviceID";
 const static char* kOutputFileName = "outputFileName";
 const static char* kUseCurrentTimeInDeviceID = "currentTimeInDeviceID";
+const static char* kUseBaseBoardSerial = "useBaseBoardSerialNumber";
 
 static Configuration* sConfiguration;
 
@@ -207,6 +208,25 @@ void
 Configuration::SetUseCurrentTimeInDeviceID(bool use)
 {
 	fValues[kUseCurrentTimeInDeviceID] = use ? "yes" : "no";
+}
+
+
+bool
+Configuration::UseBaseBoardSerialNumber() const
+{
+	std::map<std::string, std::string>::const_iterator i;
+	i = fValues.find(kUseBaseBoardSerial);
+	if (i == fValues.end())
+		return false;
+
+	return i->second.compare("yes") == 0;
+}
+
+
+void
+Configuration::SetUseBaseBoardSerialNumber(bool use)
+{
+	fValues[kUseBaseBoardSerial] = use ? "yes" : "no";
 }
 
 

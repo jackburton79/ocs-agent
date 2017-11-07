@@ -333,7 +333,10 @@ Inventory::_AddBIOSInfo(tinyxml2::XMLElement* parent)
 	systemModel->LinkEndChild(fDocument->NewText(fMachine->SystemModel().c_str()));
 
 	tinyxml2::XMLElement* ssn = fDocument->NewElement("SSN");
-	ssn->LinkEndChild(fDocument->NewText(fMachine->SystemSerialNumber().c_str()));
+	if (Configuration::Get()->UseBaseBoardSerialNumber())
+		ssn->LinkEndChild(fDocument->NewText(fMachine->MachineSerialNumber().c_str()));
+	else
+		ssn->LinkEndChild(fDocument->NewText(fMachine->SystemSerialNumber().c_str()));
 
 	tinyxml2::XMLElement* type = fDocument->NewElement("TYPE");
 	type->LinkEndChild(fDocument->NewText(fMachine->SystemType().c_str()));
