@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/jackburton79/agent.svg?branch=master)](https://travis-ci.org/jackburton79/agent)
+[![Build Status](https://travis-ci.org/jackburton79/ocs-agent.svg?branch=master)](https://travis-ci.org/jackburton79/agent)
 
 Unofficial OCS Inventory NG agent for Thinstation
 =====
