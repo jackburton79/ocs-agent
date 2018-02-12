@@ -16,7 +16,7 @@
 #include <unistd.h>
 
 
-static SSL_CTX *sSSLContext = NULL;
+static SSL_CTX* sSSLContext = NULL;
 
 
 SSLSocket::SSLSocket()
