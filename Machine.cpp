@@ -460,6 +460,8 @@ Machine::_GetGraphicsCardInfo()
 		videoInfo.name = trimmed(ProcReader("/sys/class/graphics/fb0/device/oem_product_name").ReadLine());
 		videoInfo.vendor = trimmed(ProcReader("/sys/class/graphics/fb0/device/oem_vendor").ReadLine());
 		videoInfo.resolution = trimmed(ProcReader("/sys/class/graphics/fb0/virtual_size").ReadLine());
+		std::replace(videoInfo.resolution.begin(), videoInfo.resolution.end(), ',', 'x');
+
 		fVideoInfo.push_back(videoInfo);
 	} catch (...) {
 		return false;
