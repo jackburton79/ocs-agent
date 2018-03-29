@@ -459,6 +459,7 @@ Machine::_GetGraphicsCardInfo()
 		struct video_info videoInfo;
 		videoInfo.name = trimmed(ProcReader("/sys/class/graphics/fb0/device/oem_product_name").ReadLine());
 		videoInfo.vendor = trimmed(ProcReader("/sys/class/graphics/fb0/device/oem_vendor").ReadLine());
+		videoInfo.chipset = trimmed(ProcReader("/sys/class/graphics/fb0/device/oem_string").ReadLine());
 		videoInfo.resolution = trimmed(ProcReader("/sys/class/graphics/fb0/virtual_size").ReadLine());
 		std::replace(videoInfo.resolution.begin(), videoInfo.resolution.end(), ',', 'x');
 
