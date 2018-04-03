@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <cerrno>
 #include <ctime>
+#include <iostream>
 #include <fstream>
 
 #include <assert.h>
@@ -94,6 +95,19 @@ Configuration::Save()
 		return false;
 
 	return Save(fConfigFileName.c_str());
+}
+
+
+void
+Configuration::Print() const
+{
+	try {
+		std::map<std::string, std::string>::const_iterator i;
+		for (i = fValues.begin(); i != fValues.end(); i++) {
+			std::cout << i->first << "=" << i->second << std::endl;
+		}
+	} catch (...) {
+	}
 }
 
 
