@@ -8,6 +8,7 @@
 #include "Agent.h"
 #include "Configuration.h"
 #include "Inventory.h"
+#include "Logger.h"
 
 #include <cstdlib>
 #include <iostream>
@@ -39,6 +40,13 @@ Agent::Run()
 		throw "Cannot initialize Inventory";
 
 	bool noSoftware = (config->KeyValue("nosoftware") == "true");
+	unsigned int waitSeconds = ::strtoul(
+		config->KeyValue("waittime").c_str(), NULL, 10);
+
+	Logger& logger = Logger::GetDefault();
+	logger.LogFormat(LOG_INFO, "Waiting %ld seconds...", waitSeconds);
+	::sleep(waitSeconds);
+
 	if (!inventory.Build(noSoftware))
 		return;
 
@@ -50,11 +58,6 @@ Agent::Run()
 			fullFileName.append(deviceID).append(".xml");
 		inventory.Save(fullFileName.c_str());
 	} else {
-		unsigned int waitSeconds = ::strtoul(
-			config->KeyValue("waittime").c_str(), NULL, 10);
-
-		std::cerr << "Waiting " << waitSeconds << " seconds..." << std::endl;
-		::sleep(waitSeconds);
 
 		inventory.Send(config->ServerURL().c_str());
 	}

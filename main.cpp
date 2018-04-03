@@ -59,7 +59,7 @@ PrintHelpAndExit()
 	std::cout << "      --nosoftware                   Do not retrieve installed software" << std::endl;
 	std::cout << "  -D                                 DEPRECATED, use -d instead " << std::endl;
 	std::cout << "  -d, --daemonize                    Detach from running terminal" << std::endl;
-	std::cout << "  -w, --wait <s>                     Wait for the specified amount of seconds before contacting the server" << std::endl;
+	std::cout << "  -w, --wait <s>                     Wait for the specified amount of seconds before building the inventory" << std::endl;
 	std::cout << "  -v, --verbose                      Verbose mode" << std::endl;
 	std::cout << std::endl;
 	std::cout << "  --use-current-time-in-device-ID    Use current time in the device ID, instead of the BIOS Date." << std::endl;
@@ -129,9 +129,6 @@ main(int argc, char **argv)
 			case 'D':
 			case 'd':
 				daemonize = true;
-				// TODO: Added this mostly for debugging. Without this,
-				// Daemonize mode doesn't seem to work most of the time.
-				config->SetVolatileKeyValue("waittime", "5");
 				break;
 			case 't':
 				tag = optarg;
