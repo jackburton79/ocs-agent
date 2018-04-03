@@ -19,7 +19,7 @@ public:
 	bool Save(const char* fileName);
 	bool Save();
 
-	void Print() const ;
+	void Print() const;
 
 	std::string ServerURL() const;
 	bool SetServer(const char* serverUrl);
