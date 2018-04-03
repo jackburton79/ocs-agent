@@ -34,6 +34,7 @@ struct option sLongOptions[] = {
 		{ "wait", required_argument, 0, 'w' },
 		{ "help", no_argument, 0, 'h' },
 		{ "verbose", no_argument, 0, 'v' },
+		{ "agent-string", required_argument, 0, 0 },
 		{ "use-current-time-in-device-ID", no_argument, 0, 0 },
 		{ "use-baseboard-serial-number", no_argument, 0, 0 },
 		{ 0, 0, 0, 0 }
@@ -57,6 +58,7 @@ PrintHelpAndExit()
 	std::cout << "      --stdout                       Don't send inventory, print it to stdout" << std::endl;
 	std::cout << "  -t, --tag <TAG>                    Specify tag. Will be ignored by server if a value already exists" << std::endl;
 	std::cout << "      --nosoftware                   Do not retrieve installed software" << std::endl;
+	std::cout << "      --agent-string                 Specify custom HTTP agent string" << std::endl;
 	std::cout << "  -D                                 DEPRECATED, use -d instead " << std::endl;
 	std::cout << "  -d, --daemonize                    Detach from running terminal" << std::endl;
 	std::cout << "  -w, --wait <s>                     Wait for the specified amount of seconds before building the inventory" << std::endl;
@@ -154,6 +156,8 @@ main(int argc, char **argv)
 					config->SetUseCurrentTimeInDeviceID(true);
 				else if (strcmp(sLongOptions[optIndex].name, "use-baseboard-serial-number") == 0)
 					config->SetUseBaseBoardSerialNumber(true);
+				else if (strcmp(sLongOptions[optIndex].name, "agent-string") == 0)
+					config->SetVolatileKeyValue("agent-string", optarg);
 				break;
 		}
 	}
@@ -208,6 +212,8 @@ main(int argc, char **argv)
 	try {
 		Agent agent;
 		agent.Run();
+		if (verbose)
+			Configuration::Get()->Print();
 	} catch (std::string& errorString) {
 		logger.Log(LOG_ERR, errorString.c_str());
 		return 1;

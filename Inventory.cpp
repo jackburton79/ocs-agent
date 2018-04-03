@@ -31,7 +31,7 @@
 
 #include "tinyxml2/tinyxml2.h"
 
-#define USER_AGENT "OCS-NG_unified_unix_agent_v"
+#define kDefaultUserAgentString "OCS-NG_unified_unix_agent_v"
 
 Inventory::Inventory()
 	:
@@ -150,6 +150,10 @@ Inventory::Send(const char* serverUrl)
 
 	Logger& logger = Logger::GetDefault();
 
+	std::string userAgentString = Configuration::Get()->KeyValue("user-agent");
+	if (userAgentString.empty())
+		userAgentString = kDefaultUserAgentString;
+
 	// Prepare prolog
 	logger.LogFormat(LOG_INFO, "Inventory::Send(): server URL: %s", serverUrl);
 	tinyxml2::XMLDocument prolog;
@@ -169,7 +173,7 @@ Inventory::Send(const char* serverUrl)
 	requestHeader.SetValue("TE", "deflate, gzip");
 	requestHeader.SetContentType("application/x-compress");
 	requestHeader.SetContentLength(prologLength);
-	requestHeader.SetUserAgent(USER_AGENT);
+	requestHeader.SetUserAgent(userAgentString);
 
 	// TODO: Improve.
 	if (inventoryUrl.Username() != "") {
@@ -244,7 +248,7 @@ Inventory::Send(const char* serverUrl)
 	requestHeader.SetValue("TE", "deflate, gzip");
 	requestHeader.SetContentType("application/x-compress");
 	requestHeader.SetContentLength(compressedSize);
-	requestHeader.SetUserAgent(USER_AGENT);
+	requestHeader.SetUserAgent(userAgentString);
 	if (httpObject.Request(requestHeader, compressedData, compressedSize) != 0) {
 		delete[] compressedData;
 		logger.LogFormat(LOG_ERR, "Inventory::Send(): error while sending inventory: %s",
