@@ -101,9 +101,15 @@ Configuration::Save()
 void
 Configuration::Print() const
 {
+	std::cout << "Configuration:" << std::endl;
 	try {
+		std::cout << "Persistent:" << std::endl;
 		std::map<std::string, std::string>::const_iterator i;
 		for (i = fValues.begin(); i != fValues.end(); i++) {
+			std::cout << i->first << "=" << i->second << std::endl;
+		}
+		std::cout << "Volatile:" << std::endl;
+		for (i = fVolatileValues.begin(); i != fVolatileValues.end(); i++) {
 			std::cout << i->first << "=" << i->second << std::endl;
 		}
 	} catch (...) {
