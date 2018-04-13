@@ -705,7 +705,8 @@ Inventory::_AddNetworksInfo(tinyxml2::XMLElement* parent)
 		networks->LinkEndChild(ipMask);
 
 		tinyxml2::XMLElement* ipSubnet = fDocument->NewElement("IPSUBNET");
-		ipSubnet->LinkEndChild(fDocument->NewText(interface.BroadcastAddress().c_str()));
+
+		ipSubnet->LinkEndChild(fDocument->NewText(interface.Network().c_str()));
 		networks->LinkEndChild(ipSubnet);
 
 		tinyxml2::XMLElement* mac = fDocument->NewElement("MACADDR");
