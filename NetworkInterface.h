@@ -30,6 +30,7 @@ public:
 	std::string HardwareAddress() const;
 	std::string IPAddress() const;
 	std::string NetMask() const;
+	std::string Network() const;
 	std::string BroadcastAddress() const;
 	std::string DefaultGateway() const;
 	std::string Type() const;

@@ -96,6 +96,28 @@ NetworkInterface::NetMask() const
 
 
 std::string
+NetworkInterface::Network() const
+{
+	struct ifreq ifrNetMask;
+	if (_DoRequest(SIOCGIFNETMASK, ifrNetMask) != 0)
+		return "";
+
+	struct ifreq ifrIpAddress;
+	if (_DoRequest(SIOCGIFADDR, ifrIpAddress) != 0)
+		return "";
+
+	struct sockaddr_in* ipAddr = (struct sockaddr_in*)&ifrIpAddress.ifr_addr;
+	struct sockaddr_in* netMask = (struct sockaddr_in*)&ifrNetMask.ifr_netmask;
+
+	struct in_addr networkAddress;
+	memset(&networkAddress, 0, sizeof(networkAddress));
+	networkAddress.s_addr = ipAddr->sin_addr.s_addr & netMask->sin_addr.s_addr;
+
+	return inet_ntoa(networkAddress);
+}
+
+
+std::string
 NetworkInterface::BroadcastAddress() const
 {
 	struct ifreq ifr;
