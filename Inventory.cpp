@@ -5,6 +5,7 @@
  *      Author: Stefano Ceccherini
  */
 
+#include "Agent.h"
 #include "Configuration.h"
 #include "Inventory.h"
 #include "Logger.h"
@@ -31,7 +32,6 @@
 
 #include "tinyxml2/tinyxml2.h"
 
-#define kDefaultUserAgentString "OCS-NG_unified_unix_agent_v"
 
 Inventory::Inventory()
 	:
@@ -152,7 +152,7 @@ Inventory::Send(const char* serverUrl)
 
 	std::string userAgentString = Configuration::Get()->KeyValue("user-agent");
 	if (userAgentString.empty())
-		userAgentString = kDefaultUserAgentString;
+		userAgentString = Agent::LegacyAgentString();
 
 	// Prepare prolog
 	logger.LogFormat(LOG_INFO, "Inventory::Send(): server URL: %s", serverUrl);

@@ -19,8 +19,6 @@
 #include <string>
 
 extern const char* __progname;
-const char* version = "1.6.3";
-
 
 static
 struct option sLongOptions[] = {
@@ -34,6 +32,7 @@ struct option sLongOptions[] = {
 		{ "wait", required_argument, 0, 'w' },
 		{ "help", no_argument, 0, 'h' },
 		{ "verbose", no_argument, 0, 'v' },
+		{ "new-agent-string", no_argument, 0, 0 },
 		{ "agent-string", required_argument, 0, 0 },
 		{ "use-current-time-in-device-ID", no_argument, 0, 0 },
 		{ "use-baseboard-serial-number", no_argument, 0, 0 },
@@ -44,7 +43,7 @@ struct option sLongOptions[] = {
 static void
 PrintHelpAndExit()
 {
-	std::cout << __progname << " " << version << std::endl;
+	std::cout << __progname << " " << Agent::Version() << std::endl;
 	if (geteuid() != 0) {
 		std::cout << "WARNING: This program needs to be run as root." << std::endl;
 		std::cout << std::endl;
@@ -58,6 +57,7 @@ PrintHelpAndExit()
 	std::cout << "      --stdout                       Don't send inventory, print it to stdout" << std::endl;
 	std::cout << "  -t, --tag <TAG>                    Specify tag. Will be ignored by server if a value already exists" << std::endl;
 	std::cout << "      --nosoftware                   Do not retrieve installed software" << std::endl;
+	std::cout << "      --new-agent-string             Use new agent string (warning: requires changes in OCS-NG configuration)" << std::endl;
 	std::cout << "      --agent-string                 Specify custom HTTP agent string" << std::endl;
 	std::cout << "  -D                                 DEPRECATED, use -d instead " << std::endl;
 	std::cout << "  -d, --daemonize                    Detach from running terminal" << std::endl;
@@ -156,6 +156,8 @@ main(int argc, char **argv)
 					config->SetUseCurrentTimeInDeviceID(true);
 				else if (strcmp(sLongOptions[optIndex].name, "use-baseboard-serial-number") == 0)
 					config->SetUseBaseBoardSerialNumber(true);
+				else if (strcmp(sLongOptions[optIndex].name, "new-agent-string") == 0)
+					config->SetVolatileKeyValue("agent-string", Agent::AgentString());
 				else if (strcmp(sLongOptions[optIndex].name, "agent-string") == 0)
 					config->SetVolatileKeyValue("agent-string", optarg);
 				break;

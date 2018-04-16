@@ -14,6 +14,11 @@
 #include <iostream>
 #include <unistd.h>
 
+const char* kVersion = "1.6.3";
+
+std::string Agent::sAgentString;
+
+
 Agent::Agent()
 {
 	if (geteuid() != 0) {
@@ -59,4 +64,33 @@ Agent::Run()
 
 		inventory.Send(config->ServerURL().c_str());
 	}
+}
+
+
+/* static */
+const char*
+Agent::Version()
+{
+	return kVersion;
+}
+
+
+/* static */
+const char*
+Agent::LegacyAgentString()
+{
+	return "OCS-NG_unified_unix_agent_v";
+}
+
+
+/* static */
+const char*
+Agent::AgentString()
+{
+	if (sAgentString.empty()) {
+		sAgentString = "jack_lite_inventory_agent_v";
+		sAgentString.append(Version());
+
+	}
+	return sAgentString.c_str();
 }
