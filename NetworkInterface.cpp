@@ -30,19 +30,37 @@
 
 
 static std::string
-SpeedToString(int speed)
+SpeedToString(struct ethtool_cmd* edata)
 {
+	int speed = ethtool_cmd_speed(edata);
+	if (speed == -1)
+		return "";
+
 	std::string unit = "";
 	std::string count = "";
-	if (speed / 1000 >= 1) {
+	if (speed / 1000000 >= 1) {
 		unit = "Gb/s";
-		count = int_to_string(speed / 1000);
-	} else if (speed / 1 >= 1) {
+		count = int_to_string(speed / 1000000);
+	} else if (speed / 1000 >= 1) {
 		unit = "Mb/s";
-		count = int_to_string(speed);
+		count = int_to_string(speed / 1000);
 	}
 
-	return count.append(" ").append(unit);
+	if (count == "" && unit == "")
+		return "";
+
+	std::string duplex = "";
+	if (edata->duplex == DUPLEX_FULL)
+		duplex = "Full Duplex";
+	else if (edata->duplex == DUPLEX_HALF)
+		duplex = "Half Duplex";
+
+	std::string result = "";
+	result.append(count).append(" ").append(unit);
+	if (duplex != "")
+		result.append(" ").append(duplex);
+
+	return result;
 }
 
 
@@ -189,7 +207,7 @@ NetworkInterface::Speed() const
 		return "0";
 
 	// TODO: Duplex
-	return SpeedToString(ethtool_cmd_speed(&edata));
+	return SpeedToString(&edata);
 }
 
 
@@ -227,7 +245,7 @@ NetworkInterface::_DoRequest(int request, struct ifreq& ifr)  const
 		return errno;
 
 	int status = 0;
-	if (ioctl(fd, request, &ifr) == -1)
+	if (ioctl(fd, request, &ifr) < 0)
 		status = errno;
 
 	::close(fd);
