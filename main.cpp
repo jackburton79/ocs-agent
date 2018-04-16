@@ -34,6 +34,7 @@ struct option sLongOptions[] = {
 		{ "wait", required_argument, 0, 'w' },
 		{ "help", no_argument, 0, 'h' },
 		{ "verbose", no_argument, 0, 'v' },
+		{ "version", no_argument, 0, 0 },
 		{ "use-current-time-in-device-ID", no_argument, 0, 0 },
 		{ "use-baseboard-serial-number", no_argument, 0, 0 },
 		{ 0, 0, 0, 0 }
@@ -61,6 +62,7 @@ PrintHelpAndExit()
 	std::cout << "  -d, --daemonize                    Detach from running terminal" << std::endl;
 	std::cout << "  -w, --wait <s>                     Wait for the specified amount of seconds before contacting the server" << std::endl;
 	std::cout << "  -v, --verbose                      Verbose mode" << std::endl;
+	std::cout << "      --version                      Print version and exit" << std::endl;
 	std::cout << std::endl;
 	std::cout << "  --use-current-time-in-device-ID    Use current time in the device ID, instead of the BIOS Date." << std::endl;
 	std::cout << "                                     No need to use this option unless you know why you need it." << std::endl;
@@ -99,6 +101,14 @@ PrintHelpAndExit()
 	std::cout << "    " << __progname;
 	std::cout << " --stdout" << std::endl;
 
+	::exit(0);
+}
+
+
+static void
+PrintVersionAndExit()
+{
+	std::cout << __progname << " " << version << std::endl;
 	::exit(0);
 }
 
@@ -157,6 +167,8 @@ main(int argc, char **argv)
 					config->SetUseCurrentTimeInDeviceID(true);
 				else if (strcmp(sLongOptions[optIndex].name, "use-baseboard-serial-number") == 0)
 					config->SetUseBaseBoardSerialNumber(true);
+				else if (strcmp(sLongOptions[optIndex].name, "version") == 0)
+					PrintVersionAndExit();
 				break;
 		}
 	}
