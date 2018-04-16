@@ -38,12 +38,12 @@ SpeedToString(struct ethtool_cmd* edata)
 
 	std::string unit = "";
 	std::string count = "";
-	if (speed / 1000000 >= 1) {
+	if (speed / 1000 >= 1) {
 		unit = "Gb/s";
-		count = int_to_string(speed / 1000000);
-	} else if (speed / 1000 >= 1) {
-		unit = "Mb/s";
 		count = int_to_string(speed / 1000);
+	} else if (speed / 1 >= 1) {
+		unit = "Mb/s";
+		count = int_to_string(speed / 1);
 	}
 
 	if (count == "" && unit == "")
