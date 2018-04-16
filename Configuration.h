@@ -11,6 +11,8 @@
 #include <map>
 #include <string>
 
+#define CONF_AGENT_STRING "agent-string"
+
 class Configuration {
 public:
 	static Configuration* Get();

@@ -157,9 +157,9 @@ main(int argc, char **argv)
 				else if (strcmp(sLongOptions[optIndex].name, "use-baseboard-serial-number") == 0)
 					config->SetUseBaseBoardSerialNumber(true);
 				else if (strcmp(sLongOptions[optIndex].name, "new-agent-string") == 0)
-					config->SetVolatileKeyValue("agent-string", Agent::AgentString());
+					config->SetVolatileKeyValue(CONF_AGENT_STRING, Agent::AgentString());
 				else if (strcmp(sLongOptions[optIndex].name, "agent-string") == 0)
-					config->SetVolatileKeyValue("agent-string", optarg);
+					config->SetVolatileKeyValue(CONF_AGENT_STRING, optarg);
 				break;
 		}
 	}

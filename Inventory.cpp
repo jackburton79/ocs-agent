@@ -150,8 +150,8 @@ Inventory::Send(const char* serverUrl)
 
 	Logger& logger = Logger::GetDefault();
 
-	std::string userAgentString = Configuration::Get()->KeyValue("agent-string");
-	if (userAgentString.empty())
+	std::string userAgentString = Configuration::Get()->KeyValue(CONF_AGENT_STRING);
+	if (userAgentString.empty() || userAgentString == "")
 		userAgentString = Agent::LegacyAgentString();
 
 	// Prepare prolog
