@@ -149,8 +149,8 @@ NetworkInterface::DefaultGateway() const
 std::string
 NetworkInterface::Type() const
 {
-	// TODO: Implement 
-	return "";
+	// TODO:
+	return "Ethernet";
 }
 
 
