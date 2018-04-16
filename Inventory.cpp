@@ -150,7 +150,7 @@ Inventory::Send(const char* serverUrl)
 
 	Logger& logger = Logger::GetDefault();
 
-	std::string userAgentString = Configuration::Get()->KeyValue("user-agent");
+	std::string userAgentString = Configuration::Get()->KeyValue("agent-string");
 	if (userAgentString.empty())
 		userAgentString = Agent::LegacyAgentString();
 
