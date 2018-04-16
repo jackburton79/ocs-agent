@@ -30,8 +30,6 @@ Agent::~Agent()
 void
 Agent::Run()
 {
-	// TODO: Either use Logger or just throw.
-	// Don't log directly to stdout/stderr.
 	Configuration* config = Configuration::Get();
 
 	std::string deviceID = config->DeviceID();
