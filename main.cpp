@@ -19,7 +19,7 @@
 #include <string>
 
 extern const char* __progname;
-const char* version = "1.6.3";
+const char* version = "1.6.4";
 
 
 static
