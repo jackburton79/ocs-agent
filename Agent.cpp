@@ -42,9 +42,9 @@ Agent::Run()
 	if (!inventory.Initialize(deviceID.c_str()))
 		throw "Cannot initialize Inventory";
 
-	bool noSoftware = (config->KeyValue("nosoftware") == "true");
+	bool noSoftware = (config->KeyValue(CONF_NO_SOFTWARE) == "true");
 	unsigned int waitSeconds = ::strtoul(
-		config->KeyValue("waittime").c_str(), NULL, 10);
+		config->KeyValue(CONF_WAIT_TIME).c_str(), NULL, 10);
 
 	Logger& logger = Logger::GetDefault();
 	logger.LogFormat(LOG_INFO, "Waiting %ld seconds...", waitSeconds);
@@ -53,7 +53,7 @@ Agent::Run()
 	if (!inventory.Build(noSoftware))
 		return;
 
-	if (config->KeyValue("stdout") == "true")
+	if (config->KeyValue(CONF_OUTPUT_STDOUT) == "true")
 		inventory.Print();
 	else if (config->LocalInventory()) {
 		std::string fullFileName = config->OutputFileName();
