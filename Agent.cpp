@@ -47,8 +47,10 @@ Agent::Run()
 		config->KeyValue(CONF_WAIT_TIME).c_str(), NULL, 10);
 
 	Logger& logger = Logger::GetDefault();
-	logger.LogFormat(LOG_INFO, "Waiting %ld seconds...", waitSeconds);
-	::sleep(waitSeconds);
+	if (waitSeconds > 0) {
+		logger.LogFormat(LOG_INFO, "Waiting %ld seconds...", waitSeconds);
+		::sleep(waitSeconds);
+	}
 
 	if (!inventory.Build(noSoftware))
 		return;
@@ -61,7 +63,6 @@ Agent::Run()
 			fullFileName.append(deviceID).append(".xml");
 		inventory.Save(fullFileName.c_str());
 	} else {
-
 		inventory.Send(config->ServerURL().c_str());
 	}
 }
