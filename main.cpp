@@ -56,13 +56,16 @@ PrintHelpAndExit()
 	std::cout << "                                     If the server needs authentication, use the standard syntax <user>:<password>@<host>" << std::endl;
 	std::cout << "  -l, --local <folder>               Don't send inventory, instead save a local copy in the specified file or folder" << std::endl;
 	std::cout << "      --stdout                       Don't send inventory, print it to stdout" << std::endl;
+	std::cout << std::endl;
 	std::cout << "  -t, --tag <TAG>                    Specify tag. Will be ignored by server if a value already exists" << std::endl;
 	std::cout << "      --nosoftware                   Do not retrieve installed software" << std::endl;
+	std::cout << std::endl;
 	std::cout << "      --new-agent-string             Use new agent string (warning: requires changes in OCS-NG configuration)" << std::endl;
-	std::cout << "      --agent-string                 Specify custom HTTP agent string" << std::endl;
-	std::cout << "  -D                                 DEPRECATED, use -d instead " << std::endl;
+	std::cout << "      --agent-string <string>        Specify custom HTTP agent string" << std::endl;
+	std::cout << std::endl;
 	std::cout << "  -d, --daemonize                    Detach from running terminal" << std::endl;
 	std::cout << "  -w, --wait <s>                     Wait for the specified amount of seconds before building the inventory" << std::endl;
+	std::cout << std::endl;
 	std::cout << "  -v, --verbose                      Verbose mode" << std::endl;
 	std::cout << "      --version                      Print version and exit" << std::endl;
 	std::cout << std::endl;
