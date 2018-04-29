@@ -11,7 +11,9 @@ const char* urls[] = {
     "user:pass@server/directory/file.xml",
     "http://user:password@server:81/directory/",
 	"HTTP://user:password@server:81/directory/",
-    NULL
+    "http:/malformed_url.com/path",
+	"http://malformed_url.com///path",
+	NULL
 };
 
 
