@@ -74,7 +74,7 @@ NetworkInterface::NetworkInterface(const char* name)
 	fName(name)
 {
 	if (fName.size() > IFNAMSIZ)
-		throw "NetworkInterface::NetworkInterface(): Name too long";
+		throw std::runtime_error("NetworkInterface::NetworkInterface(): Name too long");
 }
 
 

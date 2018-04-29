@@ -231,12 +231,6 @@ main(int argc, char **argv)
 		agent.Run();
 		if (verbose)
 			Configuration::Get()->Print();
-	} catch (std::string& errorString) {
-		logger.Log(LOG_ERR, errorString.c_str());
-		return 1;
-	} catch (const char* string) {
-		logger.Log(LOG_ERR, string);
-		return 1;
 	} catch (int error) {
 		logger.Log(LOG_ERR, strerror(error));
 		return 1;

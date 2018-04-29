@@ -22,7 +22,7 @@ std::string Agent::sAgentString;
 Agent::Agent()
 {
 	if (geteuid() != 0) {
-		throw std::string("This program needs to be run as root");
+		throw std::runtime_error("This program needs to be run as root");
 	}
 }
 
@@ -40,7 +40,7 @@ Agent::Run()
 	std::string deviceID = config->DeviceID();
 	Inventory inventory;
 	if (!inventory.Initialize(deviceID.c_str()))
-		throw "Cannot initialize Inventory";
+		throw std::runtime_error("Cannot initialize Inventory");
 
 	bool noSoftware = (config->KeyValue(CONF_NO_SOFTWARE) == "true");
 	unsigned int waitSeconds = ::strtoul(

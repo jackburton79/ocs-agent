@@ -21,7 +21,7 @@ ProcReader::ProcReader(const char* fullPath)
 		std::string errorString;
 		errorString.append("File not found: ");
 		errorString.append(fullPath);
-		throw errorString;
+		throw std::runtime_error(errorString);
 	}
 }
 
