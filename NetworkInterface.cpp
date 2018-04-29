@@ -10,9 +10,11 @@
 
 #include <errno.h>
 #include <cstdlib>
-#include <string.h>
-#include <stdio.h>
+#include <cstring>
+#include <cstdio>
+#include <stdexcept>
 #include <unistd.h>
+
 #include <arpa/inet.h>
 #include <linux/netlink.h>
 #include <linux/rtnetlink.h>

@@ -12,6 +12,7 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <stdexcept>
 #include <unistd.h>
 
 const char* kVersion = "1.7.0";

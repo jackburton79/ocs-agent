@@ -10,10 +10,11 @@
 
 #include "Support.h"
 
+#include <cstring>
 #include <iostream>
+#include <stdexcept>
 #include <streambuf>
 #include <string>
-#include <string.h>
 
 
 popen_streambuf::popen_streambuf()
