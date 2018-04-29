@@ -273,7 +273,7 @@ Configuration::_GenerateDeviceID()
 	
 	// DeviceID needs to have a date appended in this very format,
 	// otherwise OCSInventoryNG will reject the inventory
-	char targetString[128];
+	char targetString[256];
 	if (UseCurrentTimeInDeviceID()) {
 		time_t rawtime = time(NULL);
 		struct tm* timeinfo = localtime(&rawtime);
