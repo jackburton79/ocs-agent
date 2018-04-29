@@ -178,7 +178,7 @@ NetworkInterface::DefaultGateway() const
 	std::list<route_info>::const_iterator i;
 	for (i = routeInfo.begin(); i != routeInfo.end(); i++) {
 		if (i->dstAddr.s_addr == 0)
-			return (char*)inet_ntoa(i->gateWay);
+			return (char*)inet_ntoa(i->gateway);
 	}
 	
 	return "";
@@ -275,7 +275,7 @@ ParseRoutes(struct nlmsghdr* nlHdr, route_info* rtInfo,
 				if_indextoname(*(int*)RTA_DATA(rtAttr), rtInfo->ifName);
 				break;
 			case RTA_GATEWAY:
-				rtInfo->gateWay = *(in_addr*)RTA_DATA(rtAttr);
+				rtInfo->gateway = *(in_addr*)RTA_DATA(rtAttr);
 				break;
 			case RTA_PREFSRC:
 				rtInfo->srcAddr = *(in_addr*)RTA_DATA(rtAttr);

@@ -16,7 +16,7 @@
 struct route_info {
 	struct in_addr dstAddr;
 	struct in_addr srcAddr;
-	struct in_addr gateWay;
+	struct in_addr gateway;
 	char ifName[IF_NAMESIZE];
 };
 
