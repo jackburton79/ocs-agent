@@ -40,7 +40,6 @@ Inventory::Inventory()
 	fMachine(NULL)
 {
 	fDocument = new tinyxml2::XMLDocument;
-	fMachine = Machine::Get();
 }
 
 
@@ -74,7 +73,6 @@ Inventory::Initialize(std::string deviceIDString)
 
  	tinyxml2::XMLElement* deviceId = fDocument->NewElement("DEVICEID");
 	deviceId->LinkEndChild(fDocument->NewText(fDeviceID.c_str()));
-
 	request->LinkEndChild(deviceId);
 
 	logger.LogFormat(LOG_INFO, "Inventory::Initialize(): Device ID: %s... OK!", fDeviceID.c_str());
@@ -100,6 +98,8 @@ Inventory::Build(bool noSoftware)
 
 	tinyxml2::XMLElement* content = fContent;
 
+	fMachine = Machine::Get();
+
 	try {
 		_AddAccountInfo(content);
 		_AddBIOSInfo(content);
@@ -118,6 +118,9 @@ Inventory::Build(bool noSoftware)
 	} catch (...) {
 		// Something failed.
 	}
+
+	fMachine = NULL;
+
 	logger.Log(LOG_INFO, "Building inventory... Done!");
 	return true;
 }
