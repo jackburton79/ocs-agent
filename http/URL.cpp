@@ -153,7 +153,7 @@ URL::_DecodeURLString(const char* url)
 		if (slashPos != std::string::npos) {
 			size_t endSlash = result.find_first_not_of("/", slashPos + 1);
 			fHost = result.substr(0, slashPos);
-			fPath = result.substr(endSlash, std::string::npos);
+			fPath = result.substr(endSlash - 1, std::string::npos);
 		} else
 			fHost = result;
 	}
