@@ -32,7 +32,9 @@ const struct test_entry kTestEntries[] = {
     { "http:/malformed_url.com/path", false, "http", "malformed_url.com", 80,
         "/path", "", "" },
     { "http://malformed_url.com///path", false, "http", "malformed_url.com", 80,
-        "/path", "", "" }
+        "/path", "", "" },
+    { "http://malformed_url_with_port.com:8080///path", false, "http",
+        "malformed_url_with_port.com", 8080, "/path", "", "" }
 };
 
 
