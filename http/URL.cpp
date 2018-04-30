@@ -140,8 +140,10 @@ URL::_DecodeURLString(const char* url)
 	if (portPos != std::string::npos) {
 		fHost = result.substr(0, portPos);
 		size_t slashPos = result.find("/", portPos);
-		if (slashPos != std::string::npos)
-			fPath = result.substr(slashPos, std::string::npos);
+		if (slashPos != std::string::npos) {
+			size_t endSlash = result.find_first_not_of("/", slashPos);
+			fPath = result.substr(endSlash -1, std::string::npos);
+		}
 		fPort = ::strtol(result.substr(portPos + 1, result.length()).c_str(),
 			NULL, 10);
 	} else {
@@ -151,7 +153,7 @@ URL::_DecodeURLString(const char* url)
 			fPort = 80;
 		size_t slashPos = result.find("/");
 		if (slashPos != std::string::npos) {
-			size_t endSlash = result.find_first_not_of("/", slashPos + 1);
+			size_t endSlash = result.find_first_not_of("/", slashPos);
 			fHost = result.substr(0, slashPos);
 			fPath = result.substr(endSlash - 1, std::string::npos);
 		} else
