@@ -1,35 +1,92 @@
 #include "http/URL.h"
 
+#include <cstdlib>
+#include <cstring>
 #include <iostream>
 
-const char* urls[] = {
-    "http://www.test.com:90/test",
-    "http://www.test2.it",
-    "https://differentURL.com/part/of/path/end.xml",
-    "www.withoutproto.com",
-    "/pathonly/run.php",
-    "user:pass@server/directory/file.xml",
-    "http://user:password@server:81/directory/",
-	"HTTP://user:password@server:81/directory/",
-    "http:/malformed_url.com/path",
-	"http://malformed_url.com///path",
-	NULL
+
+struct test_entry {
+    const char* url;
+    bool relative;
+    const char* protocol;
+    const char* host;
+    const int port;
+    const char* path;
+    const char* user;
+    const char* pass;
+};
+
+
+const struct test_entry kTestEntries[] = {
+    { "http://www.test.com:90/test", false, "http", "www.test.com", 90,
+        "/test", "", "" },
+    { "http://www.test2.it", false, "http", "www.test2.it", 80, "", "", "" },
+    { "https://differentURL.com/part/of/path/end.xml", false, "https",
+        "differentURL.com", 443, "/part/of/path/end.xml", "", "" },
+    { "www.withoutproto.com", false, "", "www.withoutproto.com", 80, "", "", "" },
+    { "/pathonly/run.php", true, "", "", 80, "/pathonly/run.php", "", "" },
+    { "user:pass@server/directory/file.xml", false, "", "server", 80,
+        "/directory/file.xml", "user", "pass" },
+    { "http://user:password@server:81/directory/", false, "http", "server",
+        81, "/directory/", "user", "password" },
+    { "http:/malformed_url.com/path", false, "http", "malformed_url.com", 80,
+        "/path", "", "" },
+    { "http://malformed_url.com///path", false, "http", "malformed_url.com", 80,
+        "/path", "", "" }
 };
 
 
 int main()
 {
-    size_t i = 0;
+    bool fail = false;
     URL url;
-    for (char* urlString = NULL; (urlString = (char*)urls[i]) != NULL; i++) {
+    for (size_t i = 0; i < sizeof(kTestEntries) / sizeof(kTestEntries[0]); i++) {
+        char* urlString = (char*)kTestEntries[i].url;
         url.SetTo(urlString);
         std::cout << "url: " << url.URLString() << std::endl;
-        std::cout << "\t" << "relative: " << (url.IsRelative() ? "yes" : "no") << std::endl;
-        std::cout << "\t" << "protocol: " << url.Protocol() << std::endl;
-        std::cout << "\t" << "host: " << url.Host() << std::endl;
-        std::cout << "\t" << "port: " << url.Port() << std::endl;
-        std::cout << "\t" << "path: " << url.Path() << std::endl;
-        std::cout << "\t" << "username: " << url.Username() << std::endl;
-        std::cout << "\t" << "password: " << url.Password() << std::endl;
+        std::cout << "\t" << "relative: " << (url.IsRelative() ? "yes" : "no");
+        std::cout << " (should be: \"" ;
+        std::cout << (kTestEntries[i].relative ? "yes" : "no");
+        std::cout << "\")" << std::endl;
+        std::cout << "\t" << "protocol: " << url.Protocol();
+        std::cout << " (should be: \"" ;
+        std::cout << kTestEntries[i].protocol;
+        std::cout << "\")" << std::endl;
+        std::cout << "\t" << "host: " << url.Host();
+        std::cout << " (should be: \"" ;
+        std::cout << kTestEntries[i].host;
+        std::cout << "\")" << std::endl;
+        std::cout << "\t" << "port: " << url.Port();
+        std::cout << " (should be: \"" ;
+        std::cout << kTestEntries[i].port;
+        std::cout << "\")" << std::endl;
+        std::cout << "\t" << "path: " << url.Path();
+        std::cout << " (should be: \"" ;
+        std::cout << kTestEntries[i].path;
+        std::cout << "\")" << std::endl;
+        std::cout << "\t" << "username: " << url.Username();
+        std::cout << " (should be: \"" ;
+        std::cout << kTestEntries[i].user;
+        std::cout << "\")" << std::endl;
+        std::cout << "\t" << "password: " << url.Password();
+        std::cout << " (should be: \"" ;
+        std::cout << kTestEntries[i].pass;
+        std::cout << "\")" << std::endl;
+        if (url.IsRelative() != kTestEntries[i].relative
+            || url.Port() != kTestEntries[i].port
+            || url.Protocol().compare(kTestEntries[i].protocol)
+            || url.Host().compare(kTestEntries[i].host)
+            || url.Path().compare(kTestEntries[i].path)
+            || url.Username().compare(kTestEntries[i].user)
+            || url.Password().compare(kTestEntries[i].pass)) {
+            fail = true;
+            std::cout << "Test Failed !!!" << std::endl;
+        }
     }
+
+    if (fail) {
+        ::exit(-1);
+    }
+
+    std::cout << "All tests passed!" << std::endl;
 }
