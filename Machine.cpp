@@ -21,6 +21,7 @@
 #include <iostream>
 #include <fstream>
 #include <map>
+#include <stdexcept>
 #include <string>
 #include <sstream>
 #include <vector>
@@ -100,7 +101,7 @@ DMIExtractor::ExtractHandle(std::string handle) const
 	int numericHandle = strtol(handle.c_str(), NULL, 0);
 	dmi_db::const_iterator i = fDMIDB.find(numericHandle);
 	if (i == fDMIDB.end())
-		throw -1;
+		throw std::runtime_error("DMIExtractor::ExtractHandle: cannot find requested handle");
 	return i->second;
 }
 
@@ -784,8 +785,11 @@ void
 Machine::_GetOSInfo()
 {
 	struct utsname uName;
-	if (::uname(&uName) != 0)
-		throw errno;
+	if (::uname(&uName) != 0) {
+		std::string errorString = "Machine::_GetOsInfo(): uname() failed with error ";
+		errorString.append(::strerror(errno));
+		throw std::runtime_error(errorString);
+	}
 
 	fKernelInfo.hostname = uName.nodename;
 	fKernelInfo.comments = uName.version;
