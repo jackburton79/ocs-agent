@@ -13,17 +13,35 @@
 class Logger {
 public:
 	Logger(const char* logName);
-	~Logger();
+	virtual ~Logger();
 
 	void Log(int level, const char* const string);
 	void LogFormat(int level, const char* string, ...);
 
-	void SetConsoleLogging(bool value);
-
 	static Logger& GetDefault();
 
 private:
-	bool fVerbose;
+	virtual void DoLog(int level, const char* string) = 0;
+};
+
+
+class StdoutLogger : public Logger {
+public:
+	StdoutLogger(const char* logName);
+	virtual ~StdoutLogger();
+
+private:
+	virtual void DoLog(int level, const char* string);
+};
+
+
+class SyslogLogger : public Logger {
+public:
+	SyslogLogger(const char* logName);
+	virtual ~SyslogLogger();
+
+private:
+	virtual void DoLog(int level, const char* string);
 };
 
 #endif /* LOGGER_H_ */

@@ -179,8 +179,6 @@ main(int argc, char **argv)
 		}
 	}
 	Logger& logger = Logger::GetDefault();
-	if (verbose)
-		logger.SetConsoleLogging(true);
 
 	bool local = config->LocalInventory();
 	bool stdout = config->KeyValue("stdout") == "true";

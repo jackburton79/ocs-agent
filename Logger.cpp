@@ -12,33 +12,28 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <syslog.h>
+#include <unistd.h>
 
 extern const char* __progname;
 
 
-static Logger sDefaultLogger(__progname);
+static Logger* sDefaultLogger;
 
 
 Logger::Logger(const char* logName)
-	:
-	fVerbose(false)
 {
-	::openlog(logName, LOG_PID|LOG_CONS, LOG_USER);
 }
 
 
 Logger::~Logger()
 {
-	::closelog();
 }
 
 
 void
 Logger::Log(int level, const char* const string)
 {
-	::syslog(level, "%s", string);
-	if (fVerbose)
-		std::cerr << string << std::endl;
+	DoLog(level, string);
 }
 
 
@@ -50,16 +45,7 @@ Logger::LogFormat(int level, const char* fmtString, ...)
 	va_start(argp, fmtString);
 	vsnprintf(logString, sizeof(logString), fmtString, argp);
 	va_end(argp);
-	::syslog(level, "%s", (const char* const)logString);
-	if (fVerbose)
-		std::cerr << logString << std::endl;
-}
-
-
-void
-Logger::SetConsoleLogging(bool value)
-{
-	fVerbose = value;
+	DoLog(level, logString);
 }
 
 
@@ -67,6 +53,57 @@ Logger::SetConsoleLogging(bool value)
 Logger&
 Logger::GetDefault()
 {
-	return sDefaultLogger;
+	if (sDefaultLogger == NULL) {
+		if (::isatty(STDIN_FILENO))
+			sDefaultLogger = new StdoutLogger(__progname);
+		else
+			sDefaultLogger = new SyslogLogger(__progname);
+	}
+
+	return *sDefaultLogger;
 }
 
+
+// StdoutLogger
+StdoutLogger::StdoutLogger(const char* logName)
+	:
+	Logger(logName)
+{
+}
+
+/* virtual */
+StdoutLogger::~StdoutLogger()
+{
+}
+
+
+/* virtual */
+void
+StdoutLogger::DoLog(int level, const char* string)
+{
+	std::cerr << string << std::endl;
+}
+
+
+// SyslogLogger
+SyslogLogger::SyslogLogger(const char* logName)
+	:
+	Logger(logName)
+{
+	::openlog(logName, LOG_PID|LOG_CONS, LOG_USER);
+}
+
+
+/* virtual */
+SyslogLogger::~SyslogLogger()
+{
+	::closelog();
+}
+
+
+/* virtual */
+void
+SyslogLogger::DoLog(int level, const char* string)
+{
+	::syslog(level, "%s", (const char* const)string);
+}
