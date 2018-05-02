@@ -36,7 +36,7 @@ Logger::~Logger()
 void
 Logger::Log(int level, const char* const string)
 {
-	::syslog(level, string);
+	::syslog(level, "%s", string);
 	if (fVerbose)
 		std::cerr << string << std::endl;
 }
@@ -50,7 +50,7 @@ Logger::LogFormat(int level, const char* fmtString, ...)
 	va_start(argp, fmtString);
 	vsnprintf(logString, sizeof(logString), fmtString, argp);
 	va_end(argp);
-	::syslog(level, (const char* const)logString);
+	::syslog(level, "%s", (const char* const)logString);
 	if (fVerbose)
 		std::cerr << logString << std::endl;
 }
