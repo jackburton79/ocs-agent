@@ -8,6 +8,7 @@
 #include "HTTPDefines.h"
 #include "HTTPRequestHeader.h"
 #include "URL.h"
+#include "Utils.h"
 
 #include <iostream>
 
@@ -62,6 +63,21 @@ std::string
 HTTPRequestHeader::URL() const
 {
 	return fURL;
+}
+
+
+void
+HTTPRequestHeader::SetAuthentication(int type, std::string userName, std::string password)
+{
+	if (type != HTTP_AUTH_TYPE_BASIC)
+		return;
+
+	std::string auth("Basic ");
+	std::string authString;
+	authString.append(userName).append(":").append(password);
+	authString = Base64Encode(authString);
+	auth.append(authString);
+	SetValue("Authorization", auth.c_str());
 }
 
 

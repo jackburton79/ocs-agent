@@ -26,6 +26,8 @@ public:
 	std::string Method() const;
 	std::string URL() const;
 
+	void SetAuthentication(int type, std::string userName, std::string password);
+
 	virtual std::string ToString() const;
 
 	void SetRequest(const std::string method, const std::string path,
