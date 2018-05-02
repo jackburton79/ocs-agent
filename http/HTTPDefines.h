@@ -12,7 +12,11 @@
 
 #define CRLF "\015\012"
 
-#define HTTP_OK 200
+enum HTTP_STATUS_CODES {
+	HTTP_OK = 200,
+	HTTP_UNAUTHORIZED = 401
+};
+
 enum HTTP_AUTH_TYPE {
 	HTTP_AUTH_TYPE_BASIC = 0
 };
