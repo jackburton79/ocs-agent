@@ -23,7 +23,6 @@
 
 #include "http/HTTP.h"
 #include "http/URL.h"
-#include "http/Utils.h"
 
 #include <cstdlib>
 #include <iostream>
@@ -180,13 +179,8 @@ Inventory::Send(const char* serverUrl)
 
 	// TODO: Improve.
 	if (inventoryUrl.Username() != "") {
-		std::string auth("Basic ");
-		std::string authString;
-		authString.append(inventoryUrl.Username()).append(":");
-		authString.append(inventoryUrl.Password());
-		authString = Base64Encode(authString);
-		auth.append(authString);
-		requestHeader.SetValue("Authorization", auth.c_str());
+		requestHeader.SetAuthentication(HTTP_AUTH_TYPE_BASIC,
+				inventoryUrl.Username(), inventoryUrl.Password());
 	}
 
 	HTTP httpObject;
@@ -252,6 +246,10 @@ Inventory::Send(const char* serverUrl)
 	requestHeader.SetContentType("application/x-compress");
 	requestHeader.SetContentLength(compressedSize);
 	requestHeader.SetUserAgent(userAgentString);
+	if (inventoryUrl.Username() != "") {
+		requestHeader.SetAuthentication(HTTP_AUTH_TYPE_BASIC,
+						inventoryUrl.Username(), inventoryUrl.Password());
+	}
 	if (httpObject.Request(requestHeader, compressedData, compressedSize) != 0) {
 		delete[] compressedData;
 		logger.LogFormat(LOG_ERR, "Inventory::Send(): error while sending inventory: %s",
