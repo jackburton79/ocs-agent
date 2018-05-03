@@ -68,11 +68,30 @@ Logger::LogFormat(int level, const char* fmtString, ...)
 Logger&
 Logger::GetDefault()
 {
+	return Get(LOGGER_TYPE_DEFAULT);
+}
+
+
+/* static */
+Logger&
+Logger::Get(int loggerType)
+{
 	if (sDefaultLogger == NULL) {
-		if (::isatty(STDIN_FILENO))
-			sDefaultLogger = new StdoutLogger(__progname);
-		else
-			sDefaultLogger = new SyslogLogger(__progname);
+		switch (loggerType) {
+			case LOGGER_TYPE_SYSLOG:
+				sDefaultLogger = new SyslogLogger(__progname);
+				break;
+			case LOGGER_TYPE_STDERR:
+				sDefaultLogger = new SyslogLogger(__progname);
+				break;
+			case LOGGER_TYPE_DEFAULT:
+			default:
+				if (::isatty(STDIN_FILENO))
+					sDefaultLogger = new StdoutLogger(__progname);
+				else
+					sDefaultLogger = new SyslogLogger(__progname);
+				break;
+		}
 	}
 
 	return *sDefaultLogger;

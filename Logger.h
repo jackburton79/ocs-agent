@@ -12,6 +12,12 @@
 
 class Logger {
 public:
+	enum LOGGER_TYPE {
+		LOGGER_TYPE_DEFAULT = 0,
+		LOGGER_TYPE_STDERR = 1,
+		LOGGER_TYPE_SYSLOG = 2
+	};
+
 	Logger(const char* logName);
 	virtual ~Logger();
 
@@ -21,7 +27,8 @@ public:
 	void LogFormat(int level, const char* string, ...);
 
 	static Logger& GetDefault();
-
+	static Logger& Get(int loggerType = LOGGER_TYPE_DEFAULT);
+	
 private:
 	virtual void DoLog(int level, const char* string) = 0;
 
