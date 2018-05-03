@@ -16,9 +16,7 @@
 
 extern const char* __progname;
 
-
 static Logger* sDefaultLogger;
-
 
 class StdoutLogger : public Logger {
 public:
@@ -102,7 +100,7 @@ Logger::Get(int loggerType)
 				sDefaultLogger = new SyslogLogger(__progname);
 				break;
 			case LOGGER_TYPE_STDERR:
-				sDefaultLogger = new SyslogLogger(__progname);
+				sDefaultLogger = new StdoutLogger(__progname);
 				break;
 			case LOGGER_TYPE_DEFAULT:
 			default:
