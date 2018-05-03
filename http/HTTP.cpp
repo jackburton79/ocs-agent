@@ -262,7 +262,7 @@ HTTP::_HandleConnection(const std::string string)
 	fSocket->SetOption(SOL_SOCKET, SO_RCVTIMEO, (char*)&tv, sizeof(struct timeval));
 	fSocket->SetOption(SOL_SOCKET, SO_SNDTIMEO, (char*)&tv, sizeof(struct timeval));
 
-	if (fSocket->Connect(fHost.c_str(), fPort) < 0) {
+	if (fSocket->Connect(fHost.c_str(), fPort) != 0) {
 		fLastError = errno;
 		delete fSocket;
 		fSocket = NULL;
