@@ -302,7 +302,7 @@ Inventory::_AddAccountInfo(tinyxml2::XMLElement* parent)
 	accountInfo->LinkEndChild(keyValue);
 
 	parent->LinkEndChild(accountInfo);
-	logger.Log(LOG_INFO, "\tAdded Account Info!");
+	logger.Log(LOG_DEBUG, "\tAdded Account Info!");
 }
 
 
@@ -359,7 +359,7 @@ Inventory::_AddBIOSInfo(tinyxml2::XMLElement* parent)
 
 	parent->LinkEndChild(bios);
 
-	logger.Log(LOG_INFO, "\tAdded BIOS Info!");
+	logger.Log(LOG_DEBUG, "\tAdded BIOS Info!");
 }
 
 
@@ -401,7 +401,7 @@ Inventory::_AddCPUsInfo(tinyxml2::XMLElement* parent)
 
 		parent->LinkEndChild(cpu);
 	}
-	logger.Log(LOG_INFO, "\tAdded CPUs Info!");
+	logger.Log(LOG_DEBUG, "\tAdded CPUs Info!");
 }
 
 
@@ -451,7 +451,7 @@ Inventory::_AddStoragesInfo(tinyxml2::XMLElement* parent)
 		parent->LinkEndChild(storage);
 	}
 
-	logger.Log(LOG_INFO, "\tAdded Storage Info!");
+	logger.Log(LOG_DEBUG, "\tAdded Storage Info!");
 }
 
 
@@ -498,7 +498,7 @@ Inventory::_AddMemoriesInfo(tinyxml2::XMLElement* parent)
 
 		parent->LinkEndChild(memory);
 	}
-	logger.Log(LOG_INFO, "\tAdded Memory Info!");
+	logger.Log(LOG_DEBUG, "\tAdded Memory Info!");
 }
 
 
@@ -547,7 +547,7 @@ Inventory::_AddDrivesInfo(tinyxml2::XMLElement* parent)
 		parent->LinkEndChild(drive);
 	}
 
-	logger.Log(LOG_INFO, "\tAdded Drives info!");
+	logger.Log(LOG_DEBUG, "\tAdded Drives info!");
 }
 
 
@@ -662,7 +662,7 @@ Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 
 	parent->LinkEndChild(hardware);
 
-	logger.Log(LOG_INFO, "\tAdded Hardware info!");
+	logger.Log(LOG_DEBUG, "\tAdded Hardware info!");
 }
 
 
@@ -737,7 +737,7 @@ Inventory::_AddNetworksInfo(tinyxml2::XMLElement* parent)
 		parent->LinkEndChild(networks);
 	}
 
-	logger.Log(LOG_INFO, "\tAdded Networks info!");
+	logger.Log(LOG_DEBUG, "\tAdded Networks info!");
 }
 
 
@@ -787,7 +787,7 @@ Inventory::_AddProcessesInfo(tinyxml2::XMLElement* parent)
 		parent->LinkEndChild(process);
 	}
 
-	logger.Log(LOG_INFO, "\tAdded Processes list!");
+	logger.Log(LOG_DEBUG, "\tAdded Processes list!");
 }
 
 
@@ -828,7 +828,7 @@ Inventory::_AddSoftwaresInfo(tinyxml2::XMLElement* parent)
 
 		parent->LinkEndChild(software);
 	}
-	logger.Log(LOG_INFO, "\tAdded Software list!");
+	logger.Log(LOG_DEBUG, "\tAdded Software list!");
 }
 
 
@@ -847,7 +847,7 @@ Inventory::_AddUsersInfo(tinyxml2::XMLElement* parent)
 	}
 	parent->LinkEndChild(users);
 
-	logger.Log(LOG_INFO, "\tAdded User info!");
+	logger.Log(LOG_DEBUG, "\tAdded User info!");
 }
 
 
@@ -881,7 +881,7 @@ Inventory::_AddVideosInfo(tinyxml2::XMLElement* parent)
 
 		parent->LinkEndChild(video);
 	}
-	logger.Log(LOG_INFO, "\tAdded Video info!");
+	logger.Log(LOG_DEBUG, "\tAdded Video info!");
 }
 
 
@@ -912,7 +912,7 @@ Inventory::_AddMonitorsInfo(tinyxml2::XMLElement* parent)
 		parent->LinkEndChild(monitor);
 	}
 
-	logger.Log(LOG_INFO, "\tAdded Display info!");
+	logger.Log(LOG_DEBUG, "\tAdded Display info!");
 }
 
 

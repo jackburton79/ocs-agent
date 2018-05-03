@@ -21,6 +21,8 @@ static Logger* sDefaultLogger;
 
 
 Logger::Logger(const char* logName)
+	:
+	fLevel(LOG_INFO)
 {
 }
 
@@ -31,8 +33,18 @@ Logger::~Logger()
 
 
 void
+Logger::SetLevel(int level)
+{
+	fLevel = level;
+}
+
+
+void
 Logger::Log(int level, const char* const string)
 {
+	if (level > fLevel)
+		return;
+
 	DoLog(level, string);
 }
 
@@ -40,6 +52,9 @@ Logger::Log(int level, const char* const string)
 void
 Logger::LogFormat(int level, const char* fmtString, ...)
 {
+	if (level > fLevel)
+		return;
+
 	char logString[1024];
 	va_list argp;
 	va_start(argp, fmtString);

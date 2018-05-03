@@ -15,6 +15,8 @@ public:
 	Logger(const char* logName);
 	virtual ~Logger();
 
+	void SetLevel(int level);
+
 	void Log(int level, const char* const string);
 	void LogFormat(int level, const char* string, ...);
 
@@ -22,6 +24,8 @@ public:
 
 private:
 	virtual void DoLog(int level, const char* string) = 0;
+
+	int fLevel;
 };
 
 

@@ -78,8 +78,6 @@ PrintHelpAndExit()
 	std::cout << "If no server or output file is specified, ";
 	std::cout << "either via the -s/-l option or via configuration file (option -c), ";
 	std::cout << "the program will exit without doing anything." << std::endl;
-	std::cout << "Any warning/error will be written to the system logging facility. ";
-	std::cout << "To print them to standard error, use the option '-v (--verbose)'." << std::endl;
 	std::cout << std::endl;
 	std::cout << "Examples:" << std::endl;
 	std::cout << "  Use the configuration file /etc/ocsinventory-ng.conf :" << std::endl;
@@ -179,6 +177,10 @@ main(int argc, char **argv)
 		}
 	}
 	Logger& logger = Logger::GetDefault();
+	if (verbose)
+		logger.SetLevel(LOG_DEBUG);
+	else
+		logger.SetLevel(LOG_INFO);
 
 	bool local = config->LocalInventory();
 	bool stdout = config->KeyValue("stdout") == "true";
