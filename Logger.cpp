@@ -20,6 +20,26 @@ extern const char* __progname;
 static Logger* sDefaultLogger;
 
 
+class StdoutLogger : public Logger {
+public:
+	StdoutLogger(const char* logName);
+	virtual ~StdoutLogger();
+
+private:
+	virtual void DoLog(int level, const char* string);
+};
+
+
+class SyslogLogger : public Logger {
+public:
+	SyslogLogger(const char* logName);
+	virtual ~SyslogLogger();
+
+private:
+	virtual void DoLog(int level, const char* string);
+};
+
+
 Logger::Logger(const char* logName)
 	:
 	fLevel(LOG_INFO)

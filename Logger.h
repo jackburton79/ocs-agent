@@ -35,24 +35,4 @@ private:
 	int fLevel;
 };
 
-
-class StdoutLogger : public Logger {
-public:
-	StdoutLogger(const char* logName);
-	virtual ~StdoutLogger();
-
-private:
-	virtual void DoLog(int level, const char* string);
-};
-
-
-class SyslogLogger : public Logger {
-public:
-	SyslogLogger(const char* logName);
-	virtual ~SyslogLogger();
-
-private:
-	virtual void DoLog(int level, const char* string);
-};
-
 #endif /* LOGGER_H_ */
