@@ -8,13 +8,12 @@
 
 #include "Support.h"
 #include "XML.h"
+#include "ZLibCompressor.h"
 
 #include <iostream>
 #include <streambuf>
 #include <string>
 #include <string.h>
-
-#include <zlib.h>
 
 #include <tinyxml2/tinyxml2.h>
 
@@ -65,35 +64,19 @@ XML::Compress(const tinyxml2::XMLDocument& document, char*& destination, size_t&
 	tinyxml2::XMLPrinter memoryPrinter;
 	document.Print(&memoryPrinter);
 
-	int fileSize = memoryPrinter.CStrSize() - 1;
-
-	destLength = compressBound(fileSize);
-	destination = new char[destLength];
-
-	if (int compressStatus = compress((Bytef*)destination, (uLongf*)&destLength,
-			(const Bytef*)memoryPrinter.CStr(), (uLong)fileSize) != Z_OK) {
-		std::cerr << "Compress returned error: " << zError(compressStatus) << std::endl;
-		delete[] destination;
-		return false;
-	}
-
-	return true;
+	return ZLibCompressor::Compress(memoryPrinter.CStr(), memoryPrinter.CStrSize() - 1,
+			destination, destLength);
 }
 
 
 bool
 XML::Uncompress(const char* source, size_t sourceLen, tinyxml2::XMLDocument& document)
 {
-	size_t destLength = 32768;
-	char* destination = new char[destLength];
+	size_t destLength;
+	char* destination = NULL;
 	
-	if (int status = uncompress((Bytef*)destination, (uLongf*)&destLength,
-			(const Bytef*)source, (uLong)sourceLen) != Z_OK) {
-		std::cerr << "UncompressXml: Failed to decompress XML: ";
-		std::cerr << zError(status) << std::endl;
-		delete[] destination;
+	if (!ZLibCompressor::Uncompress(source, sourceLen, destination, destLength))
 		return false;
-	}
 
 	tinyxml2::XMLError result = document.Parse(destination, destLength - 1);
 
