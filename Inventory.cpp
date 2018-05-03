@@ -186,7 +186,6 @@ Inventory::Send(const char* serverUrl)
 	HTTP httpObject;
 	logger.Log(LOG_INFO, "Inventory::Send(): Prolog prepared!");
 	logger.LogFormat(LOG_DEBUG, "%s", requestHeader.ToString().c_str());
-
 	if (httpObject.Request(requestHeader, prologData, prologLength) != 0) {
 		delete[] prologData;
 		logger.LogFormat(LOG_INFO, "Inventory::Send(): Failed to send prolog: %s",
@@ -252,6 +251,8 @@ Inventory::Send(const char* serverUrl)
 		requestHeader.SetAuthentication(HTTP_AUTH_TYPE_BASIC,
 						inventoryUrl.Username(), inventoryUrl.Password());
 	}
+
+	logger.LogFormat(LOG_DEBUG, "%s", requestHeader.ToString().c_str());
 	if (httpObject.Request(requestHeader, compressedData, compressedSize) != 0) {
 		delete[] compressedData;
 		logger.LogFormat(LOG_ERR, "Inventory::Send(): error while sending inventory: %s",
