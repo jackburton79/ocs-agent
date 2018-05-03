@@ -185,6 +185,8 @@ Inventory::Send(const char* serverUrl)
 
 	HTTP httpObject;
 	logger.Log(LOG_INFO, "Inventory::Send(): Prolog prepared!");
+	logger.LogFormat(LOG_DEBUG, "%s", requestHeader.ToString().c_str());
+
 	if (httpObject.Request(requestHeader, prologData, prologLength) != 0) {
 		delete[] prologData;
 		logger.LogFormat(LOG_INFO, "Inventory::Send(): Failed to send prolog: %s",
