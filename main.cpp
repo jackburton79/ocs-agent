@@ -31,6 +31,7 @@ struct option sLongOptions[] = {
 		{ "daemonize", no_argument, 0, 'd' },
 		{ "wait", required_argument, 0, 'w' },
 		{ "help", no_argument, 0, 'h' },
+		{ "log", required_argument, 0, 0 },
 		{ "verbose", no_argument, 0, 'v' },
 		{ "version", no_argument, 0, 0 },
 		{ "new-agent-string", no_argument, 0, 0 },
@@ -66,6 +67,8 @@ PrintHelpAndExit()
 	std::cout << "  -d, --daemonize                    Detach from running terminal" << std::endl;
 	std::cout << "  -w, --wait <s>                     Wait for the specified amount of seconds before building the inventory" << std::endl;
 	std::cout << std::endl;
+	std::cout << "      --log <option>                 Specify error log output (STDERR / SYSLOG)." << std::endl;
+	std::cout << "                                     Default is standard error if attached to a terminal, otherwise syslog. " << std::endl;
 	std::cout << "  -v, --verbose                      Verbose mode" << std::endl;
 	std::cout << "      --version                      Print version and exit" << std::endl;
 	std::cout << std::endl;
@@ -171,7 +174,12 @@ main(int argc, char **argv)
 					config->SetVolatileKeyValue(CONF_AGENT_STRING, Agent::AgentString());
 				else if (strcmp(sLongOptions[optIndex].name, "agent-string") == 0)
 					config->SetVolatileKeyValue(CONF_AGENT_STRING, optarg);
-				else if (strcmp(sLongOptions[optIndex].name, "version") == 0)
+				else if (strcmp(sLongOptions[optIndex].name, "log") == 0) {
+					if (strcasecmp(optarg, "STDERR") == 0)
+						Logger::Get(Logger::LOGGER_TYPE_STDERR);
+					else if (strcasecmp(optarg, "SYSLOG") == 0)
+						Logger::Get(Logger::LOGGER_TYPE_SYSLOG);
+				} else if (strcmp(sLongOptions[optIndex].name, "version") == 0)
 					PrintVersionAndExit();
 				break;
 		}
