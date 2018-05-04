@@ -33,5 +33,3 @@ Screens::Screens()
 	}
 	Rewind();
 }
-
-
