@@ -92,7 +92,6 @@ Agent::AgentString()
 	if (sAgentString.empty()) {
 		sAgentString = "jack_lite_inventory_agent_v";
 		sAgentString.append(Version());
-
 	}
 	return sAgentString.c_str();
 }
