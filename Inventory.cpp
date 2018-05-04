@@ -23,7 +23,6 @@
 
 #include "http/HTTP.h"
 #include "http/URL.h"
-#include "http/Utils.h"
 
 #include <cstdlib>
 #include <iostream>
@@ -40,7 +39,6 @@ Inventory::Inventory()
 	fMachine(NULL)
 {
 	fDocument = new tinyxml2::XMLDocument;
-	fMachine = Machine::Get();
 }
 
 
@@ -74,7 +72,6 @@ Inventory::Initialize(std::string deviceIDString)
 
  	tinyxml2::XMLElement* deviceId = fDocument->NewElement("DEVICEID");
 	deviceId->LinkEndChild(fDocument->NewText(fDeviceID.c_str()));
-
 	request->LinkEndChild(deviceId);
 
 	logger.LogFormat(LOG_INFO, "Inventory::Initialize(): Device ID: %s... OK!", fDeviceID.c_str());
@@ -100,6 +97,8 @@ Inventory::Build(bool noSoftware)
 
 	tinyxml2::XMLElement* content = fContent;
 
+	fMachine = Machine::Get();
+
 	try {
 		_AddAccountInfo(content);
 		_AddBIOSInfo(content);
@@ -118,6 +117,9 @@ Inventory::Build(bool noSoftware)
 	} catch (...) {
 		// Something failed.
 	}
+
+	fMachine = NULL;
+
 	logger.Log(LOG_INFO, "Building inventory... Done!");
 	return true;
 }
@@ -177,17 +179,13 @@ Inventory::Send(const char* serverUrl)
 
 	// TODO: Improve.
 	if (inventoryUrl.Username() != "") {
-		std::string auth("Basic ");
-		std::string authString;
-		authString.append(inventoryUrl.Username()).append(":");
-		authString.append(inventoryUrl.Password());
-		authString = Base64Encode(authString);
-		auth.append(authString);
-		requestHeader.SetValue("Authorization", auth.c_str());
+		requestHeader.SetAuthentication(HTTP_AUTH_TYPE_BASIC,
+				inventoryUrl.Username(), inventoryUrl.Password());
 	}
 
 	HTTP httpObject;
 	logger.Log(LOG_INFO, "Inventory::Send(): Prolog prepared!");
+	logger.LogFormat(LOG_DEBUG, "%s", requestHeader.ToString().c_str());
 	if (httpObject.Request(requestHeader, prologData, prologLength) != 0) {
 		delete[] prologData;
 		logger.LogFormat(LOG_INFO, "Inventory::Send(): Failed to send prolog: %s",
@@ -249,6 +247,12 @@ Inventory::Send(const char* serverUrl)
 	requestHeader.SetContentType("application/x-compress");
 	requestHeader.SetContentLength(compressedSize);
 	requestHeader.SetUserAgent(userAgentString);
+	if (inventoryUrl.Username() != "") {
+		requestHeader.SetAuthentication(HTTP_AUTH_TYPE_BASIC,
+						inventoryUrl.Username(), inventoryUrl.Password());
+	}
+
+	logger.LogFormat(LOG_DEBUG, "%s", requestHeader.ToString().c_str());
 	if (httpObject.Request(requestHeader, compressedData, compressedSize) != 0) {
 		delete[] compressedData;
 		logger.LogFormat(LOG_ERR, "Inventory::Send(): error while sending inventory: %s",
@@ -301,7 +305,7 @@ Inventory::_AddAccountInfo(tinyxml2::XMLElement* parent)
 	accountInfo->LinkEndChild(keyValue);
 
 	parent->LinkEndChild(accountInfo);
-	logger.Log(LOG_INFO, "\tAdded Account Info!");
+	logger.Log(LOG_DEBUG, "\tAdded Account Info!");
 }
 
 
@@ -358,7 +362,7 @@ Inventory::_AddBIOSInfo(tinyxml2::XMLElement* parent)
 
 	parent->LinkEndChild(bios);
 
-	logger.Log(LOG_INFO, "\tAdded BIOS Info!");
+	logger.Log(LOG_DEBUG, "\tAdded BIOS Info!");
 }
 
 
@@ -400,7 +404,7 @@ Inventory::_AddCPUsInfo(tinyxml2::XMLElement* parent)
 
 		parent->LinkEndChild(cpu);
 	}
-	logger.Log(LOG_INFO, "\tAdded CPUs Info!");
+	logger.Log(LOG_DEBUG, "\tAdded CPUs Info!");
 }
 
 
@@ -450,7 +454,7 @@ Inventory::_AddStoragesInfo(tinyxml2::XMLElement* parent)
 		parent->LinkEndChild(storage);
 	}
 
-	logger.Log(LOG_INFO, "\tAdded Storage Info!");
+	logger.Log(LOG_DEBUG, "\tAdded Storage Info!");
 }
 
 
@@ -497,7 +501,7 @@ Inventory::_AddMemoriesInfo(tinyxml2::XMLElement* parent)
 
 		parent->LinkEndChild(memory);
 	}
-	logger.Log(LOG_INFO, "\tAdded Memory Info!");
+	logger.Log(LOG_DEBUG, "\tAdded Memory Info!");
 }
 
 
@@ -546,7 +550,7 @@ Inventory::_AddDrivesInfo(tinyxml2::XMLElement* parent)
 		parent->LinkEndChild(drive);
 	}
 
-	logger.Log(LOG_INFO, "\tAdded Drives info!");
+	logger.Log(LOG_DEBUG, "\tAdded Drives info!");
 }
 
 
@@ -661,7 +665,7 @@ Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 
 	parent->LinkEndChild(hardware);
 
-	logger.Log(LOG_INFO, "\tAdded Hardware info!");
+	logger.Log(LOG_DEBUG, "\tAdded Hardware info!");
 }
 
 
@@ -736,7 +740,7 @@ Inventory::_AddNetworksInfo(tinyxml2::XMLElement* parent)
 		parent->LinkEndChild(networks);
 	}
 
-	logger.Log(LOG_INFO, "\tAdded Networks info!");
+	logger.Log(LOG_DEBUG, "\tAdded Networks info!");
 }
 
 
@@ -786,7 +790,7 @@ Inventory::_AddProcessesInfo(tinyxml2::XMLElement* parent)
 		parent->LinkEndChild(process);
 	}
 
-	logger.Log(LOG_INFO, "\tAdded Processes list!");
+	logger.Log(LOG_DEBUG, "\tAdded Processes list!");
 }
 
 
@@ -827,7 +831,7 @@ Inventory::_AddSoftwaresInfo(tinyxml2::XMLElement* parent)
 
 		parent->LinkEndChild(software);
 	}
-	logger.Log(LOG_INFO, "\tAdded Software list!");
+	logger.Log(LOG_DEBUG, "\tAdded Software list!");
 }
 
 
@@ -846,7 +850,7 @@ Inventory::_AddUsersInfo(tinyxml2::XMLElement* parent)
 	}
 	parent->LinkEndChild(users);
 
-	logger.Log(LOG_INFO, "\tAdded User info!");
+	logger.Log(LOG_DEBUG, "\tAdded User info!");
 }
 
 
@@ -880,7 +884,7 @@ Inventory::_AddVideosInfo(tinyxml2::XMLElement* parent)
 
 		parent->LinkEndChild(video);
 	}
-	logger.Log(LOG_INFO, "\tAdded Video info!");
+	logger.Log(LOG_DEBUG, "\tAdded Video info!");
 }
 
 
@@ -911,7 +915,7 @@ Inventory::_AddMonitorsInfo(tinyxml2::XMLElement* parent)
 		parent->LinkEndChild(monitor);
 	}
 
-	logger.Log(LOG_INFO, "\tAdded Display info!");
+	logger.Log(LOG_DEBUG, "\tAdded Display info!");
 }
 
 

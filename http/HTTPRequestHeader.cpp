@@ -8,6 +8,7 @@
 #include "HTTPDefines.h"
 #include "HTTPRequestHeader.h"
 #include "URL.h"
+#include "Utils.h"
 
 #include <iostream>
 
@@ -65,23 +66,31 @@ HTTPRequestHeader::URL() const
 }
 
 
+void
+HTTPRequestHeader::SetAuthentication(int type, std::string userName, std::string password)
+{
+	if (type != HTTP_AUTH_TYPE_BASIC)
+		return;
+
+	std::string auth("Basic ");
+	std::string authString;
+	authString.append(userName).append(":").append(password);
+	authString = Base64Encode(authString);
+	auth.append(authString);
+	SetValue("Authorization", auth.c_str());
+}
+
+
 std::string
 HTTPRequestHeader::ToString() const
 {
+	::URL url(fURL.c_str());
+	std::string host = url.Host();
+	std::string resource = url.Path();
 	std::string string;
-	std::string host = fURL;
-	std::string resource = "/";
-	size_t pos = fURL.find("//");
-	pos = fURL.find("/", pos + 2);
-	if (pos != std::string::npos) {
-		host = fURL.substr(0, pos);
-		resource = fURL.substr(pos, std::string::npos);
-	}
 	string.append(fMethod).append(" ");
 	string.append(resource).append(" ");
 	string.append("HTTP/1.1").append(CRLF);
-	if (HasKey(HTTPHost))
-		string.append(HTTPHost).append(": ").append(Value(HTTPHost)).append(CRLF);
 	string.append(HTTPUserAgent).append(": ").append(fUserAgent).append(CRLF);
 	string.append(HTTPHeader::ToString());
 

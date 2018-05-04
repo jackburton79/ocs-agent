@@ -12,6 +12,7 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <stdexcept>
 #include <unistd.h>
 
 const char* kVersion = "1.7.0";
@@ -22,7 +23,7 @@ std::string Agent::sAgentString;
 Agent::Agent()
 {
 	if (geteuid() != 0) {
-		throw std::string("This program needs to be run as root");
+		throw std::runtime_error("This program needs to be run as root");
 	}
 }
 
@@ -40,20 +41,22 @@ Agent::Run()
 	std::string deviceID = config->DeviceID();
 	Inventory inventory;
 	if (!inventory.Initialize(deviceID.c_str()))
-		throw "Cannot initialize Inventory";
+		throw std::runtime_error("Cannot initialize Inventory");
 
-	bool noSoftware = (config->KeyValue("nosoftware") == "true");
+	bool noSoftware = (config->KeyValue(CONF_NO_SOFTWARE) == "true");
 	unsigned int waitSeconds = ::strtoul(
-		config->KeyValue("waittime").c_str(), NULL, 10);
+		config->KeyValue(CONF_WAIT_TIME).c_str(), NULL, 10);
 
 	Logger& logger = Logger::GetDefault();
-	logger.LogFormat(LOG_INFO, "Waiting %ld seconds...", waitSeconds);
-	::sleep(waitSeconds);
+	if (waitSeconds > 0) {
+		logger.LogFormat(LOG_INFO, "Waiting %ld seconds...", waitSeconds);
+		::sleep(waitSeconds);
+	}
 
 	if (!inventory.Build(noSoftware))
 		return;
 
-	if (config->KeyValue("stdout") == "true")
+	if (config->KeyValue(CONF_OUTPUT_STDOUT) == "true")
 		inventory.Print();
 	else if (config->LocalInventory()) {
 		std::string fullFileName = config->OutputFileName();
@@ -61,7 +64,6 @@ Agent::Run()
 			fullFileName.append(deviceID).append(".xml");
 		inventory.Save(fullFileName.c_str());
 	} else {
-
 		inventory.Send(config->ServerURL().c_str());
 	}
 }

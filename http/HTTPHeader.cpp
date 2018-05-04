@@ -124,8 +124,6 @@ HTTPHeader::ToString() const
 
 	std::map<std::string, std::string>::const_iterator i;
 	for (i = fValues.begin(); i != fValues.end(); i++) {
-		if (i->first == HTTPHost)
-			continue;
 		string.append(i->first);
 		string.append(": ");
 		string.append(i->second);

@@ -6,23 +6,64 @@
  */
 
 #include "NetworkInterface.h"
+#include "Support.h"
 
 #include <errno.h>
 #include <cstdlib>
-#include <string.h>
-#include <stdio.h>
+#include <cstring>
+#include <cstdio>
+#include <stdexcept>
 #include <unistd.h>
+
 #include <arpa/inet.h>
 #include <linux/netlink.h>
 #include <linux/rtnetlink.h>
+#include <linux/ethtool.h>
+#include <linux/sockios.h>
 #include <net/ethernet.h>
-
+#include <net/if.h>
+#include <netinet/in.h>
 
 #include <sys/ioctl.h>
 
 #include <iomanip>
 #include <iostream>
 #include <sstream>
+
+
+static std::string
+SpeedToString(struct ethtool_cmd* edata)
+{
+	int speed = ethtool_cmd_speed(edata);
+	if (speed == -1)
+		return "";
+
+	std::string unit = "";
+	std::string count = "";
+	if (speed / 1000 >= 1) {
+		unit = "Gb/s";
+		count = int_to_string(speed / 1000);
+	} else if (speed / 1 >= 1) {
+		unit = "Mb/s";
+		count = int_to_string(speed / 1);
+	}
+
+	if (count == "" && unit == "")
+		return "";
+
+	std::string duplex = "";
+	if (edata->duplex == DUPLEX_FULL)
+		duplex = "Full Duplex";
+	else if (edata->duplex == DUPLEX_HALF)
+		duplex = "Half Duplex";
+
+	std::string result = "";
+	result.append(count).append(" ").append(unit);
+	if (duplex != "")
+		result.append(" ").append(duplex);
+
+	return result;
+}
 
 
 NetworkInterface::NetworkInterface()
@@ -35,7 +76,7 @@ NetworkInterface::NetworkInterface(const char* name)
 	fName(name)
 {
 	if (fName.size() > IFNAMSIZ)
-		throw "NetworkInterface::NetworkInterface(): Name too long";
+		throw std::runtime_error("NetworkInterface::NetworkInterface(): Name too long");
 }
 
 
@@ -139,7 +180,7 @@ NetworkInterface::DefaultGateway() const
 	std::list<route_info>::const_iterator i;
 	for (i = routeInfo.begin(); i != routeInfo.end(); i++) {
 		if (i->dstAddr.s_addr == 0)
-			return (char*)inet_ntoa(i->gateWay);
+			return (char*)inet_ntoa(i->gateway);
 	}
 	
 	return "";
@@ -157,7 +198,18 @@ NetworkInterface::Type() const
 std::string
 NetworkInterface::Speed() const
 {
-	return "";
+	struct ifreq ifr;
+	struct ethtool_cmd edata;
+
+	ifr.ifr_data = (char*)&edata;
+
+	edata.cmd = ETHTOOL_GSET;
+
+	if (_DoRequest(SIOCETHTOOL, ifr) != 0)
+		return "0";
+
+	// TODO: Duplex
+	return SpeedToString(&edata);
 }
 
 
@@ -195,7 +247,7 @@ NetworkInterface::_DoRequest(int request, struct ifreq& ifr)  const
 		return errno;
 
 	int status = 0;
-	if (ioctl(fd, request, &ifr) == -1)
+	if (ioctl(fd, request, &ifr) < 0)
 		status = errno;
 
 	::close(fd);
@@ -225,7 +277,7 @@ ParseRoutes(struct nlmsghdr* nlHdr, route_info* rtInfo,
 				if_indextoname(*(int*)RTA_DATA(rtAttr), rtInfo->ifName);
 				break;
 			case RTA_GATEWAY:
-				rtInfo->gateWay = *(in_addr*)RTA_DATA(rtAttr);
+				rtInfo->gateway = *(in_addr*)RTA_DATA(rtAttr);
 				break;
 			case RTA_PREFSRC:
 				rtInfo->srcAddr = *(in_addr*)RTA_DATA(rtAttr);

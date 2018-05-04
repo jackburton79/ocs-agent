@@ -20,6 +20,7 @@ CPP_SRCS += \
 ../Support.cpp \
 ../VolumeReader.cpp \
 ../XML.cpp \
+../ZLibCompressor.cpp \
 ../edid-decode.c
 
 OBJS += \
@@ -39,6 +40,7 @@ OBJS += \
 ./Support.o \
 ./VolumeReader.o \
 ./XML.o \
+./ZLibCompressor.o \
 ./edid-decode.o 
 
 CPP_DEPS += \
@@ -59,6 +61,7 @@ CPP_DEPS += \
 ./Support.d \
 ./VolumeReader.d \
 ./XML.d \
+./ZLibCompressor.d \
 ./edid-decode.d 
 
 

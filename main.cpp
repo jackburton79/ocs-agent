@@ -31,6 +31,7 @@ struct option sLongOptions[] = {
 		{ "daemonize", no_argument, 0, 'd' },
 		{ "wait", required_argument, 0, 'w' },
 		{ "help", no_argument, 0, 'h' },
+		{ "log", required_argument, 0, 0 },
 		{ "verbose", no_argument, 0, 'v' },
 		{ "version", no_argument, 0, 0 },
 		{ "new-agent-string", no_argument, 0, 0 },
@@ -56,13 +57,18 @@ PrintHelpAndExit()
 	std::cout << "                                     If the server needs authentication, use the standard syntax <user>:<password>@<host>" << std::endl;
 	std::cout << "  -l, --local <folder>               Don't send inventory, instead save a local copy in the specified file or folder" << std::endl;
 	std::cout << "      --stdout                       Don't send inventory, print it to stdout" << std::endl;
+	std::cout << std::endl;
 	std::cout << "  -t, --tag <TAG>                    Specify tag. Will be ignored by server if a value already exists" << std::endl;
 	std::cout << "      --nosoftware                   Do not retrieve installed software" << std::endl;
+	std::cout << std::endl;
 	std::cout << "      --new-agent-string             Use new agent string (warning: requires changes in OCS-NG configuration)" << std::endl;
-	std::cout << "      --agent-string                 Specify custom HTTP agent string" << std::endl;
-	std::cout << "  -D                                 DEPRECATED, use -d instead " << std::endl;
+	std::cout << "      --agent-string <string>        Specify custom HTTP agent string" << std::endl;
+	std::cout << std::endl;
 	std::cout << "  -d, --daemonize                    Detach from running terminal" << std::endl;
 	std::cout << "  -w, --wait <s>                     Wait for the specified amount of seconds before building the inventory" << std::endl;
+	std::cout << std::endl;
+	std::cout << "      --log <option>                 Specify error log output (STDERR / SYSLOG)." << std::endl;
+	std::cout << "                                     Default is standard error if attached to a terminal, otherwise syslog. " << std::endl;
 	std::cout << "  -v, --verbose                      Verbose mode" << std::endl;
 	std::cout << "      --version                      Print version and exit" << std::endl;
 	std::cout << std::endl;
@@ -75,8 +81,6 @@ PrintHelpAndExit()
 	std::cout << "If no server or output file is specified, ";
 	std::cout << "either via the -s/-l option or via configuration file (option -c), ";
 	std::cout << "the program will exit without doing anything." << std::endl;
-	std::cout << "Any warning/error will be written to the system logging facility. ";
-	std::cout << "To print them to standard error, use the option '-v (--verbose)'." << std::endl;
 	std::cout << std::endl;
 	std::cout << "Examples:" << std::endl;
 	std::cout << "  Use the configuration file /etc/ocsinventory-ng.conf :" << std::endl;
@@ -170,14 +174,21 @@ main(int argc, char **argv)
 					config->SetVolatileKeyValue(CONF_AGENT_STRING, Agent::AgentString());
 				else if (strcmp(sLongOptions[optIndex].name, "agent-string") == 0)
 					config->SetVolatileKeyValue(CONF_AGENT_STRING, optarg);
-				else if (strcmp(sLongOptions[optIndex].name, "version") == 0)
+				else if (strcmp(sLongOptions[optIndex].name, "log") == 0) {
+					if (strcasecmp(optarg, "STDERR") == 0)
+						Logger::Get(Logger::LOGGER_TYPE_STDERR);
+					else if (strcasecmp(optarg, "SYSLOG") == 0)
+						Logger::Get(Logger::LOGGER_TYPE_SYSLOG);
+				} else if (strcmp(sLongOptions[optIndex].name, "version") == 0)
 					PrintVersionAndExit();
 				break;
 		}
 	}
 	Logger& logger = Logger::GetDefault();
 	if (verbose)
-		logger.SetConsoleLogging(true);
+		logger.SetLevel(LOG_DEBUG);
+	else
+		logger.SetLevel(LOG_INFO);
 
 	bool local = config->LocalInventory();
 	bool stdout = config->KeyValue("stdout") == "true";
@@ -228,15 +239,6 @@ main(int argc, char **argv)
 		agent.Run();
 		if (verbose)
 			Configuration::Get()->Print();
-	} catch (std::string& errorString) {
-		logger.Log(LOG_ERR, errorString.c_str());
-		return 1;
-	} catch (const char* string) {
-		logger.Log(LOG_ERR, string);
-		return 1;
-	} catch (int error) {
-		logger.Log(LOG_ERR, strerror(error));
-		return 1;
 	} catch (std::exception& ex) {
 		logger.Log(LOG_ERR, ex.what());
 		return 1;

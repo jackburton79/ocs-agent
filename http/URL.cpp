@@ -8,8 +8,7 @@
 #include <algorithm>
 #include <cstdlib>
 #include <cstring>
-
-const static char* kProtocolSuffix = "://";
+#include <iostream>
 
 #include "URL.h"
 
@@ -113,17 +112,18 @@ URL::IsRelative() const
 void
 URL::_DecodeURLString(const char* url)
 {
-	// TODO: Handle malformed urls
+	// TODO: Handle more malformed urls
 	std::string string = url;
 	std::string result = string;
-	size_t suffixPos = string.find(kProtocolSuffix);	
+	size_t suffixPos = string.find(":/");
 	if (suffixPos != std::string::npos) {
 		// Remove protocol part (<proto>://)
 		fProtocol = string.substr(0, suffixPos);
 		// convert to lowercase
 		std::transform(fProtocol.begin(), fProtocol.end(),
 				fProtocol.begin(), ::tolower);
-		result = string.substr(suffixPos + strlen(kProtocolSuffix), std::string::npos);
+		size_t endProtocol = string.find_first_not_of(":/", suffixPos + 1);
+		result = string.substr(endProtocol, std::string::npos);
 	}
 	// User/Password
 	size_t authPos = result.find("@");
@@ -140,8 +140,10 @@ URL::_DecodeURLString(const char* url)
 	if (portPos != std::string::npos) {
 		fHost = result.substr(0, portPos);
 		size_t slashPos = result.find("/", portPos);
-		if (slashPos != std::string::npos)
-			fPath = result.substr(slashPos, std::string::npos);
+		if (slashPos != std::string::npos) {
+			size_t endSlash = result.find_first_not_of("/", slashPos);
+			fPath = result.substr(endSlash -1, std::string::npos);
+		}
 		fPort = ::strtol(result.substr(portPos + 1, result.length()).c_str(),
 			NULL, 10);
 	} else {
@@ -151,8 +153,9 @@ URL::_DecodeURLString(const char* url)
 			fPort = 80;
 		size_t slashPos = result.find("/");
 		if (slashPos != std::string::npos) {
+			size_t endSlash = result.find_first_not_of("/", slashPos);
 			fHost = result.substr(0, slashPos);
-			fPath = result.substr(slashPos, std::string::npos);
+			fPath = result.substr(endSlash - 1, std::string::npos);
 		} else
 			fHost = result;
 	}

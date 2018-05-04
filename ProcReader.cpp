@@ -7,13 +7,14 @@
 
 #include "ProcReader.h"
 
+#include <cstring>
+#include <fcntl.h>
 #include <iostream>
 #include <string>
-
-#include <sys/ioctl.h>
-#include <fcntl.h>
-#include <string.h>
+#include <stdexcept>
 #include <unistd.h>
+#include <sys/ioctl.h>
+
 
 ProcReader::ProcReader(const char* fullPath)
 {
@@ -21,7 +22,7 @@ ProcReader::ProcReader(const char* fullPath)
 		std::string errorString;
 		errorString.append("File not found: ");
 		errorString.append(fullPath);
-		throw errorString;
+		throw std::runtime_error(errorString);
 	}
 }
 

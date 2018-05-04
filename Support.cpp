@@ -10,10 +10,11 @@
 
 #include "Support.h"
 
+#include <cstring>
 #include <iostream>
+#include <stdexcept>
 #include <streambuf>
 #include <string>
-#include <string.h>
 
 
 popen_streambuf::popen_streambuf()
@@ -31,7 +32,7 @@ popen_streambuf::popen_streambuf(const char* fileName, const char* mode)
 {
 	popen_streambuf* buf = open(fileName, mode);
 	if (buf == NULL)
-		throw -1;
+		throw std::runtime_error("popen_streambuf: cannot open file");
 }
 
 
