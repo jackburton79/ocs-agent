@@ -22,9 +22,6 @@ std::string Agent::sAgentString;
 
 Agent::Agent()
 {
-	if (geteuid() != 0) {
-		throw std::runtime_error("This program needs to be run as root");
-	}
 }
 
 

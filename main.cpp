@@ -47,7 +47,7 @@ PrintHelpAndExit()
 {
 	std::cout << __progname << " " << Agent::Version() << std::endl;
 	if (geteuid() != 0) {
-		std::cout << "WARNING: This program needs to be run as root." << std::endl;
+		std::cout << "WARNING: This program should be run as root." << std::endl;
 		std::cout << std::endl;
 	}
 	std::cout << "Usage:" << std::endl;
