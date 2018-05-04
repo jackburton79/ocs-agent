@@ -64,7 +64,9 @@ SSLSocket::Connect(const struct sockaddr *address, socklen_t addrLen)
 	if (fSSLConnection != NULL) {
 		SSL_set_fd(fSSLConnection, FD());
 		status = SSL_connect(fSSLConnection);
-		return status;
+		if (status == 1)
+			return 0;
+		// TODO: We should use SSL_get_error to retrieve the correct error
 	}
 
 	// TODO: delete connection
