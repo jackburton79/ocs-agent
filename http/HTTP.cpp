@@ -42,9 +42,7 @@ HTTP::HTTP(const std::string string)
 	fSocket(NULL),
 	fLastError(0)
 {
-	URL url(string.c_str());
-	fHost = url.Host();
-	fPort = url.Port();
+	SetHost(string);
 }
 
 
