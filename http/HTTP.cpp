@@ -240,13 +240,9 @@ HTTP::_HandleConnection(const std::string string)
 	fPort = port;
 
 	try {
-		fSocket = SocketGetter().GetSocket(url.Protocol());
+		fSocket = SocketGetter().GetSocket(url.Protocol(), AF_INET, SOCK_STREAM);
 	} catch (...) {
-		return false;
-	}
-	
-	if ((fSocket->Open(AF_INET, SOCK_STREAM, 0)) < 0) {
-		fLastError = errno;
+		fLastError = -1;
 		delete fSocket;
 		fSocket = NULL;
 		return false;
