@@ -107,7 +107,7 @@ HTTPRequestHeader::SetRequest(const std::string method,
 	
 	std::string hostName = ::URL(url.c_str()).Host();
 	if (hostName != "")
-		fValues["Host"] = hostName;
+		fValues[HTTPHost] = hostName;
 }
 
 
