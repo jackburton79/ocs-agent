@@ -70,7 +70,7 @@ HTTP::ClearPendingRequests()
 }
 
 
-HTTPRequestHeader
+const HTTPRequestHeader&
 HTTP::CurrentRequest() const
 {
 	return fCurrentRequest;
@@ -91,7 +91,7 @@ HTTP::ErrorString() const
 }
 
 
-HTTPResponseHeader
+const HTTPResponseHeader&
 HTTP::LastResponse() const
 {
 	return fLastResponse;
