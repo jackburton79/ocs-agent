@@ -220,14 +220,14 @@ Configuration::UseCurrentTimeInDeviceID() const
 	if (i == fValues.end())
 		return false;
 
-	return i->second.compare("yes") == 0;
+	return _StringToBoolean(i->second);
 }
 
 
 void
 Configuration::SetUseCurrentTimeInDeviceID(bool use)
 {
-	fValues[kUseCurrentTimeInDeviceID] = use ? "yes" : "no";
+	fValues[kUseCurrentTimeInDeviceID] = _BooleanToString(use);
 }
 
 
@@ -239,14 +239,14 @@ Configuration::UseBaseBoardSerialNumber() const
 	if (i == fValues.end())
 		return false;
 
-	return i->second.compare("yes") == 0;
+	return _StringToBoolean(i->second);
 }
 
 
 void
 Configuration::SetUseBaseBoardSerialNumber(bool use)
 {
-	fValues[kUseBaseBoardSerial] = use ? "yes" : "no";
+	fValues[kUseBaseBoardSerial] = _BooleanToString(use);
 }
 
 
@@ -292,4 +292,24 @@ Configuration::_GenerateDeviceID()
     deviceID.append(targetString);
 
 	fValues[kDeviceID] = deviceID;
+}
+
+
+std::string
+Configuration::_BooleanToString(bool value)
+{
+	return std::string(value ? "true" : "false");
+}
+
+
+bool
+Configuration::_StringToBoolean(const std::string string)
+{
+	std::string lowerCaseString = string;
+	std::transform(lowerCaseString.begin(), lowerCaseString.end(),
+		lowerCaseString.begin(), ::tolower);
+	if (lowerCaseString.compare("yes") == 0
+		|| lowerCaseString.compare("true") == 0)
+		return true;
+	return false;
 }

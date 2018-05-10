@@ -16,6 +16,9 @@
 #define CONF_OUTPUT_STDOUT "stdout"
 #define CONF_WAIT_TIME "waittime"
 
+#define CONF_VALUE_TRUE "true"
+#define CONF_VALUE_FALSE "false"
+
 class Configuration {
 public:
 	static Configuration* Get();
@@ -49,6 +52,9 @@ private:
 	~Configuration();
 
 	void _GenerateDeviceID();
+
+	static std::string _BooleanToString(bool value);
+	static bool _StringToBoolean(const std::string string);
 
 	std::map<std::string, std::string> fValues;
 	std::map<std::string, std::string> fVolatileValues;

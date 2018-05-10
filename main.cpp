@@ -191,7 +191,7 @@ main(int argc, char **argv)
 		logger.SetLevel(LOG_INFO);
 
 	bool local = config->LocalInventory();
-	bool stdout = config->KeyValue("stdout") == "true";
+	bool stdout = config->KeyValue("stdout") == CONF_VALUE_TRUE;
 	if (!stdout && serverUrl == NULL
 		&& configFile == NULL
 		&& local && fullFileName == NULL) {
