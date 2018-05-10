@@ -24,18 +24,18 @@ public:
 	virtual ~HTTPHeader();
 
 	int ContentLength() const;
-	std::string ContentType() const;
-
 	bool HasContentLength() const;
-	bool HasContentType() const;
-	bool HasKey(const std::string key) const;
-
 	void SetContentLength(int len);
+	
+	std::string ContentType() const;
+	bool HasContentType() const;
 	void SetContentType(const std::string type);
+
+	std::string Value(const std::string key) const;
+	bool HasKey(const std::string key) const;
 	void SetValue(const std::string key, const std::string value);
 
 	virtual std::string ToString() const;
-	std::string Value(const std::string key) const;
 
 	virtual void Clear();
 
