@@ -39,6 +39,7 @@ public:
 
 	const HTTPRequestHeader& CurrentRequest() const;
 	const HTTPResponseHeader& LastResponse() const;
+
 	int Error() const;
 	std::string ErrorString() const;
 	
