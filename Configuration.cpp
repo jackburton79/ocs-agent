@@ -134,6 +134,32 @@ Configuration::SetOutputFileName(const char* fileName)
 
 
 bool
+Configuration::SetKeyValueBoolean(const char* key, bool value)
+{
+	fValues[key] = _BooleanToString(value);
+	return true;
+}
+
+
+bool
+Configuration::SetVolatileKeyValueBoolean(const char* key, bool value)
+{
+	fVolatileValues[key] = _BooleanToString(value);
+	return true;
+}
+
+
+bool
+Configuration::KeyValueBoolean(const char* key) const
+{
+	std::string string = KeyValue(key);
+	if (string == "")
+		return false;
+	return _StringToBoolean(string);
+}
+
+
+bool
 Configuration::SetKeyValue(const char* key, const char* value)
 {
 	fValues[key] = value;

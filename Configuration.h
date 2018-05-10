@@ -35,6 +35,10 @@ public:
 	std::string OutputFileName() const;
 	bool SetOutputFileName(const char* fileName);
 
+	bool SetKeyValueBoolean(const char* key, bool value);
+	bool SetVolatileKeyValueBoolean(const char* key, bool value);
+	bool KeyValueBoolean(const char* key) const;
+
 	bool SetKeyValue(const char* key, const char* value);
 	bool SetVolatileKeyValue(const char* key, const char* value);
 	std::string KeyValue(const char* key) const;
