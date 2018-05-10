@@ -23,7 +23,6 @@ public:
 	HTTPHeader(const HTTPHeader&);
 	virtual ~HTTPHeader();
 
-	void AddValue(const std::string key, const std::string value);
 	int ContentLength() const;
 	std::string ContentType() const;
 
@@ -44,9 +43,6 @@ public:
 
 protected:
 	std::map<std::string, std::string, ICompareString> fValues;
-
-private:
-	void _Init();
 };
 
 #endif /* HTTPHEADER_H_ */

@@ -15,37 +15,22 @@
 
 HTTPHeader::HTTPHeader()
 {
-	_Init();
 }
 
 
 HTTPHeader::HTTPHeader(const std::string string)
 {
-	_Init();
 }
 
 
 HTTPHeader::HTTPHeader(const HTTPHeader& header)
 {
-	_Init();
 	*this = header;
 }
 
 
 HTTPHeader::~HTTPHeader()
 {
-}
-
-
-void
-HTTPHeader::AddValue(const std::string key, const std::string value)
-{
-	std::map<std::string, std::string>::const_iterator i;
-	i = fValues.find(HTTPContentLength);
-	if ( i != fValues.end())
-		fValues[key].append(", ");
-
-	fValues[key] = fValues[key].append(value);
 }
 
 
@@ -158,12 +143,6 @@ HTTPHeader::operator=(const HTTPHeader& header)
 {
 	fValues = header.fValues;
 	return *this;
-}
-
-
-void
-HTTPHeader::_Init()
-{
 }
 
 
