@@ -117,35 +117,31 @@ Configuration::Print() const
 }
 
 
-bool
+void
 Configuration::SetServer(const char* serverUrl)
 {
 	fValues[kServer] = serverUrl;
-	return true;
 }
 
 
-bool
+void
 Configuration::SetOutputFileName(const char* fileName)
 {
 	fValues[kOutputFileName] = fileName;
-	return true;
 }
 
 
-bool
+void
 Configuration::SetKeyValueBoolean(const char* key, bool value)
 {
 	fValues[key] = _BooleanToString(value);
-	return true;
 }
 
 
-bool
+void
 Configuration::SetVolatileKeyValueBoolean(const char* key, bool value)
 {
 	fVolatileValues[key] = _BooleanToString(value);
-	return true;
 }
 
 
@@ -159,11 +155,10 @@ Configuration::KeyValueBoolean(const char* key) const
 }
 
 
-bool
+void
 Configuration::SetKeyValue(const char* key, const char* value)
 {
 	fValues[key] = value;
-	return true;
 }
 
 
@@ -184,11 +179,10 @@ Configuration::KeyValue(const char* key) const
 }
 
 
-bool
+void
 Configuration::SetVolatileKeyValue(const char* key, const char* value)
 {
 	fVolatileValues[key] = value;
-	return true;
 }
 
 

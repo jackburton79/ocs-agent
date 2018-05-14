@@ -30,17 +30,17 @@ public:
 	void Print() const;
 
 	std::string ServerURL() const;
-	bool SetServer(const char* serverUrl);
+	void SetServer(const char* serverUrl);
 
 	std::string OutputFileName() const;
-	bool SetOutputFileName(const char* fileName);
+	void SetOutputFileName(const char* fileName);
 
-	bool SetKeyValueBoolean(const char* key, bool value);
-	bool SetVolatileKeyValueBoolean(const char* key, bool value);
+	void SetKeyValueBoolean(const char* key, bool value);
+	void SetVolatileKeyValueBoolean(const char* key, bool value);
 	bool KeyValueBoolean(const char* key) const;
 
-	bool SetKeyValue(const char* key, const char* value);
-	bool SetVolatileKeyValue(const char* key, const char* value);
+	void SetKeyValue(const char* key, const char* value);
+	void SetVolatileKeyValue(const char* key, const char* value);
 	std::string KeyValue(const char* key) const;
 	
 	std::string DeviceID() const;	
