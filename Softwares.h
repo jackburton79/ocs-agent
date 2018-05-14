@@ -23,7 +23,6 @@ struct software_info {
 class Softwares : public ItemsList<software_info> {
 public:
 	Softwares();
-	virtual ~Softwares();
 
 private:
 	void _ReadSoftwaresInfo();

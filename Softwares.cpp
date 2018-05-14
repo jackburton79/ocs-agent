@@ -18,11 +18,6 @@ Softwares::Softwares()
 }
 
 
-Softwares::~Softwares()
-{
-}
-
-
 void
 Softwares::_ReadSoftwaresInfo()
 {

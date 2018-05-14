@@ -10,7 +10,8 @@
 
 #include <ctime>
 #include <string>
-#include <vector>
+
+#include "ItemsList.h"
 
 struct user_entry {
 	std::string login;
@@ -18,17 +19,10 @@ struct user_entry {
 	time_t logintime;
 };
 
-class LoggedUsers {
+class LoggedUsers : public ItemsList<user_entry> {
 public:
 	LoggedUsers();
-	~LoggedUsers();
 
-	int Count() const;
-	std::string LoginNameAt(int i) const;
-	user_entry UserEntryAt(int i) const;
-
-private:
-	std::vector<user_entry> fUsers;
 };
 
 #endif /* LOGGEDUSERS_H_ */

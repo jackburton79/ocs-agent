@@ -27,35 +27,11 @@ LoggedUsers::LoggedUsers()
 			char timeString[64];
 			strftime(timeString, sizeof(timeString), "%a %b %d %R", timeinfo);
 			entry.logintimestring = timeString;
-			fUsers.push_back(entry);
+			fItems.push_back(entry);
 		}
 	}
 
 	endutxent();
-}
 
-
-LoggedUsers::~LoggedUsers()
-{
-}
-
-
-int
-LoggedUsers::Count() const
-{
-	return fUsers.size();
-}
-
-
-user_entry
-LoggedUsers::UserEntryAt(int i) const
-{
-	return fUsers[i];
-}
-
-
-std::string
-LoggedUsers::LoginNameAt(int i) const
-{
-	return fUsers[i].login;
+	Rewind();
 }

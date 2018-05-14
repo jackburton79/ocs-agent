@@ -638,8 +638,8 @@ Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 	hardware->LinkEndChild(ipAddress);
 
 	LoggedUsers users;
-	if (users.Count() > 0) {
-		user_entry user = users.UserEntryAt(users.Count() - 1);
+	user_entry user;
+	if (users.GetNext(user)) {
 		tinyxml2::XMLElement* dateLastLoggedUser = fDocument->NewElement("DATELASTLOGGEDUSER");
 		dateLastLoggedUser->LinkEndChild(fDocument->NewText(user.logintimestring.c_str()));
 		hardware->LinkEndChild(dateLastLoggedUser);
@@ -843,9 +843,10 @@ Inventory::_AddUsersInfo(tinyxml2::XMLElement* parent)
 	tinyxml2::XMLElement* users = fDocument->NewElement("USERS");
 
 	LoggedUsers usersInfo;
-	for (int i = 0; i < usersInfo.Count(); i++) {
+	user_entry userEntry;
+	while (usersInfo.GetNext(userEntry)) {
 		tinyxml2::XMLElement* login = fDocument->NewElement("LOGIN");
-		login->LinkEndChild(fDocument->NewText(usersInfo.LoginNameAt(i).c_str()));
+		login->LinkEndChild(fDocument->NewText(userEntry.login.c_str()));
 		users->LinkEndChild(login);
 	}
 	parent->LinkEndChild(users);
