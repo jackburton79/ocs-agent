@@ -12,3 +12,5 @@ engines:
       inconclusive: false
   fixme:
     enabled: true
+exclude_patterns:
+- "tinyxml2/*"
