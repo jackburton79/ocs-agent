@@ -16,24 +16,6 @@ Storages::Storages()
 	_ReadStoragesInfo();	
 }
 
-Storages::~Storages()
-{
-}
-
-
-int
-Storages::Count() const
-{
-	return fStorages.size();
-}
-
-
-storage_info
-Storages::StorageAt(int i) const
-{
-	return fStorages[i];
-}
-
 
 void
 Storages::_ReadStoragesInfo()
@@ -67,9 +49,11 @@ Storages::_ReadStoragesInfo()
 			info.name = info.model;
 			info.type = typeLine.substr(10, 26);
 			trim(info.type); 
-			fStorages.push_back(info);
+			fItems.push_back(info);
 		}
 	} catch (...) {
 	}
+
+	Rewind();
 }
 

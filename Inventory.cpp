@@ -414,9 +414,9 @@ Inventory::_AddStoragesInfo(tinyxml2::XMLElement* parent)
 	Logger& logger = Logger::GetDefault();
 
 	Storages storages;
-	for (int i = 0; i < storages.Count(); i++) {
+	storage_info info;
+	while (storages.GetNext(info)) {
 		tinyxml2::XMLElement* storage = fDocument->NewElement("STORAGES");
-		storage_info info = storages.StorageAt(i);
 
 		tinyxml2::XMLElement* manufacturer = fDocument->NewElement("MANUFACTURER");
 		manufacturer->LinkEndChild(fDocument->NewText(info.manufacturer.c_str()));

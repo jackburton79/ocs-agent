@@ -8,7 +8,8 @@
 #define STORAGES_H_
 
 #include <string>
-#include <vector>
+
+#include "ItemsList.h"
 
 struct storage_info {
 	std::string name;
@@ -21,19 +22,12 @@ struct storage_info {
 	std::string firmware;
 };
 
-class Storages {
+class Storages : public ItemsList<storage_info> {
 public:
 	Storages();
-	~Storages();
-
-	int Count() const;
-	storage_info StorageAt(int i) const;
 
 private:
 	void _ReadStoragesInfo();
-
-	std::vector<storage_info> fStorages;
-
 };
 
 #endif /* STORAGES_H_*/
