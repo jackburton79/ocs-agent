@@ -30,13 +30,8 @@ public:
 	RunningProcessesList();
 	~RunningProcessesList();
 
-
 private:
-
 	void _ReadProcessInfo(process_info& info, std::string pid);
-
-	std::list<process_info> fProcesses;
-	std::list<process_info>::iterator fIterator;
 };
 
 #endif /* RUNNINGPROCESSES_H_ */

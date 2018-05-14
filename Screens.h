@@ -23,8 +23,7 @@ struct screen_info {
 class Screens : public ItemsList<screen_info> {
 public:
   Screens();
-  
-  
+
 };
 
 

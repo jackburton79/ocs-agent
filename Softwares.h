@@ -8,7 +8,8 @@
 #define SOFTWARES_H_
 
 #include <string>
-#include <vector>
+
+#include "ItemsList.h"
 
 struct software_info {
 	std::string comments;
@@ -19,18 +20,13 @@ struct software_info {
 	std::string version;
 };
 
-class Softwares {
+class Softwares : public ItemsList<software_info> {
 public:
 	Softwares();
-	~Softwares();
-
-	int Count() const;
-	software_info SoftwareAt(int i) const;
+	virtual ~Softwares();
 
 private:
 	void _ReadSoftwaresInfo();
-
-	std::vector<software_info> fSoftwares;
 
 };
 

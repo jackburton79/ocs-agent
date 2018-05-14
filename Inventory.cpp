@@ -800,9 +800,9 @@ Inventory::_AddSoftwaresInfo(tinyxml2::XMLElement* parent)
 	Logger& logger = Logger::GetDefault();
 
 	Softwares softwares;
-	for (int i = 0; i < softwares.Count(); i++) {
+	software_info info;
+	while (softwares.GetNext(info)) {
 		tinyxml2::XMLElement* software = fDocument->NewElement("SOFTWARES");
-		software_info info = softwares.SoftwareAt(i);
 
 		tinyxml2::XMLElement* comments = fDocument->NewElement("COMMENTS");
 		comments->LinkEndChild(fDocument->NewText(info.comments.c_str()));
