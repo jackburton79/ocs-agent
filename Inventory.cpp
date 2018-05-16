@@ -575,17 +575,19 @@ Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 			break;
 	}
 
+	tinyxml2::XMLElement* ipAddress = fDocument->NewElement("IPADDR");
+	ipAddress->LinkEndChild(fDocument->NewText(interface.IPAddress().c_str()));
+	hardware->LinkEndChild(ipAddress);
+
 	std::string defaultGateway = interface.DefaultGateway();
 	tinyxml2::XMLElement* defaultGW = fDocument->NewElement("DEFAULTGATEWAY");
 	defaultGW->LinkEndChild(fDocument->NewText(defaultGateway.c_str()));
+	hardware->LinkEndChild(defaultGW);
 
 	tinyxml2::XMLElement* description = fDocument->NewElement("DESCRIPTION");
 	std::string descriptionString;
 	descriptionString.append(fMachine->OSInfo().machine).append("/");
 	description->LinkEndChild(fDocument->NewText(descriptionString.c_str()));
-
-	tinyxml2::XMLElement* ipAddress = fDocument->NewElement("IPADDR");
-	ipAddress->LinkEndChild(fDocument->NewText(interface.IPAddress().c_str()));
 
 	tinyxml2::XMLElement* memory = fDocument->NewElement("MEMORY");
 	memory->LinkEndChild(fDocument->NewText(fMachine->OSInfo().memory.c_str()));
@@ -633,9 +635,7 @@ Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 	workGroup->LinkEndChild(fDocument->NewText(fMachine->OSInfo().domain_name.c_str()));
 
 	hardware->LinkEndChild(checksum);
-	hardware->LinkEndChild(defaultGW);
 	hardware->LinkEndChild(description);
-	hardware->LinkEndChild(ipAddress);
 
 	LoggedUsers users;
 	user_entry user;
