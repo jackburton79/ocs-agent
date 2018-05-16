@@ -112,6 +112,16 @@ NetworkInterface::HardwareAddress() const
 }
 
 
+bool
+NetworkInterface::HasIPAddress() const
+{
+	std::string ip = IPAddress();
+	if (ip.empty() || ip == "" || ip == "0.0.0.0")
+		return false;
+	return true;
+}
+
+
 std::string
 NetworkInterface::IPAddress() const
 {
@@ -167,6 +177,16 @@ NetworkInterface::BroadcastAddress() const
 
 	struct sockaddr_in* ipaddr = (struct sockaddr_in*)&ifr.ifr_broadaddr;
 	return inet_ntoa(ipaddr->sin_addr);
+}
+
+
+bool
+NetworkInterface::HasDefaultGateway() const
+{
+	std::string gateway = DefaultGateway();
+	if (gateway.empty() || gateway == "" || gateway == "0.0.0.0")
+		return false;
+	return true;
 }
 
 
