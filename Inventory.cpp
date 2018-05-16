@@ -571,18 +571,18 @@ Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 	unsigned int cookie = 0;
 	while (roster.GetNextInterface(&cookie, interface) == 0) {
 		if (!interface.IsLoopback() && interface.HasIPAddress()
-				&& interface.HasDefaultGateway())
+				&& interface.HasDefaultGateway()) {
+			tinyxml2::XMLElement* ipAddress = fDocument->NewElement("IPADDR");
+			ipAddress->LinkEndChild(fDocument->NewText(interface.IPAddress().c_str()));
+			hardware->LinkEndChild(ipAddress);
+
+			std::string defaultGateway = interface.DefaultGateway();
+			tinyxml2::XMLElement* defaultGW = fDocument->NewElement("DEFAULTGATEWAY");
+			defaultGW->LinkEndChild(fDocument->NewText(defaultGateway.c_str()));
+			hardware->LinkEndChild(defaultGW);
 			break;
+		}
 	}
-
-	tinyxml2::XMLElement* ipAddress = fDocument->NewElement("IPADDR");
-	ipAddress->LinkEndChild(fDocument->NewText(interface.IPAddress().c_str()));
-	hardware->LinkEndChild(ipAddress);
-
-	std::string defaultGateway = interface.DefaultGateway();
-	tinyxml2::XMLElement* defaultGW = fDocument->NewElement("DEFAULTGATEWAY");
-	defaultGW->LinkEndChild(fDocument->NewText(defaultGateway.c_str()));
-	hardware->LinkEndChild(defaultGW);
 
 	tinyxml2::XMLElement* description = fDocument->NewElement("DESCRIPTION");
 	std::string descriptionString;
