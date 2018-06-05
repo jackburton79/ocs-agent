@@ -5,8 +5,8 @@
  *      Author: Stefano Ceccherini
  */
 
-#ifndef LOGGEDUSERS_H_
-#define LOGGEDUSERS_H_
+#ifndef USERSROSTER_H_
+#define USERSROSTER_H_
 
 #include <ctime>
 #include <string>
@@ -19,10 +19,10 @@ struct user_entry {
 	time_t logintime;
 };
 
-class LoggedUsers : public ItemsList<user_entry> {
+class UsersRoster : public ItemsList<user_entry> {
 public:
-	LoggedUsers();
+	UsersRoster();
 
 };
 
-#endif /* LOGGEDUSERS_H_ */
+#endif /* USERSROSTER_H_ */

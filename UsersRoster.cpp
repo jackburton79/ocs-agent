@@ -5,14 +5,14 @@
  *      Author: Stefano Ceccherini
  */
 
-#include "LoggedUsers.h"
 #include "Support.h"
 
 #include <ctime>
 
 #include <utmpx.h>
+#include <UsersRoster.h>
 
-LoggedUsers::LoggedUsers()
+UsersRoster::UsersRoster()
 {
 	setutxent();
 

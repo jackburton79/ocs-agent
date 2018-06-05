@@ -4,8 +4,8 @@
  *      Author: Stefano Ceccherini
  */
 
-#ifndef STORAGES_H_
-#define STORAGES_H_
+#ifndef STORAGEROSTER_H_
+#define STORAGEROSTER_H_
 
 #include <string>
 
@@ -22,12 +22,12 @@ struct storage_info {
 	std::string firmware;
 };
 
-class Storages : public ItemsList<storage_info> {
+class StorageRoster : public ItemsList<storage_info> {
 public:
-	Storages();
+	StorageRoster();
 
 private:
 	void _ReadStoragesInfo();
 };
 
-#endif /* STORAGES_H_*/
+#endif /* STORAGEROSTER_H_*/

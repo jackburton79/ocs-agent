@@ -4,21 +4,21 @@
  *      Author: Stefano Ceccherini
  */
 
-#include "Storages.h"
+#include <StorageRoster.h>
 #include "ProcReader.h"
 #include "Support.h"
 
 #include <iostream>
 #include <istream>
 
-Storages::Storages()
+StorageRoster::StorageRoster()
 {
 	_ReadStoragesInfo();	
 }
 
 
 void
-Storages::_ReadStoragesInfo()
+StorageRoster::_ReadStoragesInfo()
 {
 	try {
 		ProcReader procReader("/proc/scsi/scsi");

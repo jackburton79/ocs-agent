@@ -5,13 +5,12 @@
  *      Author: Stefano Ceccherini
  */
 
+#include <VolumeRoster.h>
 #include "Support.h"
-#include "VolumeReader.h"
-
 #include <iostream>
 #include <sstream>
 
-VolumeReader::VolumeReader(const char* options)
+VolumeRoster::VolumeRoster(const char* options)
 {
 	// TODO:
 	std::string string("export LC_ALL=C; ");
@@ -41,6 +40,6 @@ VolumeReader::VolumeReader(const char* options)
 }
 
 
-VolumeReader::~VolumeReader()
+VolumeRoster::~VolumeRoster()
 {
 }

@@ -5,20 +5,18 @@
  *      Author: Stefano Ceccherini
  */
 
+#include <ProcessRoster.h>
+#include <StorageRoster.h>
 #include "Agent.h"
 #include "Configuration.h"
 #include "Inventory.h"
 #include "Logger.h"
-#include "LoggedUsers.h"
 #include "Machine.h"
 #include "NetworkInterface.h"
 #include "NetworkRoster.h"
-#include "RunningProcessesList.h"
 #include "Screens.h"
 #include "Softwares.h"
-#include "Storages.h"
 #include "Support.h"
-#include "VolumeReader.h"
 #include "XML.h"
 
 #include "http/HTTP.h"
@@ -28,6 +26,8 @@
 #include <iostream>
 #include <memory>
 #include <unistd.h>
+#include <UsersRoster.h>
+#include <VolumeRoster.h>
 
 #include "tinyxml2/tinyxml2.h"
 
@@ -413,7 +413,7 @@ Inventory::_AddStoragesInfo(tinyxml2::XMLElement* parent)
 {
 	Logger& logger = Logger::GetDefault();
 
-	Storages storages;
+	StorageRoster storages;
 	storage_info info;
 	while (storages.GetNext(info)) {
 		tinyxml2::XMLElement* storage = fDocument->NewElement("STORAGES");
@@ -510,7 +510,7 @@ Inventory::_AddDrivesInfo(tinyxml2::XMLElement* parent)
 {
 	Logger& logger = Logger::GetDefault();
 
-	VolumeReader reader;
+	VolumeRoster reader;
 	volume_info info;
 	while (reader.GetNext(info)) {
 		tinyxml2::XMLElement* drive = fDocument->NewElement("DRIVES");
@@ -637,7 +637,7 @@ Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 	hardware->LinkEndChild(checksum);
 	hardware->LinkEndChild(description);
 
-	LoggedUsers users;
+	UsersRoster users;
 	user_entry user;
 	if (users.GetNext(user)) {
 		tinyxml2::XMLElement* dateLastLoggedUser = fDocument->NewElement("DATELASTLOGGEDUSER");
@@ -842,7 +842,7 @@ Inventory::_AddUsersInfo(tinyxml2::XMLElement* parent)
 
 	tinyxml2::XMLElement* users = fDocument->NewElement("USERS");
 
-	LoggedUsers usersInfo;
+	UsersRoster usersInfo;
 	user_entry userEntry;
 	while (usersInfo.GetNext(userEntry)) {
 		tinyxml2::XMLElement* login = fDocument->NewElement("LOGIN");
