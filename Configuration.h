@@ -16,6 +16,9 @@
 #define CONF_OUTPUT_STDOUT "stdout"
 #define CONF_WAIT_TIME "waittime"
 
+#define CONF_VALUE_TRUE "true"
+#define CONF_VALUE_FALSE "false"
+
 class Configuration {
 public:
 	static Configuration* Get();
@@ -27,13 +30,17 @@ public:
 	void Print() const;
 
 	std::string ServerURL() const;
-	bool SetServer(const char* serverUrl);
+	void SetServer(const char* serverUrl);
 
 	std::string OutputFileName() const;
-	bool SetOutputFileName(const char* fileName);
+	void SetOutputFileName(const char* fileName);
 
-	bool SetKeyValue(const char* key, const char* value);
-	bool SetVolatileKeyValue(const char* key, const char* value);
+	void SetKeyValueBoolean(const char* key, bool value);
+	void SetVolatileKeyValueBoolean(const char* key, bool value);
+	bool KeyValueBoolean(const char* key) const;
+
+	void SetKeyValue(const char* key, const char* value);
+	void SetVolatileKeyValue(const char* key, const char* value);
 	std::string KeyValue(const char* key) const;
 	
 	std::string DeviceID() const;	
@@ -49,6 +56,9 @@ private:
 	~Configuration();
 
 	void _GenerateDeviceID();
+
+	static std::string _BooleanToString(bool value);
+	static bool _StringToBoolean(const std::string string);
 
 	std::map<std::string, std::string> fValues;
 	std::map<std::string, std::string> fVolatileValues;

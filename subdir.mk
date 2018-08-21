@@ -8,17 +8,17 @@ CPP_SRCS += \
 ../Configuration.cpp \
 ../Inventory.cpp \
 ../Logger.cpp \
-../LoggedUsers.cpp \
 ../Machine.cpp \
 ../NetworkInterface.cpp \
 ../NetworkRoster.cpp \
 ../ProcReader.cpp \
-../RunningProcessesList.cpp \
+../ProcessRoster.cpp \
 ../Screens.cpp \
 ../Softwares.cpp \
-../Storages.cpp \
+../StorageRoster.cpp \
 ../Support.cpp \
-../VolumeReader.cpp \
+../UsersRoster.cpp \
+../VolumeRoster.cpp \
 ../XML.cpp \
 ../ZLibCompressor.cpp \
 ../edid-decode.c
@@ -28,17 +28,17 @@ OBJS += \
 ./Configuration.o \
 ./Inventory.o \
 ./Logger.o \
-./LoggedUsers.o \
 ./Machine.o \
 ./NetworkInterface.o \
 ./NetworkRoster.o \
 ./ProcReader.o \
-./RunningProcessesList.o \
+./ProcessRoster.o \
 ./Screens.o \
 ./Softwares.o \
-./Storages.o \
+./StorageRoster.o \
 ./Support.o \
-./VolumeReader.o \
+./UsersRoster.o \
+./VolumeRoster.o \
 ./XML.o \
 ./ZLibCompressor.o \
 ./edid-decode.o 
@@ -49,17 +49,17 @@ CPP_DEPS += \
 ./Drives.d \
 ./Inventory.d \
 ./Logger.d \
-./LoggedUsers.d \
 ./Machine.d \
 ./NetworkInterface.d \
 ./NetworkRoster.d \
 ./ProcReader.d \
-./RunningProcessesList.d \
+./ProcessRoster.d \
 ./Screens.d \
 ./Sofwares.d \
-./Storages.d \
+./StorageRoster.d \
 ./Support.d \
-./VolumeReader.d \
+./UsersRoster.d \
+./VolumeRoster.d \
 ./XML.d \
 ./ZLibCompressor.d \
 ./edid-decode.d 

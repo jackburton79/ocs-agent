@@ -22,9 +22,6 @@ std::string Agent::sAgentString;
 
 Agent::Agent()
 {
-	if (geteuid() != 0) {
-		throw std::runtime_error("This program needs to be run as root");
-	}
 }
 
 
@@ -43,7 +40,7 @@ Agent::Run()
 	if (!inventory.Initialize(deviceID.c_str()))
 		throw std::runtime_error("Cannot initialize Inventory");
 
-	bool noSoftware = (config->KeyValue(CONF_NO_SOFTWARE) == "true");
+	bool noSoftware = (config->KeyValue(CONF_NO_SOFTWARE) == CONF_VALUE_TRUE);
 	unsigned int waitSeconds = ::strtoul(
 		config->KeyValue(CONF_WAIT_TIME).c_str(), NULL, 10);
 
@@ -56,7 +53,7 @@ Agent::Run()
 	if (!inventory.Build(noSoftware))
 		return;
 
-	if (config->KeyValue(CONF_OUTPUT_STDOUT) == "true")
+	if (config->KeyValue(CONF_OUTPUT_STDOUT) == CONF_VALUE_TRUE)
 		inventory.Print();
 	else if (config->LocalInventory()) {
 		std::string fullFileName = config->OutputFileName();

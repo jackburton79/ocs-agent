@@ -1,0 +1,583 @@
+[
+    {
+        "arguments": [
+            "c++", 
+            "-c", 
+            "-DTIXML_USE_STL", 
+            "-O2", 
+            "-Wall", 
+            "-I", 
+            "./", 
+            "-fmessage-length=0", 
+            "-MFLogger.d", 
+            "-MTLogger.d", 
+            "-o", 
+            "Logger.o", 
+            "Logger.cpp"
+        ], 
+        "directory": "/home/ubuntu/workspace", 
+        "file": "Logger.cpp"
+    }, 
+    {
+        "arguments": [
+            "c++", 
+            "-c", 
+            "-DTIXML_USE_STL", 
+            "-O2", 
+            "-Wall", 
+            "-I", 
+            "./", 
+            "-fmessage-length=0", 
+            "-MFZLibCompressor.d", 
+            "-MTZLibCompressor.d", 
+            "-o", 
+            "ZLibCompressor.o", 
+            "ZLibCompressor.cpp"
+        ], 
+        "directory": "/home/ubuntu/workspace", 
+        "file": "ZLibCompressor.cpp"
+    }, 
+    {
+        "arguments": [
+            "c++", 
+            "-c", 
+            "-DTIXML_USE_STL", 
+            "-O2", 
+            "-Wall", 
+            "-I", 
+            "./", 
+            "-fmessage-length=0", 
+            "-MFProcReader.d", 
+            "-MTProcReader.d", 
+            "-o", 
+            "ProcReader.o", 
+            "ProcReader.cpp"
+        ], 
+        "directory": "/home/ubuntu/workspace", 
+        "file": "ProcReader.cpp"
+    }, 
+    {
+        "arguments": [
+            "c++", 
+            "-c", 
+            "-DTIXML_USE_STL", 
+            "-O2", 
+            "-Wall", 
+            "-I", 
+            "./", 
+            "-fmessage-length=0", 
+            "-MFScreens.d", 
+            "-MTScreens.d", 
+            "-o", 
+            "Screens.o", 
+            "Screens.cpp"
+        ], 
+        "directory": "/home/ubuntu/workspace", 
+        "file": "Screens.cpp"
+    }, 
+    {
+        "arguments": [
+            "c++", 
+            "-c", 
+            "-DTIXML_USE_STL", 
+            "-O2", 
+            "-Wall", 
+            "-I", 
+            "./", 
+            "-fmessage-length=0", 
+            "-MFStorages.d", 
+            "-MTStorages.d", 
+            "-o", 
+            "Storages.o", 
+            "Storages.cpp"
+        ], 
+        "directory": "/home/ubuntu/workspace", 
+        "file": "Storages.cpp"
+    }, 
+    {
+        "arguments": [
+            "c++", 
+            "-c", 
+            "-DTIXML_USE_STL", 
+            "-O2", 
+            "-Wall", 
+            "-I", 
+            "./", 
+            "-fmessage-length=0", 
+            "-MFAgent.d", 
+            "-MTAgent.d", 
+            "-o", 
+            "Agent.o", 
+            "Agent.cpp"
+        ], 
+        "directory": "/home/ubuntu/workspace", 
+        "file": "Agent.cpp"
+    }, 
+    {
+        "arguments": [
+            "c++", 
+            "-c", 
+            "-DTIXML_USE_STL", 
+            "-O2", 
+            "-Wall", 
+            "-I", 
+            "./", 
+            "-fmessage-length=0", 
+            "-MFhttp/HTTPHeader.d", 
+            "-MThttp/HTTPHeader.d", 
+            "-o", 
+            "http/HTTPHeader.o", 
+            "http/HTTPHeader.cpp"
+        ], 
+        "directory": "/home/ubuntu/workspace", 
+        "file": "http/HTTPHeader.cpp"
+    }, 
+    {
+        "arguments": [
+            "c++", 
+            "-c", 
+            "-DTIXML_USE_STL", 
+            "-O2", 
+            "-Wall", 
+            "-I", 
+            "./", 
+            "-fmessage-length=0", 
+            "-MFhttp/Socket.d", 
+            "-MThttp/Socket.d", 
+            "-o", 
+            "http/Socket.o", 
+            "http/Socket.cpp"
+        ], 
+        "directory": "/home/ubuntu/workspace", 
+        "file": "http/Socket.cpp"
+    }, 
+    {
+        "arguments": [
+            "c++", 
+            "-c", 
+            "-DTIXML_USE_STL", 
+            "-O2", 
+            "-Wall", 
+            "-I", 
+            "./", 
+            "-fmessage-length=0", 
+            "-MFmain.d", 
+            "-MTmain.d", 
+            "-o", 
+            "main.o", 
+            "main.cpp"
+        ], 
+        "directory": "/home/ubuntu/workspace", 
+        "file": "main.cpp"
+    }, 
+    {
+        "arguments": [
+            "c++", 
+            "-c", 
+            "-DTIXML_USE_STL", 
+            "-O2", 
+            "-Wall", 
+            "-I", 
+            "./", 
+            "-fmessage-length=0", 
+            "-MFhttp/Utils.d", 
+            "-MThttp/Utils.d", 
+            "-o", 
+            "http/Utils.o", 
+            "http/Utils.cpp"
+        ], 
+        "directory": "/home/ubuntu/workspace", 
+        "file": "http/Utils.cpp"
+    }, 
+    {
+        "arguments": [
+            "c++", 
+            "-c", 
+            "-DTIXML_USE_STL", 
+            "-O2", 
+            "-Wall", 
+            "-I", 
+            "./", 
+            "-fmessage-length=0", 
+            "-MFtinyxml2/tinyxml2.d", 
+            "-MTtinyxml2/tinyxml2.d", 
+            "-o", 
+            "tinyxml2/tinyxml2.o", 
+            "tinyxml2/tinyxml2.cpp"
+        ], 
+        "directory": "/home/ubuntu/workspace", 
+        "file": "tinyxml2/tinyxml2.cpp"
+    }, 
+    {
+        "arguments": [
+            "c++", 
+            "-c", 
+            "-DTIXML_USE_STL", 
+            "-O2", 
+            "-Wall", 
+            "-I", 
+            "./", 
+            "-fmessage-length=0", 
+            "-MFSoftwares.d", 
+            "-MTSoftwares.d", 
+            "-o", 
+            "Softwares.o", 
+            "Softwares.cpp"
+        ], 
+        "directory": "/home/ubuntu/workspace", 
+        "file": "Softwares.cpp"
+    }, 
+    {
+        "arguments": [
+            "c++", 
+            "-c", 
+            "-DTIXML_USE_STL", 
+            "-O2", 
+            "-Wall", 
+            "-I", 
+            "./", 
+            "-fmessage-length=0", 
+            "-MFhttp/HTTP.d", 
+            "-MThttp/HTTP.d", 
+            "-o", 
+            "http/HTTP.o", 
+            "http/HTTP.cpp"
+        ], 
+        "directory": "/home/ubuntu/workspace", 
+        "file": "http/HTTP.cpp"
+    }, 
+    {
+        "arguments": [
+            "c++", 
+            "-c", 
+            "-DTIXML_USE_STL", 
+            "-O2", 
+            "-Wall", 
+            "-I", 
+            "./", 
+            "-fmessage-length=0", 
+            "-MFRunningProcessesList.d", 
+            "-MTRunningProcessesList.d", 
+            "-o", 
+            "RunningProcessesList.o", 
+            "RunningProcessesList.cpp"
+        ], 
+        "directory": "/home/ubuntu/workspace", 
+        "file": "RunningProcessesList.cpp"
+    }, 
+    {
+        "arguments": [
+            "c++", 
+            "-c", 
+            "-DTIXML_USE_STL", 
+            "-O2", 
+            "-Wall", 
+            "-I", 
+            "./", 
+            "-fmessage-length=0", 
+            "-MFhttp/HTTPResponseHeader.d", 
+            "-MThttp/HTTPResponseHeader.d", 
+            "-o", 
+            "http/HTTPResponseHeader.o", 
+            "http/HTTPResponseHeader.cpp"
+        ], 
+        "directory": "/home/ubuntu/workspace", 
+        "file": "http/HTTPResponseHeader.cpp"
+    }, 
+    {
+        "arguments": [
+            "c++", 
+            "-c", 
+            "-DTIXML_USE_STL", 
+            "-O2", 
+            "-Wall", 
+            "-I", 
+            "./", 
+            "-fmessage-length=0", 
+            "-MFInventory.d", 
+            "-MTInventory.d", 
+            "-o", 
+            "Inventory.o", 
+            "Inventory.cpp"
+        ], 
+        "directory": "/home/ubuntu/workspace", 
+        "file": "Inventory.cpp"
+    }, 
+    {
+        "arguments": [
+            "c++", 
+            "-c", 
+            "-DTIXML_USE_STL", 
+            "-O2", 
+            "-Wall", 
+            "-I", 
+            "./", 
+            "-fmessage-length=0", 
+            "-MFXML.d", 
+            "-MTXML.d", 
+            "-o", 
+            "XML.o", 
+            "XML.cpp"
+        ], 
+        "directory": "/home/ubuntu/workspace", 
+        "file": "XML.cpp"
+    }, 
+    {
+        "arguments": [
+            "c++", 
+            "-c", 
+            "-DTIXML_USE_STL", 
+            "-O2", 
+            "-Wall", 
+            "-I", 
+            "./", 
+            "-fmessage-length=0", 
+            "-MFhttp/URL.d", 
+            "-MThttp/URL.d", 
+            "-o", 
+            "http/URL.o", 
+            "http/URL.cpp"
+        ], 
+        "directory": "/home/ubuntu/workspace", 
+        "file": "http/URL.cpp"
+    }, 
+    {
+        "arguments": [
+            "c++", 
+            "-c", 
+            "-DTIXML_USE_STL", 
+            "-O2", 
+            "-Wall", 
+            "-I", 
+            "./", 
+            "-fmessage-length=0", 
+            "-MFhttp/HTTPDefines.d", 
+            "-MThttp/HTTPDefines.d", 
+            "-o", 
+            "http/HTTPDefines.o", 
+            "http/HTTPDefines.cpp"
+        ], 
+        "directory": "/home/ubuntu/workspace", 
+        "file": "http/HTTPDefines.cpp"
+    }, 
+    {
+        "arguments": [
+            "c++", 
+            "-c", 
+            "-DTIXML_USE_STL", 
+            "-O2", 
+            "-Wall", 
+            "-I", 
+            "./", 
+            "-fmessage-length=0", 
+            "-MFMachine.d", 
+            "-MTMachine.d", 
+            "-o", 
+            "Machine.o", 
+            "Machine.cpp"
+        ], 
+        "directory": "/home/ubuntu/workspace", 
+        "file": "Machine.cpp"
+    }, 
+    {
+        "arguments": [
+            "c++", 
+            "-c", 
+            "-DTIXML_USE_STL", 
+            "-O2", 
+            "-Wall", 
+            "-I", 
+            "./", 
+            "-fmessage-length=0", 
+            "-MFhttp/SSLSocket.d", 
+            "-MThttp/SSLSocket.d", 
+            "-o", 
+            "http/SSLSocket.o", 
+            "http/SSLSocket.cpp"
+        ], 
+        "directory": "/home/ubuntu/workspace", 
+        "file": "http/SSLSocket.cpp"
+    }, 
+    {
+        "arguments": [
+            "c++", 
+            "-c", 
+            "-DTIXML_USE_STL", 
+            "-O2", 
+            "-Wall", 
+            "-I", 
+            "./", 
+            "-fmessage-length=0", 
+            "-MFNetworkInterface.d", 
+            "-MTNetworkInterface.d", 
+            "-o", 
+            "NetworkInterface.o", 
+            "NetworkInterface.cpp"
+        ], 
+        "directory": "/home/ubuntu/workspace", 
+        "file": "NetworkInterface.cpp"
+    }, 
+    {
+        "arguments": [
+            "c++", 
+            "-c", 
+            "-DTIXML_USE_STL", 
+            "-O2", 
+            "-Wall", 
+            "-I", 
+            "./", 
+            "-fmessage-length=0", 
+            "-MFhttp/SocketGetter.d", 
+            "-MThttp/SocketGetter.d", 
+            "-o", 
+            "http/SocketGetter.o", 
+            "http/SocketGetter.cpp"
+        ], 
+        "directory": "/home/ubuntu/workspace", 
+        "file": "http/SocketGetter.cpp"
+    }, 
+    {
+        "arguments": [
+            "c++", 
+            "-c", 
+            "-DTIXML_USE_STL", 
+            "-O2", 
+            "-Wall", 
+            "-I", 
+            "./", 
+            "-fmessage-length=0", 
+            "-MFhttp/HTTPRequestHeader.d", 
+            "-MThttp/HTTPRequestHeader.d", 
+            "-o", 
+            "http/HTTPRequestHeader.o", 
+            "http/HTTPRequestHeader.cpp"
+        ], 
+        "directory": "/home/ubuntu/workspace", 
+        "file": "http/HTTPRequestHeader.cpp"
+    }, 
+    {
+        "arguments": [
+            "c++", 
+            "-c", 
+            "-DTIXML_USE_STL", 
+            "-O2", 
+            "-Wall", 
+            "-I", 
+            "./", 
+            "-fmessage-length=0", 
+            "-MFSupport.d", 
+            "-MTSupport.d", 
+            "-o", 
+            "Support.o", 
+            "Support.cpp"
+        ], 
+        "directory": "/home/ubuntu/workspace", 
+        "file": "Support.cpp"
+    }, 
+    {
+        "arguments": [
+            "c++", 
+            "-c", 
+            "-DTIXML_USE_STL", 
+            "-O2", 
+            "-Wall", 
+            "-I", 
+            "./", 
+            "-fmessage-length=0", 
+            "-MFNetworkRoster.d", 
+            "-MTNetworkRoster.d", 
+            "-o", 
+            "NetworkRoster.o", 
+            "NetworkRoster.cpp"
+        ], 
+        "directory": "/home/ubuntu/workspace", 
+        "file": "NetworkRoster.cpp"
+    }, 
+    {
+        "arguments": [
+            "c++", 
+            "-c", 
+            "-DTIXML_USE_STL", 
+            "-O2", 
+            "-Wall", 
+            "-I", 
+            "./", 
+            "-fmessage-length=0", 
+            "-MFtest/urltest.d", 
+            "-MTtest/urltest.d", 
+            "-o", 
+            "test/urltest.o", 
+            "test/urltest.cpp"
+        ], 
+        "directory": "/home/ubuntu/workspace", 
+        "file": "test/urltest.cpp"
+    }, 
+    {
+        "arguments": [
+            "c++", 
+            "-c", 
+            "-DTIXML_USE_STL", 
+            "-O2", 
+            "-Wall", 
+            "-I", 
+            "./", 
+            "-fmessage-length=0", 
+            "-MFVolumeReader.d", 
+            "-MTVolumeReader.d", 
+            "-o", 
+            "VolumeReader.o", 
+            "VolumeReader.cpp"
+        ], 
+        "directory": "/home/ubuntu/workspace", 
+        "file": "VolumeReader.cpp"
+    }, 
+    {
+        "arguments": [
+            "cc", 
+            "-c", 
+            "-o", 
+            "edid-decode.o", 
+            "edid-decode.c"
+        ], 
+        "directory": "/home/ubuntu/workspace", 
+        "file": "edid-decode.c"
+    }, 
+    {
+        "arguments": [
+            "c++", 
+            "-c", 
+            "-DTIXML_USE_STL", 
+            "-O2", 
+            "-Wall", 
+            "-I", 
+            "./", 
+            "-fmessage-length=0", 
+            "-MFLoggedUsers.d", 
+            "-MTLoggedUsers.d", 
+            "-o", 
+            "LoggedUsers.o", 
+            "LoggedUsers.cpp"
+        ], 
+        "directory": "/home/ubuntu/workspace", 
+        "file": "LoggedUsers.cpp"
+    }, 
+    {
+        "arguments": [
+            "c++", 
+            "-c", 
+            "-DTIXML_USE_STL", 
+            "-O2", 
+            "-Wall", 
+            "-I", 
+            "./", 
+            "-fmessage-length=0", 
+            "-MFConfiguration.d", 
+            "-MTConfiguration.d", 
+            "-o", 
+            "Configuration.o", 
+            "Configuration.cpp"
+        ], 
+        "directory": "/home/ubuntu/workspace", 
+        "file": "Configuration.cpp"
+    }
+]

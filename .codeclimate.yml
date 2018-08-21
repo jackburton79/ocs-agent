@@ -3,6 +3,7 @@ engines:
     enabled: true
     config:
       check: all
+      project: compile_commands.json
       language: c++
       stds:
         - c++11
@@ -12,3 +13,5 @@ engines:
       inconclusive: false
   fixme:
     enabled: true
+exclude_patterns:
+- "tinyxml2/*"

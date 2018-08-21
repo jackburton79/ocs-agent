@@ -5,20 +5,18 @@
  *      Author: Stefano Ceccherini
  */
 
+#include <ProcessRoster.h>
+#include <StorageRoster.h>
 #include "Agent.h"
 #include "Configuration.h"
 #include "Inventory.h"
 #include "Logger.h"
-#include "LoggedUsers.h"
 #include "Machine.h"
 #include "NetworkInterface.h"
 #include "NetworkRoster.h"
-#include "RunningProcessesList.h"
 #include "Screens.h"
 #include "Softwares.h"
-#include "Storages.h"
 #include "Support.h"
-#include "VolumeReader.h"
 #include "XML.h"
 
 #include "http/HTTP.h"
@@ -28,6 +26,8 @@
 #include <iostream>
 #include <memory>
 #include <unistd.h>
+#include <UsersRoster.h>
+#include <VolumeRoster.h>
 
 #include "tinyxml2/tinyxml2.h"
 
@@ -413,10 +413,10 @@ Inventory::_AddStoragesInfo(tinyxml2::XMLElement* parent)
 {
 	Logger& logger = Logger::GetDefault();
 
-	Storages storages;
-	for (int i = 0; i < storages.Count(); i++) {
+	StorageRoster storages;
+	storage_info info;
+	while (storages.GetNext(info)) {
 		tinyxml2::XMLElement* storage = fDocument->NewElement("STORAGES");
-		storage_info info = storages.StorageAt(i);
 
 		tinyxml2::XMLElement* manufacturer = fDocument->NewElement("MANUFACTURER");
 		manufacturer->LinkEndChild(fDocument->NewText(info.manufacturer.c_str()));
@@ -510,7 +510,7 @@ Inventory::_AddDrivesInfo(tinyxml2::XMLElement* parent)
 {
 	Logger& logger = Logger::GetDefault();
 
-	VolumeReader reader;
+	VolumeRoster reader;
 	volume_info info;
 	while (reader.GetNext(info)) {
 		tinyxml2::XMLElement* drive = fDocument->NewElement("DRIVES");
@@ -570,22 +570,24 @@ Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 	NetworkInterface interface;
 	unsigned int cookie = 0;
 	while (roster.GetNextInterface(&cookie, interface) == 0) {
-		if (!interface.IsLoopback() && interface.IPAddress() != ""
-				&& interface.IPAddress() != "0.0.0.0")
-			break;
-	}
+		if (!interface.IsLoopback() && interface.HasIPAddress()
+				&& interface.HasDefaultGateway()) {
+			tinyxml2::XMLElement* ipAddress = fDocument->NewElement("IPADDR");
+			ipAddress->LinkEndChild(fDocument->NewText(interface.IPAddress().c_str()));
+			hardware->LinkEndChild(ipAddress);
 
-	std::string defaultGateway = interface.DefaultGateway();
-	tinyxml2::XMLElement* defaultGW = fDocument->NewElement("DEFAULTGATEWAY");
-	defaultGW->LinkEndChild(fDocument->NewText(defaultGateway.c_str()));
+			std::string defaultGateway = interface.DefaultGateway();
+			tinyxml2::XMLElement* defaultGW = fDocument->NewElement("DEFAULTGATEWAY");
+			defaultGW->LinkEndChild(fDocument->NewText(defaultGateway.c_str()));
+			hardware->LinkEndChild(defaultGW);
+			break;
+		}
+	}
 
 	tinyxml2::XMLElement* description = fDocument->NewElement("DESCRIPTION");
 	std::string descriptionString;
 	descriptionString.append(fMachine->OSInfo().machine).append("/");
 	description->LinkEndChild(fDocument->NewText(descriptionString.c_str()));
-
-	tinyxml2::XMLElement* ipAddress = fDocument->NewElement("IPADDR");
-	ipAddress->LinkEndChild(fDocument->NewText(interface.IPAddress().c_str()));
 
 	tinyxml2::XMLElement* memory = fDocument->NewElement("MEMORY");
 	memory->LinkEndChild(fDocument->NewText(fMachine->OSInfo().memory.c_str()));
@@ -633,13 +635,11 @@ Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 	workGroup->LinkEndChild(fDocument->NewText(fMachine->OSInfo().domain_name.c_str()));
 
 	hardware->LinkEndChild(checksum);
-	hardware->LinkEndChild(defaultGW);
 	hardware->LinkEndChild(description);
-	hardware->LinkEndChild(ipAddress);
 
-	LoggedUsers users;
-	if (users.Count() > 0) {
-		user_entry user = users.UserEntryAt(users.Count() - 1);
+	UsersRoster users;
+	user_entry user;
+	if (users.GetNext(user)) {
 		tinyxml2::XMLElement* dateLastLoggedUser = fDocument->NewElement("DATELASTLOGGEDUSER");
 		dateLastLoggedUser->LinkEndChild(fDocument->NewText(user.logintimestring.c_str()));
 		hardware->LinkEndChild(dateLastLoggedUser);
@@ -800,9 +800,9 @@ Inventory::_AddSoftwaresInfo(tinyxml2::XMLElement* parent)
 	Logger& logger = Logger::GetDefault();
 
 	Softwares softwares;
-	for (int i = 0; i < softwares.Count(); i++) {
+	software_info info;
+	while (softwares.GetNext(info)) {
 		tinyxml2::XMLElement* software = fDocument->NewElement("SOFTWARES");
-		software_info info = softwares.SoftwareAt(i);
 
 		tinyxml2::XMLElement* comments = fDocument->NewElement("COMMENTS");
 		comments->LinkEndChild(fDocument->NewText(info.comments.c_str()));
@@ -842,10 +842,11 @@ Inventory::_AddUsersInfo(tinyxml2::XMLElement* parent)
 
 	tinyxml2::XMLElement* users = fDocument->NewElement("USERS");
 
-	LoggedUsers usersInfo;
-	for (int i = 0; i < usersInfo.Count(); i++) {
+	UsersRoster usersInfo;
+	user_entry userEntry;
+	while (usersInfo.GetNext(userEntry)) {
 		tinyxml2::XMLElement* login = fDocument->NewElement("LOGIN");
-		login->LinkEndChild(fDocument->NewText(usersInfo.LoginNameAt(i).c_str()));
+		login->LinkEndChild(fDocument->NewText(userEntry.login.c_str()));
 		users->LinkEndChild(login);
 	}
 	parent->LinkEndChild(users);

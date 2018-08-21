@@ -28,11 +28,17 @@ public:
 
 	std::string Name() const;
 	std::string HardwareAddress() const;
+
+	bool HasIPAddress() const;
 	std::string IPAddress() const;
+
 	std::string NetMask() const;
 	std::string Network() const;
 	std::string BroadcastAddress() const;
+
+	bool HasDefaultGateway() const;
 	std::string DefaultGateway() const;
+
 	std::string Type() const;
 	std::string Speed() const;
 	std::string Status() const;

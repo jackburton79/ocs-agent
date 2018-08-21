@@ -4,11 +4,12 @@
  *      Author: Stefano Ceccherini
  */
 
-#ifndef STORAGES_H_
-#define STORAGES_H_
+#ifndef STORAGEROSTER_H_
+#define STORAGEROSTER_H_
 
 #include <string>
-#include <vector>
+
+#include "ItemsList.h"
 
 struct storage_info {
 	std::string name;
@@ -21,19 +22,12 @@ struct storage_info {
 	std::string firmware;
 };
 
-class Storages {
+class StorageRoster : public ItemsList<storage_info> {
 public:
-	Storages();
-	~Storages();
-
-	int Count() const;
-	storage_info StorageAt(int i) const;
+	StorageRoster();
 
 private:
 	void _ReadStoragesInfo();
-
-	std::vector<storage_info> fStorages;
-
 };
 
-#endif /* STORAGES_H_*/
+#endif /* STORAGEROSTER_H_*/

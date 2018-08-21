@@ -42,9 +42,7 @@ HTTP::HTTP(const std::string string)
 	fSocket(NULL),
 	fLastError(0)
 {
-	URL url(string.c_str());
-	fHost = url.Host();
-	fPort = url.Port();
+	SetHost(string);
 }
 
 
@@ -72,7 +70,7 @@ HTTP::ClearPendingRequests()
 }
 
 
-HTTPRequestHeader
+const HTTPRequestHeader&
 HTTP::CurrentRequest() const
 {
 	return fCurrentRequest;
@@ -93,7 +91,7 @@ HTTP::ErrorString() const
 }
 
 
-HTTPResponseHeader
+const HTTPResponseHeader&
 HTTP::LastResponse() const
 {
 	return fLastResponse;
@@ -242,13 +240,9 @@ HTTP::_HandleConnection(const std::string string)
 	fPort = port;
 
 	try {
-		fSocket = SocketGetter().GetSocket(url.Protocol());
+		fSocket = SocketGetter().GetSocket(url.Protocol(), AF_INET, SOCK_STREAM);
 	} catch (...) {
-		return false;
-	}
-	
-	if ((fSocket->Open(AF_INET, SOCK_STREAM, 0)) < 0) {
-		fLastError = errno;
+		fLastError = -1;
 		delete fSocket;
 		fSocket = NULL;
 		return false;

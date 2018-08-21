@@ -37,8 +37,9 @@ public:
 
 	int Read(void* data, const size_t& length);
 
-	HTTPRequestHeader CurrentRequest() const;
-	HTTPResponseHeader LastResponse() const;
+	const HTTPRequestHeader& CurrentRequest() const;
+	const HTTPResponseHeader& LastResponse() const;
+
 	int Error() const;
 	std::string ErrorString() const;
 	

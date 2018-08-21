@@ -6,10 +6,10 @@
  */
 
 #include "ProcReader.h"
-#include "RunningProcessesList.h"
 #include "Support.h"
 
 #include <dirent.h>
+#include <ProcessRoster.h>
 #include <stdlib.h>
 
 #include <iostream>

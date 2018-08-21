@@ -117,27 +117,48 @@ Configuration::Print() const
 }
 
 
-bool
+void
 Configuration::SetServer(const char* serverUrl)
 {
 	fValues[kServer] = serverUrl;
-	return true;
 }
 
 
-bool
+void
 Configuration::SetOutputFileName(const char* fileName)
 {
 	fValues[kOutputFileName] = fileName;
-	return true;
+}
+
+
+void
+Configuration::SetKeyValueBoolean(const char* key, bool value)
+{
+	fValues[key] = _BooleanToString(value);
+}
+
+
+void
+Configuration::SetVolatileKeyValueBoolean(const char* key, bool value)
+{
+	fVolatileValues[key] = _BooleanToString(value);
 }
 
 
 bool
+Configuration::KeyValueBoolean(const char* key) const
+{
+	std::string string = KeyValue(key);
+	if (string == "")
+		return false;
+	return _StringToBoolean(string);
+}
+
+
+void
 Configuration::SetKeyValue(const char* key, const char* value)
 {
 	fValues[key] = value;
-	return true;
 }
 
 
@@ -158,11 +179,10 @@ Configuration::KeyValue(const char* key) const
 }
 
 
-bool
+void
 Configuration::SetVolatileKeyValue(const char* key, const char* value)
 {
 	fVolatileValues[key] = value;
-	return true;
 }
 
 
@@ -220,14 +240,14 @@ Configuration::UseCurrentTimeInDeviceID() const
 	if (i == fValues.end())
 		return false;
 
-	return i->second.compare("yes") == 0;
+	return _StringToBoolean(i->second);
 }
 
 
 void
 Configuration::SetUseCurrentTimeInDeviceID(bool use)
 {
-	fValues[kUseCurrentTimeInDeviceID] = use ? "yes" : "no";
+	fValues[kUseCurrentTimeInDeviceID] = _BooleanToString(use);
 }
 
 
@@ -239,14 +259,14 @@ Configuration::UseBaseBoardSerialNumber() const
 	if (i == fValues.end())
 		return false;
 
-	return i->second.compare("yes") == 0;
+	return _StringToBoolean(i->second);
 }
 
 
 void
 Configuration::SetUseBaseBoardSerialNumber(bool use)
 {
-	fValues[kUseBaseBoardSerial] = use ? "yes" : "no";
+	fValues[kUseBaseBoardSerial] = _BooleanToString(use);
 }
 
 
@@ -292,4 +312,24 @@ Configuration::_GenerateDeviceID()
     deviceID.append(targetString);
 
 	fValues[kDeviceID] = deviceID;
+}
+
+
+std::string
+Configuration::_BooleanToString(bool value)
+{
+	return std::string(value ? "true" : "false");
+}
+
+
+bool
+Configuration::_StringToBoolean(const std::string string)
+{
+	std::string lowerCaseString = string;
+	std::transform(lowerCaseString.begin(), lowerCaseString.end(),
+		lowerCaseString.begin(), ::tolower);
+	if (lowerCaseString.compare("yes") == 0
+		|| lowerCaseString.compare("true") == 0)
+		return true;
+	return false;
 }

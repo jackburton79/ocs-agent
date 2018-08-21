@@ -5,8 +5,8 @@
  *      Author: Stefano Ceccherini
  */
 
-#ifndef VOLUMEREADER_H_
-#define VOLUMEREADER_H_
+#ifndef VOLUMEROSTER_H_
+#define VOLUMEROSTER_H_
 
 #include "ItemsList.h"
 
@@ -25,10 +25,10 @@ struct volume_info {
 };
 
 
-class VolumeReader : public ItemsList<volume_info> {
+class VolumeRoster : public ItemsList<volume_info> {
 public:
-	VolumeReader(const char* options = "");
-	~VolumeReader();
+	VolumeRoster(const char* options = "");
+	~VolumeRoster();
 };
 
-#endif /* VOLUMEREADER_H_ */
+#endif /* VOLUMEROSTER_H_ */

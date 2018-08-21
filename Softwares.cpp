@@ -18,25 +18,6 @@ Softwares::Softwares()
 }
 
 
-Softwares::~Softwares()
-{
-}
-
-
-int
-Softwares::Count() const
-{
-	return fSoftwares.size();
-}
-
-
-software_info
-Softwares::SoftwareAt(int i) const
-{
-	return fSoftwares[i];
-}
-
-
 void
 Softwares::_ReadSoftwaresInfo()
 {
@@ -67,7 +48,7 @@ Softwares::_ReadSoftwaresInfo()
 					info.installdate = installdate;
 					info.name = name;
 					info.version = version;
-					fSoftwares.push_back(info);
+					fItems.push_back(info);
 				}
 				// then update name
 				name = string.substr(13, 35);
@@ -107,10 +88,12 @@ Softwares::_ReadSoftwaresInfo()
 			info.installdate = installdate;
 			info.name = name;
 			info.version = version;
-			fSoftwares.push_back(info);
+			fItems.push_back(info);
 		}
          
 	} catch (...) {
 		std::cerr << "No software info" << std::endl;
 	}
+
+	Rewind();
 }

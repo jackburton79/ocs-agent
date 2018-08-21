@@ -28,3 +28,16 @@ SocketGetter::GetSocket(std::string protocol)
 	throw std::runtime_error("INVALID PROTOCOL!!!!!!");
 	return NULL;
 }
+
+
+Socket*
+SocketGetter::GetSocket(std::string protocol, int domain, int type)
+{
+	if (protocol == "https")
+		return new SSLSocket(domain, type, 0);
+	else if (protocol == "http")
+		return new Socket(domain, type, 0);
+
+	throw std::runtime_error("INVALID PROTOCOL!!!!!!");
+	return NULL;
+}
