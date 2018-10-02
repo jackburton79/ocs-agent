@@ -408,7 +408,7 @@ Machine::MemorySpeed(int num)
 std::string
 Machine::MemoryNumSlot(int num)
 {
-	return int_to_string(num);
+	return int_to_string(num + 1);
 }
 
 
@@ -1013,6 +1013,6 @@ Machine::_ExtractDataFromDMIDB(dmi_db systemInfo)
 		// Make sure we have at least some valid info
 		if (info.caption != "" || info.purpose != ""
 			|| info.type != "" || info.serial != "" || info.speed != "")
-		fMemoryInfo.push_back(info);
+			fMemoryInfo.push_back(info);
 	}
 }
