@@ -8,8 +8,11 @@ engines:
       stds:
         - c++11
       platform: unix64   
+      defines:
+      - "__cplusplus"
       includes:
       - http/
+      - tinyxml2/
       inconclusive: false
   fixme:
     enabled: true
