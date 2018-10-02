@@ -19,7 +19,7 @@ public:
 class HTTPHeader {
 public:
 	HTTPHeader();
-	HTTPHeader(const std::string string);
+	HTTPHeader(const std::string& string);
 	HTTPHeader(const HTTPHeader&);
 	virtual ~HTTPHeader();
 
@@ -29,11 +29,11 @@ public:
 	
 	std::string ContentType() const;
 	bool HasContentType() const;
-	void SetContentType(const std::string type);
+	void SetContentType(const std::string& type);
 
-	std::string Value(const std::string key) const;
-	bool HasKey(const std::string key) const;
-	void SetValue(const std::string key, const std::string value);
+	std::string Value(const std::string& key) const;
+	bool HasKey(const std::string& key) const;
+	void SetValue(const std::string& key, const std::string& value);
 
 	virtual std::string ToString() const;
 

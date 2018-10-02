@@ -18,7 +18,7 @@ HTTPHeader::HTTPHeader()
 }
 
 
-HTTPHeader::HTTPHeader(const std::string string)
+HTTPHeader::HTTPHeader(const std::string& string)
 {
 }
 
@@ -73,7 +73,7 @@ HTTPHeader::HasContentType() const
 
 
 bool
-HTTPHeader::HasKey(const std::string key) const
+HTTPHeader::HasKey(const std::string& key) const
 {
 	return fValues.find(key) != fValues.end();
 }
@@ -89,14 +89,14 @@ HTTPHeader::SetContentLength(int len)
 
 
 void
-HTTPHeader::SetContentType(const std::string type)
+HTTPHeader::SetContentType(const std::string& type)
 {
 	fValues[HTTPContentType] = type;
 }
 
 
 void
-HTTPHeader::SetValue(const std::string key, const std::string value)
+HTTPHeader::SetValue(const std::string& key, const std::string& value)
 {
 	fValues[key] = value;
 }
@@ -120,7 +120,7 @@ HTTPHeader::ToString() const
 
 
 std::string
-HTTPHeader::Value(const std::string key) const
+HTTPHeader::Value(const std::string& key) const
 {
 	std::map<std::string, std::string>::const_iterator i = fValues.find(key);
 	if (i == fValues.end())

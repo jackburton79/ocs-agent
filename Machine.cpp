@@ -45,8 +45,8 @@ static Machine* sMachine = NULL;
 class DMIExtractor {
 public:
 	DMIExtractor(dmi_db db);
-	int CountEntries(std::string context) const;
-	std::vector<string_map> ExtractEntry(std::string context) const;
+	int CountEntries(const std::string& context) const;
+	std::vector<string_map> ExtractEntry(const std::string& context) const;
 	string_map ExtractHandle(std::string handle) const;
 private:
 	dmi_db fDMIDB;
@@ -61,11 +61,10 @@ DMIExtractor::DMIExtractor(dmi_db db)
 
 
 int
-DMIExtractor::CountEntries(std::string context) const
+DMIExtractor::CountEntries(const std::string& context) const
 {
 	dmi_db::const_iterator dbIterator;
 	int count = 0;
-	const string_map entry;
 	for (dbIterator = fDMIDB.begin(); dbIterator != fDMIDB.end(); dbIterator++) {
 		string_map entry = (*dbIterator).second;
 		string_map::const_iterator i = entry.find("NAME");
@@ -79,7 +78,7 @@ DMIExtractor::CountEntries(std::string context) const
 
 
 std::vector<string_map>
-DMIExtractor::ExtractEntry(std::string context) const
+DMIExtractor::ExtractEntry(const std::string& context) const
 {
 	dmi_db::const_iterator dbIterator;
 	string_map entry;
