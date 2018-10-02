@@ -21,17 +21,17 @@ class Socket;
 class HTTP {
 public:
 	HTTP();
-	HTTP(const std::string hostName);
+	HTTP(const std::string& string);
 	~HTTP();
 
 	void Close();
 	void ClearPendingRequests();
 
-	int SetHost(const std::string hostName);
+	int SetHost(const std::string& hostName);
 	
-	int Get(const std::string path);
-	int Put(const std::string path, const char* data, const size_t dataLength);
-	int Post(const std::string path, const char* data, const size_t dataLength);
+	int Get(const std::string& path);
+	int Put(const std::string& path, const char* data, const size_t dataLength);
+	int Post(const std::string& path, const char* data, const size_t dataLength);
 	int Request(const HTTPRequestHeader& header, const void* data = NULL,
 			const size_t dataLength = 0);
 
@@ -44,7 +44,7 @@ public:
 	std::string ErrorString() const;
 	
 private:
-	bool _HandleConnection(const std::string host);
+	bool _HandleConnection(const std::string& host);
 
 	static bool _ReadLineFromSocket(std::string& string, Socket* socket);
 

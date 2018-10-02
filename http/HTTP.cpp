@@ -36,7 +36,7 @@ HTTP::HTTP()
 }
 
 
-HTTP::HTTP(const std::string string)
+HTTP::HTTP(const std::string& string)
 	:
 	fPort(-1),
 	fSocket(NULL),
@@ -99,7 +99,7 @@ HTTP::LastResponse() const
 
 
 int
-HTTP::SetHost(const std::string hostName)
+HTTP::SetHost(const std::string& hostName)
 {
 	try {
 		URL url(hostName.c_str());
@@ -114,7 +114,7 @@ HTTP::SetHost(const std::string hostName)
 
 
 int
-HTTP::Get(const std::string path)
+HTTP::Get(const std::string& path)
 {
 	HTTPRequestHeader requestHeader("GET", path);
 	return Request(requestHeader);
@@ -122,7 +122,7 @@ HTTP::Get(const std::string path)
 
 
 int
-HTTP::Put(const std::string path, const char* data, const size_t dataLength)
+HTTP::Put(const std::string& path, const char* data, const size_t dataLength)
 {
 	HTTPRequestHeader requestHeader("PUT", path);
 	return Request(requestHeader, data, dataLength);
@@ -130,7 +130,7 @@ HTTP::Put(const std::string path, const char* data, const size_t dataLength)
 
 
 int
-HTTP::Post(const std::string path, const char* data, const size_t dataLength)
+HTTP::Post(const std::string& path, const char* data, const size_t dataLength)
 {
 	HTTPRequestHeader requestHeader("POST", path);
 	return Request(requestHeader, data, dataLength);
@@ -206,7 +206,7 @@ HTTP::Request(const HTTPRequestHeader& header, const void* data, const size_t le
 
 
 bool
-HTTP::_HandleConnection(const std::string string)
+HTTP::_HandleConnection(const std::string& string)
 {
 	URL url(string.c_str());
 	std::string hostName = url.Host();
