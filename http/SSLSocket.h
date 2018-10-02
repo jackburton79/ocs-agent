@@ -21,7 +21,7 @@ public:
 	virtual int Open(int domain, int type, int protocol);
 	virtual void Close();
 
-	virtual int Connect(const struct sockaddr *address, socklen_t len);
+	virtual int Connect(const struct sockaddr *address, socklen_t addrLen);
 
 	virtual int Read(void* data, const size_t& length);
 	virtual int Write(const void* data, const size_t& length);
