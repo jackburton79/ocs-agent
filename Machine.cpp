@@ -1002,10 +1002,10 @@ Machine::_ExtractDataFromDMIDB(dmi_db systemInfo)
 				std::string parentHandle = mapIter->second;
 				string_map arrayHandle = dmiExtractor.ExtractHandle(parentHandle);
 				mapIter = arrayHandle.find("Use");
-				if (mapIter != entry.end())
+				if (mapIter != arrayHandle.end())
 					info.purpose = mapIter->second;
 				mapIter = arrayHandle.find("Use");
-				if (mapIter != entry.end())
+				if (mapIter != arrayHandle.end())
 					info.caption = mapIter->second;
 			}
 		} catch (...) {
