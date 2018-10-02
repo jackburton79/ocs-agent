@@ -20,7 +20,7 @@
 
 class ElementFinderByName : public tinyxml2::XMLVisitor {
 public:
-	ElementFinderByName(std::string elementName, bool onlyFullName);
+	ElementFinderByName(const std::string& elementName, bool onlyFullName);
 	virtual bool VisitEnter(const tinyxml2::XMLElement& element, const tinyxml2::XMLAttribute* attr);
 
 	const tinyxml2::XMLElement* Element() const;
@@ -33,8 +33,8 @@ private:
 
 class ElementFinderByAttribute : public tinyxml2::XMLVisitor {
 public:
-	ElementFinderByAttribute(std::string attributeName,
-							std::string attributeValue,
+	ElementFinderByAttribute(const std::string& attributeName,
+							const std::string& attributeValue,
 							bool onlyFullValue);
 	virtual bool VisitEnter(const tinyxml2::XMLElement& element, const tinyxml2::XMLAttribute* attr);
 
@@ -123,7 +123,7 @@ XML::GetElementByAttribute(const tinyxml2::XMLNode& node,
 
 
 // ElementFinderByName
-ElementFinderByName::ElementFinderByName(std::string elementName, bool onlyFullName)
+ElementFinderByName::ElementFinderByName(const std::string& elementName, bool onlyFullName)
 	:
 	XMLVisitor(),
 	fElementName(elementName),
@@ -165,8 +165,8 @@ ElementFinderByName::Element() const
 
 
 // ElementFinderByAttribute
-ElementFinderByAttribute::ElementFinderByAttribute(std::string attributeName,
-											std::string attributeValue,
+ElementFinderByAttribute::ElementFinderByAttribute(const std::string& attributeName,
+											const std::string& attributeValue,
 											bool onlyFullValue)
 	:
 	XMLVisitor(),
