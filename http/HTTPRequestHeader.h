@@ -16,12 +16,12 @@ class HTTPRequestHeader : public HTTPHeader {
 public:
 	HTTPRequestHeader();
 	HTTPRequestHeader(const HTTPRequestHeader&);
-	HTTPRequestHeader(const std::string method, const std::string path,
+	HTTPRequestHeader(const std::string& method, const std::string& path,
 			int majorVer = 1, int minorVer = 1);
 	~HTTPRequestHeader();
 
 	std::string UserAgent() const;
-	void SetUserAgent(const std::string agent);
+	void SetUserAgent(const std::string& agent);
 
 	std::string Method() const;
 	std::string URL() const;
@@ -30,7 +30,7 @@ public:
 
 	virtual std::string ToString() const;
 
-	void SetRequest(const std::string method, const std::string path,
+	void SetRequest(const std::string& method, const std::string& path,
 			int majorVer = 1, int minorVer = 1);
 
 	virtual void Clear();

@@ -25,8 +25,8 @@ HTTPRequestHeader::HTTPRequestHeader(const HTTPRequestHeader& header)
 }
 
 
-HTTPRequestHeader::HTTPRequestHeader(const std::string method,
-		const std::string url, int majorVer, int minorVer)
+HTTPRequestHeader::HTTPRequestHeader(const std::string& method,
+		const std::string& url, int majorVer, int minorVer)
 {
 	_Init();
 	SetRequest(method, url);
@@ -46,7 +46,7 @@ HTTPRequestHeader::UserAgent() const
 
 
 void
-HTTPRequestHeader::SetUserAgent(const std::string string)
+HTTPRequestHeader::SetUserAgent(const std::string& string)
 {
 	fUserAgent = string;
 }
@@ -77,7 +77,7 @@ HTTPRequestHeader::SetAuthentication(int type, std::string userName, std::string
 	authString.append(userName).append(":").append(password);
 	authString = Base64Encode(authString);
 	auth.append(authString);
-	SetValue("Authorization", auth.c_str());
+	SetValue("Authorization", auth);
 }
 
 
@@ -99,8 +99,8 @@ HTTPRequestHeader::ToString() const
 
 
 void
-HTTPRequestHeader::SetRequest(const std::string method,
-		const std::string url, int majorVer, int minorVer)
+HTTPRequestHeader::SetRequest(const std::string& method,
+		const std::string& url, int majorVer, int minorVer)
 {
 	fMethod = method;
 	fURL = url;
