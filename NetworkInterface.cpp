@@ -240,7 +240,7 @@ NetworkInterface::Status() const
 	if (_DoRequest(SIOCGIFFLAGS, ifr) != 0)
 		return "";
 
-	return ifr.ifr_flags & IFF_UP ? "Up" : "Down";
+	return (ifr.ifr_flags & IFF_UP) ? "Up" : "Down";
 }
 
 
