@@ -323,7 +323,7 @@ Configuration::_BooleanToString(bool value)
 
 
 bool
-Configuration::_StringToBoolean(const std::string string)
+Configuration::_StringToBoolean(const std::string& string)
 {
 	std::string lowerCaseString = string;
 	std::transform(lowerCaseString.begin(), lowerCaseString.end(),

@@ -18,7 +18,7 @@ SocketGetter::SocketGetter()
 
 
 Socket*
-SocketGetter::GetSocket(std::string protocol)
+SocketGetter::GetSocket(const std::string& protocol)
 {
 	if (protocol == "https")
 		return new SSLSocket();
@@ -31,7 +31,7 @@ SocketGetter::GetSocket(std::string protocol)
 
 
 Socket*
-SocketGetter::GetSocket(std::string protocol, int domain, int type)
+SocketGetter::GetSocket(const std::string& protocol, int domain, int type)
 {
 	if (protocol == "https")
 		return new SSLSocket(domain, type, 0);

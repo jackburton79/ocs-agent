@@ -58,7 +58,7 @@ private:
 	void _GenerateDeviceID();
 
 	static std::string _BooleanToString(bool value);
-	static bool _StringToBoolean(const std::string string);
+	static bool _StringToBoolean(const std::string& string);
 
 	std::map<std::string, std::string> fValues;
 	std::map<std::string, std::string> fVolatileValues;
