@@ -973,6 +973,10 @@ Machine::_ExtractDataFromDMIDB(dmi_db systemInfo)
 			} else
 				info.size = int_to_string(0);
 
+			mapIter = entry.find("Locator");
+			if (mapIter != entry.end())
+				info.description = mapIter->second;
+
 			mapIter = entry.find("Type");
 			if (mapIter != entry.end() && info.size != "0")
 				info.type = mapIter->second;
