@@ -13,13 +13,13 @@
 class HTTPResponseHeader: public HTTPHeader {
 public:
 	HTTPResponseHeader();
-	HTTPResponseHeader(int code, const std::string text = "",
+	HTTPResponseHeader(int code, const std::string& text = "",
 			const int majVersion = 1, const int minVersion = 1);
 	HTTPResponseHeader(const HTTPResponseHeader& header);
 	~HTTPResponseHeader();
 
 	std::string ReasonPhrase() const;
-	void SetStatusLine(int code, const std::string text = "",
+	void SetStatusLine(int code, const std::string& text = "",
 			const int majVersion = 1, const int minVersion = 1);
 	int StatusCode() const;
 	std::string StatusString() const;

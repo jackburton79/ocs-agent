@@ -17,7 +17,7 @@ HTTPResponseHeader::HTTPResponseHeader()
 }
 
 
-HTTPResponseHeader::HTTPResponseHeader(int code, const std::string text,
+HTTPResponseHeader::HTTPResponseHeader(int code, const std::string& text,
 		const int majVersion, const int minVersion)
 {
 	SetStatusLine(code, text, majVersion, minVersion);
@@ -43,7 +43,7 @@ HTTPResponseHeader::ReasonPhrase() const
 
 
 void
-HTTPResponseHeader::SetStatusLine(int code, const std::string text,
+HTTPResponseHeader::SetStatusLine(int code, const std::string& text,
 		const int majVersion, const int minVersion)
 {
 	fCode = code;
