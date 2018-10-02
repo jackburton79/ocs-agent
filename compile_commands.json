@@ -85,25 +85,6 @@
             "-I", 
             "./", 
             "-fmessage-length=0", 
-            "-MFStorages.d", 
-            "-MTStorages.d", 
-            "-o", 
-            "Storages.o", 
-            "Storages.cpp"
-        ], 
-        "directory": "/home/ubuntu/workspace", 
-        "file": "Storages.cpp"
-    }, 
-    {
-        "arguments": [
-            "c++", 
-            "-c", 
-            "-DTIXML_USE_STL", 
-            "-O2", 
-            "-Wall", 
-            "-I", 
-            "./", 
-            "-fmessage-length=0", 
             "-MFAgent.d", 
             "-MTAgent.d", 
             "-o", 
@@ -161,14 +142,14 @@
             "-I", 
             "./", 
             "-fmessage-length=0", 
-            "-MFmain.d", 
-            "-MTmain.d", 
+            "-MFNetworkInterface.d", 
+            "-MTNetworkInterface.d", 
             "-o", 
-            "main.o", 
-            "main.cpp"
+            "NetworkInterface.o", 
+            "NetworkInterface.cpp"
         ], 
         "directory": "/home/ubuntu/workspace", 
-        "file": "main.cpp"
+        "file": "NetworkInterface.cpp"
     }, 
     {
         "arguments": [
@@ -218,6 +199,44 @@
             "-I", 
             "./", 
             "-fmessage-length=0", 
+            "-MFUsersRoster.d", 
+            "-MTUsersRoster.d", 
+            "-o", 
+            "UsersRoster.o", 
+            "UsersRoster.cpp"
+        ], 
+        "directory": "/home/ubuntu/workspace", 
+        "file": "UsersRoster.cpp"
+    }, 
+    {
+        "arguments": [
+            "c++", 
+            "-c", 
+            "-DTIXML_USE_STL", 
+            "-O2", 
+            "-Wall", 
+            "-I", 
+            "./", 
+            "-fmessage-length=0", 
+            "-MFProcessRoster.d", 
+            "-MTProcessRoster.d", 
+            "-o", 
+            "ProcessRoster.o", 
+            "ProcessRoster.cpp"
+        ], 
+        "directory": "/home/ubuntu/workspace", 
+        "file": "ProcessRoster.cpp"
+    }, 
+    {
+        "arguments": [
+            "c++", 
+            "-c", 
+            "-DTIXML_USE_STL", 
+            "-O2", 
+            "-Wall", 
+            "-I", 
+            "./", 
+            "-fmessage-length=0", 
             "-MFSoftwares.d", 
             "-MTSoftwares.d", 
             "-o", 
@@ -245,25 +264,6 @@
         ], 
         "directory": "/home/ubuntu/workspace", 
         "file": "http/HTTP.cpp"
-    }, 
-    {
-        "arguments": [
-            "c++", 
-            "-c", 
-            "-DTIXML_USE_STL", 
-            "-O2", 
-            "-Wall", 
-            "-I", 
-            "./", 
-            "-fmessage-length=0", 
-            "-MFRunningProcessesList.d", 
-            "-MTRunningProcessesList.d", 
-            "-o", 
-            "RunningProcessesList.o", 
-            "RunningProcessesList.cpp"
-        ], 
-        "directory": "/home/ubuntu/workspace", 
-        "file": "RunningProcessesList.cpp"
     }, 
     {
         "arguments": [
@@ -408,14 +408,33 @@
             "-I", 
             "./", 
             "-fmessage-length=0", 
-            "-MFNetworkInterface.d", 
-            "-MTNetworkInterface.d", 
+            "-MFmain.d", 
+            "-MTmain.d", 
             "-o", 
-            "NetworkInterface.o", 
-            "NetworkInterface.cpp"
+            "main.o", 
+            "main.cpp"
         ], 
         "directory": "/home/ubuntu/workspace", 
-        "file": "NetworkInterface.cpp"
+        "file": "main.cpp"
+    }, 
+    {
+        "arguments": [
+            "c++", 
+            "-c", 
+            "-DTIXML_USE_STL", 
+            "-O2", 
+            "-Wall", 
+            "-I", 
+            "./", 
+            "-fmessage-length=0", 
+            "-MFSupport.d", 
+            "-MTSupport.d", 
+            "-o", 
+            "Support.o", 
+            "Support.cpp"
+        ], 
+        "directory": "/home/ubuntu/workspace", 
+        "file": "Support.cpp"
     }, 
     {
         "arguments": [
@@ -446,6 +465,25 @@
             "-I", 
             "./", 
             "-fmessage-length=0", 
+            "-MFVolumeRoster.d", 
+            "-MTVolumeRoster.d", 
+            "-o", 
+            "VolumeRoster.o", 
+            "VolumeRoster.cpp"
+        ], 
+        "directory": "/home/ubuntu/workspace", 
+        "file": "VolumeRoster.cpp"
+    }, 
+    {
+        "arguments": [
+            "c++", 
+            "-c", 
+            "-DTIXML_USE_STL", 
+            "-O2", 
+            "-Wall", 
+            "-I", 
+            "./", 
+            "-fmessage-length=0", 
             "-MFhttp/HTTPRequestHeader.d", 
             "-MThttp/HTTPRequestHeader.d", 
             "-o", 
@@ -465,14 +503,14 @@
             "-I", 
             "./", 
             "-fmessage-length=0", 
-            "-MFSupport.d", 
-            "-MTSupport.d", 
+            "-MFStorageRoster.d", 
+            "-MTStorageRoster.d", 
             "-o", 
-            "Support.o", 
-            "Support.cpp"
+            "StorageRoster.o", 
+            "StorageRoster.cpp"
         ], 
         "directory": "/home/ubuntu/workspace", 
-        "file": "Support.cpp"
+        "file": "StorageRoster.cpp"
     }, 
     {
         "arguments": [
@@ -514,25 +552,6 @@
     }, 
     {
         "arguments": [
-            "c++", 
-            "-c", 
-            "-DTIXML_USE_STL", 
-            "-O2", 
-            "-Wall", 
-            "-I", 
-            "./", 
-            "-fmessage-length=0", 
-            "-MFVolumeReader.d", 
-            "-MTVolumeReader.d", 
-            "-o", 
-            "VolumeReader.o", 
-            "VolumeReader.cpp"
-        ], 
-        "directory": "/home/ubuntu/workspace", 
-        "file": "VolumeReader.cpp"
-    }, 
-    {
-        "arguments": [
             "cc", 
             "-c", 
             "-o", 
@@ -541,25 +560,6 @@
         ], 
         "directory": "/home/ubuntu/workspace", 
         "file": "edid-decode.c"
-    }, 
-    {
-        "arguments": [
-            "c++", 
-            "-c", 
-            "-DTIXML_USE_STL", 
-            "-O2", 
-            "-Wall", 
-            "-I", 
-            "./", 
-            "-fmessage-length=0", 
-            "-MFLoggedUsers.d", 
-            "-MTLoggedUsers.d", 
-            "-o", 
-            "LoggedUsers.o", 
-            "LoggedUsers.cpp"
-        ], 
-        "directory": "/home/ubuntu/workspace", 
-        "file": "LoggedUsers.cpp"
     }, 
     {
         "arguments": [
