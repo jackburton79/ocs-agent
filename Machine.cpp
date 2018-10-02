@@ -974,11 +974,16 @@ Machine::_ExtractDataFromDMIDB(dmi_db systemInfo)
 				info.size = int_to_string(0);
 
 			mapIter = entry.find("Type");
-			if (mapIter != entry.end())
+			if (mapIter != entry.end() && info.size != "0")
 				info.type = mapIter->second;
+			else
+				info.type = "Empty slot";
+
 			mapIter = entry.find("Speed");
-			if (mapIter != entry.end())
-				info.speed = mapIter->second;
+			if (mapIter != entry.end()) {
+				unsigned int speedInteger = strtoul(mapIter->second.c_str(), NULL, 10);
+				info.speed = int_to_string(speedInteger);
+			}
 			mapIter = entry.find("Manufacturer");
 			if (mapIter != entry.end())
 				info.vendor = mapIter->second;
@@ -1003,6 +1008,8 @@ Machine::_ExtractDataFromDMIDB(dmi_db systemInfo)
 		} catch (...) {
 
 		}
+		if (info.speed == "")
+			info.speed = "0";
 		// Make sure we have at least some valid info
 		if (info.caption != "" || info.purpose != ""
 			|| info.type != "" || info.serial != "" || info.speed != "")
