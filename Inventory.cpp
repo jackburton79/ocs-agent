@@ -49,13 +49,13 @@ Inventory::~Inventory()
 
 
 bool
-Inventory::Initialize(std::string deviceIDString)
+Inventory::Initialize(const std::string& deviceID)
 {
 	Logger& logger = Logger::GetDefault();
 
 	Clear();
 
-	fDeviceID = deviceIDString;
+	fDeviceID = deviceID;
 
 	logger.LogFormat(LOG_INFO, "Inventory::Initialize(): Device ID: %s...", fDeviceID.c_str());
 	tinyxml2::XMLDeclaration* declaration = fDocument->NewDeclaration();

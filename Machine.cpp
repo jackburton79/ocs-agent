@@ -44,7 +44,7 @@ static Machine* sMachine = NULL;
 // It iterates the full dmi_db for every call of CountEntries() or ExtractEntry()
 class DMIExtractor {
 public:
-	DMIExtractor(dmi_db db);
+	DMIExtractor(const dmi_db& db);
 	int CountEntries(const std::string& context) const;
 	std::vector<string_map> ExtractEntry(const std::string& context) const;
 	string_map ExtractHandle(std::string handle) const;
@@ -53,7 +53,7 @@ private:
 };
 
 
-DMIExtractor::DMIExtractor(dmi_db db)
+DMIExtractor::DMIExtractor(const dmi_db& db)
 	:
 	fDMIDB(db)
 {
@@ -808,8 +808,8 @@ Machine::_GetOSInfo()
 	std::istream stream(&proc);
 
 	std::string string;
-	size_t pos;
 	while (std::getline(stream, string)) {
+		size_t pos;
 		if ((pos = string.find("SwapTotal:")) != std::string::npos) {
 			pos = string.find(":");
 			std::string swapString = string.substr(pos + 1, std::string::npos);

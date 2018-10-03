@@ -21,11 +21,11 @@ public:
 	Inventory();
 	~Inventory();
 
-	bool Initialize(std::string deviceID);
+	bool Initialize(const std::string& deviceID);
 	void Clear();
 
 	bool Build(bool noSoftware = false);
-	bool Save(const char* filePath);
+	bool Save(const char* fileName);
 	bool Send(const char* serverUrl);
 	void Print();
 
