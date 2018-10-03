@@ -33,7 +33,7 @@ RunningProcessesList::RunningProcessesList()
 				std::string fullName = "/proc/";
 				fullName.append(procPid);
 				process_info info;
-				_ReadProcessInfo(info, procPid.c_str());
+				_ReadProcessInfo(info, procPid);
 				fItems.push_back(info);
 			}
 		}
