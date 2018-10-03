@@ -22,7 +22,7 @@ public:
 	int FD() const;
 	bool IsOpened() const;
 
-	virtual int Connect(const struct sockaddr *address, socklen_t len);
+	virtual int Connect(const struct sockaddr *address, socklen_t addrLen);
 	int Connect(const struct hostent* hostEnt, const int port);
 	int Connect(const char *hostName, const int port);
 
