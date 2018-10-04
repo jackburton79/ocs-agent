@@ -110,10 +110,10 @@ URL::IsRelative() const
 
 
 void
-URL::_DecodeURLString(const char* url)
+URL::_DecodeURLString(const char* urlString)
 {
 	// TODO: Handle more malformed urls
-	std::string string = url;
+	std::string string = urlString;
 	std::string result = string;
 	size_t suffixPos = string.find(":/");
 	if (suffixPos != std::string::npos) {

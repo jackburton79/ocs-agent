@@ -150,7 +150,7 @@ HTTP::Read(void* data,  const size_t& length)
 
 
 int
-HTTP::Request(const HTTPRequestHeader& header, const void* data, const size_t length)
+HTTP::Request(const HTTPRequestHeader& header, const void* data, const size_t dataLength)
 {
 	if (!_HandleConnection(header.URL()))
 		return -1;
@@ -167,8 +167,8 @@ HTTP::Request(const HTTPRequestHeader& header, const void* data, const size_t le
 		return errno;
 	}
 
-	if (data != NULL && length != 0) {
-		if (fSocket->Write(data, length) != (int)length) {
+	if (data != NULL && dataLength != 0) {
+		if (fSocket->Write(data, dataLength) != (int)dataLength) {
 			fLastError = errno;
 			return errno;
 		}
