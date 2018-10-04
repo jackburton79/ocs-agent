@@ -866,70 +866,70 @@ Machine::_OSDescription()
 
 
 void
-Machine::_ExtractDataFromDMIDB(dmi_db systemInfo)
+Machine::_ExtractDataFromDMIDB(dmi_db dmiDb)
 {
 	std::string string;
-	string = GetValueFromMap(systemInfo, "Release Date", kBIOSInfo);
+	string = GetValueFromMap(dmiDb, "Release Date", kBIOSInfo);
 	if (string != "" && fBIOSInfo.release_date == "")
 		fBIOSInfo.release_date = string;
-	string = GetValueFromMap(systemInfo, "Vendor", kBIOSInfo);
+	string = GetValueFromMap(dmiDb, "Vendor", kBIOSInfo);
 	if (string != "" && fBIOSInfo.vendor == "")
 		fBIOSInfo.vendor = string;
-	string = GetValueFromMap(systemInfo, "Version", kBIOSInfo);
+	string = GetValueFromMap(dmiDb, "Version", kBIOSInfo);
 	if (string != "" && fBIOSInfo.version == "")
 		fBIOSInfo.version = string;
 
-	string = GetValueFromMap(systemInfo, "Product Name", kSystemInfo);
+	string = GetValueFromMap(dmiDb, "Product Name", kSystemInfo);
 	if (string != "" && fSystemInfo.name == "")
 		fSystemInfo.name = string;
-	string = GetValueFromMap(systemInfo, "Version", kSystemInfo);
+	string = GetValueFromMap(dmiDb, "Version", kSystemInfo);
 	if (string != "" && fSystemInfo.version == "")
 		fSystemInfo.version = string;
-	string = GetValueFromMap(systemInfo, "UUID", kSystemInfo);
+	string = GetValueFromMap(dmiDb, "UUID", kSystemInfo);
 	if (string != "" && fSystemInfo.uuid == "")
 		fSystemInfo.uuid = string;
-	string = GetValueFromMap(systemInfo, "Serial Number", kSystemInfo);
+	string = GetValueFromMap(dmiDb, "Serial Number", kSystemInfo);
 	if (string != "" && fSystemInfo.serial == "")
 		fSystemInfo.serial = string;
 		
-	string = GetValueFromMap(systemInfo, "Asset Tag", "Chassis Information");
+	string = GetValueFromMap(dmiDb, "Asset Tag", "Chassis Information");
 	if (string != "" && fChassisInfo.asset_tag == "")
 		fChassisInfo.asset_tag = string;
-	string = GetValueFromMap(systemInfo, "Serial Number", "Chassis Information");
+	string = GetValueFromMap(dmiDb, "Serial Number", "Chassis Information");
 	if (string != "" && fChassisInfo.serial == "")
 		fChassisInfo.serial = string;
-	string = GetValueFromMap(systemInfo, "Type", "Chassis Information");
+	string = GetValueFromMap(dmiDb, "Type", "Chassis Information");
 	if (string != "" && fChassisInfo.type == "")
 		fChassisInfo.type = string;
-	string = GetValueFromMap(systemInfo, "Manufacturer", "Chassis Information");
+	string = GetValueFromMap(dmiDb, "Manufacturer", "Chassis Information");
 	if (string != "" && fChassisInfo.vendor == "")
 		fChassisInfo.vendor = string;
-	string = GetValueFromMap(systemInfo, "Version",  "Chassis Information");
+	string = GetValueFromMap(dmiDb, "Version",  "Chassis Information");
 	if (string != "" && fChassisInfo.version == "")
 		fChassisInfo.version = string;
 
-	string = GetValueFromMap(systemInfo, "Asset Tag", "Base Board Information");
+	string = GetValueFromMap(dmiDb, "Asset Tag", "Base Board Information");
 	if (string != "" && fBoardInfo.asset_tag == "")
 		fBoardInfo.asset_tag = string;
-	string = GetValueFromMap(systemInfo, "Product Name", "Base Board Information");
+	string = GetValueFromMap(dmiDb, "Product Name", "Base Board Information");
 	if (string != "" && fBoardInfo.name == "")
 		fBoardInfo.name = string;
-	string = GetValueFromMap(systemInfo, "Manufacturer", "Base Board Information");
+	string = GetValueFromMap(dmiDb, "Manufacturer", "Base Board Information");
 	if (string != "" && fBoardInfo.vendor == "")
 		fBoardInfo.vendor = string;
-	string = GetValueFromMap(systemInfo, "Version", "Base Board Information");
+	string = GetValueFromMap(dmiDb, "Version", "Base Board Information");
 	if (string != "" && fBoardInfo.version == "")
 		fBoardInfo.version = string;
-	string = GetValueFromMap(systemInfo, "Serial Number", "Base Board Information");
+	string = GetValueFromMap(dmiDb, "Serial Number", "Base Board Information");
 	if (string != "" && fBoardInfo.serial == "")
 		fBoardInfo.serial = string;
 
-	string = GetValueFromMap(systemInfo, "Manufacturer", kSystemInfo);
+	string = GetValueFromMap(dmiDb, "Manufacturer", kSystemInfo);
 	if (string != "" && fSystemInfo.vendor == "")
 		fSystemInfo.vendor = string;
 
 	std::vector<string_map> valuesVector;
-	DMIExtractor dmiExtractor(systemInfo);
+	DMIExtractor dmiExtractor(dmiDb);
 	std::vector<string_map>::iterator i;
 
 	// Graphics cards

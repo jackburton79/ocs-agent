@@ -20,7 +20,7 @@ public:
 
 	ProcReader* open(const char* command, const char* mode);
 	void close();
-	std::streamsize xsgetn(char_type* ptr, std::streamsize n);
+	std::streamsize xsgetn(char_type* ptr, std::streamsize num);
 	int_type underflow();
 	std::streamsize showmanyc();
 	std::string ReadLine();

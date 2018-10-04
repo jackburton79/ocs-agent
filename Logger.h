@@ -24,7 +24,7 @@ public:
 	void SetLevel(int level);
 
 	void Log(int level, const char* const string);
-	void LogFormat(int level, const char* string, ...);
+	void LogFormat(int level, const char* fmtString, ...);
 
 	// There can be only one logger per application.
 	// The first call will create the requested logger.
