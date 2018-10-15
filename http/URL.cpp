@@ -25,7 +25,7 @@ URL::URL()
 }
 
 
-URL::URL(const char* url)
+URL::URL(const std::string& url)
 	:
 	fURLString(url),
 	fProtocol(""),
@@ -40,7 +40,7 @@ URL::URL(const char* url)
 
 
 void
-URL::SetTo(const char* url)
+URL::SetTo(const std::string& url)
 {
 	fURLString = url;
 	fProtocol = "";
@@ -110,10 +110,9 @@ URL::IsRelative() const
 
 
 void
-URL::_DecodeURLString(const char* urlString)
+URL::_DecodeURLString(const std::string& string)
 {
 	// TODO: Handle more malformed urls
-	std::string string = urlString;
 	std::string result = string;
 	size_t suffixPos = string.find(":/");
 	if (suffixPos != std::string::npos) {

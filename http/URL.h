@@ -14,8 +14,8 @@
 class URL {
 public:
 	URL();
-	URL(const char* url);
-	void SetTo(const char* url);
+	URL(const std::string& url);
+	void SetTo(const std::string& url);
 
 	std::string URLString() const;
 	std::string Protocol() const;
@@ -28,7 +28,7 @@ public:
 	bool IsRelative() const;
 
 private:
-	void _DecodeURLString(const char* urlString);
+	void _DecodeURLString(const std::string& string);
 
 	std::string fURLString;
 	std::string fProtocol;
