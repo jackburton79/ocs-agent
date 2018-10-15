@@ -1,9 +1,5 @@
 language: cpp
 compiler:
   - gcc
-before_install:
-  - git clone --depth 1 https://github.com/rizsotto/Bear.git
-install:
-  - (cd Bear && mkdir build && cd build && cmake ../ && sudo make install)
 script: 
-  bear make all
+  make all
