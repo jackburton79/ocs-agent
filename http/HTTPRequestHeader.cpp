@@ -46,9 +46,9 @@ HTTPRequestHeader::UserAgent() const
 
 
 void
-HTTPRequestHeader::SetUserAgent(const std::string& string)
+HTTPRequestHeader::SetUserAgent(const std::string& agent)
 {
-	fUserAgent = string;
+	fUserAgent = agent;
 }
 
 
@@ -84,7 +84,7 @@ HTTPRequestHeader::SetAuthentication(int type, std::string userName, std::string
 std::string
 HTTPRequestHeader::ToString() const
 {
-	::URL url(fURL.c_str());
+	::URL url(fURL);
 	std::string host = url.Host();
 	std::string resource = url.Path();
 	std::string string;
@@ -105,7 +105,7 @@ HTTPRequestHeader::SetRequest(const std::string& method,
 	fMethod = method;
 	fURL = url;
 	
-	std::string hostName = ::URL(url.c_str()).Host();
+	std::string hostName = ::URL(url).Host();
 	if (hostName != "")
 		fValues[HTTPHost] = hostName;
 }
