@@ -8,10 +8,13 @@
 #include "SSLSocket.h"
  
 #include <openssl/ssl.h>
+#include <openssl/x509.h>
+#include <openssl/x509v3.h>
 
 #include <cerrno>
 #include <cstdio>
 #include <cstring>
+#include <iostream>
 #include <stdexcept>
 #include <unistd.h>
 
@@ -24,7 +27,7 @@ SSLSocket::SSLSocket()
 	fSSLConnection(NULL)
 {
 	if (sSSLContext == NULL)
-		SSLInit();
+		_SSLInit();
 }
 
 
@@ -33,7 +36,7 @@ SSLSocket::SSLSocket(int domain, int type, int protocol)
 	fSSLConnection(NULL)
 {
 	if (sSSLContext == NULL)
-		SSLInit();
+		_SSLInit();
 	if (Open(domain, type, protocol) < 0)
 		throw std::runtime_error("SSLSocket::SSLSocket(): cannot open socket!");
 }
@@ -77,6 +80,7 @@ SSLSocket::Connect(const struct sockaddr *address, socklen_t addrLen)
 		status = SSL_connect(fSSLConnection);
 		if (status == 1) {
 			// Connection estabilished successfully.
+			_CheckCertificate();
 			return 0;
 		}
 		// TODO: Maybe use SSL_get_error to retrieve the correct error, but 
@@ -102,7 +106,7 @@ SSLSocket::Write(const void* data, const size_t& length)
 
 
 void
-SSLSocket::SSLInit()
+SSLSocket::_SSLInit()
 {
 	if (sSSLContext == NULL) {
 		SSL_load_error_strings();
@@ -111,4 +115,21 @@ SSLSocket::SSLInit()
 		if (sSSLContext == NULL)
 			throw std::runtime_error("SSL: can't initialize SSL Library");
 	}
+}
+
+
+bool
+SSLSocket::_CheckCertificate()
+{
+	X509 *cert = SSL_get_peer_certificate(fSSLConnection);
+	if (cert == NULL)
+		return false;
+	STACK_OF(X509) *sk = SSL_get_peer_cert_chain(fSSLConnection);
+	if (sk == NULL)
+		return false;
+
+	char *subj = X509_NAME_oneline(X509_get_subject_name(cert), NULL, 0);
+	char *issuer = X509_NAME_oneline(X509_get_issuer_name(cert), NULL, 0);
+	std::cout << "subject: " << subj << std::endl;
+	std::cout << "issuer: " << issuer << std::endl;
 }
