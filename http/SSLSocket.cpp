@@ -75,19 +75,20 @@ SSLSocket::Connect(const struct sockaddr *address, socklen_t addrLen)
 		return status;
 
 	fSSLConnection = SSL_new(sSSLContext);
-	if (fSSLConnection != NULL) {
-		SSL_set_fd(fSSLConnection, FD());
-		status = SSL_connect(fSSLConnection);
-		if (status == 1) {
-			// Connection estabilished successfully.
-			_CheckCertificate();
-			return 0;
-		}
+	if (fSSLConnection == NULL)
+		return -1;
+
+	SSL_set_fd(fSSLConnection, FD());
+	status = SSL_connect(fSSLConnection);
+	if (status != 1) {
 		// TODO: Maybe use SSL_get_error to retrieve the correct error, but 
-		// we shouldn't pass it to the upper layers, anyway
+		// we shouldn't pass it to the upper layers, anyway		
+		return -1;
 	}
 
-	return -1;
+	// Connection estabilished successfully.
+	_CheckCertificate();
+	return 0;
 }
 
 
