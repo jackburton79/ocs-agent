@@ -122,6 +122,7 @@ SSLSocket::_SSLInit()
 bool
 SSLSocket::_CheckCertificate()
 {
+#if 0
 	X509 *cert = SSL_get_peer_certificate(fSSLConnection);
 	if (cert == NULL)
 		return false;
@@ -129,8 +130,20 @@ SSLSocket::_CheckCertificate()
 	if (sk == NULL)
 		return false;
 
-	char *subj = X509_NAME_oneline(X509_get_subject_name(cert), NULL, 0);
-	char *issuer = X509_NAME_oneline(X509_get_issuer_name(cert), NULL, 0);
+	X509_NAME* subjectName = X509_get_subject_name(cert);
+	if (subjectName == NULL)
+		return false;
+	char *subj = X509_NAME_oneline(subjectName, NULL, 0);
+	X509_NAME* issuerName = X509_get_issuer_name(cert);
+	if (issuerName == NULL)
+		return false;	
+	char *issuer = X509_NAME_oneline(issuerName, NULL, 0);
+
+	ASN1_TIME *notBefore = X509_get_notBefore(cert);
+	ASN1_TIME *notAfter = X509_get_notAfter(cert);
+	
 	std::cout << "subject: " << subj << std::endl;
 	std::cout << "issuer: " << issuer << std::endl;
+#endif
+	return true;
 }
