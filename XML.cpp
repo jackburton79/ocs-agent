@@ -20,7 +20,7 @@
 
 class ElementFinderByName : public tinyxml2::XMLVisitor {
 public:
-	ElementFinderByName(const std::string& elementName, bool onlyFullName);
+	ElementFinderByName(const std::string& elementName, int matchMode);
 	virtual bool VisitEnter(const tinyxml2::XMLElement& element, const tinyxml2::XMLAttribute* attr);
 
 	const tinyxml2::XMLElement* Element() const;
@@ -35,7 +35,7 @@ class ElementFinderByAttribute : public tinyxml2::XMLVisitor {
 public:
 	ElementFinderByAttribute(const std::string& attributeName,
 							const std::string& attributeValue,
-							bool onlyFullValue);
+							int matchMode);
 	virtual bool VisitEnter(const tinyxml2::XMLElement& element, const tinyxml2::XMLAttribute* attr);
 
 	const tinyxml2::XMLElement* Element() const;
@@ -100,9 +100,9 @@ XML::GetElementText(const tinyxml2::XMLNode& node, const std::string& elementNam
 const tinyxml2::XMLElement*
 XML::GetElementByName(const tinyxml2::XMLNode& node,
 						std::string elementName,
-						bool onlyFullName)
+						int matchMode)
 {
-	ElementFinderByName textFinder(elementName, onlyFullName);
+	ElementFinderByName textFinder(elementName, matchMode);
 	node.Accept(&textFinder);
 
 	return textFinder.Element();
@@ -113,9 +113,9 @@ const tinyxml2::XMLElement*
 XML::GetElementByAttribute(const tinyxml2::XMLNode& node,
 							std::string attributeName,
 							std::string attributeValue,
-							bool onlyFullValue)
+							int matchMode)
 {
-	ElementFinderByAttribute attributeFinder(attributeName, attributeValue, onlyFullValue);
+	ElementFinderByAttribute attributeFinder(attributeName, attributeValue, matchMode);
 	node.Accept(&attributeFinder);
 
 	return attributeFinder.Element();
@@ -123,12 +123,12 @@ XML::GetElementByAttribute(const tinyxml2::XMLNode& node,
 
 
 // ElementFinderByName
-ElementFinderByName::ElementFinderByName(const std::string& elementName, bool onlyFullName)
+ElementFinderByName::ElementFinderByName(const std::string& elementName, int matchMode)
 	:
 	XMLVisitor(),
 	fElementName(elementName),
 	fElement(NULL),
-	fFull(onlyFullName)
+	fFull(matchMode == XML::match_full)
 {
 }
 
@@ -166,14 +166,14 @@ ElementFinderByName::Element() const
 
 // ElementFinderByAttribute
 ElementFinderByAttribute::ElementFinderByAttribute(const std::string& attributeName,
-											const std::string& attributeValue,
-											bool onlyFullValue)
+						const std::string& attributeValue,
+						int matchMode)
 	:
 	XMLVisitor(),
 	fAttributeName(attributeName),
 	fAttributeValue(attributeValue),
 	fElement(NULL),
-	fFull(onlyFullValue)
+	fFull(matchMode == XML::match_full)
 {
 }
 

@@ -636,14 +636,14 @@ Machine::_GetLSHWData()
 	}
 
 	if (fMemoryInfo.size() == 0) {
-		element = XML::GetElementByAttribute(doc, "id", "memory", false);
+		element = XML::GetElementByAttribute(doc, "id", "memory", XML::match_partial);
 		while (element != NULL) {
 			std::string memoryCaption;
 			tmpElement = element->FirstChildElement("description");
 			if (tmpElement != NULL)
 				memoryCaption = tmpElement->GetText();
 			const tinyxml2::XMLElement* bankElement
-				= XML::GetElementByAttribute(*element, "id", "bank", false);
+				= XML::GetElementByAttribute(*element, "id", "bank", XML::match_partial);
 			if (bankElement == NULL) {
 				// In some cases (VMs for example), there is no "bank" element
 				memory_device_info info;
@@ -675,6 +675,7 @@ Machine::_GetLSHWData()
 						else if (info.description.find("DDR") != std::string::npos)
 							info.type = "DDR";
 						// TODO: Yeah, and DDR2 ? DDR3 ?
+						// TODO: Handle empty slots like we do for dmidecode
 					}
 					tmpElement = bankElement->FirstChildElement("serial");
 					if (tmpElement != NULL) {
