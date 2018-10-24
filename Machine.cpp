@@ -479,7 +479,7 @@ Machine::_GetDMIDecodeData()
 		return false;
 
 	try {
-		popen_streambuf dmi("dmidecode", "r");
+		CommandStreamBuffer dmi("dmidecode", "r");
 		std::istream iStream(&dmi);
 		std::string string;
 		dmi_db dmiDatabase;
@@ -539,7 +539,7 @@ Machine::_GetLSHWData()
 		return false;
 
 	// Load command output into "string"
-	popen_streambuf lshw("lshw -xml", "r");
+	CommandStreamBuffer lshw("lshw -xml", "r");
 	std::istream iStream(&lshw);
 	std::istreambuf_iterator<char> eos;
 	std::string string(std::istreambuf_iterator<char>(iStream), eos);
@@ -832,7 +832,7 @@ Machine::_OSDescription()
 {
 	std::string osDescription;
 	if (CommandExists("lsb_release")) {
-		popen_streambuf lsb;
+		CommandStreamBuffer lsb;
 		lsb.open("lsb_release -a", "r");
 		std::istream lsbStream(&lsb);
 		std::string line;

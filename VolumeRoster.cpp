@@ -15,7 +15,7 @@ VolumeRoster::VolumeRoster(const char* options)
 	// TODO:
 	std::string string("export LC_ALL=C; ");
 	string.append("df ").append(options);
-	popen_streambuf df(string.c_str(), "r");
+	CommandStreamBuffer df(string.c_str(), "r");
 	std::istream stream(&df);
 
 	std::string line;

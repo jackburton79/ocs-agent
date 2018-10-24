@@ -15,13 +15,13 @@
 #include <string>
 
 
-class popen_streambuf : public std::streambuf {
+class CommandStreamBuffer : public std::streambuf {
 public:
-	popen_streambuf();
-	popen_streambuf(const char* fileName, const char* mode);
-	virtual ~popen_streambuf();
+	CommandStreamBuffer();
+	CommandStreamBuffer(const char* fileName, const char* mode);
+	virtual ~CommandStreamBuffer();
 
-	popen_streambuf* open(const char* command, const char* mode);
+	CommandStreamBuffer* open(const char* command, const char* mode);
 	void close();
 	std::streamsize xsgetn(char_type* ptr, std::streamsize n);
 	int_type underflow();

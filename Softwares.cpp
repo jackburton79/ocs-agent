@@ -25,7 +25,7 @@ Softwares::_ReadSoftwaresInfo()
 		if (!CommandExists("rpm"))
 			return;
 
-		popen_streambuf rpms("rpm -qai", "r");
+		CommandStreamBuffer rpms("rpm -qai", "r");
 		std::istream iStreamRpms(&rpms);
 		std::string string;
 		std::string strtmp;

@@ -15,7 +15,7 @@
 Screens::Screens()
 {
 	if (CommandExists("find")) {        
-		popen_streambuf buf("find /sys/devices/ -name edid", "r");
+		CommandStreamBuffer buf("find /sys/devices/ -name edid", "r");
 		std::istream stream(&buf);
 		std::string line;
 		while (std::getline(stream, line)) {

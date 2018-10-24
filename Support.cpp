@@ -17,7 +17,7 @@
 #include <string>
 
 
-popen_streambuf::popen_streambuf()
+CommandStreamBuffer::CommandStreamBuffer()
 	:
 	fFile(NULL),
 	fBuffer(NULL)
@@ -25,25 +25,25 @@ popen_streambuf::popen_streambuf()
 }
 
 
-popen_streambuf::popen_streambuf(const char* fileName, const char* mode)
+CommandStreamBuffer::CommandStreamBuffer(const char* fileName, const char* mode)
 	:
 	fFile(NULL),
 	fBuffer(NULL)
 {
-	popen_streambuf* buf = open(fileName, mode);
+	CommandStreamBuffer* buf = open(fileName, mode);
 	if (buf == NULL)
-		throw std::runtime_error("popen_streambuf: cannot open file");
+		throw std::runtime_error("CommandStreamBuffer: cannot open file");
 }
 
 
-popen_streambuf::~popen_streambuf()
+CommandStreamBuffer::~CommandStreamBuffer()
 {
 	close();
 }
 
 
-popen_streambuf*
-popen_streambuf::open(const char* fileName, const char* mode)
+CommandStreamBuffer*
+CommandStreamBuffer::open(const char* fileName, const char* mode)
 {
 	fFile = popen(fileName, mode);
 	if (fFile == NULL)
@@ -59,7 +59,7 @@ popen_streambuf::open(const char* fileName, const char* mode)
 
 
 void
-popen_streambuf::close()
+CommandStreamBuffer::close()
 {
 	if (fFile != NULL) {
 		pclose(fFile);
@@ -71,7 +71,7 @@ popen_streambuf::close()
 
 
 std::streamsize
-popen_streambuf::xsgetn(char_type* ptr, std::streamsize num)
+CommandStreamBuffer::xsgetn(char_type* ptr, std::streamsize num)
 {
 	std::streamsize howMany = showmanyc();
 	if (num < howMany) {
@@ -90,8 +90,8 @@ popen_streambuf::xsgetn(char_type* ptr, std::streamsize num)
 }
 
 
-popen_streambuf::traits_type::int_type
-popen_streambuf::underflow()
+CommandStreamBuffer::traits_type::int_type
+CommandStreamBuffer::underflow()
 {
 	if (gptr() == 0)
 		return traits_type::eof();
@@ -108,7 +108,7 @@ popen_streambuf::underflow()
 
 
 std::streamsize
-popen_streambuf::showmanyc()
+CommandStreamBuffer::showmanyc()
 {
 	if (gptr() == 0)
 		return 0;
