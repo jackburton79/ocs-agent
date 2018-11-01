@@ -636,6 +636,7 @@ Machine::_GetLSHWData()
 	}
 
 	if (fMemoryInfo.size() == 0) {
+		const size_t memoryLength = ::strlen("memory");
 		element = XML::GetElementByAttribute(doc, "id", "memory", XML::match_partial);
 		while (element != NULL) {
 			std::string memoryCaption;
@@ -654,7 +655,7 @@ Machine::_GetLSHWData()
 					memory_device_info info;
 					info.caption = memoryCaption;
 					info.purpose = info.caption;
-					info.size = strtoul(tmpElement->GetText(), NULL, 10) / (1024 * 1024);
+					info.size = ::strtoul(tmpElement->GetText(), NULL, 10) / (1024 * 1024);
 					fMemoryInfo.push_back(info);
 				}
 			} else {
@@ -684,11 +685,11 @@ Machine::_GetLSHWData()
 					tmpElement = bankElement->FirstChildElement("clock");
 					if (tmpElement != NULL) {
 						// In Hz, usually, but we should check the unit
-						info.speed = strtoul(tmpElement->GetText(), NULL, 10) / (1000 * 1000);
+						info.speed = ::strtoul(tmpElement->GetText(), NULL, 10) / (1000 * 1000);
 					}
 					tmpElement = bankElement->FirstChildElement("size");
 					if (tmpElement != NULL) {
-						info.size = strtoul(tmpElement->GetText(), NULL, 10) / (1024 * 1024);
+						info.size = ::strtoul(tmpElement->GetText(), NULL, 10) / (1024 * 1024);
 						fMemoryInfo.push_back(info);
 					}
 					bankElement = bankElement->NextSiblingElement();
@@ -697,7 +698,7 @@ Machine::_GetLSHWData()
 
 			element = element->NextSiblingElement();
 			if (element != NULL) {
-				if (::strncasecmp(element->Attribute("id"), "memory", strlen("memory")) != 0)
+				if (::strncasecmp(element->Attribute("id"), "memory", memoryLength) != 0)
 					break;
 			}
 		}
