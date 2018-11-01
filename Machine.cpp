@@ -492,7 +492,7 @@ Machine::_GetDMIDecodeData()
 				size_t numEnd = string.find_first_of(",", numStart);
 				std::string handle = string.substr(numStart + 1, numEnd - numStart - 1);
 
-				numericHandle = strtol(handle.c_str(), NULL, 16);
+				numericHandle = ::strtol(handle.c_str(), NULL, 16);
 
 				std::string name;
 				std::getline(iStream, name);
@@ -756,7 +756,7 @@ Machine::_GetCPUInfo()
 					tmpCPUInfo[processorNum].cores = value;
 				else if (name == "physical id")
 					tmpCPUInfo[processorNum].physical_id =
-						strtol(value.c_str(), NULL, 0);
+						::strtol(value.c_str(), NULL, 0);
 				else if (name == "cache size")
 					tmpCPUInfo[processorNum].cache_size = value;
 
@@ -981,7 +981,7 @@ Machine::_ExtractDataFromDMIDB(dmi_db dmiDb)
 
 			mapIter = entry.find("Speed");
 			if (mapIter != entry.end())
-				info.speed = strtoul(mapIter->second.c_str(), NULL, 10);
+				info.speed = ::strtoul(mapIter->second.c_str(), NULL, 10);
 
 			mapIter = entry.find("Manufacturer");
 			if (mapIter != entry.end())
@@ -1013,6 +1013,14 @@ Machine::_ExtractDataFromDMIDB(dmi_db dmiDb)
 			|| info.type != "" || info.serial != "" || info.speed != 0)
 			fMemoryInfo.push_back(info);
 	}
+}
+
+
+memory_device_info::memory_device_info()
+	:
+	speed(0),
+	size(0)
+{
 }
 
 

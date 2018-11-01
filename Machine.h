@@ -82,6 +82,8 @@ struct video_info {
 
 
 struct memory_device_info {
+	memory_device_info();
+
 	std::string Type() const;
 	std::string Speed() const;
 	std::string Size() const;
