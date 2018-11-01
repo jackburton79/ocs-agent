@@ -127,11 +127,11 @@ GetValueFromMap(dmi_db &db, std::string key, std::string context)
 
 // Returns a string containing the size, in MBytes,
 // starting from a string like '3GB' or '1024 KB'
-std::string
+unsigned int
 convert_to_MBytes(std::string string)
 {
 	char *memoryUnit = NULL;
-	int memorySize = ::strtol(string.c_str(), &memoryUnit, 10);
+	unsigned int memorySize = ::strtol(string.c_str(), &memoryUnit, 10);
 	std::string unit = memoryUnit;
 	trim(unit);
 	if (::strcasecmp(unit.c_str(), "KB") == 0
@@ -140,7 +140,7 @@ convert_to_MBytes(std::string string)
 	else if (::strcasecmp(unit.c_str(), "GB") == 0
 		 || ::strcasecmp(unit.c_str(), "GiB") == 0)
 		memorySize *= 1024;
-	return int_to_string(memorySize);
+	return memorySize;
 }
 
 
@@ -379,7 +379,7 @@ Machine::MemoryDescription(int num)
 std::string
 Machine::MemoryCapacity(int num)
 {
-	return fMemoryInfo.at(num).size;
+	return fMemoryInfo.at(num).Size();
 }
 
 
@@ -393,14 +393,14 @@ Machine::MemoryPurpose(int num)
 std::string
 Machine::MemoryType(int num)
 {
-	return fMemoryInfo.at(num).type;
+	return fMemoryInfo.at(num).Type();
 }
 
 
 std::string
 Machine::MemorySpeed(int num)
 {
-	return fMemoryInfo.at(num).speed;
+	return fMemoryInfo.at(num).Speed();
 }
 
 
@@ -654,8 +654,7 @@ Machine::_GetLSHWData()
 					memory_device_info info;
 					info.caption = memoryCaption;
 					info.purpose = info.caption;
-					unsigned int numBytes = strtol(tmpElement->GetText(), NULL, 10);
-					info.size = int_to_string(numBytes / (1024 * 1024));
+					info.size = strtoul(tmpElement->GetText(), NULL, 10) / (1024 * 1024);
 					fMemoryInfo.push_back(info);
 				}
 			} else {
@@ -685,13 +684,11 @@ Machine::_GetLSHWData()
 					tmpElement = bankElement->FirstChildElement("clock");
 					if (tmpElement != NULL) {
 						// In Hz, usually, but we should check the unit
-						unsigned int speed = strtol(tmpElement->GetText(), NULL, 10);
-						info.speed = int_to_string(speed / (1000 * 1000));
+						info.speed = strtoul(tmpElement->GetText(), NULL, 10) / (1000 * 1000);
 					}
 					tmpElement = bankElement->FirstChildElement("size");
 					if (tmpElement != NULL) {
-						unsigned int numBytes = strtol(tmpElement->GetText(), NULL, 10);
-						info.size = int_to_string(numBytes / (1024 * 1024));
+						info.size = strtoul(tmpElement->GetText(), NULL, 10) / (1024 * 1024);
 						fMemoryInfo.push_back(info);
 					}
 					bankElement = bankElement->NextSiblingElement();
@@ -971,23 +968,20 @@ Machine::_ExtractDataFromDMIDB(dmi_db dmiDb)
 			if (mapIter != entry.end()) {
 				info.size = convert_to_MBytes(mapIter->second);
 			} else
-				info.size = int_to_string(0);
+				info.size = 0;
 
 			mapIter = entry.find("Locator");
 			if (mapIter != entry.end())
 				info.description = mapIter->second;
 
 			mapIter = entry.find("Type");
-			if (mapIter != entry.end() && info.size != "0")
+			if (mapIter != entry.end())
 				info.type = mapIter->second;
-			else
-				info.type = "Empty slot";
 
 			mapIter = entry.find("Speed");
-			if (mapIter != entry.end()) {
-				unsigned int speedInteger = strtoul(mapIter->second.c_str(), NULL, 10);
-				info.speed = int_to_string(speedInteger);
-			}
+			if (mapIter != entry.end())
+				info.speed = strtoul(mapIter->second.c_str(), NULL, 10);
+
 			mapIter = entry.find("Manufacturer");
 			if (mapIter != entry.end())
 				info.vendor = mapIter->second;
@@ -1012,11 +1006,33 @@ Machine::_ExtractDataFromDMIDB(dmi_db dmiDb)
 		} catch (...) {
 
 		}
-		if (info.speed == "")
-			info.speed = "0";
+
 		// Make sure we have at least some valid info
 		if (info.caption != "" || info.purpose != ""
-			|| info.type != "" || info.serial != "" || info.speed != "")
+			|| info.type != "" || info.serial != "" || info.speed != 0)
 			fMemoryInfo.push_back(info);
 	}
+}
+
+
+std::string
+memory_device_info::Type() const
+{
+	if (size == 0)
+		return "Empty slot";
+	return type;
+}
+
+
+std::string
+memory_device_info::Speed() const
+{
+	return int_to_string(speed);
+}
+
+
+std::string
+memory_device_info::Size() const
+{
+	return int_to_string(speed);
 }
