@@ -125,7 +125,7 @@ GetValueFromMap(dmi_db &db, std::string key, std::string context)
 }
 
 
-// Returns a string containing the size, in MBytes,
+// Returns size, in MBytes,
 // starting from a string like '3GB' or '1024 KB'
 unsigned int
 convert_to_MBytes(std::string string)
