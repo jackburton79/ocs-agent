@@ -1,12 +1,12 @@
 /*
- * Reader.h
+ * ItemsList.h
  *
  *  Created on: 19/lug/2013
- *      Author: stefano
+ *      Author: Stefano Ceccherini (stefano.ceccherini@gmail.com)
  */
 
-#ifndef READER_H_
-#define READER_H_
+#ifndef ITEMSLIST_H_
+#define ITEMSLIST_H_
 
 
 #include <list>
@@ -31,4 +31,4 @@ protected:
 	typename std::list<T>::iterator fIterator;
 };
 
-#endif /* READER_H_ */
+#endif /* ITEMSLIST_H_ */
