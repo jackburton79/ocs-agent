@@ -548,72 +548,75 @@ Machine::_GetLSHWData()
 	if (doc.Parse(string.c_str(), string.size()) != tinyxml2::XML_SUCCESS)
 		return false;
 
+	const tinyxml2::XMLElement* element = NULL;
 	const tinyxml2::XMLElement* tmpElement = NULL;
-	const tinyxml2::XMLElement* element = XML::GetElementByAttribute(doc, "id", "firmware");
-	if (element != NULL) {
-		if (fBIOSInfo.release_date.empty()) {
+	if (fBIOSInfo.Score() < 100) {
+		element = XML::GetElementByAttribute(doc, "id", "firmware");
+		if (element != NULL) {
+			bios_info biosInfo;
 			tmpElement = element->FirstChildElement("date");
 			if (tmpElement != NULL)
-				fBIOSInfo.release_date = tmpElement->GetText();
-		}
-		if (fBIOSInfo.vendor.empty()) {
+					biosInfo.release_date = tmpElement->GetText();
 			tmpElement = element->FirstChildElement("vendor");
 			if (tmpElement != NULL)
-				fBIOSInfo.vendor = tmpElement->GetText();
-		}
-		if (fBIOSInfo.version.empty()) {
+				biosInfo.vendor = tmpElement->GetText();
 			tmpElement = element->FirstChildElement("version");
 			if (tmpElement != NULL)
-				fBIOSInfo.version = tmpElement->GetText();
+				biosInfo.version = tmpElement->GetText();
+
+			if (biosInfo.Score() > fBIOSInfo.Score())
+				fBIOSInfo = biosInfo;
 		}
 	}
 
 	element = XML::GetElementByAttribute(doc, "class", "system");
 	if (element != NULL) {
-		if (fSystemInfo.name.empty()) {
+		if (fSystemInfo.Score() < 100) {
+			system_info systemInfo;
 			tmpElement = element->FirstChildElement("product");
 			if (tmpElement != NULL)
-				fSystemInfo.name = tmpElement->GetText();
-		}
-		if (fSystemInfo.version.empty()) {
+				systemInfo.name = tmpElement->GetText();
 			tmpElement = element->FirstChildElement("version");
 			if (tmpElement != NULL)
-				fSystemInfo.version = tmpElement->GetText();
-		}
-		if (fSystemInfo.serial.empty()) {
+				systemInfo.version = tmpElement->GetText();
 			tmpElement = element->FirstChildElement("serial");
 			if (tmpElement != NULL)
-				fSystemInfo.serial = tmpElement->GetText();
-		}
-		if (fSystemInfo.vendor.empty()) {
+				systemInfo.serial = tmpElement->GetText();
 			tmpElement = element->FirstChildElement("vendor");
 			if (tmpElement != NULL)
-				fSystemInfo.vendor = tmpElement->GetText();
+				systemInfo.vendor = tmpElement->GetText();
+
+			if (systemInfo.Score() > fSystemInfo.Score())
+				fSystemInfo = systemInfo;
 		}
-		// TODO: Check if this is always correct
-		if (fChassisInfo.type.empty()) {
+
+		if (fChassisInfo.Score() < 100) {
+			chassis_info chassisInfo;
+			// TODO: Check if this is always correct
 			tmpElement = element->FirstChildElement("description");
 			if (tmpElement != NULL)
-				fChassisInfo.type = tmpElement->GetText();
+				chassisInfo.type = tmpElement->GetText();
+
+			if (chassisInfo.Score() > fChassisInfo.Score())
+				fChassisInfo = chassisInfo;
 		}
 	}
 
-	element = XML::GetElementByAttribute(doc, "id", "core");
-	if (element != NULL) {
-		if (fBoardInfo.name.empty()) {
+	if (fBoardInfo.Score() < 100) {
+		element = XML::GetElementByAttribute(doc, "id", "core");
+		if (element != NULL) {
+			board_info boardInfo;
 			tmpElement = element->FirstChildElement("product");
 			if (tmpElement != NULL)
-				fBoardInfo.name = tmpElement->GetText();
-		}
-		if (fBoardInfo.vendor.empty()) {
+				boardInfo.name = tmpElement->GetText();
 			tmpElement = element->FirstChildElement("vendor");
 			if (tmpElement != NULL)
-				fBoardInfo.vendor = tmpElement->GetText();
-		}
-		if (fBoardInfo.serial.empty()) {
+				boardInfo.vendor = tmpElement->GetText();
 			tmpElement = element->FirstChildElement("serial");
 			if (tmpElement != NULL)
-				fBoardInfo.serial = tmpElement->GetText();
+				boardInfo.serial = tmpElement->GetText();
+			if (boardInfo.Score() > fBoardInfo.Score())
+				fBoardInfo = boardInfo;
 		}
 	}
 
@@ -978,7 +981,7 @@ Machine::_ExtractDataFromDMIDB(dmi_db dmiDb)
 				info.asset_tag = mapIter->second;
 			mapIter = entry.find("Serial Number");
 			if (mapIter != entry.end())
-				info.serial= mapIter->second;
+				info.serial = mapIter->second;
 			
 			mapIter = entry.find("Array Handle");
 			if (mapIter != entry.end()) {
