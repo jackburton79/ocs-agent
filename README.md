@@ -1,5 +1,7 @@
 [![Build Status](https://travis-ci.org/jackburton79/ocs-agent.svg?branch=master)](https://travis-ci.org/jackburton79/ocs-agent)
 
+[![CodeFactor](https://www.codefactor.io/repository/github/jackburton79/ocs-agent/badge)](https://www.codefactor.io/repository/github/jackburton79/ocs-agent)
+
 (Unofficial) Linux lite OCS Inventory NG agent
 =====
 A couple of years ago, where I work, we started using [OCS Inventory NG](http://www.ocsinventory-ng.org), which
