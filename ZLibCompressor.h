@@ -1,5 +1,5 @@
 /*
- * ZLibCompression.h
+ * ZLibCompressor.h
  *
  *  Created on: 03 mag 2018
  *      Author: Stefano ceccherini (stefano.ceccherini@gmail.com)
@@ -18,4 +18,4 @@ public:
 
 
 
-#endif /* ZLIBCOMPRESSION_H_ */
+#endif /* ZLIBCOMPRESSOR_H_ */
