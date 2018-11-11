@@ -867,66 +867,53 @@ Machine::_OSDescription()
 void
 Machine::_ExtractDataFromDMIDB(dmi_db dmiDb)
 {
-	std::string string;
-	string = GetValueFromMap(dmiDb, "Release Date", kBIOSInfo);
-	if (string != "" && fBIOSInfo.release_date == "")
-		fBIOSInfo.release_date = string;
-	string = GetValueFromMap(dmiDb, "Vendor", kBIOSInfo);
-	if (string != "" && fBIOSInfo.vendor == "")
-		fBIOSInfo.vendor = string;
-	string = GetValueFromMap(dmiDb, "Version", kBIOSInfo);
-	if (string != "" && fBIOSInfo.version == "")
-		fBIOSInfo.version = string;
+	if (fBIOSInfo.Score() < 100) {
+		bios_info biosInfo;
+		biosInfo.release_date = GetValueFromMap(dmiDb, "Release Date", kBIOSInfo);
+		biosInfo.vendor = GetValueFromMap(dmiDb, "Vendor", kBIOSInfo);
+		biosInfo.version = GetValueFromMap(dmiDb, "Version", kBIOSInfo);
+		if (biosInfo.Score() > fBIOSInfo.Score())
+			fBIOSInfo = biosInfo;
+	}
 
-	string = GetValueFromMap(dmiDb, "Product Name", kSystemInfo);
-	if (string != "" && fSystemInfo.name == "")
-		fSystemInfo.name = string;
-	string = GetValueFromMap(dmiDb, "Version", kSystemInfo);
-	if (string != "" && fSystemInfo.version == "")
-		fSystemInfo.version = string;
-	string = GetValueFromMap(dmiDb, "UUID", kSystemInfo);
-	if (string != "" && fSystemInfo.uuid == "")
-		fSystemInfo.uuid = string;
-	string = GetValueFromMap(dmiDb, "Serial Number", kSystemInfo);
-	if (string != "" && fSystemInfo.serial == "")
-		fSystemInfo.serial = string;
-		
-	string = GetValueFromMap(dmiDb, "Asset Tag", "Chassis Information");
-	if (string != "" && fChassisInfo.asset_tag == "")
-		fChassisInfo.asset_tag = string;
-	string = GetValueFromMap(dmiDb, "Serial Number", "Chassis Information");
-	if (string != "" && fChassisInfo.serial == "")
-		fChassisInfo.serial = string;
-	string = GetValueFromMap(dmiDb, "Type", "Chassis Information");
-	if (string != "" && fChassisInfo.type == "")
-		fChassisInfo.type = string;
-	string = GetValueFromMap(dmiDb, "Manufacturer", "Chassis Information");
-	if (string != "" && fChassisInfo.vendor == "")
-		fChassisInfo.vendor = string;
-	string = GetValueFromMap(dmiDb, "Version",  "Chassis Information");
-	if (string != "" && fChassisInfo.version == "")
-		fChassisInfo.version = string;
+	if (fSystemInfo.Score() < 100) {
+		system_info systemInfo;
+		systemInfo.name = GetValueFromMap(dmiDb, "Product Name", kSystemInfo);
+		systemInfo.version = GetValueFromMap(dmiDb, "Version", kSystemInfo);
+		systemInfo.uuid = GetValueFromMap(dmiDb, "UUID", kSystemInfo);
+		systemInfo.serial = GetValueFromMap(dmiDb, "Serial Number", kSystemInfo);
+		if (systemInfo.Score() > fSystemInfo.Score())
+			fSystemInfo = systemInfo;
+	}
 
-	string = GetValueFromMap(dmiDb, "Asset Tag", "Base Board Information");
-	if (string != "" && fBoardInfo.asset_tag == "")
-		fBoardInfo.asset_tag = string;
-	string = GetValueFromMap(dmiDb, "Product Name", "Base Board Information");
-	if (string != "" && fBoardInfo.name == "")
-		fBoardInfo.name = string;
-	string = GetValueFromMap(dmiDb, "Manufacturer", "Base Board Information");
-	if (string != "" && fBoardInfo.vendor == "")
-		fBoardInfo.vendor = string;
-	string = GetValueFromMap(dmiDb, "Version", "Base Board Information");
-	if (string != "" && fBoardInfo.version == "")
-		fBoardInfo.version = string;
-	string = GetValueFromMap(dmiDb, "Serial Number", "Base Board Information");
-	if (string != "" && fBoardInfo.serial == "")
-		fBoardInfo.serial = string;
+	if (fChassisInfo.Score() < 100) {
+		chassis_info chassisInfo;
+		chassisInfo.asset_tag = GetValueFromMap(dmiDb, "Asset Tag", "Chassis Information");
+		chassisInfo.serial = GetValueFromMap(dmiDb, "Serial Number", "Chassis Information");
+		chassisInfo.type = GetValueFromMap(dmiDb, "Type", "Chassis Information");
+		chassisInfo.vendor = GetValueFromMap(dmiDb, "Manufacturer", "Chassis Information");
+		chassisInfo.version = GetValueFromMap(dmiDb, "Version",  "Chassis Information");
+		if (chassisInfo.Score() > fChassisInfo.Score())
+			fChassisInfo = chassisInfo;
+	}
 
-	string = GetValueFromMap(dmiDb, "Manufacturer", kSystemInfo);
-	if (string != "" && fSystemInfo.vendor == "")
-		fSystemInfo.vendor = string;
+	if (fBoardInfo.Score() < 100) {
+		board_info boardInfo;
+		boardInfo.asset_tag = GetValueFromMap(dmiDb, "Asset Tag", "Base Board Information");
+		boardInfo.name = GetValueFromMap(dmiDb, "Product Name", "Base Board Information");
+		boardInfo.vendor = GetValueFromMap(dmiDb, "Manufacturer", "Base Board Information");
+		boardInfo.version = GetValueFromMap(dmiDb, "Version", "Base Board Information");
+		boardInfo.serial = GetValueFromMap(dmiDb, "Serial Number", "Base Board Information");
+		if (boardInfo.Score() > fBoardInfo.Score())
+			fBoardInfo = boardInfo;
+	}
 
+	if (fSystemInfo.Score() < 100) {
+		system_info systemInfo;
+		systemInfo.vendor = GetValueFromMap(dmiDb, "Manufacturer", kSystemInfo);
+		if (systemInfo.Score() > fSystemInfo.Score())
+			fSystemInfo = systemInfo;
+	}
 	std::vector<string_map> valuesVector;
 	DMIExtractor dmiExtractor(dmiDb);
 	std::vector<string_map>::iterator i;
@@ -1016,6 +1003,61 @@ Machine::_ExtractDataFromDMIDB(dmi_db dmiDb)
 }
 
 
+// bios_info
+int
+bios_info::Score() const
+{
+	int score = 0;
+	score += vendor.empty() ? 0 : 34;
+	score += release_date.empty() ? 0 : 34;
+	score += version.empty() ? 0 : 34;
+	return score;
+}
+
+
+// system_info
+int
+system_info::Score() const
+{
+	int score = 0;
+	score += name.empty() ? 0 : 20;
+	score += vendor.empty() ? 0 : 20;
+	score += serial.empty() ? 0 : 20;
+	score += version.empty() ? 0 : 20;
+	score += uuid.empty() ? 0 : 20;
+	return score;
+}
+
+
+// board_info
+int
+board_info::Score() const
+{
+	int score = 0;
+	score += asset_tag.empty() ? 0 : 20;
+	score += name.empty() ? 0 : 20;
+	score += serial.empty() ? 0 : 20;
+	score += vendor.empty() ? 0 : 20;
+	score += version.empty() ? 0 : 20;
+	return score;
+}
+
+
+// chassis_info
+int
+chassis_info::Score() const
+{
+	int score = 0;
+	score += asset_tag.empty() ? 0 : 20;
+	score += serial.empty() ? 0 : 20;
+	score += type.empty() ? 0 : 20;
+	score += vendor.empty() ? 0 : 20;
+	score += version.empty() ? 0 : 20;
+	return score;
+}
+
+
+// memory_device_info
 memory_device_info::memory_device_info()
 	:
 	speed(0),

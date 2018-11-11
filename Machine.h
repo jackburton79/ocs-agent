@@ -19,6 +19,7 @@ struct bios_info {
 	std::string vendor;
 	std::string release_date;
 	std::string version;
+	int Score() const;
 };
 
 
@@ -28,6 +29,7 @@ struct system_info {
 	std::string serial;
 	std::string version;
 	std::string uuid;
+	int Score() const;
 };
 
 
@@ -37,6 +39,7 @@ struct board_info {
 	std::string serial;
 	std::string vendor;
 	std::string version;
+	int Score() const;
 };
 
 
@@ -46,6 +49,7 @@ struct chassis_info {
 	std::string type;
 	std::string vendor;
 	std::string version;
+	int Score() const;
 };
 
 
