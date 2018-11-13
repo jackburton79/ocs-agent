@@ -51,6 +51,7 @@ public:
 
 	void SetUseBaseBoardSerialNumber(bool use);
 	bool UseBaseBoardSerialNumber() const;
+
 private:
 	Configuration();
 	~Configuration();
@@ -63,7 +64,6 @@ private:
 	std::map<std::string, std::string> fValues;
 	std::map<std::string, std::string> fVolatileValues;
 	std::string fConfigFileName;
-
 };
 
 #endif /* CONFIGURATION_H_ */
