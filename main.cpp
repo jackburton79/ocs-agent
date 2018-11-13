@@ -119,38 +119,33 @@ PrintVersionAndExit()
 }
 
 
-int
-main(int argc, char **argv)
+static void
+HandleArgs(int argc, char **argv)
 {
-	char* configFile = NULL;
-	char* serverUrl = NULL;
-	char* fullFileName = NULL;
-	char* tag = NULL;
-	int optIndex = 0;
-	int c = 0;
 	bool verbose = false;
 	bool daemonize = false;
-	
 	Configuration* config = Configuration::Get();
-
+	int optIndex = 0;
+	int c = 0;
 	while ((c = ::getopt_long(argc, argv, "c:s:dDt:l:hvw:",
 			sLongOptions, &optIndex)) != -1) {
 		switch (c) {
 			case 'c':
-				configFile = optarg;
+				config->Load(optarg);
 				break;
 			case 's':
-				serverUrl = optarg;
+				config->SetServer(optarg);
 				break;
 			case 'D':
 			case 'd':
 				daemonize = true;
+				config->SetVolatileKeyValue("DAEMONIZE", "true");
 				break;
 			case 't':
-				tag = optarg;
+				config->SetVolatileKeyValue("TAG", optarg);
 				break;
 			case 'l':
-				fullFileName = optarg;
+				config->SetOutputFileName(optarg);
 				break;
 			case 'h':
 				PrintHelpAndExit();
@@ -184,21 +179,28 @@ main(int argc, char **argv)
 				break;
 		}
 	}
+
 	Logger& logger = Logger::GetDefault();
 	if (verbose)
 		logger.SetLevel(LOG_DEBUG);
 	else
 		logger.SetLevel(LOG_INFO);
 
-	bool local = config->LocalInventory();
 	bool stdout = config->KeyValue("stdout") == CONF_VALUE_TRUE;
-	if (!stdout && serverUrl == NULL
-		&& configFile == NULL
-		&& local && fullFileName == NULL) {
+	if (!stdout && config->ServerURL().empty()
+		&& config->LocalInventory() && config->OutputFileName().empty()) {
 		PrintHelpAndExit();
 	}
+}
 
-	if (daemonize) {
+
+int
+main(int argc, char **argv)
+{
+	HandleArgs(argc, argv);
+
+	Logger& logger = Logger::GetDefault();
+	if (Configuration::Get()->KeyValue("DAEMONIZE") == CONF_VALUE_TRUE) {
 		pid_t processID = fork();
 		if (processID < 0) {
 			logger.Log(LOG_ERR, "Failed to daemonize. Exiting...");
@@ -224,21 +226,11 @@ main(int argc, char **argv)
 		close(STDERR_FILENO);
 	}
 
-	if (configFile != NULL)
-		Configuration::Get()->Load(configFile);
-	else if (serverUrl != NULL)
-		Configuration::Get()->SetServer(serverUrl);
-	else if (fullFileName != NULL)
-		Configuration::Get()->SetOutputFileName(fullFileName);
-
-	if (tag != NULL)
-		Configuration::Get()->SetVolatileKeyValue("TAG", tag);
-
 	try {
 		Agent agent;
 		agent.Run();
-		if (verbose)
-			Configuration::Get()->Print();
+		//if (verbose)
+		//	Configuration::Get()->Print();
 	} catch (std::exception& ex) {
 		logger.Log(LOG_ERR, ex.what());
 		return 1;
@@ -247,8 +239,7 @@ main(int argc, char **argv)
 		return 1;
 	}
 
-	if (configFile != NULL)
-		Configuration::Get()->Save();
+	Configuration::Get()->Save();
 
 	return 0;
 }
