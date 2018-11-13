@@ -549,49 +549,37 @@ Machine::_GetLSHWData()
 
 	const tinyxml2::XMLElement* element = NULL;
 	const tinyxml2::XMLElement* tmpElement = NULL;
-	if (fBIOSInfo.Score() < 100) {
-		element = XML::GetElementByAttribute(doc, "id", "firmware");
-		if (element != NULL) {
-			bios_info biosInfo;
-			biosInfo.release_date = XML::GetFirstChildElementText(element, "date");
-			biosInfo.vendor = XML::GetFirstChildElementText(element, "vendor");
-			biosInfo.version = XML::GetFirstChildElementText(element, "version");
-			if (biosInfo.Score() > fBIOSInfo.Score())
-				fBIOSInfo.MergeWith(biosInfo);
-		}
+	element = XML::GetElementByAttribute(doc, "id", "firmware");
+	if (element != NULL) {
+		bios_info biosInfo;
+		biosInfo.release_date = XML::GetFirstChildElementText(element, "date");
+		biosInfo.vendor = XML::GetFirstChildElementText(element, "vendor");
+		biosInfo.version = XML::GetFirstChildElementText(element, "version");
+		fBIOSInfo.MergeWith(biosInfo);
 	}
 
 	element = XML::GetElementByAttribute(doc, "class", "system");
 	if (element != NULL) {
-		if (fSystemInfo.Score() < 100) {
-			system_info systemInfo;
-			systemInfo.name = XML::GetFirstChildElementText(element, "product");
-			systemInfo.version = XML::GetFirstChildElementText(element, "version");
-			systemInfo.serial = XML::GetFirstChildElementText(element, "serial");
-			systemInfo.vendor = XML::GetFirstChildElementText(element, "vendor");
-			if (systemInfo.Score() > fSystemInfo.Score())
-				fSystemInfo.MergeWith(systemInfo);
-		}
+		system_info systemInfo;
+		systemInfo.name = XML::GetFirstChildElementText(element, "product");
+		systemInfo.version = XML::GetFirstChildElementText(element, "version");
+		systemInfo.serial = XML::GetFirstChildElementText(element, "serial");
+		systemInfo.vendor = XML::GetFirstChildElementText(element, "vendor");
+		fSystemInfo.MergeWith(systemInfo);
 
-		if (fChassisInfo.Score() < 100) {
-			chassis_info chassisInfo;
-			// TODO: Check if this is always correct
-			chassisInfo.type = XML::GetFirstChildElementText(element, "description");
-			if (chassisInfo.Score() > fChassisInfo.Score())
-				fChassisInfo.MergeWith(chassisInfo);
-		}
+		chassis_info chassisInfo;
+		// TODO: Check if this is always correct
+		chassisInfo.type = XML::GetFirstChildElementText(element, "description");
+		fChassisInfo.MergeWith(chassisInfo);
 	}
 
-	if (fBoardInfo.Score() < 100) {
-		element = XML::GetElementByAttribute(doc, "id", "core");
-		if (element != NULL) {
-			board_info boardInfo;
-			boardInfo.name = XML::GetFirstChildElementText(element, "product");
-			boardInfo.vendor = XML::GetFirstChildElementText(element, "vendor");
-			boardInfo.serial = XML::GetFirstChildElementText(element, "serial");
-			if (boardInfo.Score() > fBoardInfo.Score())
-				fBoardInfo.MergeWith(boardInfo);
-		}
+	element = XML::GetElementByAttribute(doc, "id", "core");
+	if (element != NULL) {
+		board_info boardInfo;
+		boardInfo.name = XML::GetFirstChildElementText(element, "product");
+		boardInfo.vendor = XML::GetFirstChildElementText(element, "vendor");
+		boardInfo.serial = XML::GetFirstChildElementText(element, "serial");
+		fBoardInfo.MergeWith(boardInfo);
 	}
 
 	if (fVideoInfo.size() == 0) {
@@ -832,53 +820,36 @@ Machine::_OSDescription()
 void
 Machine::_ExtractDataFromDMIDB(dmi_db dmiDb)
 {
-	if (fBIOSInfo.Score() < 100) {
-		bios_info biosInfo;
-		biosInfo.release_date = GetValueFromMap(dmiDb, "Release Date", kBIOSInfo);
-		biosInfo.vendor = GetValueFromMap(dmiDb, "Vendor", kBIOSInfo);
-		biosInfo.version = GetValueFromMap(dmiDb, "Version", kBIOSInfo);
-		if (biosInfo.Score() > fBIOSInfo.Score())
-			fBIOSInfo.MergeWith(biosInfo);
-	}
+	bios_info biosInfo;
+	biosInfo.release_date = GetValueFromMap(dmiDb, "Release Date", kBIOSInfo);
+	biosInfo.vendor = GetValueFromMap(dmiDb, "Vendor", kBIOSInfo);
+	biosInfo.version = GetValueFromMap(dmiDb, "Version", kBIOSInfo);
+	fBIOSInfo.MergeWith(biosInfo);
 
-	if (fSystemInfo.Score() < 100) {
-		system_info systemInfo;
-		systemInfo.name = GetValueFromMap(dmiDb, "Product Name", kSystemInfo);
-		systemInfo.version = GetValueFromMap(dmiDb, "Version", kSystemInfo);
-		systemInfo.uuid = GetValueFromMap(dmiDb, "UUID", kSystemInfo);
-		systemInfo.serial = GetValueFromMap(dmiDb, "Serial Number", kSystemInfo);
-		if (systemInfo.Score() > fSystemInfo.Score())
-			fSystemInfo.MergeWith(systemInfo);
-	}
+	system_info systemInfo;
+	systemInfo.name = GetValueFromMap(dmiDb, "Product Name", kSystemInfo);
+	systemInfo.version = GetValueFromMap(dmiDb, "Version", kSystemInfo);
+	systemInfo.uuid = GetValueFromMap(dmiDb, "UUID", kSystemInfo);
+	systemInfo.serial = GetValueFromMap(dmiDb, "Serial Number", kSystemInfo);
+	systemInfo.vendor = GetValueFromMap(dmiDb, "Manufacturer", kSystemInfo);
+	fSystemInfo.MergeWith(systemInfo);
 
-	if (fChassisInfo.Score() < 100) {
-		chassis_info chassisInfo;
-		chassisInfo.asset_tag = GetValueFromMap(dmiDb, "Asset Tag", "Chassis Information");
-		chassisInfo.serial = GetValueFromMap(dmiDb, "Serial Number", "Chassis Information");
-		chassisInfo.type = GetValueFromMap(dmiDb, "Type", "Chassis Information");
-		chassisInfo.vendor = GetValueFromMap(dmiDb, "Manufacturer", "Chassis Information");
-		chassisInfo.version = GetValueFromMap(dmiDb, "Version",  "Chassis Information");
-		if (chassisInfo.Score() > fChassisInfo.Score())
-			fChassisInfo.MergeWith(chassisInfo);
-	}
+	chassis_info chassisInfo;
+	chassisInfo.asset_tag = GetValueFromMap(dmiDb, "Asset Tag", "Chassis Information");
+	chassisInfo.serial = GetValueFromMap(dmiDb, "Serial Number", "Chassis Information");
+	chassisInfo.type = GetValueFromMap(dmiDb, "Type", "Chassis Information");
+	chassisInfo.vendor = GetValueFromMap(dmiDb, "Manufacturer", "Chassis Information");
+	chassisInfo.version = GetValueFromMap(dmiDb, "Version",  "Chassis Information");
+	fChassisInfo.MergeWith(chassisInfo);
 
-	if (fBoardInfo.Score() < 100) {
-		board_info boardInfo;
-		boardInfo.asset_tag = GetValueFromMap(dmiDb, "Asset Tag", "Base Board Information");
-		boardInfo.name = GetValueFromMap(dmiDb, "Product Name", "Base Board Information");
-		boardInfo.vendor = GetValueFromMap(dmiDb, "Manufacturer", "Base Board Information");
-		boardInfo.version = GetValueFromMap(dmiDb, "Version", "Base Board Information");
-		boardInfo.serial = GetValueFromMap(dmiDb, "Serial Number", "Base Board Information");
-		if (boardInfo.Score() > fBoardInfo.Score())
-			fBoardInfo.MergeWith(boardInfo);
-	}
+	board_info boardInfo;
+	boardInfo.asset_tag = GetValueFromMap(dmiDb, "Asset Tag", "Base Board Information");
+	boardInfo.name = GetValueFromMap(dmiDb, "Product Name", "Base Board Information");
+	boardInfo.vendor = GetValueFromMap(dmiDb, "Manufacturer", "Base Board Information");
+	boardInfo.version = GetValueFromMap(dmiDb, "Version", "Base Board Information");
+	boardInfo.serial = GetValueFromMap(dmiDb, "Serial Number", "Base Board Information");
+	fBoardInfo.MergeWith(boardInfo);
 
-	if (fSystemInfo.Score() < 100) {
-		system_info systemInfo;
-		systemInfo.vendor = GetValueFromMap(dmiDb, "Manufacturer", kSystemInfo);
-		if (systemInfo.Score() > fSystemInfo.Score())
-			fSystemInfo.MergeWith(systemInfo);
-	}
 	std::vector<string_map> valuesVector;
 	DMIExtractor dmiExtractor(dmiDb);
 	std::vector<string_map>::iterator i;
