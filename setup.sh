@@ -1,6 +1,6 @@
 #!/bin/sh
 
-THINSTATION_PATH=`cat ../../THINSTATION_PATH`
+THINSTATION_PATH=$(cat ../../THINSTATION_PATH)
 
 . ../SET_ENV
 
