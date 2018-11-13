@@ -518,7 +518,6 @@ Machine::_GetDMIDecodeData()
 					std::string value = trimmed(string.substr(pos + 2, std::string::npos));
 					dmiDatabase[numericHandle][name] = value;
 				} catch (...) {
-
 				}
 			}
 		}
@@ -705,7 +704,6 @@ Machine::_GetLSHWData()
 					break;
 			}
 		}
-		
 	}
 	
 	return true;
@@ -762,7 +760,6 @@ Machine::_GetCPUInfo()
 						::strtol(value.c_str(), NULL, 0);
 				else if (name == "cache size")
 					tmpCPUInfo[processorNum].cache_size = value;
-
 			} catch (...) {
 			}
 		}
@@ -940,7 +937,6 @@ Machine::_ExtractDataFromDMIDB(dmi_db dmiDb)
 					info.chipset = mapIter->second;
 				fVideoInfo.push_back(info);
 			} catch (...) {
-
 			}
 		}
 	}
@@ -995,7 +991,6 @@ Machine::_ExtractDataFromDMIDB(dmi_db dmiDb)
 					info.caption = mapIter->second;
 			}
 		} catch (...) {
-
 		}
 
 		// Make sure we have at least some valid info
