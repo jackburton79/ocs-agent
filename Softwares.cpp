@@ -90,7 +90,6 @@ Softwares::_ReadSoftwaresInfo()
 			info.version = version;
 			fItems.push_back(info);
 		}
-         
 	} catch (...) {
 		std::cerr << "No software info" << std::endl;
 	}

@@ -20,13 +20,13 @@ struct software_info {
 	std::string version;
 };
 
+
 class Softwares : public ItemsList<software_info> {
 public:
 	Softwares();
 
 private:
 	void _ReadSoftwaresInfo();
-
 };
 
 #endif /* SOFTWARES_H_*/
