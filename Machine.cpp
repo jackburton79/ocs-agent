@@ -128,7 +128,7 @@ GetValueFromMap(dmi_db &db, std::string key, std::string context)
 // Returns size, in MBytes,
 // starting from a string like '3GB' or '1024 KB'
 unsigned int
-convert_to_MBytes(std::string string)
+convert_to_MBytes(const std::string& string)
 {
 	char *memoryUnit = NULL;
 	unsigned int memorySize = ::strtol(string.c_str(), &memoryUnit, 10);
@@ -142,6 +142,27 @@ convert_to_MBytes(std::string string)
 		memorySize *= 1024;
 	return memorySize;
 }
+
+
+std::string
+RAM_type_from_description(const std::string& description)
+{
+	std::string type;
+	if (!description.empty()) {
+		// TODO: Not the cleanest approach, but lshw doesn't
+		// seem to return this in any other field
+		if (description.find("SDRAM") != std::string::npos)
+			type = "SDRAM";
+		else if (description.find("FLASH") != std::string::npos)
+			type = "FLASH";
+		else if (description.find("DDR") != std::string::npos)
+			type = "DDR";
+		// TODO: Yeah, and DDR2 ? DDR3 ?
+		// TODO: Handle empty slots like we do for dmidecode
+	}
+	return type;
+}
+
 
 
 // Machine
@@ -623,18 +644,7 @@ Machine::_GetLSHWData()
 					info.caption = memoryCaption;
 					info.purpose = info.caption;
 					info.description = XML::GetFirstChildElementText(bankElement, "description");
-					if (!info.description.empty()) {
-						// TODO: Not the cleanest approach, but lshw doesn't
-						// seem to return this in any other field
-						if (info.description.find("SDRAM") != std::string::npos)
-							info.type = "SDRAM";
-						else if (info.description.find("FLASH") != std::string::npos)
-							info.type = "FLASH";
-						else if (info.description.find("DDR") != std::string::npos)
-							info.type = "DDR";
-						// TODO: Yeah, and DDR2 ? DDR3 ?
-						// TODO: Handle empty slots like we do for dmidecode
-					}
+					info.type = RAM_type_from_description(info.description);
 					info.serial = XML::GetFirstChildElementText(bankElement, "serial");
 
 					tmpElement = bankElement->FirstChildElement("clock");
