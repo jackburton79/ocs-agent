@@ -22,7 +22,6 @@ public:
 	static const char* AgentString();
 
 private:
-
 	void _RetrieveInventory();
 	void _PrintInventory();
 	void _SendInventory();
