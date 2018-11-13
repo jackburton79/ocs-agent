@@ -39,7 +39,6 @@ RunningProcessesList::RunningProcessesList()
 		}
 		::closedir(dir);
 	}
-
 	Rewind();
 }
 
@@ -78,7 +77,5 @@ RunningProcessesList::_ReadProcessInfo(process_info& info, std::string pid)
 			}
 		}
 	} catch (...) {
-
 	}
-
 }

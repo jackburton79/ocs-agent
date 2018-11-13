@@ -32,7 +32,6 @@ public:
 	int Checksum() const;
 
 private:
-
     void _AddAccountInfo(tinyxml2::XMLElement* parent);
     void _AddBIOSInfo(tinyxml2::XMLElement* parent);
     void _AddCPUsInfo(tinyxml2::XMLElement* parent);

@@ -1,5 +1,5 @@
 language: cpp
 compiler:
   - gcc
-script: 
+script:
   make all
