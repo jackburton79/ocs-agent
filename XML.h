@@ -27,6 +27,7 @@ public:
 	static bool Uncompress(const char* source, size_t sourceLen, tinyxml2::XMLDocument& document);
 
 	static std::string GetElementText(const tinyxml2::XMLNode& node, const std::string& elementName);
+	static std::string GetFirstChildElementText(const tinyxml2::XMLElement*, const std::string& elementName);
 
 	static const tinyxml2::XMLElement* GetElementByName(const tinyxml2::XMLNode& node,
 							std::string elementName,

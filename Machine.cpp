@@ -553,16 +553,9 @@ Machine::_GetLSHWData()
 		element = XML::GetElementByAttribute(doc, "id", "firmware");
 		if (element != NULL) {
 			bios_info biosInfo;
-			tmpElement = element->FirstChildElement("date");
-			if (tmpElement != NULL)
-					biosInfo.release_date = tmpElement->GetText();
-			tmpElement = element->FirstChildElement("vendor");
-			if (tmpElement != NULL)
-				biosInfo.vendor = tmpElement->GetText();
-			tmpElement = element->FirstChildElement("version");
-			if (tmpElement != NULL)
-				biosInfo.version = tmpElement->GetText();
-
+			biosInfo.release_date = XML::GetFirstChildElementText(element, "date");
+			biosInfo.vendor = XML::GetFirstChildElementText(element, "vendor");
+			biosInfo.version = XML::GetFirstChildElementText(element, "version");
 			if (biosInfo.Score() > fBIOSInfo.Score())
 				fBIOSInfo.MergeWith(biosInfo);
 		}
@@ -572,19 +565,10 @@ Machine::_GetLSHWData()
 	if (element != NULL) {
 		if (fSystemInfo.Score() < 100) {
 			system_info systemInfo;
-			tmpElement = element->FirstChildElement("product");
-			if (tmpElement != NULL)
-				systemInfo.name = tmpElement->GetText();
-			tmpElement = element->FirstChildElement("version");
-			if (tmpElement != NULL)
-				systemInfo.version = tmpElement->GetText();
-			tmpElement = element->FirstChildElement("serial");
-			if (tmpElement != NULL)
-				systemInfo.serial = tmpElement->GetText();
-			tmpElement = element->FirstChildElement("vendor");
-			if (tmpElement != NULL)
-				systemInfo.vendor = tmpElement->GetText();
-
+			systemInfo.name = XML::GetFirstChildElementText(element, "product");
+			systemInfo.version = XML::GetFirstChildElementText(element, "version");
+			systemInfo.serial = XML::GetFirstChildElementText(element, "serial");
+			systemInfo.vendor = XML::GetFirstChildElementText(element, "vendor");
 			if (systemInfo.Score() > fSystemInfo.Score())
 				fSystemInfo.MergeWith(systemInfo);
 		}
@@ -592,10 +576,7 @@ Machine::_GetLSHWData()
 		if (fChassisInfo.Score() < 100) {
 			chassis_info chassisInfo;
 			// TODO: Check if this is always correct
-			tmpElement = element->FirstChildElement("description");
-			if (tmpElement != NULL)
-				chassisInfo.type = tmpElement->GetText();
-
+			chassisInfo.type = XML::GetFirstChildElementText(element, "description");
 			if (chassisInfo.Score() > fChassisInfo.Score())
 				fChassisInfo.MergeWith(chassisInfo);
 		}
@@ -605,15 +586,9 @@ Machine::_GetLSHWData()
 		element = XML::GetElementByAttribute(doc, "id", "core");
 		if (element != NULL) {
 			board_info boardInfo;
-			tmpElement = element->FirstChildElement("product");
-			if (tmpElement != NULL)
-				boardInfo.name = tmpElement->GetText();
-			tmpElement = element->FirstChildElement("vendor");
-			if (tmpElement != NULL)
-				boardInfo.vendor = tmpElement->GetText();
-			tmpElement = element->FirstChildElement("serial");
-			if (tmpElement != NULL)
-				boardInfo.serial = tmpElement->GetText();
+			boardInfo.name = XML::GetFirstChildElementText(element, "product");
+			boardInfo.vendor = XML::GetFirstChildElementText(element, "vendor");
+			boardInfo.serial = XML::GetFirstChildElementText(element, "serial");
 			if (boardInfo.Score() > fBoardInfo.Score())
 				fBoardInfo.MergeWith(boardInfo);
 		}
@@ -624,15 +599,9 @@ Machine::_GetLSHWData()
 		if (element != NULL) {
 			// TODO: there could be multiple displays
 			video_info info;
-			tmpElement = element->FirstChildElement("description"); 
-			if (tmpElement != NULL)
-				info.name = tmpElement->GetText();
-			tmpElement = element->FirstChildElement("vendor");
-			if (tmpElement != NULL)
-				info.vendor = tmpElement->GetText();
-			tmpElement = element->FirstChildElement("product");
-			if (tmpElement != NULL)
-				info.chipset = tmpElement->GetText();
+			info.name = XML::GetFirstChildElementText(element, "description");
+			info.vendor = XML::GetFirstChildElementText(element, "vendor");
+			info.chipset = XML::GetFirstChildElementText(element, "product");
 			fVideoInfo.push_back(info);
 		}
 	}
@@ -665,9 +634,8 @@ Machine::_GetLSHWData()
 					memory_device_info info;
 					info.caption = memoryCaption;
 					info.purpose = info.caption;
-					tmpElement = bankElement->FirstChildElement("description");
-					if (tmpElement != NULL) {
-						info.description = tmpElement->GetText();
+					info.description = XML::GetFirstChildElementText(bankElement, "description");
+					if (!info.description.empty()) {
 						// TODO: Not the cleanest approach, but lshw doesn't
 						// seem to return this in any other field
 						if (info.description.find("SDRAM") != std::string::npos)
@@ -679,10 +647,7 @@ Machine::_GetLSHWData()
 						// TODO: Yeah, and DDR2 ? DDR3 ?
 						// TODO: Handle empty slots like we do for dmidecode
 					}
-					tmpElement = bankElement->FirstChildElement("serial");
-					if (tmpElement != NULL) {
-						info.serial = tmpElement->GetText();
-					}
+					info.serial = XML::GetFirstChildElementText(bankElement, "serial");
 
 					tmpElement = bankElement->FirstChildElement("clock");
 					if (tmpElement != NULL) {

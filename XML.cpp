@@ -97,6 +97,17 @@ XML::GetElementText(const tinyxml2::XMLNode& node, const std::string& elementNam
 }
 
 
+std::string
+XML::GetFirstChildElementText(const tinyxml2::XMLElement* element, const std::string& elementName)
+{
+	std::string result;
+	const tinyxml2::XMLElement* foundElement = element->FirstChildElement(elementName.c_str());
+	if (element != NULL)
+		result = foundElement->GetText();
+	return result;
+}
+
+
 const tinyxml2::XMLElement*
 XML::GetElementByName(const tinyxml2::XMLNode& node,
 						std::string elementName,
