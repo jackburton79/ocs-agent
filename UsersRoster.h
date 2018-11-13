@@ -19,10 +19,10 @@ struct user_entry {
 	time_t logintime;
 };
 
+
 class UsersRoster : public ItemsList<user_entry> {
 public:
 	UsersRoster();
-
 };
 
 #endif /* USERSROSTER_H_ */
