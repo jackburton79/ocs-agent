@@ -564,7 +564,7 @@ Machine::_GetLSHWData()
 				biosInfo.version = tmpElement->GetText();
 
 			if (biosInfo.Score() > fBIOSInfo.Score())
-				fBIOSInfo = biosInfo;
+				fBIOSInfo.MergeWith(biosInfo);
 		}
 	}
 
@@ -586,7 +586,7 @@ Machine::_GetLSHWData()
 				systemInfo.vendor = tmpElement->GetText();
 
 			if (systemInfo.Score() > fSystemInfo.Score())
-				fSystemInfo = systemInfo;
+				fSystemInfo.MergeWith(systemInfo);
 		}
 
 		if (fChassisInfo.Score() < 100) {
@@ -597,7 +597,7 @@ Machine::_GetLSHWData()
 				chassisInfo.type = tmpElement->GetText();
 
 			if (chassisInfo.Score() > fChassisInfo.Score())
-				fChassisInfo = chassisInfo;
+				fChassisInfo.MergeWith(chassisInfo);
 		}
 	}
 
@@ -615,7 +615,7 @@ Machine::_GetLSHWData()
 			if (tmpElement != NULL)
 				boardInfo.serial = tmpElement->GetText();
 			if (boardInfo.Score() > fBoardInfo.Score())
-				fBoardInfo = boardInfo;
+				fBoardInfo.MergeWith(boardInfo);
 		}
 	}
 
@@ -873,7 +873,7 @@ Machine::_ExtractDataFromDMIDB(dmi_db dmiDb)
 		biosInfo.vendor = GetValueFromMap(dmiDb, "Vendor", kBIOSInfo);
 		biosInfo.version = GetValueFromMap(dmiDb, "Version", kBIOSInfo);
 		if (biosInfo.Score() > fBIOSInfo.Score())
-			fBIOSInfo = biosInfo;
+			fBIOSInfo.MergeWith(biosInfo);
 	}
 
 	if (fSystemInfo.Score() < 100) {
@@ -883,7 +883,7 @@ Machine::_ExtractDataFromDMIDB(dmi_db dmiDb)
 		systemInfo.uuid = GetValueFromMap(dmiDb, "UUID", kSystemInfo);
 		systemInfo.serial = GetValueFromMap(dmiDb, "Serial Number", kSystemInfo);
 		if (systemInfo.Score() > fSystemInfo.Score())
-			fSystemInfo = systemInfo;
+			fSystemInfo.MergeWith(systemInfo);
 	}
 
 	if (fChassisInfo.Score() < 100) {
@@ -894,7 +894,7 @@ Machine::_ExtractDataFromDMIDB(dmi_db dmiDb)
 		chassisInfo.vendor = GetValueFromMap(dmiDb, "Manufacturer", "Chassis Information");
 		chassisInfo.version = GetValueFromMap(dmiDb, "Version",  "Chassis Information");
 		if (chassisInfo.Score() > fChassisInfo.Score())
-			fChassisInfo = chassisInfo;
+			fChassisInfo.MergeWith(chassisInfo);
 	}
 
 	if (fBoardInfo.Score() < 100) {
@@ -905,14 +905,14 @@ Machine::_ExtractDataFromDMIDB(dmi_db dmiDb)
 		boardInfo.version = GetValueFromMap(dmiDb, "Version", "Base Board Information");
 		boardInfo.serial = GetValueFromMap(dmiDb, "Serial Number", "Base Board Information");
 		if (boardInfo.Score() > fBoardInfo.Score())
-			fBoardInfo = boardInfo;
+			fBoardInfo.MergeWith(boardInfo);
 	}
 
 	if (fSystemInfo.Score() < 100) {
 		system_info systemInfo;
 		systemInfo.vendor = GetValueFromMap(dmiDb, "Manufacturer", kSystemInfo);
 		if (systemInfo.Score() > fSystemInfo.Score())
-			fSystemInfo = systemInfo;
+			fSystemInfo.MergeWith(systemInfo);
 	}
 	std::vector<string_map> valuesVector;
 	DMIExtractor dmiExtractor(dmiDb);
