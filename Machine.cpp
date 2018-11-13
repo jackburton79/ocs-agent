@@ -1002,6 +1002,18 @@ Machine::_ExtractDataFromDMIDB(dmi_db dmiDb)
 
 
 // bios_info
+void
+bios_info::MergeWith(const bios_info& info)
+{
+	if (vendor.empty())
+		vendor = info.vendor;
+	if (release_date.empty())
+		release_date = info.release_date;
+	if (version.empty())
+		version = info.version;
+}
+
+
 int
 bios_info::Score() const
 {
@@ -1014,6 +1026,22 @@ bios_info::Score() const
 
 
 // system_info
+void
+system_info::MergeWith(const system_info& info)
+{
+	if (name.empty())
+		name = info.name;
+	if (vendor.empty())
+		vendor = info.vendor;
+	if (serial.empty())
+		serial = info.serial;
+	if (version.empty())
+		version = info.version;
+	if (uuid.empty())
+		uuid = info.uuid;
+}
+
+
 int
 system_info::Score() const
 {
@@ -1028,6 +1056,22 @@ system_info::Score() const
 
 
 // board_info
+void
+board_info::MergeWith(const board_info& info)
+{
+	if (asset_tag.empty())
+		asset_tag = info.asset_tag;
+	if (name.empty())
+		name = info.name;
+	if (serial.empty())
+		serial = info.serial;
+	if (vendor.empty())
+		vendor = info.vendor;
+	if (version.empty())
+		version = info.version;
+}
+
+
 int
 board_info::Score() const
 {
@@ -1042,6 +1086,22 @@ board_info::Score() const
 
 
 // chassis_info
+void
+chassis_info::MergeWith(const chassis_info& info)
+{
+	if (asset_tag.empty())
+		asset_tag = info.asset_tag;
+	if (serial.empty())
+		serial = info.serial;
+	if (type.empty())
+		type = info.type;
+	if (vendor.empty())
+		vendor = info.vendor;
+	if (version.empty())
+		version = info.version;
+}
+
+
 int
 chassis_info::Score() const
 {
