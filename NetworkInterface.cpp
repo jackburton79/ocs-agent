@@ -347,7 +347,6 @@ ReadRouteInfoFromSocket(int sockFd, char *bufPtr, int seqNum, int pId)
 		// Check if its a multi part message
 		if ((nlHdr->nlmsg_flags & NLM_F_MULTI) == 0)
 			break;
-
 	} while(((int)nlHdr->nlmsg_seq != seqNum) || ((int)nlHdr->nlmsg_pid != pId));
 	
 	return msgLen;
