@@ -102,7 +102,7 @@ XML::GetFirstChildElementText(const tinyxml2::XMLElement* element, const std::st
 {
 	std::string result;
 	const tinyxml2::XMLElement* foundElement = element->FirstChildElement(elementName.c_str());
-	if (element != NULL)
+	if (foundElement != NULL)
 		result = foundElement->GetText();
 	return result;
 }
