@@ -236,8 +236,9 @@ main(int argc, char **argv)
 	try {
 		Agent agent;
 		agent.Run();
-		//if (verbose)
-		//	Configuration::Get()->Print();
+#if DEBUG
+		Configuration::Get()->Print();
+#endif
 	} catch (std::exception& ex) {
 		logger.Log(LOG_ERR, ex.what());
 		return 1;
