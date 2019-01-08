@@ -152,9 +152,7 @@ Inventory::Send(const char* serverUrl)
 
 	Logger& logger = Logger::GetDefault();
 
-	std::string userAgentString = Configuration::Get()->KeyValue(CONF_AGENT_STRING);
-	if (userAgentString.empty() || userAgentString == "")
-		userAgentString = Agent::LegacyAgentString();
+	std::string userAgentString = Agent::AgentString();
 
 	// Prepare prolog
 	logger.LogFormat(LOG_INFO, "Inventory::Send(): server URL: %s", serverUrl);
