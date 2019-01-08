@@ -166,7 +166,7 @@ HandleArgs(int argc, char **argv)
 				else if (strcmp(sLongOptions[optIndex].name, "use-baseboard-serial-number") == 0)
 					config->SetUseBaseBoardSerialNumber(true);
 				else if (strcmp(sLongOptions[optIndex].name, "new-agent-string") == 0)
-					config->SetVolatileKeyValue(CONF_AGENT_STRING, Agent::AgentString());
+					config->SetVolatileKeyValue("new-agent-string", CONF_VALUE_TRUE);
 				else if (strcmp(sLongOptions[optIndex].name, "agent-string") == 0)
 					config->SetVolatileKeyValue(CONF_AGENT_STRING, optarg);
 				else if (strcmp(sLongOptions[optIndex].name, "logger") == 0) {
@@ -238,6 +238,7 @@ main(int argc, char **argv)
 		agent.Run();
 #if DEBUG
 		Configuration::Get()->Print();
+		std::cout << "Agent String: " << Agent::AgentString() << std::endl;
 #endif
 	} catch (std::exception& ex) {
 		logger.Log(LOG_ERR, ex.what());
