@@ -23,7 +23,8 @@ UsersRoster::UsersRoster()
 			entry.login = record->ut_user;
 			time_t loginTime = record->ut_tv.tv_sec;
 			entry.logintime = loginTime;
-			struct tm* timeinfo = localtime(&loginTime);
+			struct tm timeInfoStruct;
+			struct tm* timeinfo = localtime_r(&loginTime, &timeInfoStruct);
 			char timeString[64];
 			strftime(timeString, sizeof(timeString), "%a %b %d %R", timeinfo);
 			entry.logintimestring = timeString;
