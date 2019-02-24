@@ -273,7 +273,10 @@ Configuration::SetUseBaseBoardSerialNumber(bool use)
 void
 Configuration::_GenerateDeviceID()
 {
+	// Try system UUID.
 	std::string deviceID = Machine::Get()->SystemUUID();
+
+	// If it's empty, use the MAC address of the first NIC
 	if (deviceID.length() <= 1) {
 		NetworkRoster roster;
 		NetworkInterface interface;
@@ -287,28 +290,28 @@ Configuration::_GenerateDeviceID()
 			}
 		}
 	}
-	
+
+	// If it's empty (unlikely), just use the hostname
 	if (deviceID == "")
 		deviceID = Machine::Get()->HostName();
-	
-	// DeviceID needs to have a date appended in this very format,
-	// otherwise OCSInventoryNG will reject the inventory
+
 	char targetString[256];
+	struct tm biosDate;
 	if (UseCurrentTimeInDeviceID()) {
 		time_t rawtime = time(NULL);
-		struct tm timeInfoStruct;
-		struct tm* timeinfo = localtime_r(&rawtime, &timeInfoStruct);
-		strftime(targetString, sizeof(targetString), "-%Y-%m-%d-%H-%M-%S", timeinfo);
+		localtime_r(&rawtime, &biosDate);
 	} else {
 		std::string biosDateString = Machine::Get()->BIOSDate();
 		// On some machines, this can be empty. So use an harcoded
 		// value, since we need a correct date for the device id
 		if (biosDateString.length() <= 1)
 			biosDateString = "01/01/2017";
-		struct tm biosDate;
 		strptime(biosDateString.c_str(), "%m/%d/%Y", &biosDate);
-		strftime(targetString, sizeof(targetString), "-%Y-%m-%d-00-00-00", &biosDate);
 	}
+
+	// DeviceID needs to have a date appended in this very format,
+	// otherwise OCSInventoryNG will reject the inventory
+	strftime(targetString, sizeof(targetString), "-%Y-%m-%d-00-00-00", &biosDate);
 
     deviceID.append(targetString);
 
