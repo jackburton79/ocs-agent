@@ -296,7 +296,8 @@ Configuration::_GenerateDeviceID()
 	char targetString[256];
 	if (UseCurrentTimeInDeviceID()) {
 		time_t rawtime = time(NULL);
-		struct tm* timeinfo = localtime(&rawtime);
+		struct tm timeInfoStruct;
+		struct tm* timeinfo = localtime_r(&rawtime, &timeInfoStruct);
 		strftime(targetString, sizeof(targetString), "-%Y-%m-%d-%H-%M-%S", timeinfo);
 	} else {
 		std::string biosDateString = Machine::Get()->BIOSDate();
