@@ -1,5 +1,11 @@
 language: cpp
+os:
+  - linux
+  - osx
 compiler:
   - gcc
+matrix:
+  allow_failures:
+    - os: osx
 script:
   make all
