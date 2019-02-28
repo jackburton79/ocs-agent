@@ -7,7 +7,10 @@ compiler:
 matrix:
   allow_failures:
     - os: osx
-before-install:
-  if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then export CFLAGS="-I/usr/local/opt/openssl/include $CFLAGS" LDFLAGS="-L/usr/local/opt/openssl/lib $LDFLAGS"; fi
+before_install:
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then
+      CFLAGS="-I/usr/local/opt/openssl/include $CFLAGS"
+      LDFLAGS="-L/usr/local/opt/openssl/lib $LDFLAGS"
+    fi
 script:
   make all
