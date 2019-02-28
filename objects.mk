@@ -2,4 +2,4 @@ USER_OBJS :=
 
 LIBS := -lz -lcrypto -lssl
 
-CXXFLAGS := -O2 -Wall -I ./
+CXXFLAGS := $(CFLAGS) -O2 -Wall -I ./
