@@ -9,8 +9,8 @@ matrix:
     - os: osx
 before_install:
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then
-      CFLAGS="-I/usr/local/opt/openssl/include $CFLAGS"
-      LDFLAGS="-L/usr/local/opt/openssl/lib $LDFLAGS"
+      CFLAGS="-I/usr/local/opt/openssl/include $CFLAGS";
+      LDFLAGS="-L/usr/local/opt/openssl/lib $LDFLAGS";
     fi
 script:
   make all
