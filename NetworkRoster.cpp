@@ -10,6 +10,8 @@
 #include "Support.h"
 
 #include <errno.h>
+
+#define _BSD_SOURCE
 #include <ifaddrs.h>
 #include <unistd.h>
 
@@ -64,7 +66,7 @@ int
 NetworkRoster::_RefreshInterfaces()
 {
 	fInterfaces.clear();
-	
+
 	ifaddrs* addrs = NULL;
 	if (getifaddrs(&addrs) != 0)
 		return errno;
