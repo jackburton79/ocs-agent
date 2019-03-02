@@ -560,8 +560,8 @@ Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 	tinyxml2::XMLElement* hardware = fDocument->NewElement("HARDWARE");
 
 	tinyxml2::XMLElement* checksum = fDocument->NewElement("CHECKSUM");
-
 	checksum->LinkEndChild(fDocument->NewText(int_to_string(Checksum()).c_str()));
+	hardware->LinkEndChild(checksum);
 
 	// Find first active interface
 	NetworkRoster roster;
@@ -586,55 +586,66 @@ Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 	std::string descriptionString;
 	descriptionString.append(fMachine->OSInfo().machine).append("/");
 	description->LinkEndChild(fDocument->NewText(descriptionString.c_str()));
+	hardware->LinkEndChild(description);
 
 	tinyxml2::XMLElement* memory = fDocument->NewElement("MEMORY");
 	memory->LinkEndChild(fDocument->NewText(fMachine->OSInfo().memory.c_str()));
+	hardware->LinkEndChild(memory);
 
 	tinyxml2::XMLElement* name = fDocument->NewElement("NAME");
 	name->LinkEndChild(fDocument->NewText(fMachine->HostName().c_str()));
+	hardware->LinkEndChild(name);
 
 	tinyxml2::XMLElement* osComments = fDocument->NewElement("OSCOMMENTS");
 	osComments->LinkEndChild(fDocument->NewText(fMachine->OSInfo().comments.c_str()));
+	hardware->LinkEndChild(osComments);
 
 	tinyxml2::XMLElement* osName = fDocument->NewElement("OSNAME");
 	osName->LinkEndChild(fDocument->NewText(fMachine->OSInfo().os_description.c_str()));
+	hardware->LinkEndChild(osName);
 
 	tinyxml2::XMLElement* osVersion = fDocument->NewElement("OSVERSION");
 	osVersion->LinkEndChild(fDocument->NewText(fMachine->OSInfo().os_release.c_str()));
+	hardware->LinkEndChild(osVersion);
 
 	tinyxml2::XMLElement* processorN = fDocument->NewElement("PROCESSORN");
 	processorN->LinkEndChild(fDocument->NewText(int_to_string(fMachine->CountProcessors()).c_str()));
+	hardware->LinkEndChild(processorN);
 
-	tinyxml2::XMLElement* processorS = fDocument->NewElement("PROCESSORS");
-	processorS->LinkEndChild(fDocument->NewText(fMachine->ProcessorSpeed(0).c_str()));
+	if (fMachine->CountProcessors() > 0) {
+		tinyxml2::XMLElement* processorS = fDocument->NewElement("PROCESSORS");
+		processorS->LinkEndChild(fDocument->NewText(fMachine->ProcessorSpeed(0).c_str()));
+		hardware->LinkEndChild(processorS);
 
-	tinyxml2::XMLElement* processorT = fDocument->NewElement("PROCESSORT");
-	processorT->LinkEndChild(fDocument->NewText(fMachine->ProcessorType(0).c_str()));
-
+		tinyxml2::XMLElement* processorT = fDocument->NewElement("PROCESSORT");
+		processorT->LinkEndChild(fDocument->NewText(fMachine->ProcessorType(0).c_str()));
+		hardware->LinkEndChild(processorT);
+	}
 	tinyxml2::XMLElement* arch = fDocument->NewElement("ARCH");
 	arch->LinkEndChild(fDocument->NewText(fMachine->Architecture().c_str()));
-
+	hardware->LinkEndChild(arch);
+	
 	tinyxml2::XMLElement* swap = fDocument->NewElement("SWAP");
 	swap->LinkEndChild(fDocument->NewText(fMachine->OSInfo().swap.c_str()));
+	hardware->LinkEndChild(swap);
 
 	tinyxml2::XMLElement* userID = fDocument->NewElement("USERID");
-
 	// TODO: Fix this. Use the process user ?
 	userID->LinkEndChild(fDocument->NewText("root"));
+	hardware->LinkEndChild(userID);
 
 	tinyxml2::XMLElement* uuid = fDocument->NewElement("UUID");
 	uuid->LinkEndChild(fDocument->NewText(fMachine->SystemUUID().c_str()));
+	hardware->LinkEndChild(uuid);
 
 	tinyxml2::XMLElement* vmSystem = fDocument->NewElement("VMSYSTEM");
 	vmSystem->LinkEndChild(fDocument->NewText("Physical"));
-	// <VMSYSTEM>Xen</VMSYSTEM>
+	hardware->LinkEndChild(vmSystem);
 
 	tinyxml2::XMLElement* workGroup = fDocument->NewElement("WORKGROUP");
 	workGroup->LinkEndChild(fDocument->NewText(fMachine->OSInfo().domain_name.c_str()));
-
-	hardware->LinkEndChild(checksum);
-	hardware->LinkEndChild(description);
-
+	hardware->LinkEndChild(workGroup);
+	
 	UsersRoster users;
 	user_entry user;
 	if (users.GetNext(user)) {
@@ -645,21 +656,6 @@ Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 		lastLoggedUser->LinkEndChild(fDocument->NewText(user.login.c_str()));
 		hardware->LinkEndChild(lastLoggedUser);
 	}
-
-	hardware->LinkEndChild(arch);
-	hardware->LinkEndChild(memory);
-	hardware->LinkEndChild(name);
-	hardware->LinkEndChild(osComments);
-	hardware->LinkEndChild(osName);
-	hardware->LinkEndChild(osVersion);
-	hardware->LinkEndChild(processorN);
-	hardware->LinkEndChild(processorS);
-	hardware->LinkEndChild(processorT);
-	hardware->LinkEndChild(swap);
-	hardware->LinkEndChild(userID);
-	hardware->LinkEndChild(uuid);
-	hardware->LinkEndChild(vmSystem);
-	hardware->LinkEndChild(workGroup);
 
 	parent->LinkEndChild(hardware);
 
