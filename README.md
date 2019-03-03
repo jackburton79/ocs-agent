@@ -1,5 +1,6 @@
 [![Build Status](https://travis-ci.org/jackburton79/ocs-agent.svg?branch=master)](https://travis-ci.org/jackburton79/ocs-agent)
 [![CodeFactor](https://www.codefactor.io/repository/github/jackburton79/ocs-agent/badge)](https://www.codefactor.io/repository/github/jackburton79/ocs-agent)
+[![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/g/jackburton79/ocs-agent.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/jackburton79/ocs-agent/context:cpp)
 
 (Unofficial) Linux lite OCS Inventory NG agent
 =====
