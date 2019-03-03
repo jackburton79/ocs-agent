@@ -41,7 +41,7 @@ Agent::Run()
 		throw std::runtime_error("Cannot initialize Inventory");
 
 	bool noSoftware = (config->KeyValue(CONF_NO_SOFTWARE) == CONF_VALUE_TRUE);
-	unsigned int waitSeconds = ::strtoul(
+	unsigned long waitSeconds = ::strtoul(
 		config->KeyValue(CONF_WAIT_TIME).c_str(), NULL, 10);
 
 	Logger& logger = Logger::GetDefault();
