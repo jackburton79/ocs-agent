@@ -31,17 +31,6 @@ SSLSocket::SSLSocket()
 }
 
 
-SSLSocket::SSLSocket(int domain, int type, int protocol)
-	:
-	fSSLConnection(NULL)
-{
-	if (sSSLContext == NULL)
-		_SSLInit();
-	if (Open(domain, type, protocol) < 0)
-		throw std::runtime_error("SSLSocket::SSLSocket(): cannot open socket!");
-}
-
-
 SSLSocket::~SSLSocket()
 {
 	Close();

@@ -15,7 +15,6 @@
 class SSLSocket : public Socket {
 public:
 	SSLSocket();
-	SSLSocket(int domain, int type, int protocol);
 	virtual ~SSLSocket();
 
 	virtual int Open(int domain, int type, int protocol);

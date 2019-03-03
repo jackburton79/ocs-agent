@@ -13,7 +13,6 @@
 class Socket {
 public:
 	Socket();
-	Socket(int domain, int type, int protocol);
 	virtual ~Socket();
 
 	virtual int Open(int domain, int type, int protocol);

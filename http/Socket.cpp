@@ -27,15 +27,6 @@ Socket::Socket()
 }
 
 
-Socket::Socket(int domain, int type, int protocol)
-	:
-	fFD(-1)
-{
-	if (Open(domain, type, protocol) < 0)
-		throw std::runtime_error("Socket::Socket(): cannot open socket!");
-}
-
-
 Socket::~Socket()
 {
     Close();
