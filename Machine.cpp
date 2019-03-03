@@ -676,8 +676,8 @@ Machine::_GetLSHWData()
 void
 Machine::_GetCPUInfo()
 {
-	ProcReader cpu("/proc/cpuinfo");
-	std::istream iStream(&cpu);
+	ProcReader cpuReader("/proc/cpuinfo");
+	std::istream iStream(&cpuReader);
 
 	// First pass: we get every processor info into a map,
 	// based on processor number. Then we examine the map and 
