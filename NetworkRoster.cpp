@@ -11,7 +11,9 @@
 
 #include <errno.h>
 
+#ifndef _BSD_SOURCE
 #define _BSD_SOURCE
+#endif
 #include <ifaddrs.h>
 #include <unistd.h>
 
