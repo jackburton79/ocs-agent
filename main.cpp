@@ -157,26 +157,26 @@ HandleArgs(int argc, char **argv)
 				config->SetVolatileKeyValue("waittime", optarg);
 				break;
 			case 0:
-				if (strcmp(sLongOptions[optIndex].name, "nosoftware") == 0)
+			{
+				std::string optName = sLongOptions[optIndex].name;
+				if (optName == "nosoftware")
 					config->SetVolatileKeyValue("nosoftware", "true");
-				else if (strcmp(sLongOptions[optIndex].name, "stdout") == 0 && !daemonize)
+				else if (optName == "stdout" && !daemonize)
 					config->SetVolatileKeyValue("stdout", "true");
-				else if (strcmp(sLongOptions[optIndex].name, "use-current-time-in-device-ID") == 0)
+				else if (optName == "use-current-time-in-device-ID")
 					config->SetUseCurrentTimeInDeviceID(true);
-				else if (strcmp(sLongOptions[optIndex].name, "use-baseboard-serial-number") == 0)
+				else if (optName == "use-baseboard-serial-number")
 					config->SetUseBaseBoardSerialNumber(true);
-				else if (strcmp(sLongOptions[optIndex].name, "new-agent-string") == 0)
+				else if (optName == "new-agent-string")
 					config->SetVolatileKeyValue("new-agent-string", CONF_VALUE_TRUE);
-				else if (strcmp(sLongOptions[optIndex].name, "agent-string") == 0)
+				else if (optName == "agent-string")
 					config->SetVolatileKeyValue(CONF_AGENT_STRING, optarg);
-				else if (strcmp(sLongOptions[optIndex].name, "logger") == 0) {
-					if (strcasecmp(optarg, "STDERR") == 0)
-						Logger::Get(Logger::LOGGER_TYPE_STDERR);
-					else if (strcasecmp(optarg, "SYSLOG") == 0)
-						Logger::Get(Logger::LOGGER_TYPE_SYSLOG);
-				} else if (strcmp(sLongOptions[optIndex].name, "version") == 0)
+				else if (optName == "logger")
+					Logger::Get(optarg);
+				else if (optName == "version")
 					PrintVersionAndExit();
 				break;
+			}
 		}
 	}
 
