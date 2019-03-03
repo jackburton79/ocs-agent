@@ -19,10 +19,10 @@ extern const char* __progname;
 
 static Logger* sDefaultLogger;
 
-class StdoutLogger : public Logger {
+class StdErrLogger : public Logger {
 public:
-	StdoutLogger(const char* logName);
-	virtual ~StdoutLogger();
+	StdErrLogger(const char* logName);
+	virtual ~StdErrLogger();
 
 private:
 	virtual void DoLog(int level, const char* string);
@@ -101,12 +101,12 @@ Logger::Get(int loggerType)
 				sDefaultLogger = new SyslogLogger(__progname);
 				break;
 			case LOGGER_TYPE_STDERR:
-				sDefaultLogger = new StdoutLogger(__progname);
+				sDefaultLogger = new StdErrLogger(__progname);
 				break;
 			case LOGGER_TYPE_DEFAULT:
 			default:
 				if (::isatty(STDIN_FILENO))
-					sDefaultLogger = new StdoutLogger(__progname);
+					sDefaultLogger = new StdErrLogger(__progname);
 				else
 					sDefaultLogger = new SyslogLogger(__progname);
 				break;
@@ -131,21 +131,21 @@ Logger::Get(const std::string& loggerType)
 
 
 // StdoutLogger
-StdoutLogger::StdoutLogger(const char* logName)
+StdErrLogger::StdErrLogger(const char* logName)
 	:
 	Logger(logName)
 {
 }
 
 /* virtual */
-StdoutLogger::~StdoutLogger()
+StdErrLogger::~StdErrLogger()
 {
 }
 
 
 /* virtual */
 void
-StdoutLogger::DoLog(int level, const char* string)
+StdErrLogger::DoLog(int level, const char* string)
 {
 	std::cerr << string << std::endl;
 }
