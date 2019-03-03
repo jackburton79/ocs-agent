@@ -180,6 +180,7 @@ HandleArgs(int argc, char **argv)
 		}
 	}
 
+	// Get the already initialized logger, if any, otherwise the default one
 	Logger& logger = Logger::GetDefault();
 	if (verbose)
 		logger.SetLevel(LOG_DEBUG);
