@@ -29,7 +29,7 @@ Socket::Socket()
 
 Socket::~Socket()
 {
-    Close();
+    Socket::Close();
 }
 
 
