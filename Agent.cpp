@@ -46,7 +46,7 @@ Agent::Run()
 
 	Logger& logger = Logger::GetDefault();
 	if (waitSeconds > 0) {
-		logger.LogFormat(LOG_INFO, "Waiting %ld seconds...", waitSeconds);
+		logger.LogFormat(LOG_INFO, "Waiting %lu seconds...", waitSeconds);
 		::sleep(waitSeconds);
 	}
 
