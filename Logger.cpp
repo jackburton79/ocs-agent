@@ -8,9 +8,10 @@
 #include "Logger.h"
 
 
+#include <cstdio>
 #include <iostream>
 #include <stdarg.h>
-#include <stdio.h>
+#include <string.h>
 #include <syslog.h>
 #include <unistd.h>
 
@@ -110,6 +111,21 @@ Logger::Get(int loggerType)
 					sDefaultLogger = new SyslogLogger(__progname);
 				break;
 		}
+	}
+
+	return *sDefaultLogger;
+}
+
+
+/* static */
+Logger&
+Logger::Get(const std::string& loggerType)
+{
+	if (sDefaultLogger == NULL) {
+		if (::strcasecmp(loggerType.c_str(), "STDERR") == 0)
+			return Get(Logger::LOGGER_TYPE_STDERR);
+		else if (::strcasecmp(loggerType.c_str(), "SYSLOG") == 0)
+			return Get(Logger::LOGGER_TYPE_SYSLOG);
 	}
 
 	return *sDefaultLogger;

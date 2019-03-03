@@ -8,6 +8,7 @@
 #ifndef LOGGER_H_
 #define LOGGER_H_
 
+#include <string>
 #include <syslog.h>
 
 class Logger {
@@ -32,6 +33,7 @@ public:
 	// even if called with different parameters.
 	static Logger& GetDefault();
 	static Logger& Get(int loggerType = LOGGER_TYPE_DEFAULT);
+	static Logger& Get(const std::string& loggerType);
 	
 private:
 	virtual void DoLog(int level, const char* string) = 0;
