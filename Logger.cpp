@@ -121,14 +121,12 @@ Logger::Get(int loggerType)
 Logger&
 Logger::Get(const std::string& loggerType)
 {
-	if (sDefaultLogger == NULL) {
-		if (::strcasecmp(loggerType.c_str(), "STDERR") == 0)
-			return Get(Logger::LOGGER_TYPE_STDERR);
-		else if (::strcasecmp(loggerType.c_str(), "SYSLOG") == 0)
-			return Get(Logger::LOGGER_TYPE_SYSLOG);
-	}
-
-	return *sDefaultLogger;
+	if (::strcasecmp(loggerType.c_str(), "STDERR") == 0)
+		return Get(Logger::LOGGER_TYPE_STDERR);
+	else if (::strcasecmp(loggerType.c_str(), "SYSLOG") == 0)
+		return Get(Logger::LOGGER_TYPE_SYSLOG);
+	else
+		return Get(Logger::LOGGER_TYPE_DEFAULT);
 }
 
 
