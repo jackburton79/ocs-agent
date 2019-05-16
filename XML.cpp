@@ -167,7 +167,6 @@ ElementFinderByName::VisitEnter(const tinyxml2::XMLElement& element, const tinyx
 }
 
 
-
 const tinyxml2::XMLElement*
 ElementFinderByName::Element() const
 {
@@ -220,7 +219,6 @@ ElementFinderByAttribute::VisitEnter(const tinyxml2::XMLElement& element, const 
 
 	return true;
 }
-
 
 
 const tinyxml2::XMLElement*
