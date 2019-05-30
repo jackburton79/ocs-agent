@@ -2,7 +2,7 @@
 [![CodeFactor](https://www.codefactor.io/repository/github/jackburton79/ocs-agent/badge)](https://www.codefactor.io/repository/github/jackburton79/ocs-agent)
 [![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/g/jackburton79/ocs-agent.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/jackburton79/ocs-agent/context:cpp)
 
-(Unofficial) Linux lite OCS Inventory NG agent
+Linux lite inventory agent
 =====
 A couple of years ago, where I work, we started using [OCS Inventory NG](http://www.ocsinventory-ng.org), which
 is a really useful application in enterprises. It allows system administrators to inventory servers and workstations,
@@ -18,7 +18,7 @@ The agent is not complete yet, but it can already produce an inventory of the ma
 OCSInventory server, or save it locally.
 The compiled program weights around 300kb on disk for now, and only has zlib and openssl as dependency, which are already present on any Thinstation installation.
 It also uses [tinyxml2](http://www.grinninglizard.com/tinyxml2), a very small and efficient XML parsing/writing library, linked statically into the executable.
-Remember, this is not the official OCSInventory NG agent, which can be found here: https://github.com/OCSInventory-NG/UnixAgent
+This is not the official OCSInventory NG agent, which can be found here: https://github.com/OCSInventory-NG/UnixAgent
 
     Usage:
       -h, --help                         Print usage
