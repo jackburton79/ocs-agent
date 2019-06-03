@@ -152,8 +152,6 @@ Inventory::Send(const char* serverUrl)
 
 	Logger& logger = Logger::GetDefault();
 
-	std::string userAgentString = Agent::AgentString();
-
 	// Prepare prolog
 	logger.LogFormat(LOG_INFO, "Inventory::Send(): server URL: %s", serverUrl);
 	tinyxml2::XMLDocument prolog;
@@ -173,61 +171,74 @@ Inventory::Send(const char* serverUrl)
 	requestHeader.SetValue("TE", "deflate, gzip");
 	requestHeader.SetContentType("application/x-compress");
 	requestHeader.SetContentLength(prologLength);
-	requestHeader.SetUserAgent(userAgentString);
 
 	// TODO: Improve.
 	if (inventoryUrl.Username() != "") {
 		requestHeader.SetAuthentication(HTTP_AUTH_TYPE_BASIC,
 				inventoryUrl.Username(), inventoryUrl.Password());
 	}
-
+	
 	HTTP httpObject;
-	logger.Log(LOG_INFO, "Inventory::Send(): Prolog prepared!");
-	logger.LogFormat(LOG_DEBUG, "%s", requestHeader.ToString().c_str());
-	if (httpObject.Request(requestHeader, prologData, prologLength) != 0) {
+	std::string userAgentString;
+	for (int c = 0; c < 2; c++) {
+		userAgentString = (c == 0) ? Agent::AgentString()
+			: Agent::LegacyAgentString();
+		requestHeader.SetUserAgent(userAgentString);
+
+		logger.Log(LOG_INFO, "Inventory::Send(): Prolog prepared!");
+		logger.LogFormat(LOG_DEBUG, "%s", requestHeader.ToString().c_str());
+		if (httpObject.Request(requestHeader, prologData, prologLength) != 0) {
+			delete[] prologData;
+			logger.LogFormat(LOG_INFO, "Inventory::Send(): Failed to send prolog: %s",
+						httpObject.ErrorString().c_str());
+			return false;
+		}
+
+		logger.Log(LOG_INFO, "Inventory::Send(): Prolog Sent!");
+		const HTTPResponseHeader& responseHeader = httpObject.LastResponse();
+		if (responseHeader.StatusCode() == HTTP_BAD_REQUEST) {
+			if (c < 2) {
+				logger.LogFormat(LOG_INFO, "Server didn't accept prolog. Try again with standard agent string.");
+				continue;
+			}
+		}
+
 		delete[] prologData;
-		logger.LogFormat(LOG_INFO, "Inventory::Send(): Failed to send prolog: %s",
-					httpObject.ErrorString().c_str());
-		return false;
-	}
 
-	delete[] prologData;
+		if (responseHeader.StatusCode() != HTTP_OK
+				|| !responseHeader.HasContentLength()) {
+			logger.LogFormat(LOG_ERR, "Server replied %s", responseHeader.StatusString().c_str());
+			logger.LogFormat(LOG_ERR, "%s", responseHeader.ToString().c_str());
+			return false;
+		}
 
-	logger.Log(LOG_INFO, "Inventory::Send(): Prolog Sent!");
-	const HTTPResponseHeader& responseHeader = httpObject.LastResponse();
-	if (responseHeader.StatusCode() != HTTP_OK
-			|| !responseHeader.HasContentLength()) {
-		logger.LogFormat(LOG_ERR, "Server replied %s", responseHeader.StatusString().c_str());
-		logger.LogFormat(LOG_ERR, "%s", responseHeader.ToString().c_str());
-		return false;
-	}
-
-	size_t contentLength = ::strtol(responseHeader.Value(HTTPContentLength).c_str(), NULL, 10);
-	char* resultData = new char[contentLength];
-	if (httpObject.Read(resultData, contentLength) < (int)contentLength) {
-		delete[] resultData;
-		logger.LogFormat(LOG_ERR, "Inventory::Send(): failed to read XML response: %s",
+		size_t contentLength = ::strtol(responseHeader.Value(HTTPContentLength).c_str(), NULL, 10);
+		char* resultData = new char[contentLength];
+		if (httpObject.Read(resultData, contentLength) < (int)contentLength) {
+			delete[] resultData;
+			logger.LogFormat(LOG_ERR, "Inventory::Send(): failed to read XML response: %s",
 				httpObject.ErrorString().c_str());
 
-		return false;
-	}
+			return false;
+		}
 
-	logger.Log(LOG_INFO, "Inventory::Send(): Decompressing XML... ");
-	tinyxml2::XMLDocument document;
-	bool uncompress = XML::Uncompress(resultData, contentLength, document);
-	delete[] resultData;
-	if (!uncompress) {
-		logger.Log(LOG_ERR, "failed to decompress XML");
-		return false;
-	}
+		logger.Log(LOG_INFO, "Inventory::Send(): Decompressing XML... ");
+		tinyxml2::XMLDocument document;
+		bool uncompress = XML::Uncompress(resultData, contentLength, document);
+		delete[] resultData;
+		if (!uncompress) {
+			logger.Log(LOG_ERR, "failed to decompress XML");
+			return false;
+		}
 
-	std::string serverResponse = XML::GetElementText(document, "RESPONSE");
-	if (serverResponse != "SEND") {
+		std::string serverResponse = XML::GetElementText(document, "RESPONSE");
+		logger.LogFormat(LOG_INFO, "Inventory::Send(): server replied %s", serverResponse.c_str());
+		if (serverResponse == "SEND")
+			break;
 		logger.LogFormat(LOG_ERR, "Server not ready to accept inventory: %s", serverResponse.c_str());
 		return false;
 	}
-
-	logger.LogFormat(LOG_INFO, "Inventory::Send(): server replied %s", serverResponse.c_str());
+	
 	logger.Log(LOG_INFO, "Inventory::Send(): Compressing XML inventory data... ");
 	char* compressedData = NULL;
 	size_t compressedSize;

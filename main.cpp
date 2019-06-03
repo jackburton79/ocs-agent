@@ -34,7 +34,6 @@ struct option sLongOptions[] = {
 		{ "logger", required_argument, 0, 0 },
 		{ "verbose", no_argument, 0, 'v' },
 		{ "version", no_argument, 0, 0 },
-		{ "new-agent-string", no_argument, 0, 0 },
 		{ "agent-string", required_argument, 0, 0 },
 		{ "use-current-time-in-device-ID", no_argument, 0, 0 },
 		{ "use-baseboard-serial-number", no_argument, 0, 0 },
@@ -61,7 +60,6 @@ PrintHelpAndExit()
 	std::cout << "  -t, --tag <TAG>                    Specify tag. Will be ignored by server if a value already exists" << std::endl;
 	std::cout << "      --nosoftware                   Do not retrieve installed software" << std::endl;
 	std::cout << std::endl;
-	std::cout << "      --new-agent-string             Use new agent string (warning: requires changes in OCS-NG configuration)" << std::endl;
 	std::cout << "      --agent-string <string>        Specify custom HTTP agent string" << std::endl;
 	std::cout << std::endl;
 	std::cout << "  -d, --daemonize                    Detach from running terminal" << std::endl;
@@ -167,8 +165,6 @@ HandleArgs(int argc, char **argv)
 					config->SetUseCurrentTimeInDeviceID(true);
 				else if (optName == "use-baseboard-serial-number")
 					config->SetUseBaseBoardSerialNumber(true);
-				else if (optName == "new-agent-string")
-					config->SetVolatileKeyValue("new-agent-string", CONF_VALUE_TRUE);
 				else if (optName == "agent-string")
 					config->SetVolatileKeyValue(CONF_AGENT_STRING, optarg);
 				else if (optName == "logger")

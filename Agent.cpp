@@ -90,11 +90,10 @@ Agent::AgentString()
 		std::string agentString = Configuration::Get()->KeyValue(CONF_AGENT_STRING);
 		if (!agentString.empty())
 			sAgentString = agentString;
-		else if (Configuration::Get()->KeyValue("new-agent-string") == CONF_VALUE_TRUE) {
+		else {
 			sAgentString = "jack_lite_inventory_agent_v";
 			sAgentString.append(Version());
-		} else
-			sAgentString = LegacyAgentString();
+		}
 	}
 	return sAgentString.c_str();
 }
