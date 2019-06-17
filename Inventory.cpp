@@ -181,6 +181,8 @@ Inventory::Send(const char* serverUrl)
 	HTTP httpObject;
 	std::string userAgentString;
 	for (int c = 0; c < 2; c++) {
+		// Try first with the new agent. If it fails, try with the old,
+		// safe one.
 		userAgentString = (c == 0) ? Agent::AgentString()
 			: Agent::LegacyAgentString();
 		requestHeader.SetUserAgent(userAgentString);
