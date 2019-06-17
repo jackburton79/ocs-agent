@@ -35,9 +35,13 @@
 #include <ctype.h>
 #include <math.h>
 
+#include "EDID.h"
+
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(*(x)))
 #define min(a, b) ((a) < (b) ? (a) : (b))
 #define max(a, b) ((a) > (b) ? (a) : (b))
+
+#define printf (void)
 
 enum {
 	EDID_PAGE_SIZE = 128u
@@ -104,12 +108,15 @@ static unsigned supported_hdmi_vic_vsb_codes = 0;
 
 static int conformant = 1;
 
+static char serial_string[13];
+static char model_string[13];
+
 enum output_format {
 	OUT_FMT_DEFAULT,
 	OUT_FMT_HEX,
 	OUT_FMT_RAW,
 	OUT_FMT_CARRAY
-};
+};			
 
 /*
  * Options
@@ -794,6 +801,7 @@ static int detailed_block(const unsigned char *x, int in_extension)
 		}
 		case 0xFC:
 			has_name_descriptor = 1;
+			strcpy(model_string, extract_string(x + 5, &has_valid_name_descriptor, 13));
 			printf("Monitor name: %s\n",
 			       extract_string(x + 5, &has_valid_name_descriptor, 13));
 			return 1;
@@ -958,8 +966,9 @@ static int detailed_block(const unsigned char *x, int in_extension)
 			return 1;
 		case 0xFF:
 			has_serial_string = 1;
-			printf("Serial number: %s\n",
-			       extract_string(x + 5, &has_valid_serial_string, 13));
+			strcpy(serial_string, extract_string(x + 5, &has_valid_serial_string, 13));
+			/*printf("Serial number: %s\n",
+			       extract_string(x + 5, &has_valid_serial_string, 13));*/
 			return 1;
 		default:
 			printf("Unknown monitor description type %d\n", x[3]);
@@ -2890,8 +2899,7 @@ static void write_edid(FILE *f, const unsigned char *edid, unsigned size,
 	}
 }
 
-static int edid_from_file(const char *from_file, const char *to_file,
-			  enum output_format out_fmt)
+static int edid_from_file(const char *from_file, struct edid_info* info)
 {
 	int fd;
 	FILE *out = NULL;
@@ -2902,21 +2910,13 @@ static int edid_from_file(const char *from_file, const char *to_file,
 	int analog, i;
 	unsigned col_x, col_y;
 
+	info->description[0] = '\0';
+	
 	if (!from_file || !strcmp(from_file, "-")) {
 		fd = 0;
 	} else if ((fd = open(from_file, O_RDONLY)) == -1) {
 		perror(from_file);
 		return -1;
-	}
-	if (to_file) {
-		if (!strcmp(to_file, "-")) {
-			out = stdout;
-		} else if ((out = fopen(to_file, "w")) == NULL) {
-			perror(to_file);
-			return -1;
-		}
-		if (out_fmt == OUT_FMT_DEFAULT)
-			out_fmt = out == stdout ? OUT_FMT_HEX : OUT_FMT_RAW;
 	}
 
 	edid = extract_edid(fd);
@@ -2926,13 +2926,6 @@ static int edid_from_file(const char *from_file, const char *to_file,
 	}
 	if (fd != 0)
 		close(fd);
-
-	if (out) {
-		write_edid(out, edid, edid_lines * 16, out_fmt);
-		if (out == stdout)
-			return 0;
-		fclose(out);
-	}
 
 	if (options[OptExtract])
 		dump_breakdown(edid);
@@ -2962,6 +2955,8 @@ static int edid_from_file(const char *from_file, const char *to_file,
 		claims_one_point_oh = 1;
 	}
 
+	strncpy(info->manufacturer, manufacturer_name(edid + 0x08), sizeof(info->manufacturer));
+	
 	printf("Manufacturer: %s Model %x Serial Number %u\n",
 	       manufacturer_name(edid + 0x08),
 	       (unsigned short)(edid[0x0A] + (edid[0x0B] << 8)),
@@ -2970,6 +2965,9 @@ static int edid_from_file(const char *from_file, const char *to_file,
 	has_valid_serial_number = edid[0x0C] || edid[0x0D] || edid[0x0E] || edid[0x0F];
 	/* XXX need manufacturer ID table */
 
+	int week = 0;
+	int year = 0;
+
 	time(&the_time);
 	ptm = localtime(&the_time);
 	if (edid[0x10] < 55 || (edid[0x10] == 0xff && claims_one_point_four)) {
@@ -2977,9 +2975,13 @@ static int edid_from_file(const char *from_file, const char *to_file,
 		if (edid[0x11] > 0x0f) {
 			if (edid[0x10] == 0xff) {
 				has_valid_year = 1;
+				week = edid[0x10];
+				year = edid[0x11];
 				printf("Model year %hd\n", edid[0x11] + 1990);
 			} else if (edid[0x11] + 90 <= ptm->tm_year + 1) {
 				has_valid_year = 1;
+				week = edid[0x10];
+				year = edid[0x11] + 1990;
 				if (edid[0x10])
 					printf("Made in week %hd of %hd\n", edid[0x10], edid[0x11] + 1990);
 				else
@@ -2988,6 +2990,8 @@ static int edid_from_file(const char *from_file, const char *to_file,
 		}
 	}
 
+	snprintf(info->description, sizeof(info->description), "%s (%hd/%hd)", info->manufacturer, week, year);
+	
 	/* display section */
 
 	if (edid[0x14] & 0x80) {
@@ -3189,6 +3193,9 @@ static int edid_from_file(const char *from_file, const char *to_file,
 		nonconformant_extension += parse_extension(x);
 	}
 
+	strncpy(info->model, model_string, sizeof(info->model));
+	strncpy(info->serial_number, serial_string, sizeof(info->serial_number));
+	
 	if (!options[OptCheck]) {
 		free(edid);
 		return 0;
@@ -3345,70 +3352,17 @@ static int edid_from_file(const char *from_file, const char *to_file,
 		printf("Warning: CVT block does not set preferred refresh rate\n");
 	if ((supported_hdmi_vic_vsb_codes & supported_hdmi_vic_codes) != supported_hdmi_vic_codes)
 		printf("Warning: HDMI VIC Codes must have their CTA-861 VIC equivalents in the VSB\n");
-
+		
 	free(edid);
 	return conformant ? 0 : -2;
 }
 
-int main(int argc, char **argv)
+
+int get_edid_info(const char *filename, struct edid_info* info)
 {
-	char short_options[26 * 2 * 2 + 1];
-	enum output_format out_fmt = OUT_FMT_DEFAULT;
-	int ch;
-	int i;
-
-	while (1) {
-		int option_index = 0;
-		int idx = 0;
-
-		for (i = 0; long_options[i].name; i++) {
-			if (!isalpha(long_options[i].val))
-				continue;
-			short_options[idx++] = long_options[i].val;
-			if (long_options[i].has_arg == required_argument)
-				short_options[idx++] = ':';
-		}
-		short_options[idx] = 0;
-		ch = getopt_long(argc, argv, short_options,
-				 long_options, &option_index);
-		if (ch == -1)
-			break;
-
-		options[(int)ch] = 1;
-		switch (ch) {
-		case OptHelp:
-			usage();
-			return -1;
-		case OptOutputFormat:
-			if (!strcmp(optarg, "hex")) {
-				out_fmt = OUT_FMT_HEX;
-			} else if (!strcmp(optarg, "raw")) {
-				out_fmt = OUT_FMT_RAW;
-			} else if (!strcmp(optarg, "carray")) {
-				out_fmt = OUT_FMT_CARRAY;
-			} else {
-				usage();
-				exit(1);
-			}
-			break;
-		case ':':
-			fprintf(stderr, "Option `%s' requires a value\n",
-				argv[optind]);
-			usage();
-			return -1;
-		case '?':
-			fprintf(stderr, "Unknown argument `%s'\n",
-				argv[optind]);
-			usage();
-			return -1;
-		}
-	}
-	if (optind == argc)
-		return edid_from_file(NULL, NULL, out_fmt);
-	if (optind == argc - 1)
-		return edid_from_file(argv[optind], NULL, out_fmt);
-	return edid_from_file(argv[optind], argv[optind + 1], out_fmt);
+	return edid_from_file(filename, info);
 }
+
 
 /*
  * Notes on panel extensions: (TODO, implement me in the code)

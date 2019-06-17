@@ -6,7 +6,8 @@
  */
  
 #include "Screens.h"
-#include "edid-decode.h"
+
+#include "EDID.h"
 #include "Support.h"
 
 #include <iostream>

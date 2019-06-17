@@ -6,6 +6,7 @@
 CPP_SRCS += \
 ../Agent.cpp \
 ../Configuration.cpp \
+../EDID.cpp \
 ../Inventory.cpp \
 ../Logger.cpp \
 ../Machine.cpp \
@@ -26,6 +27,7 @@ CPP_SRCS += \
 OBJS += \
 ./Agent.o \
 ./Configuration.o \
+./EDID.o \
 ./Inventory.o \
 ./Logger.o \
 ./Machine.o \
@@ -46,7 +48,7 @@ OBJS += \
 CPP_DEPS += \
 ./Agent.d \
 ./Configuration.d \
-./Drives.d \
+./EDID.d \
 ./Inventory.d \
 ./Logger.d \
 ./Machine.d \
