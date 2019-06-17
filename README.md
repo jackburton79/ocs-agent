@@ -30,7 +30,6 @@ This is not the official OCSInventory NG agent, which can be found here: https:/
       -t, --tag <TAG>                    Specify tag. Will be ignored by server if a value already exists
           --nosoftware                   Do not retrieve installed software
 
-          --new-agent-string             Use new agent string (warning: requires changes in OCS-NG configuration)
           --agent-string <string>        Specify custom HTTP agent string
 
       -d, --daemonize                    Detach from running terminal
@@ -43,8 +42,6 @@ This is not the official OCSInventory NG agent, which can be found here: https:/
 
         --use-current-time-in-device-ID  Use current time in the device ID, instead of the BIOS Date.
                                          No need to use this option unless you know why you need it.
-        --use-baseboard-serial-number    Use baseboard serial number instead of system serial number.
-                                         There are some systems where the system serial number is empty
 
     The -l and -s option are mutually exclusive.
     If no server or output file is specified, either via the -s/-l option or via configuration file (option -c), the program will exit without doing anything.
