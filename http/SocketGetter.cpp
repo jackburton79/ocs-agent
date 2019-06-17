@@ -22,7 +22,7 @@ SocketGetter::GetSocket(const std::string& protocol)
 {
 	if (protocol == "https")
 		return new SSLSocket();
-	else if (protocol == "http")
+	else /*if (protocol == "http")*/
 		return new Socket();
 	
 	throw std::runtime_error("INVALID PROTOCOL!!!!!!");

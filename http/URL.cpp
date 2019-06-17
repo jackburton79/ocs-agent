@@ -124,8 +124,6 @@ URL::_DecodeURLString(const std::string& string)
 		size_t endProtocol = string.find_first_not_of(":/", suffixPos + 1);
 		result = string.substr(endProtocol, std::string::npos);
 	}
-	if (fProtocol.empty())
-		fProtocol = "http";
 
 	// User/Password
 	size_t authPos = result.find("@");
