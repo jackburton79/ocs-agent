@@ -36,7 +36,6 @@ struct option sLongOptions[] = {
 		{ "version", no_argument, 0, 0 },
 		{ "agent-string", required_argument, 0, 0 },
 		{ "use-current-time-in-device-ID", no_argument, 0, 0 },
-		{ "use-baseboard-serial-number", no_argument, 0, 0 },
 		{ 0, 0, 0, 0 }
 };
 
@@ -70,10 +69,9 @@ PrintHelpAndExit()
 	std::cout << "  -v, --verbose                      Verbose mode" << std::endl;
 	std::cout << "      --version                      Print version and exit" << std::endl;
 	std::cout << std::endl;
+	std::cout << "  --use-baseboard-serial-number      Deprecated" << std::endl;
 	std::cout << "  --use-current-time-in-device-ID    Use current time in the device ID, instead of the BIOS Date." << std::endl;
 	std::cout << "                                     No need to use this option unless you know why you need it." << std::endl;
-	std::cout << "  --use-baseboard-serial-number      Use baseboard serial number instead of system serial number." << std::endl;
-	std::cout << "                                     There are some systems where the system serial number is empty" << std::endl;
 	std::cout << std::endl;
 	std::cout << "The -l and -s option are mutually exclusive." << std::endl;
 	std::cout << "If no server or output file is specified, ";
@@ -163,8 +161,6 @@ HandleArgs(int argc, char **argv)
 					config->SetVolatileKeyValue("stdout", "true");
 				else if (optName == "use-current-time-in-device-ID")
 					config->SetUseCurrentTimeInDeviceID(true);
-				else if (optName == "use-baseboard-serial-number")
-					config->SetUseBaseBoardSerialNumber(true);
 				else if (optName == "agent-string")
 					config->SetVolatileKeyValue(CONF_AGENT_STRING, optarg);
 				else if (optName == "logger")

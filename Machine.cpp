@@ -267,6 +267,13 @@ Machine::SystemModel() const
 std::string
 Machine::SystemSerialNumber() const
 {
+	// Some systems have this empty, or, like our MCP79s,
+	// "To Be Filled by O.E.M.", which is pretty much useless,
+	// so in that case we use the baseboard serial number
+	if (fSystemInfo.serial.empty()
+		|| fSystemInfo.serial == "To Be Filled By O.E.M.")
+		return MachineSerialNumber();
+		
 	return fSystemInfo.serial;
 }
 
