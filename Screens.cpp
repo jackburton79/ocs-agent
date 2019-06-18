@@ -13,6 +13,16 @@
 #include <iostream>
 #include <string>
 
+struct pnp_id {
+	const char* manufacturer;
+	const char* id;
+	const char* date_added;
+};
+
+static const struct pnp_id kPNPIDs[] = {
+#include "pnp_ids.h"
+};
+
 Screens::Screens()
 {
 	if (CommandExists("find")) {        
@@ -25,7 +35,7 @@ Screens::Screens()
 			info.name = line;
 			if (get_edid_info(line.c_str(), &edidInfo) == 0) {
 				info.description = edidInfo.description;
-				info.manufacturer = edidInfo.manufacturer;
+				info.manufacturer = GetManufacturerFromID(edidInfo.manufacturer);
 				info.type = edidInfo.type;
 				info.model = edidInfo.model;
 				info.serial_number = edidInfo.serial_number;
@@ -34,4 +44,16 @@ Screens::Screens()
 		}
 	}
 	Rewind();
+}
+
+
+std::string
+GetManufacturerFromID(const std::string& string)
+{
+	// TODO: Improve
+	for (size_t i = 0; i < sizeof(kPNPIDs) / sizeof(kPNPIDs[0]); i++) {
+		if (string.compare(kPNPIDs[i].id) == 0)
+			return kPNPIDs[i].manufacturer;
+	}
+	return string;
 }

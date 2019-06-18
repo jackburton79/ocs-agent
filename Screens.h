@@ -26,6 +26,7 @@ public:
   Screens();
 };
 
+std::string GetManufacturerFromID(const std::string& string);
 
 #endif
 
