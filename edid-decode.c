@@ -234,7 +234,7 @@ static char *manufacturer_name(const unsigned char *x)
 	name[1] = ((x[0] & 0x03) << 3) + ((x[1] & 0xE0) >> 5) + '@';
 	name[2] = (x[1] & 0x1F) + '@';
 	name[3] = 0;
-
+							
 	if (isupper(name[0]) && isupper(name[1]) && isupper(name[2]))
 		manufacturer_name_well_formed = 1;
 
@@ -2958,11 +2958,13 @@ static int edid_from_file(const char *from_file, struct edid_info* info)
 
 	strncpy(info->manufacturer, manufacturer_name(edid + 0x08), sizeof(info->manufacturer));
 	
+	
+	unsigned short model = (unsigned short)(edid[0x0A] + (edid[0x0B] << 8));
+	unsigned int serial = (unsigned int)(edid[0x0C] + (edid[0x0D] << 8));
+			      + (edid[0x0E] << 16) + (edid[0x0F] << 24);
 	printf("Manufacturer: %s Model %x Serial Number %u\n",
 	       manufacturer_name(edid + 0x08),
-	       (unsigned short)(edid[0x0A] + (edid[0x0B] << 8)),
-	       (unsigned int)(edid[0x0C] + (edid[0x0D] << 8)
-			      + (edid[0x0E] << 16) + (edid[0x0F] << 24)));
+	       model, serial);
 	has_valid_serial_number = edid[0x0C] || edid[0x0D] || edid[0x0E] || edid[0x0F];
 	/* XXX need manufacturer ID table */
 
@@ -2991,7 +2993,9 @@ static int edid_from_file(const char *from_file, struct edid_info* info)
 		}
 	}
 
-	snprintf(info->description, sizeof(info->description), "%s (%hd/%hd)", info->manufacturer, week, year);
+	// TODO: find out what is the binary number after the %s.%x. I think
+	// it's the manufacturer code, but how is it generated ?
+	snprintf(info->description, sizeof(info->description), "%s.%x.000000000 (%hd/%hd)", info->manufacturer, model, week, year);
 	
 	/* display section */
 
