@@ -15,6 +15,7 @@
 struct screen_info {
   std::string name;
   std::string description;
+  std::string type;
   std::string manufacturer;
   std::string model;
   std::string serial_number;  

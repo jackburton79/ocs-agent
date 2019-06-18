@@ -41,6 +41,7 @@
 #define min(a, b) ((a) < (b) ? (a) : (b))
 #define max(a, b) ((a) > (b) ? (a) : (b))
 
+// Avoid printing stuff to stdout
 #define printf (void)
 
 enum {
@@ -967,8 +968,8 @@ static int detailed_block(const unsigned char *x, int in_extension)
 		case 0xFF:
 			has_serial_string = 1;
 			strcpy(serial_string, extract_string(x + 5, &has_valid_serial_string, 13));
-			/*printf("Serial number: %s\n",
-			       extract_string(x + 5, &has_valid_serial_string, 13));*/
+			printf("Serial number: %s\n",
+			       extract_string(x + 5, &has_valid_serial_string, 13));
 			return 1;
 		default:
 			printf("Unknown monitor description type %d\n", x[3]);
@@ -2997,6 +2998,7 @@ static int edid_from_file(const char *from_file, struct edid_info* info)
 	if (edid[0x14] & 0x80) {
 		int conformance_mask;
 		analog = 0;
+		snprintf(info->type, sizeof(info->type), "Digital display");
 		printf("Digital display\n");
 		if (claims_one_point_four) {
 			conformance_mask = 0;
@@ -3030,6 +3032,7 @@ static int edid_from_file(const char *from_file, struct edid_info* info)
 		analog = 1;
 		int voltage = (edid[0x14] & 0x60) >> 5;
 		int sync = (edid[0x14] & 0x0F);
+		snprintf(info->type, sizeof(info->type), "Analog display");
 		printf("Analog display, Input voltage level: %s V\n",
 		       voltage == 3 ? "0.7/0.7" :
 		       voltage == 2 ? "1.0/0.4" :
