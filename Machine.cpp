@@ -207,6 +207,8 @@ Machine::_RetrieveData()
 std::string
 Machine::AssetTag() const
 {
+	if (fChassisInfo.asset_tag.empty())
+		return fBoardInfo.serial;
 	return fChassisInfo.asset_tag;
 }
 
