@@ -1,0 +1,11 @@
+[Unit]
+Description=ocsinventory-agent service
+Wants=network-online.target
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/ocsinventory-agent --conf /etc/ocsinventory-agent.conf
+
+[Install]
+WantedBy=multi-user.target
