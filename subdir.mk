@@ -11,6 +11,7 @@ CPP_SRCS += \
 ../Machine.cpp \
 ../NetworkInterface.cpp \
 ../NetworkRoster.cpp \
+../Processors.cpp \
 ../ProcReader.cpp \
 ../ProcessRoster.cpp \
 ../Screens.cpp \
@@ -31,6 +32,7 @@ OBJS += \
 ./Machine.o \
 ./NetworkInterface.o \
 ./NetworkRoster.o \
+./Processors.o \
 ./ProcReader.o \
 ./ProcessRoster.o \
 ./Screens.o \
@@ -51,6 +53,7 @@ CPP_DEPS += \
 ./Machine.d \
 ./NetworkInterface.d \
 ./NetworkRoster.d \
+./Processors.d \
 ./ProcReader.d \
 ./ProcessRoster.d \
 ./Screens.d \

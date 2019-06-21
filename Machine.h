@@ -57,17 +57,6 @@ struct chassis_info {
 };
 
 
-struct processor_info {
-	int physical_id;
-	std::string manufacturer;
-	std::string type;
-	std::string speed;
-	std::string cores;
-	std::string cache_size;
-	std::string serial;
-};
-
-
 struct os_info {
 	std::string comments;
 	std::string hostname;
@@ -129,14 +118,6 @@ public:
 	std::string Architecture() const;
 	std::string HostName() const;
 
-	int CountProcessors() const;
-	std::string ProcessorSpeed(int numCpu) const;
-	std::string ProcessorManufacturer(int numCpu) const;
-	std::string ProcessorSerialNumber(int numCpu) const;
-	std::string ProcessorType(int numCpu) const;
-	std::string ProcessorCores(int numCpu) const;
-	std::string ProcessorCacheSize(int numCpu) const;
-
 	int CountMemories();
 	std::string MemoryCaption(int num);
 	std::string MemoryDescription(int num);
@@ -161,13 +142,11 @@ private:
 	bool _GetGraphicsCardInfo();
 	bool _GetDMIDecodeData();
 	bool _GetLSHWData();
-	void _GetCPUInfo();
 	void _GetOSInfo();
 	void _ExtractDataFromDMIDB(dmi_db dmiDb);
 	
 	std::string _OSDescription();
-	
-	std::vector<processor_info> fCPUInfo;
+
 	std::vector<memory_device_info> fMemoryInfo;
 	
 	bios_info fBIOSInfo;

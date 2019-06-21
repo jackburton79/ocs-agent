@@ -5,8 +5,6 @@
  *      Author: Stefano Ceccherini
  */
 
-#include <ProcessRoster.h>
-#include <StorageRoster.h>
 #include "Agent.h"
 #include "Configuration.h"
 #include "Inventory.h"
@@ -14,8 +12,11 @@
 #include "Machine.h"
 #include "NetworkInterface.h"
 #include "NetworkRoster.h"
+#include "Processors.h"
+#include "ProcessRoster.h"
 #include "Screens.h"
 #include "Softwares.h"
+#include "StorageRoster.h"
 #include "Support.h"
 #include "XML.h"
 
@@ -379,8 +380,10 @@ Inventory::_AddCPUsInfo(tinyxml2::XMLElement* parent)
 {
 	Logger& logger = Logger::GetDefault();
 
+	processor_info cpuInfo;
+	Processors CPUs;
+	while (CPUs.GetNext(cpuInfo)) {
 	// TODO: Check if the fields name and structure are correct.
-	for (int i = 0; i < fMachine->CountProcessors(); i++) {
 		tinyxml2::XMLElement* cpu = fDocument->NewElement("CPUS");
 		tinyxml2::XMLElement* manufacturer = fDocument->NewElement("MANUFACTURER");
 		tinyxml2::XMLElement* serial = fDocument->NewElement("SERIAL");
@@ -391,17 +394,17 @@ Inventory::_AddCPUsInfo(tinyxml2::XMLElement* parent)
 
 		// TODO: Seems like we should interpretate the vendor_id ?
 		manufacturer->LinkEndChild(
-			fDocument->NewText(fMachine->ProcessorManufacturer(i).c_str()));
+			fDocument->NewText(cpuInfo.manufacturer.c_str()));
 		serial->LinkEndChild(
-			fDocument->NewText(fMachine->ProcessorSerialNumber(i).c_str()));
+			fDocument->NewText(cpuInfo.serial.c_str()));
 		speed->LinkEndChild(
-			fDocument->NewText(fMachine->ProcessorSpeed(i).c_str()));
+			fDocument->NewText(cpuInfo.Speed().c_str()));
 		model->LinkEndChild(
-			fDocument->NewText(fMachine->ProcessorType(i).c_str()));
+			fDocument->NewText(cpuInfo.type.c_str()));
 		cores->LinkEndChild(
-			fDocument->NewText(fMachine->ProcessorCores(i).c_str()));
+			fDocument->NewText(cpuInfo.cores.c_str()));
 		cacheSize->LinkEndChild(
-			fDocument->NewText(fMachine->ProcessorCacheSize(i).c_str()));
+			fDocument->NewText(cpuInfo.cache_size.c_str()));
 
 		cpu->LinkEndChild(model);
 		cpu->LinkEndChild(manufacturer);
@@ -618,17 +621,21 @@ Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 	osVersion->LinkEndChild(fDocument->NewText(fMachine->OSInfo().os_release.c_str()));
 	hardware->LinkEndChild(osVersion);
 
+	Processors CPUs;
+	size_t cpuCount = CPUs.Count();
 	tinyxml2::XMLElement* processorN = fDocument->NewElement("PROCESSORN");
-	processorN->LinkEndChild(fDocument->NewText(int_to_string(fMachine->CountProcessors()).c_str()));
+	processorN->LinkEndChild(fDocument->NewText(int_to_string(cpuCount).c_str()));
 	hardware->LinkEndChild(processorN);
 
-	if (fMachine->CountProcessors() > 0) {
+	processor_info cpuInfo;
+	if (cpuCount) {
+		CPUs.GetNext(cpuInfo);
 		tinyxml2::XMLElement* processorS = fDocument->NewElement("PROCESSORS");
-		processorS->LinkEndChild(fDocument->NewText(fMachine->ProcessorSpeed(0).c_str()));
+		processorS->LinkEndChild(fDocument->NewText(cpuInfo.Speed().c_str()));
 		hardware->LinkEndChild(processorS);
 
 		tinyxml2::XMLElement* processorT = fDocument->NewElement("PROCESSORT");
-		processorT->LinkEndChild(fDocument->NewText(fMachine->ProcessorType(0).c_str()));
+		processorT->LinkEndChild(fDocument->NewText(cpuInfo.type.c_str()));
 		hardware->LinkEndChild(processorT);
 	}
 	tinyxml2::XMLElement* arch = fDocument->NewElement("ARCH");
