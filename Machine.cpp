@@ -1096,5 +1096,5 @@ memory_device_info::Speed() const
 std::string
 memory_device_info::Size() const
 {
-	return int_to_string(speed);
+	return int_to_string(size);
 }
