@@ -18,6 +18,8 @@
 #include "Softwares.h"
 #include "StorageRoster.h"
 #include "Support.h"
+#include "UsersRoster.h"
+#include "VolumeRoster.h"
 #include "XML.h"
 
 #include "http/HTTP.h"
@@ -27,8 +29,6 @@
 #include <iostream>
 #include <memory>
 #include <unistd.h>
-#include <UsersRoster.h>
-#include <VolumeRoster.h>
 
 #include "tinyxml2/tinyxml2.h"
 
@@ -178,7 +178,7 @@ Inventory::Send(const char* serverUrl)
 		requestHeader.SetAuthentication(HTTP_AUTH_TYPE_BASIC,
 				inventoryUrl.Username(), inventoryUrl.Password());
 	}
-	
+
 	HTTP httpObject;
 	std::string userAgentString;
 	for (int c = 0; c < 2; c++) {
@@ -200,7 +200,7 @@ Inventory::Send(const char* serverUrl)
 		logger.Log(LOG_INFO, "Inventory::Send(): Prolog Sent!");
 		const HTTPResponseHeader& responseHeader = httpObject.LastResponse();
 		if (responseHeader.StatusCode() == HTTP_BAD_REQUEST) {
-			if (c < 2) {
+			if (c == 0) {
 				logger.LogFormat(LOG_INFO, "Server didn't accept prolog. Try again with standard agent string.");
 				continue;
 			}
@@ -241,7 +241,7 @@ Inventory::Send(const char* serverUrl)
 		logger.LogFormat(LOG_ERR, "Server not ready to accept inventory: %s", serverResponse.c_str());
 		return false;
 	}
-	
+
 	logger.Log(LOG_INFO, "Inventory::Send(): Compressing XML inventory data... ");
 	char* compressedData = NULL;
 	size_t compressedSize;
@@ -443,7 +443,7 @@ Inventory::_AddStoragesInfo(tinyxml2::XMLElement* parent)
 
 		tinyxml2::XMLElement* type = fDocument->NewElement("TYPE");
 		type->LinkEndChild(fDocument->NewText(info.type.c_str()));
-		
+
 		tinyxml2::XMLElement* diskSize = fDocument->NewElement("DISKSIZE");
 		diskSize->LinkEndChild(fDocument->NewText(info.size.c_str()));
 
@@ -641,7 +641,7 @@ Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 	tinyxml2::XMLElement* arch = fDocument->NewElement("ARCH");
 	arch->LinkEndChild(fDocument->NewText(fMachine->Architecture().c_str()));
 	hardware->LinkEndChild(arch);
-	
+
 	tinyxml2::XMLElement* swap = fDocument->NewElement("SWAP");
 	swap->LinkEndChild(fDocument->NewText(fMachine->OSInfo().swap.c_str()));
 	hardware->LinkEndChild(swap);
@@ -662,7 +662,7 @@ Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 	tinyxml2::XMLElement* workGroup = fDocument->NewElement("WORKGROUP");
 	workGroup->LinkEndChild(fDocument->NewText(fMachine->OSInfo().domain_name.c_str()));
 	hardware->LinkEndChild(workGroup);
-	
+
 	UsersRoster users;
 	user_entry user;
 	if (users.GetNext(user)) {
