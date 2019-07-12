@@ -595,30 +595,31 @@ Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 		}
 	}
 
+    OSInfo osInfo;
 	tinyxml2::XMLElement* description = fDocument->NewElement("DESCRIPTION");
 	std::string descriptionString;
-	descriptionString.append(fMachine->OSInfo().machine).append("/");
+	descriptionString.append(osInfo.machine).append("/");
 	description->LinkEndChild(fDocument->NewText(descriptionString.c_str()));
 	hardware->LinkEndChild(description);
 
 	tinyxml2::XMLElement* memory = fDocument->NewElement("MEMORY");
-	memory->LinkEndChild(fDocument->NewText(fMachine->OSInfo().memory.c_str()));
+	memory->LinkEndChild(fDocument->NewText(osInfo.memory.c_str()));
 	hardware->LinkEndChild(memory);
 
 	tinyxml2::XMLElement* name = fDocument->NewElement("NAME");
-	name->LinkEndChild(fDocument->NewText(fMachine->HostName().c_str()));
+	name->LinkEndChild(fDocument->NewText(osInfo.hostname.c_str()));
 	hardware->LinkEndChild(name);
 
 	tinyxml2::XMLElement* osComments = fDocument->NewElement("OSCOMMENTS");
-	osComments->LinkEndChild(fDocument->NewText(fMachine->OSInfo().comments.c_str()));
+	osComments->LinkEndChild(fDocument->NewText(osInfo.comments.c_str()));
 	hardware->LinkEndChild(osComments);
 
 	tinyxml2::XMLElement* osName = fDocument->NewElement("OSNAME");
-	osName->LinkEndChild(fDocument->NewText(fMachine->OSInfo().os_description.c_str()));
+	osName->LinkEndChild(fDocument->NewText(osInfo.description.c_str()));
 	hardware->LinkEndChild(osName);
 
 	tinyxml2::XMLElement* osVersion = fDocument->NewElement("OSVERSION");
-	osVersion->LinkEndChild(fDocument->NewText(fMachine->OSInfo().os_release.c_str()));
+	osVersion->LinkEndChild(fDocument->NewText(osInfo.release.c_str()));
 	hardware->LinkEndChild(osVersion);
 
 	Processors CPUs;
@@ -639,11 +640,11 @@ Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 		hardware->LinkEndChild(processorT);
 	}
 	tinyxml2::XMLElement* arch = fDocument->NewElement("ARCH");
-	arch->LinkEndChild(fDocument->NewText(fMachine->Architecture().c_str()));
+	arch->LinkEndChild(fDocument->NewText(osInfo.machine.c_str()));
 	hardware->LinkEndChild(arch);
 
 	tinyxml2::XMLElement* swap = fDocument->NewElement("SWAP");
-	swap->LinkEndChild(fDocument->NewText(fMachine->OSInfo().swap.c_str()));
+	swap->LinkEndChild(fDocument->NewText(osInfo.swap.c_str()));
 	hardware->LinkEndChild(swap);
 
 	tinyxml2::XMLElement* userID = fDocument->NewElement("USERID");
@@ -660,7 +661,7 @@ Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 	hardware->LinkEndChild(vmSystem);
 
 	tinyxml2::XMLElement* workGroup = fDocument->NewElement("WORKGROUP");
-	workGroup->LinkEndChild(fDocument->NewText(fMachine->OSInfo().domain_name.c_str()));
+	workGroup->LinkEndChild(fDocument->NewText(osInfo.domainname.c_str()));
 	hardware->LinkEndChild(workGroup);
 
 	UsersRoster users;

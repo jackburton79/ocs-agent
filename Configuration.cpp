@@ -273,7 +273,7 @@ Configuration::_GenerateDeviceID()
 
 	// If it's empty (unlikely), just use the hostname
 	if (deviceID == "")
-		deviceID = Machine::Get()->HostName();
+		deviceID = OSInfo().hostname;
 
 	char targetString[256];
 	struct tm biosDate;

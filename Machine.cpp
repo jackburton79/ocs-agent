@@ -164,6 +164,90 @@ RAM_type_from_description(const std::string& description)
 }
 
 
+// OSInfo
+OSInfo::OSInfo()
+{
+	struct utsname uName;
+	if (::uname(&uName) != 0) {
+		std::string errorString = "OSInfo::_GetOsInfo(): uname() failed with error ";
+		errorString.append(::strerror(errno));
+		throw std::runtime_error(errorString);
+	}
+
+	hostname = uName.nodename;
+	comments = uName.version;
+	release = uName.release;
+	domainname = uName.domainname;
+	machine = uName.machine;
+
+	//Feed domain name from host name when possible.
+	if (domainname == "" || domainname == "(none)") {
+		size_t dotPos = hostname.find('.');
+		if (dotPos != std::string::npos) {
+			domainname = hostname.substr(dotPos + 1);
+		}
+	}
+
+	ProcReader proc("/proc/meminfo");
+	std::istream stream(&proc);
+
+	std::string string;
+	while (std::getline(stream, string)) {
+		size_t pos;
+		if ((pos = string.find("SwapTotal:")) != std::string::npos) {
+			pos = string.find(":");
+			std::string swapString = string.substr(pos + 1, std::string::npos);
+			int swapInt = ::strtol(trim(swapString).c_str(), NULL, 10) / 1000;
+			swap = int_to_string(swapInt);
+		} else if ((pos = string.find("MemTotal:")) != std::string::npos) {
+			pos = string.find(":");
+			std::string memString = string.substr(pos + 1, std::string::npos);
+			int memInt = ::strtol(trim(memString).c_str(), NULL, 10) / 1000;
+			memory = int_to_string(memInt);
+		}
+	}
+
+	description = _OSDescription();
+}
+
+
+std::string
+OSInfo::_OSDescription()
+{
+	std::string osDescription;
+	if (CommandExists("lsb_release")) {
+		CommandStreamBuffer lsb;
+		lsb.open("lsb_release -a", "r");
+		std::istream lsbStream(&lsb);
+		std::string line;
+		while (std::getline(lsbStream, line)) {
+			size_t pos = line.find(':');
+			if (pos != std::string::npos) {
+				std::string key = line.substr(0, pos);
+				if (key == "Description") {
+					std::string value = line.substr(pos + 1, std::string::npos);
+					osDescription = trim(value);
+				}
+			}
+		}
+	} else if (::access("/etc/thinstation.global", F_OK) != -1) {
+		osDescription = "Thinstation";
+		char* tsVersion = ::getenv("TS_VERSION");
+		if (tsVersion != NULL) {
+			osDescription += " ";
+			osDescription += tsVersion;
+		}
+	} else {
+		try {
+			osDescription = trimmed(ProcReader("/etc/redhat-release").ReadLine());
+		} catch (...) {
+			osDescription = "Unknown";
+		}
+	}
+
+	return osDescription;
+}
+
 
 // Machine
 /* static */
@@ -196,7 +280,6 @@ Machine::_RetrieveData()
 		_GetGraphicsCardInfo();
 		_GetDMIDecodeData();
 		_GetLSHWData();
-		_GetOSInfo();
 	} catch (...) {
 		std::cerr << "Failed to get hardware info." << std::endl;
 	}
@@ -239,24 +322,6 @@ Machine::SystemManufacturer() const
 
 
 std::string
-Machine::Architecture() const
-{
-	return fKernelInfo.machine;
-}
-
-
-std::string
-Machine::HostName() const
-{
-	struct ::utsname utsName;
-	if (uname(&utsName) != 0)
-		return "";
-
-	return utsName.nodename;
-}
-
-
-std::string
 Machine::SystemModel() const
 {
 	return fSystemInfo.name;
@@ -272,7 +337,7 @@ Machine::SystemSerialNumber() const
 	if (fSystemInfo.serial.empty()
 		|| fSystemInfo.serial == "To Be Filled By O.E.M.")
 		return MachineSerialNumber();
-		
+
 	return fSystemInfo.serial;
 }
 
@@ -302,13 +367,6 @@ std::string
 Machine::MachineManufacturer() const
 {
 	return fBoardInfo.vendor;
-}
-
-
-os_info
-Machine::OSInfo() const
-{
-	return fKernelInfo;
 }
 
 
@@ -397,24 +455,24 @@ Machine::_GetDMIData()
 		fBIOSInfo.release_date = trimmed(ProcReader("/sys/devices/virtual/dmi/id/bios_date").ReadLine());
 		fBIOSInfo.vendor = trimmed(ProcReader("/sys/devices/virtual/dmi/id/bios_vendor").ReadLine());
 		fBIOSInfo.version = trimmed(ProcReader("/sys/devices/virtual/dmi/id/bios_version").ReadLine());
-		
+
 		fSystemInfo.name = trimmed(ProcReader("/sys/devices/virtual/dmi/id/product_name").ReadLine());
 		fSystemInfo.version = trimmed(ProcReader("/sys/devices/virtual/dmi/id/product_version").ReadLine());
 		fSystemInfo.uuid = trimmed(ProcReader("/sys/devices/virtual/dmi/id/product_uuid").ReadLine());
 		fSystemInfo.serial = trimmed(ProcReader("/sys/devices/virtual/dmi/id/product_serial").ReadLine());
-		
+
 		fChassisInfo.asset_tag = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_asset_tag").ReadLine());
 		fChassisInfo.serial = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_serial").ReadLine());
 		//fChassisInfo.type = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_type").ReadLine());
 		fChassisInfo.vendor = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_vendor").ReadLine());
 		fChassisInfo.version = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_version").ReadLine());
-		
+
 		fBoardInfo.asset_tag = trimmed(ProcReader("/sys/devices/virtual/dmi/id/board_asset_tag").ReadLine());
 		fBoardInfo.name = trimmed(ProcReader("/sys/devices/virtual/dmi/id/board_name").ReadLine());
 		fBoardInfo.serial = trimmed(ProcReader("/sys/devices/virtual/dmi/id/board_serial").ReadLine());
 		fBoardInfo.vendor = trimmed(ProcReader("/sys/devices/virtual/dmi/id/board_vendor").ReadLine());
 		fBoardInfo.version = trimmed(ProcReader("/sys/devices/virtual/dmi/id/board_version").ReadLine());
-		
+
 		fSystemInfo.vendor = trimmed(ProcReader("/sys/devices/virtual/dmi/id/sys_vendor").ReadLine());
 	} catch (...) {
 		return false;
@@ -618,96 +676,8 @@ Machine::_GetLSHWData()
 			}
 		}
 	}
-	
+
 	return true;
-}
-
-
-
-
-
-void
-Machine::_GetOSInfo()
-{
-	struct utsname uName;
-	if (::uname(&uName) != 0) {
-		std::string errorString = "Machine::_GetOsInfo(): uname() failed with error ";
-		errorString.append(::strerror(errno));
-		throw std::runtime_error(errorString);
-	}
-
-	fKernelInfo.hostname = uName.nodename;
-	fKernelInfo.comments = uName.version;
-	fKernelInfo.os_release = uName.release;
-	fKernelInfo.domain_name = uName.domainname;
-	fKernelInfo.machine = uName.machine;
-
-	//Feed domain name from host name when possible.
-	if (fKernelInfo.domain_name == "" || fKernelInfo.domain_name == "(none)") {
-		size_t dotPos = fKernelInfo.hostname.find('.');
-		if (dotPos != std::string::npos) {
-			fKernelInfo.domain_name = fKernelInfo.hostname.substr(dotPos + 1);
-		}
-	}
-
-	ProcReader proc("/proc/meminfo");
-	std::istream stream(&proc);
-
-	std::string string;
-	while (std::getline(stream, string)) {
-		size_t pos;
-		if ((pos = string.find("SwapTotal:")) != std::string::npos) {
-			pos = string.find(":");
-			std::string swapString = string.substr(pos + 1, std::string::npos);
-			int swapInt = ::strtol(trim(swapString).c_str(), NULL, 10) / 1000;
-			fKernelInfo.swap = int_to_string(swapInt);
-		} else if ((pos = string.find("MemTotal:")) != std::string::npos) {
-			pos = string.find(":");
-			std::string memString = string.substr(pos + 1, std::string::npos);
-			int memInt = ::strtol(trim(memString).c_str(), NULL, 10) / 1000;
-			fKernelInfo.memory = int_to_string(memInt);
-		}
-	}
-
-	fKernelInfo.os_description = _OSDescription();
-}
-
-
-std::string 
-Machine::_OSDescription()
-{
-	std::string osDescription;
-	if (CommandExists("lsb_release")) {
-		CommandStreamBuffer lsb;
-		lsb.open("lsb_release -a", "r");
-		std::istream lsbStream(&lsb);
-		std::string line;
-		while (std::getline(lsbStream, line)) {
-			size_t pos = line.find(':');
-			if (pos != std::string::npos) {
-				std::string key = line.substr(0, pos);
-				if (key == "Description") {
-					std::string value = line.substr(pos + 1, std::string::npos);
-					osDescription = trim(value);
-				}
-			}
-		}
-	} else if (::access("/etc/thinstation.global", F_OK) != -1) {
-		osDescription = "Thinstation";
-		char* tsVersion = ::getenv("TS_VERSION");
-		if (tsVersion != NULL) {
-			osDescription += " ";
-			osDescription += tsVersion;
-		}
-	} else {
-		try {
-			osDescription = trimmed(ProcReader("/etc/redhat-release").ReadLine());
-		} catch (...) {
-			osDescription = "Unknown";
-		}
-	}
-	
-	return osDescription;
 }
 
 
@@ -770,7 +740,7 @@ Machine::_ExtractDataFromDMIDB(dmi_db dmiDb)
 			}
 		}
 	}
-	
+
 	// Memory slots
 	if (fMemoryInfo.size() > 0)
 		return;
@@ -808,7 +778,7 @@ Machine::_ExtractDataFromDMIDB(dmi_db dmiDb)
 			mapIter = entry.find("Serial Number");
 			if (mapIter != entry.end())
 				info.serial = mapIter->second;
-			
+
 			mapIter = entry.find("Array Handle");
 			if (mapIter != entry.end()) {
 				std::string parentHandle = mapIter->second;

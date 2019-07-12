@@ -57,18 +57,6 @@ struct chassis_info {
 };
 
 
-struct os_info {
-	std::string comments;
-	std::string hostname;
-	std::string machine;
-	std::string domain_name;
-	std::string os_release;
-	std::string os_description;
-	std::string memory;
-	std::string swap;
-};
-
-
 struct video_info {
 	std::string vendor;
 	std::string chipset;
@@ -84,7 +72,7 @@ struct memory_device_info {
 	std::string Type() const;
 	std::string Speed() const;
 	std::string Size() const;
-	
+
 	std::string description;
 	std::string caption;
 	std::string purpose;
@@ -97,6 +85,22 @@ struct memory_device_info {
 };
 
 
+class OSInfo {
+public:
+    OSInfo();
+	std::string description;
+    std::string release;
+	std::string hostname;
+    std::string domainname;
+	std::string machine;
+	std::string memory;
+	std::string swap;
+    std::string comments;
+private:
+    std::string _OSDescription();
+};
+
+
 class Machine {
 public:
 	static Machine* Get();
@@ -105,18 +109,15 @@ public:
 	std::string BIOSManufacturer() const;
 	std::string BIOSDate() const;
 	std::string BIOSVersion() const;
-	
+
 	std::string MachineManufacturer() const;
 	std::string MachineSerialNumber() const;
-	
+
 	std::string SystemModel() const;
 	std::string SystemSerialNumber() const;
 	std::string SystemUUID() const;
 	std::string SystemManufacturer() const;
 	std::string SystemType() const;
-
-	std::string Architecture() const;
-	std::string HostName() const;
 
 	int CountMemories();
 	std::string MemoryCaption(int num);
@@ -127,8 +128,6 @@ public:
 	std::string MemorySpeed(int num);
 	std::string MemoryNumSlot(int num);
 	std::string MemorySerialNumber(int num);
-
-	os_info OSInfo() const;
 
 	int CountVideos() const;
 	video_info VideoInfoFor(int numVideo) const;
@@ -142,17 +141,13 @@ private:
 	bool _GetGraphicsCardInfo();
 	bool _GetDMIDecodeData();
 	bool _GetLSHWData();
-	void _GetOSInfo();
 	void _ExtractDataFromDMIDB(dmi_db dmiDb);
-	
-	std::string _OSDescription();
 
 	std::vector<memory_device_info> fMemoryInfo;
-	
+
 	bios_info fBIOSInfo;
 	chassis_info fChassisInfo;
 	board_info fBoardInfo;
-	os_info fKernelInfo;
 	system_info fSystemInfo;
 
 	std::vector<struct video_info> fVideoInfo;
