@@ -178,7 +178,7 @@ OSInfo::OSInfo()
 	comments = uName.version;
 	release = uName.release;
 	domainname = uName.domainname;
-	machine = uName.machine;
+	architecture = uName.machine;
 
 	//Feed domain name from host name when possible.
 	if (domainname == "" || domainname == "(none)") {

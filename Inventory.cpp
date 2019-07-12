@@ -598,7 +598,7 @@ Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
     OSInfo osInfo;
 	tinyxml2::XMLElement* description = fDocument->NewElement("DESCRIPTION");
 	std::string descriptionString;
-	descriptionString.append(osInfo.machine).append("/");
+	descriptionString.append(osInfo.architecture).append("/");
 	description->LinkEndChild(fDocument->NewText(descriptionString.c_str()));
 	hardware->LinkEndChild(description);
 
@@ -640,7 +640,7 @@ Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 		hardware->LinkEndChild(processorT);
 	}
 	tinyxml2::XMLElement* arch = fDocument->NewElement("ARCH");
-	arch->LinkEndChild(fDocument->NewText(osInfo.machine.c_str()));
+	arch->LinkEndChild(fDocument->NewText(osInfo.architecture.c_str()));
 	hardware->LinkEndChild(arch);
 
 	tinyxml2::XMLElement* swap = fDocument->NewElement("SWAP");

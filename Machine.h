@@ -92,7 +92,7 @@ public:
     std::string release;
 	std::string hostname;
     std::string domainname;
-	std::string machine;
+	std::string architecture;
 	std::string memory;
 	std::string swap;
     std::string comments;
