@@ -69,7 +69,6 @@ PrintHelpAndExit()
 	std::cout << "  -v, --verbose                      Verbose mode" << std::endl;
 	std::cout << "      --version                      Print version and exit" << std::endl;
 	std::cout << std::endl;
-	std::cout << "  --use-baseboard-serial-number      Deprecated" << std::endl;
 	std::cout << "  --use-current-time-in-device-ID    Use current time in the device ID, instead of the BIOS Date." << std::endl;
 	std::cout << "                                     No need to use this option unless you know why you need it." << std::endl;
 	std::cout << std::endl;
