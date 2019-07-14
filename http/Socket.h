@@ -9,6 +9,7 @@
 #define SOCKET_H
 
 #include <netinet/in.h>
+#include <string>
 
 class Socket {
 public:
@@ -17,8 +18,9 @@ public:
 
 	virtual int Open(int domain, int type, int protocol);
 	virtual void Close();
-	
+
 	int FD() const;
+    std::string HostName() const;
 	bool IsOpened() const;
 
 	virtual int Connect(const struct sockaddr *address, socklen_t addrLen);
@@ -32,6 +34,7 @@ public:
 
 private:
 	int fFD;
+    std::string fHostName;
 };
 
 #endif // SOCKET_H
