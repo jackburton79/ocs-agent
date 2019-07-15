@@ -50,15 +50,14 @@ Inventory::~Inventory()
 
 
 bool
-Inventory::Initialize(const std::string& deviceID)
+Inventory::Initialize()
 {
 	Logger& logger = Logger::GetDefault();
 
 	Clear();
 
-	fDeviceID = deviceID;
-
-	logger.LogFormat(LOG_INFO, "Inventory::Initialize(): Device ID: %s...", fDeviceID.c_str());
+    std::string deviceID = Configuration::Get()->DeviceID();
+	logger.LogFormat(LOG_INFO, "Inventory::Initialize(): Device ID: %s...", deviceID.c_str());
 	tinyxml2::XMLDeclaration* declaration = fDocument->NewDeclaration();
 	tinyxml2::XMLElement* request = fDocument->NewElement("REQUEST");
 	fDocument->LinkEndChild(declaration);
@@ -71,11 +70,11 @@ Inventory::Initialize(const std::string& deviceID)
 	query->LinkEndChild(fDocument->NewText("INVENTORY"));
 	request->LinkEndChild(query);
 
- 	tinyxml2::XMLElement* deviceId = fDocument->NewElement("DEVICEID");
-	deviceId->LinkEndChild(fDocument->NewText(fDeviceID.c_str()));
-	request->LinkEndChild(deviceId);
+ 	tinyxml2::XMLElement* deviceIdElement = fDocument->NewElement("DEVICEID");
+	deviceIdElement->LinkEndChild(fDocument->NewText(deviceID.c_str()));
+	request->LinkEndChild(deviceIdElement);
 
-	logger.LogFormat(LOG_INFO, "Inventory::Initialize(): Device ID: %s... OK!", fDeviceID.c_str());
+	logger.LogFormat(LOG_INFO, "Inventory::Initialize(): Device ID: %s... OK!", deviceID.c_str());
 
 	return true;
 }
@@ -85,7 +84,6 @@ void
 Inventory::Clear()
 {
 	fDocument->Clear();
-	fDeviceID = "";
 }
 
 
@@ -134,7 +132,7 @@ Inventory::Save(const char* fileName)
 
 	Logger& logger = Logger::GetDefault();
 
-	logger.LogFormat(LOG_INFO, "Saving %s inventory as %s", fDeviceID.c_str(), fileName);
+	logger.LogFormat(LOG_INFO, "Saving %s inventory as %s", Configuration::Get()->DeviceID().c_str(), fileName);
 
 	bool result = fDocument->SaveFile(fileName) == tinyxml2::XML_SUCCESS;
 	if (result)

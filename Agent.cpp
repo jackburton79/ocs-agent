@@ -37,7 +37,7 @@ Agent::Run()
 
 	std::string deviceID = config->DeviceID();
 	Inventory inventory;
-	if (!inventory.Initialize(deviceID.c_str()))
+	if (!inventory.Initialize())
 		throw std::runtime_error("Cannot initialize Inventory");
 
 	bool noSoftware = (config->KeyValue(CONF_NO_SOFTWARE) == CONF_VALUE_TRUE);
