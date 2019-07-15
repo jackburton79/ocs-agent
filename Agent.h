@@ -17,9 +17,9 @@ public:
 
 	void Run();
 
-	static const char* Version();
-	static const char* LegacyAgentString();
-	static const char* AgentString();
+	static std::string Version();
+	static std::string LegacyAgentString();
+	static std::string AgentString();
 
 private:
 	void _RetrieveInventory();

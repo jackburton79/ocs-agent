@@ -67,7 +67,7 @@ Agent::Run()
 
 
 /* static */
-const char*
+std::string
 Agent::Version()
 {
 	return kVersion;
@@ -75,7 +75,7 @@ Agent::Version()
 
 
 /* static */
-const char*
+std::string
 Agent::LegacyAgentString()
 {
 	return "OCS-NG_unified_unix_agent_v";
@@ -83,7 +83,7 @@ Agent::LegacyAgentString()
 
 
 /* static */
-const char*
+std::string
 Agent::AgentString()
 {
 	if (sAgentString.empty()) {
@@ -95,5 +95,5 @@ Agent::AgentString()
 			sAgentString.append(Version());
 		}
 	}
-	return sAgentString.c_str();
+	return sAgentString;
 }
