@@ -295,7 +295,7 @@ Configuration::_GenerateDeviceID()
 
     deviceID.append(targetString);
 
-	fValues[kDeviceID] = deviceID;
+    fValues[kDeviceID] = deviceID;
 }
 
 
