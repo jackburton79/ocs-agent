@@ -51,16 +51,20 @@ SpeedToString(struct ethtool_cmd* edata)
 	if (count == "" && unit == "")
 		return "";
 
+	std::string result = "";
+	result.append(count).append(" ").append(unit);
+
+#if 0
+	// Seems that GLPI doesn't like if we add duplex info here
 	std::string duplex = "";
 	if (edata->duplex == DUPLEX_FULL)
 		duplex = "Full Duplex";
 	else if (edata->duplex == DUPLEX_HALF)
 		duplex = "Half Duplex";
-
-	std::string result = "";
-	result.append(count).append(" ").append(unit);
+	
 	if (duplex != "")
 		result.append(" ").append(duplex);
+#endif
 
 	return result;
 }
