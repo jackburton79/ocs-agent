@@ -5,8 +5,6 @@
  *      Author: Stefano Ceccherini
  */
 
-#include <ProcessRoster.h>
-#include <StorageRoster.h>
 #include "Agent.h"
 #include "Configuration.h"
 #include "Inventory.h"
@@ -14,9 +12,14 @@
 #include "Machine.h"
 #include "NetworkInterface.h"
 #include "NetworkRoster.h"
+#include "Processors.h"
+#include "ProcessRoster.h"
 #include "Screens.h"
 #include "Softwares.h"
+#include "StorageRoster.h"
 #include "Support.h"
+#include "UsersRoster.h"
+#include "VolumeRoster.h"
 #include "XML.h"
 
 #include "http/HTTP.h"
@@ -26,8 +29,6 @@
 #include <iostream>
 #include <memory>
 #include <unistd.h>
-#include <UsersRoster.h>
-#include <VolumeRoster.h>
 
 #include "tinyxml2/tinyxml2.h"
 
@@ -49,15 +50,14 @@ Inventory::~Inventory()
 
 
 bool
-Inventory::Initialize(const std::string& deviceID)
+Inventory::Initialize()
 {
 	Logger& logger = Logger::GetDefault();
 
 	Clear();
 
-	fDeviceID = deviceID;
-
-	logger.LogFormat(LOG_INFO, "Inventory::Initialize(): Device ID: %s...", fDeviceID.c_str());
+    std::string deviceID = Configuration::Get()->DeviceID();
+	logger.LogFormat(LOG_INFO, "Inventory::Initialize(): Device ID: %s...", deviceID.c_str());
 	tinyxml2::XMLDeclaration* declaration = fDocument->NewDeclaration();
 	tinyxml2::XMLElement* request = fDocument->NewElement("REQUEST");
 	fDocument->LinkEndChild(declaration);
@@ -70,11 +70,11 @@ Inventory::Initialize(const std::string& deviceID)
 	query->LinkEndChild(fDocument->NewText("INVENTORY"));
 	request->LinkEndChild(query);
 
- 	tinyxml2::XMLElement* deviceId = fDocument->NewElement("DEVICEID");
-	deviceId->LinkEndChild(fDocument->NewText(fDeviceID.c_str()));
-	request->LinkEndChild(deviceId);
+ 	tinyxml2::XMLElement* deviceIdElement = fDocument->NewElement("DEVICEID");
+	deviceIdElement->LinkEndChild(fDocument->NewText(deviceID.c_str()));
+	request->LinkEndChild(deviceIdElement);
 
-	logger.LogFormat(LOG_INFO, "Inventory::Initialize(): Device ID: %s... OK!", fDeviceID.c_str());
+	logger.LogFormat(LOG_INFO, "Inventory::Initialize(): Device ID: %s... OK!", deviceID.c_str());
 
 	return true;
 }
@@ -84,7 +84,6 @@ void
 Inventory::Clear()
 {
 	fDocument->Clear();
-	fDeviceID = "";
 }
 
 
@@ -133,7 +132,7 @@ Inventory::Save(const char* fileName)
 
 	Logger& logger = Logger::GetDefault();
 
-	logger.LogFormat(LOG_INFO, "Saving %s inventory as %s", fDeviceID.c_str(), fileName);
+	logger.LogFormat(LOG_INFO, "Saving %s inventory as %s", Configuration::Get()->DeviceID().c_str(), fileName);
 
 	bool result = fDocument->SaveFile(fileName) == tinyxml2::XML_SUCCESS;
 	if (result)
@@ -177,7 +176,7 @@ Inventory::Send(const char* serverUrl)
 		requestHeader.SetAuthentication(HTTP_AUTH_TYPE_BASIC,
 				inventoryUrl.Username(), inventoryUrl.Password());
 	}
-	
+
 	HTTP httpObject;
 	std::string userAgentString;
 	for (int c = 0; c < 2; c++) {
@@ -199,7 +198,7 @@ Inventory::Send(const char* serverUrl)
 		logger.Log(LOG_INFO, "Inventory::Send(): Prolog Sent!");
 		const HTTPResponseHeader& responseHeader = httpObject.LastResponse();
 		if (responseHeader.StatusCode() == HTTP_BAD_REQUEST) {
-			if (c < 2) {
+			if (c == 0) {
 				logger.LogFormat(LOG_INFO, "Server didn't accept prolog. Try again with standard agent string.");
 				continue;
 			}
@@ -240,7 +239,7 @@ Inventory::Send(const char* serverUrl)
 		logger.LogFormat(LOG_ERR, "Server not ready to accept inventory: %s", serverResponse.c_str());
 		return false;
 	}
-	
+
 	logger.Log(LOG_INFO, "Inventory::Send(): Compressing XML inventory data... ");
 	char* compressedData = NULL;
 	size_t compressedSize;
@@ -379,8 +378,10 @@ Inventory::_AddCPUsInfo(tinyxml2::XMLElement* parent)
 {
 	Logger& logger = Logger::GetDefault();
 
+	processor_info cpuInfo;
+	Processors CPUs;
+	while (CPUs.GetNext(cpuInfo)) {
 	// TODO: Check if the fields name and structure are correct.
-	for (int i = 0; i < fMachine->CountProcessors(); i++) {
 		tinyxml2::XMLElement* cpu = fDocument->NewElement("CPUS");
 		tinyxml2::XMLElement* manufacturer = fDocument->NewElement("MANUFACTURER");
 		tinyxml2::XMLElement* serial = fDocument->NewElement("SERIAL");
@@ -391,17 +392,17 @@ Inventory::_AddCPUsInfo(tinyxml2::XMLElement* parent)
 
 		// TODO: Seems like we should interpretate the vendor_id ?
 		manufacturer->LinkEndChild(
-			fDocument->NewText(fMachine->ProcessorManufacturer(i).c_str()));
+			fDocument->NewText(cpuInfo.manufacturer.c_str()));
 		serial->LinkEndChild(
-			fDocument->NewText(fMachine->ProcessorSerialNumber(i).c_str()));
+			fDocument->NewText(cpuInfo.serial.c_str()));
 		speed->LinkEndChild(
-			fDocument->NewText(fMachine->ProcessorSpeed(i).c_str()));
+			fDocument->NewText(cpuInfo.Speed().c_str()));
 		model->LinkEndChild(
-			fDocument->NewText(fMachine->ProcessorType(i).c_str()));
+			fDocument->NewText(cpuInfo.type.c_str()));
 		cores->LinkEndChild(
-			fDocument->NewText(fMachine->ProcessorCores(i).c_str()));
+			fDocument->NewText(cpuInfo.cores.c_str()));
 		cacheSize->LinkEndChild(
-			fDocument->NewText(fMachine->ProcessorCacheSize(i).c_str()));
+			fDocument->NewText(cpuInfo.cache_size.c_str()));
 
 		cpu->LinkEndChild(model);
 		cpu->LinkEndChild(manufacturer);
@@ -440,7 +441,7 @@ Inventory::_AddStoragesInfo(tinyxml2::XMLElement* parent)
 
 		tinyxml2::XMLElement* type = fDocument->NewElement("TYPE");
 		type->LinkEndChild(fDocument->NewText(info.type.c_str()));
-		
+
 		tinyxml2::XMLElement* diskSize = fDocument->NewElement("DISKSIZE");
 		diskSize->LinkEndChild(fDocument->NewText(info.size.c_str()));
 
@@ -592,51 +593,56 @@ Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 		}
 	}
 
+    OSInfo osInfo;
 	tinyxml2::XMLElement* description = fDocument->NewElement("DESCRIPTION");
 	std::string descriptionString;
-	descriptionString.append(fMachine->OSInfo().machine).append("/");
+	descriptionString.append(osInfo.architecture).append("/");
 	description->LinkEndChild(fDocument->NewText(descriptionString.c_str()));
 	hardware->LinkEndChild(description);
 
 	tinyxml2::XMLElement* memory = fDocument->NewElement("MEMORY");
-	memory->LinkEndChild(fDocument->NewText(fMachine->OSInfo().memory.c_str()));
+	memory->LinkEndChild(fDocument->NewText(osInfo.memory.c_str()));
 	hardware->LinkEndChild(memory);
 
 	tinyxml2::XMLElement* name = fDocument->NewElement("NAME");
-	name->LinkEndChild(fDocument->NewText(fMachine->HostName().c_str()));
+	name->LinkEndChild(fDocument->NewText(osInfo.hostname.c_str()));
 	hardware->LinkEndChild(name);
 
 	tinyxml2::XMLElement* osComments = fDocument->NewElement("OSCOMMENTS");
-	osComments->LinkEndChild(fDocument->NewText(fMachine->OSInfo().comments.c_str()));
+	osComments->LinkEndChild(fDocument->NewText(osInfo.comments.c_str()));
 	hardware->LinkEndChild(osComments);
 
 	tinyxml2::XMLElement* osName = fDocument->NewElement("OSNAME");
-	osName->LinkEndChild(fDocument->NewText(fMachine->OSInfo().os_description.c_str()));
+	osName->LinkEndChild(fDocument->NewText(osInfo.description.c_str()));
 	hardware->LinkEndChild(osName);
 
 	tinyxml2::XMLElement* osVersion = fDocument->NewElement("OSVERSION");
-	osVersion->LinkEndChild(fDocument->NewText(fMachine->OSInfo().os_release.c_str()));
+	osVersion->LinkEndChild(fDocument->NewText(osInfo.release.c_str()));
 	hardware->LinkEndChild(osVersion);
 
+	Processors CPUs;
+	size_t cpuCount = CPUs.Count();
 	tinyxml2::XMLElement* processorN = fDocument->NewElement("PROCESSORN");
-	processorN->LinkEndChild(fDocument->NewText(int_to_string(fMachine->CountProcessors()).c_str()));
+	processorN->LinkEndChild(fDocument->NewText(int_to_string(cpuCount).c_str()));
 	hardware->LinkEndChild(processorN);
 
-	if (fMachine->CountProcessors() > 0) {
+	processor_info cpuInfo;
+	if (cpuCount) {
+		CPUs.GetNext(cpuInfo);
 		tinyxml2::XMLElement* processorS = fDocument->NewElement("PROCESSORS");
-		processorS->LinkEndChild(fDocument->NewText(fMachine->ProcessorSpeed(0).c_str()));
+		processorS->LinkEndChild(fDocument->NewText(cpuInfo.Speed().c_str()));
 		hardware->LinkEndChild(processorS);
 
 		tinyxml2::XMLElement* processorT = fDocument->NewElement("PROCESSORT");
-		processorT->LinkEndChild(fDocument->NewText(fMachine->ProcessorType(0).c_str()));
+		processorT->LinkEndChild(fDocument->NewText(cpuInfo.type.c_str()));
 		hardware->LinkEndChild(processorT);
 	}
 	tinyxml2::XMLElement* arch = fDocument->NewElement("ARCH");
-	arch->LinkEndChild(fDocument->NewText(fMachine->Architecture().c_str()));
+	arch->LinkEndChild(fDocument->NewText(osInfo.architecture.c_str()));
 	hardware->LinkEndChild(arch);
-	
+
 	tinyxml2::XMLElement* swap = fDocument->NewElement("SWAP");
-	swap->LinkEndChild(fDocument->NewText(fMachine->OSInfo().swap.c_str()));
+	swap->LinkEndChild(fDocument->NewText(osInfo.swap.c_str()));
 	hardware->LinkEndChild(swap);
 
 	tinyxml2::XMLElement* userID = fDocument->NewElement("USERID");
@@ -653,9 +659,9 @@ Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 	hardware->LinkEndChild(vmSystem);
 
 	tinyxml2::XMLElement* workGroup = fDocument->NewElement("WORKGROUP");
-	workGroup->LinkEndChild(fDocument->NewText(fMachine->OSInfo().domain_name.c_str()));
+	workGroup->LinkEndChild(fDocument->NewText(osInfo.domainname.c_str()));
 	hardware->LinkEndChild(workGroup);
-	
+
 	UsersRoster users;
 	user_entry user;
 	if (users.GetNext(user)) {

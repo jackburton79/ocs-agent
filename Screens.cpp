@@ -4,7 +4,7 @@
  *  Created on: 15/lug/2015
  *      Author: Stefano Ceccherini
  */
- 
+
 #include "Screens.h"
 
 #include "EDID.h"
@@ -16,7 +16,6 @@
 struct pnp_id {
 	const char* manufacturer;
 	const char* id;
-	const char* date_added;
 };
 
 static const struct pnp_id kPNPIDs[] = {
@@ -25,7 +24,7 @@ static const struct pnp_id kPNPIDs[] = {
 
 Screens::Screens()
 {
-	if (CommandExists("find")) {        
+	if (CommandExists("find")) {
 		CommandStreamBuffer buf("find /sys/devices/ -name edid", "r");
 		std::istream stream(&buf);
 		std::string line;

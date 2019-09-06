@@ -37,7 +37,7 @@ Agent::Run()
 
 	std::string deviceID = config->DeviceID();
 	Inventory inventory;
-	if (!inventory.Initialize(deviceID.c_str()))
+	if (!inventory.Initialize())
 		throw std::runtime_error("Cannot initialize Inventory");
 
 	bool noSoftware = (config->KeyValue(CONF_NO_SOFTWARE) == CONF_VALUE_TRUE);
@@ -67,7 +67,7 @@ Agent::Run()
 
 
 /* static */
-const char*
+std::string
 Agent::Version()
 {
 	return kVersion;
@@ -75,7 +75,7 @@ Agent::Version()
 
 
 /* static */
-const char*
+std::string
 Agent::LegacyAgentString()
 {
 	return "OCS-NG_unified_unix_agent_v";
@@ -83,7 +83,7 @@ Agent::LegacyAgentString()
 
 
 /* static */
-const char*
+std::string
 Agent::AgentString()
 {
 	if (sAgentString.empty()) {
@@ -95,5 +95,5 @@ Agent::AgentString()
 			sAgentString.append(Version());
 		}
 	}
-	return sAgentString.c_str();
+	return sAgentString;
 }

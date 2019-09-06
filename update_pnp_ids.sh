@@ -1,4 +1,3 @@
 #!/bin/sh
 wget https://uefi.org/uefi-pnp-export
-cat uefi-pnp-export | sed -r s/'<tr class="(.+)"><td>'/'{"'/  | sed -r s/'(<\/td><td>)'/\",\"/g | sed -r s/'<\/td> <\/tr>'/'\"},'/ | grep -v '<' > pnp_ids.h
-
+sed -r -e s/'<tr class="(.+)"><td>'/'{"'/ -e 's:<td>[[:digit:]]{2}/[[:digit:]]{2}/[[:digit:]]{4}</td>::g' -e s/'(<\/td><td>)'/\",\"/g -e s/'<\/td> <\/tr>'/'\"},'/ uefi-pnp-export | grep -v '<' > pnp_ids.h

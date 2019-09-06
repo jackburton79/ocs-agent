@@ -5,12 +5,13 @@
  *      Author: Stefano Ceccherini
  */
 
+#include "UsersRoster.h"
+
 #include "Support.h"
 
 #include <ctime>
-
 #include <utmpx.h>
-#include <UsersRoster.h>
+
 
 UsersRoster::UsersRoster()
 {

@@ -3,7 +3,7 @@
 
 
 struct edid_info {
-  char description[32];
+  char description[64];
   char manufacturer[16];
   char type[24];
   char model[16];

@@ -21,7 +21,7 @@ public:
 	Inventory();
 	~Inventory();
 
-	bool Initialize(const std::string& deviceID);
+	bool Initialize();
 	void Clear();
 
 	bool Build(bool noSoftware = false);
@@ -51,7 +51,6 @@ private:
     tinyxml2::XMLDocument* fDocument;
     tinyxml2::XMLElement* fContent;
 	Machine* fMachine;
-	std::string fDeviceID;
 };
 
 #endif /* INVENTORY_H_ */

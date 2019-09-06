@@ -51,16 +51,20 @@ SpeedToString(struct ethtool_cmd* edata)
 	if (count == "" && unit == "")
 		return "";
 
+	std::string result = "";
+	result.append(count).append(" ").append(unit);
+
+#if 0
+	// Seems that GLPI doesn't like if we add duplex info here
 	std::string duplex = "";
 	if (edata->duplex == DUPLEX_FULL)
 		duplex = "Full Duplex";
 	else if (edata->duplex == DUPLEX_HALF)
 		duplex = "Half Duplex";
-
-	std::string result = "";
-	result.append(count).append(" ").append(unit);
+	
 	if (duplex != "")
 		result.append(" ").append(duplex);
+#endif
 
 	return result;
 }
@@ -196,13 +200,13 @@ NetworkInterface::DefaultGateway() const
 	std::list<route_info> routeInfo;
 	if (_GetRoutes(routeInfo) <= 0)
 		return "";
-	
+
 	std::list<route_info>::const_iterator i;
 	for (i = routeInfo.begin(); i != routeInfo.end(); i++) {
 		if (i->dstAddr.s_addr == 0)
 			return (char*)inet_ntoa(i->gateway);
 	}
-	
+
 	return "";
 }
 
@@ -228,8 +232,7 @@ NetworkInterface::Speed() const
 	if (_DoRequest(SIOCETHTOOL, ifr) != 0)
 		return "0";
 
-	// TODO: Duplex
-	return SpeedToString(&edata);
+    return SpeedToString(&edata);
 }
 
 
@@ -329,7 +332,7 @@ ReadRouteInfoFromSocket(int sockFd, char *bufPtr, int seqNum, int pId)
 
 		nlHdr = (nlmsghdr*)bufPtr;
 
-		// Check if the header is valid 
+		// Check if the header is valid
 		if ((NLMSG_OK(nlHdr, readLen) == (int)0) ||
 				(nlHdr->nlmsg_type == NLMSG_ERROR)) {
 			return -1;
@@ -339,7 +342,7 @@ ReadRouteInfoFromSocket(int sockFd, char *bufPtr, int seqNum, int pId)
 		if (nlHdr->nlmsg_type == NLMSG_DONE) {
 			break;
 		} else {
-			// Else move the pointer to buffer appropriately 
+			// Else move the pointer to buffer appropriately
 			bufPtr += readLen;
 			msgLen += readLen;
 		}
@@ -348,7 +351,7 @@ ReadRouteInfoFromSocket(int sockFd, char *bufPtr, int seqNum, int pId)
 		if ((nlHdr->nlmsg_flags & NLM_F_MULTI) == 0)
 			break;
 	} while(((int)nlHdr->nlmsg_seq != seqNum) || ((int)nlHdr->nlmsg_pid != pId));
-	
+
 	return msgLen;
 }
 
@@ -383,8 +386,8 @@ NetworkInterface::_GetRoutes(std::list<route_info>& routeList) const
 		::close(sock);
 		return len;
 	}
-	
-	// Parse and add to list	
+
+	// Parse and add to list
 	for (; NLMSG_OK(nlMsg, len) != (int)0; nlMsg = NLMSG_NEXT(nlMsg, len)) {
 		route_info rtInfo;
 		memset(&rtInfo, 0, sizeof(rtInfo));
