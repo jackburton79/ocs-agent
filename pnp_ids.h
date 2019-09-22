@@ -2440,3 +2440,4 @@
  {"Shenzhen Dlodlo Technologies Co., Ltd.","DLO"},
  {"LENOVO BEIJING CO. LTD.","VLM"},
  {"Cammegh Limited","CRW"},
+ {"Beihai Century Joint Innovation Technology Co.,Ltd","LHC"},
