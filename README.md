@@ -1,4 +1,4 @@
-[![Build Status](https://github.com/jackburton79/ocs-agent/workflows/build/badge.svg)]
+![](https://github.com/jackburton79/ocs-agent/workflows/build/badge.svg)
 [![CodeFactor](https://www.codefactor.io/repository/github/jackburton79/ocs-agent/badge)](https://www.codefactor.io/repository/github/jackburton79/ocs-agent)
 [![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/g/jackburton79/ocs-agent.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/jackburton79/ocs-agent/context:cpp)
 
