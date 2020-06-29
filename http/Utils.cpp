@@ -31,7 +31,7 @@ Base64Encode(std::string string)
 
 	size_t encodedSize = pointer->length;
 	std::string encoded(encodedSize + 1, '\0');
-	memcpy(&encoded[0], pointer->data, encodedSize);
+	::memcpy(&encoded[0], pointer->data, encodedSize);
 	encoded.resize(encodedSize);
 
 	BIO_free_all(buffer);

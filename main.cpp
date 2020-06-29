@@ -189,29 +189,29 @@ HandleArgs(int argc, char **argv)
 static void
 Daemonize()
 {
-	pid_t processID = fork();
+	pid_t processID = ::fork();
 	if (processID < 0) {
 		Logger::GetDefault().Log(LOG_ERR, "Failed to daemonize. Exiting...");
 		// Return failure in exit status
-		exit(1);
+		::exit(1);
 	}
 
 	// Exit the parent process
 	if (processID > 0)
-		exit(0);
+		::exit(0);
 
-	umask(0);
-	if (chdir("/") < 0)
+	::umask(0);
+	if (::chdir("/") < 0)
 		; // Ignore
 
 	//set new session
-	pid_t sid = setsid();
+	pid_t sid = ::setsid();
 	if (sid < 0)
-		exit(1);
+		::exit(1);
 
-	close(STDIN_FILENO);
-	close(STDOUT_FILENO);
-	close(STDERR_FILENO);
+	::close(STDIN_FILENO);
+	::close(STDOUT_FILENO);
+	::close(STDERR_FILENO);
 }
 
 

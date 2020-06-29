@@ -165,7 +165,7 @@ NetworkInterface::Network() const
 	struct sockaddr_in* netMask = (struct sockaddr_in*)&ifrNetMask.ifr_netmask;
 
 	struct in_addr networkAddress;
-	memset(&networkAddress, 0, sizeof(networkAddress));
+	::memset(&networkAddress, 0, sizeof(networkAddress));
 	networkAddress.s_addr = ipAddr->sin_addr.s_addr & netMask->sin_addr.s_addr;
 
 	return inet_ntoa(networkAddress);
@@ -270,7 +270,7 @@ NetworkInterface::_DoRequest(int request, struct ifreq& ifr)  const
 		return errno;
 
 	int status = 0;
-	if (ioctl(fd, request, &ifr) < 0)
+	if (::ioctl(fd, request, &ifr) < 0)
 		status = errno;
 
 	::close(fd);
@@ -364,7 +364,7 @@ NetworkInterface::_GetRoutes(std::list<route_info>& routeList) const
 		return errno;
 
 	char msgBuf[kBufSize];
-	memset(msgBuf, 0, kBufSize);
+	::memset(msgBuf, 0, kBufSize);
 	struct nlmsghdr* nlMsg = (struct nlmsghdr*)msgBuf;
 
 	int msgSeq = 0;

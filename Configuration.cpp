@@ -286,12 +286,12 @@ Configuration::_GenerateDeviceID()
 		// value, since we need a correct date for the device id
 		if (biosDateString.length() <= 1)
 			biosDateString = "01/01/2017";
-		strptime(biosDateString.c_str(), "%m/%d/%Y", &biosDate);
+		::strptime(biosDateString.c_str(), "%m/%d/%Y", &biosDate);
 	}
 
 	// DeviceID needs to have a date appended in this very format,
 	// otherwise OCSInventoryNG will reject the inventory
-	strftime(targetString, sizeof(targetString), "-%Y-%m-%d-00-00-00", &biosDate);
+	::strftime(targetString, sizeof(targetString), "-%Y-%m-%d-00-00-00", &biosDate);
 
     deviceID.append(targetString);
 
