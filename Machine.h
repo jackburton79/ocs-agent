@@ -63,6 +63,7 @@ struct video_info {
 	std::string memory;
 	std::string name;
 	std::string resolution;
+	void MergeWith(const video_info& info);
 };
 
 
