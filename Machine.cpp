@@ -484,19 +484,34 @@ Machine::_GetDMIData()
 bool
 Machine::_GetGraphicsCardInfo()
 {
+	// TODO: Does not work with multiple video cards. And does not work well in general
+	struct video_info videoInfo;
 	try {
-		struct video_info videoInfo;
 		videoInfo.name = trimmed(ProcReader("/sys/class/graphics/fb0/device/oem_product_name").ReadLine());
-		videoInfo.vendor = trimmed(ProcReader("/sys/class/graphics/fb0/device/oem_vendor").ReadLine());
-		videoInfo.chipset = trimmed(ProcReader("/sys/class/graphics/fb0/device/oem_string").ReadLine());
-		videoInfo.resolution = trimmed(ProcReader("/sys/class/graphics/fb0/virtual_size").ReadLine());
-		std::replace(videoInfo.resolution.begin(), videoInfo.resolution.end(), ',', 'x');
-
-		fVideoInfo.push_back(videoInfo);
 	} catch (...) {
-		return false;
 	}
+	try {
+		videoInfo.vendor = trimmed(ProcReader("/sys/class/graphics/fb0/device/oem_vendor").ReadLine());
+	} catch (...) {
+	}
+	try {
+		videoInfo.chipset = trimmed(ProcReader("/sys/class/graphics/fb0/device/oem_string").ReadLine());
+	} catch (...) {
+	}
+	try {
+		videoInfo.resolution = trimmed(ProcReader("/sys/class/graphics/fb0/virtual_size").ReadLine());
+	} catch (...) {
+	}
+	// try this other path
+	try {
+		videoInfo.resolution = trimmed(ProcReader("/sys/class/graphics/fb0/device/graphics/fb0/virtual_size").ReadLine());
+	} catch (...) {
+	}
+	std::replace(videoInfo.resolution.begin(), videoInfo.resolution.end(), ',', 'x');
+	if (videoInfo.resolution.empty() && videoInfo.name.empty() && videoInfo.chipset.empty())
+		return false;
 
+	fVideoInfo.push_back(videoInfo);
 	return true;
 }
 
@@ -611,16 +626,17 @@ Machine::_GetLSHWData()
 		fBoardInfo.MergeWith(boardInfo);
 	}
 
-	if (fVideoInfo.size() == 0) {
-		element = XML::GetElementByAttribute(doc, "id", "display");
-		if (element != NULL) {
-			// TODO: there could be multiple displays
-			video_info info;
-			info.name = XML::GetFirstChildElementText(element, "description");
-			info.vendor = XML::GetFirstChildElementText(element, "vendor");
-			info.chipset = XML::GetFirstChildElementText(element, "product");
+	element = XML::GetElementByAttribute(doc, "id", "display");
+	if (element != NULL) {
+		// TODO: there could be multiple displays
+		video_info info;
+		info.name = XML::GetFirstChildElementText(element, "description");
+		info.vendor = XML::GetFirstChildElementText(element, "vendor");
+		info.chipset = XML::GetFirstChildElementText(element, "product");
+		if (fVideoInfo.size() == 0)
 			fVideoInfo.push_back(info);
-		}
+		else
+			fVideoInfo[0].MergeWith(info);
 	}
 
 	if (fMemoryInfo.size() == 0) {
@@ -912,6 +928,22 @@ chassis_info::Score() const
 	score += vendor.empty() ? 0 : 20;
 	score += version.empty() ? 0 : 20;
 	return score;
+}
+
+
+void
+video_info::MergeWith(const video_info& info)
+{
+	if (name.empty())
+		name = info.name;
+	if (vendor.empty())
+		vendor = info.vendor;
+	if (chipset.empty())
+		chipset = info.chipset;
+	if (memory.empty())
+		memory = info.memory;
+	if (resolution.empty())
+		resolution = info.resolution;
 }
 
 
