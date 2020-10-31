@@ -44,4 +44,3 @@ ZLibCompressor::Uncompress(const char* source, size_t sourceLen, char*& destinat
 
 	return true;
 }
-
