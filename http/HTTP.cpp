@@ -243,7 +243,12 @@ HTTP::_HandleConnection(const std::string& string)
 	try {
 		fSocket = SocketGetter().GetSocket(url.Protocol());
 		if (fSocket->Open(AF_INET, SOCK_STREAM, 0) < 0)
-			throw "Cannot open socket";
+			throw errno;
+	} catch (int& error) {
+		fLastError = error;
+		delete fSocket;
+		fSocket = NULL;
+		return false;
 	} catch (...) {
 		fLastError = -1;
 		delete fSocket;
