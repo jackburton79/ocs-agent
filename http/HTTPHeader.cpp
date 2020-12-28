@@ -148,7 +148,7 @@ HTTPHeader::operator=(const HTTPHeader& header)
 
 // ICompareString
 bool
-ICompareString::operator()(const std::string a, const std::string b) const
+ICompareString::operator()(const std::string& a, const std::string& b) const
 {
 	return ::strcasecmp(a.c_str(), b.c_str()) < 0;
 }
