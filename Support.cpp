@@ -45,7 +45,7 @@ CommandStreamBuffer::~CommandStreamBuffer()
 CommandStreamBuffer*
 CommandStreamBuffer::open(const char* fileName, const char* mode)
 {
-	fFile = popen(fileName, mode);
+	fFile = ::popen(fileName, mode);
 	if (fFile == NULL)
 		return NULL;
 
@@ -62,7 +62,7 @@ void
 CommandStreamBuffer::close()
 {
 	if (fFile != NULL) {
-		pclose(fFile);
+		::pclose(fFile);
 		fFile = NULL;
 	}
 
@@ -75,12 +75,12 @@ CommandStreamBuffer::xsgetn(char_type* ptr, std::streamsize num)
 {
 	std::streamsize howMany = showmanyc();
 	if (num < howMany) {
-		memcpy(ptr, gptr(), num * sizeof(char_type));
+		::memcpy(ptr, gptr(), num * sizeof(char_type));
 		gbump(num);
 		return num;
 	}
 
-	memcpy(ptr, gptr(), howMany * sizeof(char_type));
+	::memcpy(ptr, gptr(), howMany * sizeof(char_type));
 	gbump(howMany);
 
 	if (traits_type::eof() == underflow())
@@ -99,7 +99,7 @@ CommandStreamBuffer::underflow()
 	if (gptr() < egptr())
 		return traits_type::to_int_type(*gptr());
 
-	size_t len = fread(eback(), sizeof(char_type), 512, fFile);
+	size_t len = ::fread(eback(), sizeof(char_type), 512, fFile);
 	setg(eback(), eback(), eback() + sizeof(char_type) * len);
 	if (len == 0)
 		return traits_type::eof();
@@ -125,7 +125,7 @@ CommandExists(const char* command)
 	fullCommand.append("type ").append(command).append(" > /dev/null 2>&1");
 
 	int result = -1;
-	int systemStatus = system(fullCommand.c_str());
+	int systemStatus = ::system(fullCommand.c_str());
 	if (systemStatus == 0)
 		result = WEXITSTATUS(systemStatus);
 		
