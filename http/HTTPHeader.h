@@ -13,7 +13,7 @@
 
 class ICompareString {
 public:
-	bool operator()(const std::string a, const std::string b) const;
+	bool operator()(const std::string& a, const std::string& b) const;
 };
 
 class HTTPHeader {
