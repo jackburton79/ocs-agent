@@ -77,6 +77,7 @@ Processors::_GetCPUInfo()
 	std::map<int, processor_info>::const_iterator i;
 	for (i = tmpCPUInfo.begin(); i != tmpCPUInfo.end(); i++) {
 		const processor_info& cpu = i->second;
+		// TODO: Review this, it doesn't look correct
 		int CPUPhysID = cpu.physical_id;
 		processor_info processorInfo;
 		processorInfo.type = cpu.type;
@@ -84,12 +85,15 @@ Processors::_GetCPUInfo()
 		processorInfo.cores = cpu.cores;
 		processorInfo.manufacturer = cpu.manufacturer;
 		processorInfo.cache_size = cpu.cache_size;
-		if (size_t(CPUPhysID) >= fItems.size())
+		if (size_t(CPUPhysID) >= fItems.size()) {
+			processorInfo.physical_id = CPUPhysID;
 			fItems.push_back(processorInfo);
-		else {
+		} else {
 			// TODO: Find out why it doesn't recognize the [] operator
 			std::list<processor_info>::iterator it = fItems.begin();
 			std::advance(it, CPUPhysID);
+			// TODO: we are overwriting a full processor_info struct with
+			// an incomplete one (physical_id is not set here)
 			*it = processorInfo;
 		}
 	}
