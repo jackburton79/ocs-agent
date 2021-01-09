@@ -85,7 +85,6 @@ std::string
 HTTPRequestHeader::ToString() const
 {
 	::URL url(fURL);
-	std::string host = url.Host();
 	std::string resource = url.Path();
 	std::string string;
 	string.append(fMethod).append(" ");
