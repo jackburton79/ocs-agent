@@ -130,12 +130,13 @@ Logger::Get(const std::string& loggerType)
 }
 
 
-// StdoutLogger
+// StdErrLogger
 StdErrLogger::StdErrLogger(const char* logName)
 	:
 	Logger(logName)
 {
 }
+
 
 /* virtual */
 StdErrLogger::~StdErrLogger()
