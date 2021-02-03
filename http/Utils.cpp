@@ -12,13 +12,21 @@
 #include <openssl/evp.h>
 
 #include <cstring>
+#include <new>
+#include <stdexcept>
+
 
 std::string
 Base64Encode(std::string string)
 {
-	// TODO: Error checking
 	BIO* b64f = BIO_new(BIO_f_base64());
+	if (b64f == NULL)
+		throw std::bad_alloc();
+
 	BIO* buffer = BIO_new(BIO_s_mem());
+	if (buffer == NULL)
+		throw std::bad_alloc();
+
 	buffer = BIO_push(b64f, buffer);
 
 	BIO_set_flags(buffer, BIO_FLAGS_BASE64_NO_NL);
