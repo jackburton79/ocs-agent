@@ -10,15 +10,18 @@
 #include "EDID.h"
 #include "Support.h"
 
+#include <cstring>
 #include <iostream>
 #include <string>
 
 struct pnp_id {
 	const char* manufacturer;
 	const char* id;
+	bool operator==(const pnp_id& a) const { return ::strcasecmp(a.id, id) == 0; };
+	bool operator()(const pnp_id& a, const pnp_id& b) const { return ::strcasecmp(a.id, b.id) < 0; };
 };
 
-static const struct pnp_id kPNPIDs[] = {
+static struct pnp_id kPNPIDs[] = {
 #include "pnp_ids.h"
 };
 
@@ -42,6 +45,8 @@ Screens::Screens()
 			}
 		}
 	}
+	const size_t numElements = sizeof(kPNPIDs) / sizeof(kPNPIDs[0]);
+	std::sort(kPNPIDs, kPNPIDs + numElements, kPNPIDs[0]);
 	Rewind();
 }
 
@@ -49,10 +54,9 @@ Screens::Screens()
 std::string
 GetManufacturerFromID(const std::string& string)
 {
-	// TODO: Improve
-	for (size_t i = 0; i < sizeof(kPNPIDs) / sizeof(kPNPIDs[0]); i++) {
-		if (string.compare(kPNPIDs[i].id) == 0)
-			return kPNPIDs[i].manufacturer;
-	}
-	return string;
+	const size_t numElements = sizeof(kPNPIDs) / sizeof(kPNPIDs[0]);
+	const struct pnp_id key = { "dummy", string.c_str() };
+	pnp_id* element = std::find(kPNPIDs, kPNPIDs + numElements, key);
+
+	return element->manufacturer;
 }
