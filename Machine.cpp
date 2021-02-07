@@ -225,7 +225,9 @@ OSInfo::_OSDescription()
 					std::string key = line.substr(0, pos);
 					if (key == "PRETTY_NAME") {
 						std::string value = line.substr(pos + 1, std::string::npos);
-						osDescription = trim(value);
+						value = trim(value);
+						// remove quotes
+						osDescription = value.substr(1, value.length() - 2);
 						break;
 					}
 				}
