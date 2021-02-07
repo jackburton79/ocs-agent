@@ -220,10 +220,9 @@ OSInfo::_OSDescription()
 		ProcReader osReader("/etc/os-release");
 		try {
 			while ((line = osReader.ReadLine()) != "") {
-				size_t pos = line.find('=');
-				if (pos != std::string::npos) {
-					std::string key = line.substr(0, pos);
-					if (key == "PRETTY_NAME") {
+				if (line.find("PRETTY_NAME") != std::string::npos) {
+					size_t pos = line.find('=');
+					if (pos != std::string::npos) {
 						std::string value = line.substr(pos + 1, std::string::npos);
 						value = trim(value);
 						// remove quotes
@@ -240,10 +239,9 @@ OSInfo::_OSDescription()
 		lsb.open("lsb_release -a", "r");
 		std::istream lsbStream(&lsb);
 		while (std::getline(lsbStream, line)) {
-			size_t pos = line.find(':');
-			if (pos != std::string::npos) {
-				std::string key = line.substr(0, pos);
-				if (key == "Description") {
+			if (line.find("Description") != std::string::npos) {
+				size_t pos = line.find(':');
+				if (pos != std::string::npos) {
 					std::string value = line.substr(pos + 1, std::string::npos);
 					osDescription = trim(value);
 					break;
