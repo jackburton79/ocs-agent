@@ -36,7 +36,7 @@ endif
 # Add inputs and outputs from these tool invocations to the build variables 
 
 # All Target
-all: OcsInventory-ng-agent urltest
+all: OcsInventory-ng-agent urltest processors-info-test
 
 # Tool invocations
 OcsInventory-ng-agent: $(OBJS) $(USER_OBJS) main.o
@@ -53,9 +53,16 @@ urltest: $(OBJS) $(USER_OBJS) test/urltest.o
 	@echo 'Finished building target: $@'
 	@echo ' '
 
+processors-info-test: $(OBJS) $(USER_OBJS) test/processors-info-test.o
+	@echo 'Building target: $@'
+	@echo 'Invoking: GCC C++ Linker'
+	g++  -o "test/processors-info-test" $(OBJS) $(USER_OBJS) test/processors-info-test.o $(LDFLAGS) $(LIBS)
+	@echo 'Finished building target: $@'
+	@echo ' '
+
 # Other Targets
 clean:
-	-$(RM) $(OBJS)$(C++_DEPS)$(C_DEPS)$(CC_DEPS)$(CPP_DEPS)$(EXECUTABLES)$(CXX_DEPS)$(C_UPPER_DEPS) main.o test/urltest.o ocsinventory-agent test/urltest
+	-$(RM) $(OBJS)$(C++_DEPS)$(C_DEPS)$(CC_DEPS)$(CPP_DEPS)$(EXECUTABLES)$(CXX_DEPS)$(C_UPPER_DEPS) main.o test/urltest.o test/processors-info-test.o ocsinventory-agent test/urltest test/processors-info-test
 	-@echo ' '
 
 .PHONY: all clean dependents
