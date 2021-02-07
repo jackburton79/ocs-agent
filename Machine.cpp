@@ -214,12 +214,28 @@ OSInfo::OSInfo()
 std::string
 OSInfo::_OSDescription()
 {
+	std::string line;
 	std::string osDescription;
-	if (CommandExists("lsb_release")) {
+	if (::access("/etc/os-release", F_OK) != -1) {
+		ProcReader osReader("/etc/os-release");
+		try {
+			while ((line = osReader.ReadLine()) != "") {
+				size_t pos = line.find('=');
+				if (pos != std::string::npos) {
+					std::string key = line.substr(0, pos);
+					if (key == "PRETTY_NAME") {
+						std::string value = line.substr(pos + 1, std::string::npos);
+						osDescription = trim(value);
+					}
+				}
+			}
+		} catch (...) {
+			// not an error
+		}
+	} else if (CommandExists("lsb_release")) {
 		CommandStreamBuffer lsb;
 		lsb.open("lsb_release -a", "r");
 		std::istream lsbStream(&lsb);
-		std::string line;
 		while (std::getline(lsbStream, line)) {
 			size_t pos = line.find(':');
 			if (pos != std::string::npos) {
