@@ -56,7 +56,7 @@ GetManufacturerFromID(const std::string& string)
 {
 	const size_t numElements = sizeof(kPNPIDs) / sizeof(kPNPIDs[0]);
 	const struct pnp_id key = { "dummy", string.c_str() };
-	pnp_id* element = std::find(kPNPIDs, kPNPIDs + numElements, key);
+	const pnp_id* element = std::find(kPNPIDs, kPNPIDs + numElements, key);
 
 	return element->manufacturer;
 }
