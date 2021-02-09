@@ -19,6 +19,7 @@ int main()
 		std::cout << "SPEED:" << cpuInfo.Speed() << std::endl;
 		std::cout << "TYPE:" << cpuInfo.type << std::endl;
 		std::cout << "CORES:" << cpuInfo.cores << std::endl;
+		std::cout << "LOGICAL CPUs:" << cpuInfo.logical_cpus << std::endl;
 		std::cout << "L2CACHESIZE:" << cpuInfo.cache_size << std::endl;
 	}
 }

@@ -17,6 +17,7 @@ struct processor_info {
 	std::string type;
 	std::string Speed() const;
 	std::string cores;
+	std::string logical_cpus;
 	std::string cache_size;
 	std::string serial;
 	std::string speed;

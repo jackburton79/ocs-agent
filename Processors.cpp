@@ -69,6 +69,8 @@ Processors::_GetCPUInfo()
 						::strtol(value.c_str(), NULL, 0);
 				else if (name == "cache size")
 					tmpCPUInfo[processorNum].cache_size = value;
+				else if (name == "siblings")
+					tmpCPUInfo[processorNum].logical_cpus = value;
 			} catch (...) {
 			}
 		}
@@ -85,6 +87,7 @@ Processors::_GetCPUInfo()
 		processorInfo.cores = cpu.cores;
 		processorInfo.manufacturer = cpu.manufacturer;
 		processorInfo.cache_size = cpu.cache_size;
+		processorInfo.logical_cpus = cpu.logical_cpus;
 		if (size_t(CPUPhysID) >= fItems.size()) {
 			processorInfo.physical_id = CPUPhysID;
 			fItems.push_back(processorInfo);
