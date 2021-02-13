@@ -390,7 +390,7 @@ Inventory::_AddCPUsInfo(tinyxml2::XMLElement* parent)
 		tinyxml2::XMLElement* serial = fDocument->NewElement("SERIAL");
 		tinyxml2::XMLElement* speed = fDocument->NewElement("SPEED");
 		tinyxml2::XMLElement* model = fDocument->NewElement("TYPE");
-		tinyxml2::XMLElement* arch = fDocument->NewElement("ARCH");
+		tinyxml2::XMLElement* arch = fDocument->NewElement("CPUARCH");
 		tinyxml2::XMLElement* cores = fDocument->NewElement("CORES");
 		tinyxml2::XMLElement* cacheSize = fDocument->NewElement("L2CACHESIZE");
 		tinyxml2::XMLElement* logicalCpu = fDocument->NewElement("LOGICAL_CPUS");
