@@ -378,6 +378,9 @@ Inventory::_AddCPUsInfo(tinyxml2::XMLElement* parent)
 {
 	Logger& logger = Logger::GetDefault();
 
+	// TODO: This is not completely correct: We could have a 64 bit capable CPU on
+	// a 32 bit OS.
+	OSInfo osInfo;
 	processor_info cpuInfo;
 	Processors CPUs;
 	while (CPUs.GetNext(cpuInfo)) {
@@ -387,6 +390,7 @@ Inventory::_AddCPUsInfo(tinyxml2::XMLElement* parent)
 		tinyxml2::XMLElement* serial = fDocument->NewElement("SERIAL");
 		tinyxml2::XMLElement* speed = fDocument->NewElement("SPEED");
 		tinyxml2::XMLElement* model = fDocument->NewElement("TYPE");
+		tinyxml2::XMLElement* arch = fDocument->NewElement("ARCH");
 		tinyxml2::XMLElement* cores = fDocument->NewElement("CORES");
 		tinyxml2::XMLElement* cacheSize = fDocument->NewElement("L2CACHESIZE");
 		tinyxml2::XMLElement* logicalCpu = fDocument->NewElement("LOGICAL_CPUS");
@@ -402,6 +406,8 @@ Inventory::_AddCPUsInfo(tinyxml2::XMLElement* parent)
 			fDocument->NewText(cpuInfo.type.c_str()));
 		cores->LinkEndChild(
 			fDocument->NewText(cpuInfo.cores.c_str()));
+		arch->LinkEndChild(
+			fDocument->NewText(osInfo.architecture.c_str()));
 		cacheSize->LinkEndChild(
 			fDocument->NewText(cpuInfo.cache_size.c_str()));
 		logicalCpu->LinkEndChild(
@@ -412,6 +418,7 @@ Inventory::_AddCPUsInfo(tinyxml2::XMLElement* parent)
 		cpu->LinkEndChild(serial);
 		cpu->LinkEndChild(speed);
 		cpu->LinkEndChild(cores);
+		cpu->LinkEndChild(arch);
 		cpu->LinkEndChild(cacheSize);
 		cpu->LinkEndChild(logicalCpu);
 
