@@ -14,6 +14,7 @@
 struct processor_info {
 	int physical_id;
 	std::string manufacturer;
+	std::string Manufacturer() const;
 	std::string type;
 	std::string arch;
 	std::string Speed() const;

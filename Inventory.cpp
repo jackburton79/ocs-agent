@@ -402,9 +402,8 @@ Inventory::_AddCPUsInfo(tinyxml2::XMLElement* parent)
 		if (osInfo.architecture == "x86_64")
 			dataWidthString = "64";
 
-		// TODO: Seems like we should interpretate the vendor_id ?
 		manufacturer->LinkEndChild(
-			fDocument->NewText(cpuInfo.manufacturer.c_str()));
+			fDocument->NewText(cpuInfo.Manufacturer().c_str()));
 		serial->LinkEndChild(
 			fDocument->NewText(cpuInfo.serial.c_str()));
 		speed->LinkEndChild(

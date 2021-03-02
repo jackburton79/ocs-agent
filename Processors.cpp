@@ -104,6 +104,16 @@ Processors::_GetCPUInfo()
 
 
 std::string
+processor_info::Manufacturer() const
+{
+	if (manufacturer == "GenuineIntel")
+		return "Intel";
+
+	return manufacturer;
+}
+
+
+std::string
 processor_info::Speed() const
 {
 	std::string mhz = speed;
