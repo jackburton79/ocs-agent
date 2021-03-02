@@ -392,6 +392,7 @@ Inventory::_AddCPUsInfo(tinyxml2::XMLElement* parent)
 		tinyxml2::XMLElement* model = fDocument->NewElement("TYPE");
 		tinyxml2::XMLElement* arch = fDocument->NewElement("CPUARCH");
 		tinyxml2::XMLElement* dataWidth = fDocument->NewElement("DATA_WIDTH");
+		tinyxml2::XMLElement* currentAddressWidth = fDocument->NewElement("CURRENT_ADDRESS_WIDTH");
 		tinyxml2::XMLElement* cores = fDocument->NewElement("CORES");
 		tinyxml2::XMLElement* cacheSize = fDocument->NewElement("L2CACHESIZE");
 		tinyxml2::XMLElement* logicalCpu = fDocument->NewElement("LOGICAL_CPUS");
@@ -415,6 +416,9 @@ Inventory::_AddCPUsInfo(tinyxml2::XMLElement* parent)
 			fDocument->NewText(osInfo.architecture.c_str()));
 		dataWidth->LinkEndChild(
 			fDocument->NewText(dataWidthString.c_str()));
+		// Not a copy/paste error: the fields are the same
+		currentAddressWidth->LinkEndChild(
+				fDocument->NewText(dataWidthString.c_str()));
 		cacheSize->LinkEndChild(
 			fDocument->NewText(cpuInfo.cache_size.c_str()));
 		logicalCpu->LinkEndChild(
@@ -427,6 +431,7 @@ Inventory::_AddCPUsInfo(tinyxml2::XMLElement* parent)
 		cpu->LinkEndChild(cores);
 		cpu->LinkEndChild(arch);
 		cpu->LinkEndChild(dataWidth);
+		cpu->LinkEndChild(currentAddressWidth);
 		cpu->LinkEndChild(cacheSize);
 		cpu->LinkEndChild(logicalCpu);
 
