@@ -391,9 +391,14 @@ Inventory::_AddCPUsInfo(tinyxml2::XMLElement* parent)
 		tinyxml2::XMLElement* speed = fDocument->NewElement("SPEED");
 		tinyxml2::XMLElement* model = fDocument->NewElement("TYPE");
 		tinyxml2::XMLElement* arch = fDocument->NewElement("CPUARCH");
+		tinyxml2::XMLElement* dataWidth = fDocument->NewElement("DATA_WIDTH");
 		tinyxml2::XMLElement* cores = fDocument->NewElement("CORES");
 		tinyxml2::XMLElement* cacheSize = fDocument->NewElement("L2CACHESIZE");
 		tinyxml2::XMLElement* logicalCpu = fDocument->NewElement("LOGICAL_CPUS");
+
+		std::string dataWidthString = "32";
+		if (osInfo.architecture == "x86_64")
+			dataWidthString = "64";
 
 		// TODO: Seems like we should interpretate the vendor_id ?
 		manufacturer->LinkEndChild(
@@ -408,6 +413,8 @@ Inventory::_AddCPUsInfo(tinyxml2::XMLElement* parent)
 			fDocument->NewText(cpuInfo.cores.c_str()));
 		arch->LinkEndChild(
 			fDocument->NewText(osInfo.architecture.c_str()));
+		dataWidth->LinkEndChild(
+			fDocument->NewText(dataWidthString.c_str()));
 		cacheSize->LinkEndChild(
 			fDocument->NewText(cpuInfo.cache_size.c_str()));
 		logicalCpu->LinkEndChild(
@@ -419,6 +426,7 @@ Inventory::_AddCPUsInfo(tinyxml2::XMLElement* parent)
 		cpu->LinkEndChild(speed);
 		cpu->LinkEndChild(cores);
 		cpu->LinkEndChild(arch);
+		cpu->LinkEndChild(dataWidth);
 		cpu->LinkEndChild(cacheSize);
 		cpu->LinkEndChild(logicalCpu);
 
