@@ -289,7 +289,7 @@ int
 Inventory::Checksum() const
 {
 	return 1 | 2 | 4 | 8 | 16 | 32 | 64 | 128 | 256 | 512 | 1024
-			| 2048 | 4096 | 8192 | 16384 | 32768 | 65536 | 131072;
+			| 2048 | 4096 | 8192 | 16384 | 32768 | 65536 | 131072 | 262144;
 }
 
 
@@ -384,7 +384,8 @@ Inventory::_AddCPUsInfo(tinyxml2::XMLElement* parent)
 	processor_info cpuInfo;
 	Processors CPUs;
 	while (CPUs.GetNext(cpuInfo)) {
-	// TODO: Check if the fields name and structure are correct.
+		// TODO: Need something like "AddElement("NAME", "VALUE");
+		// TODO: Check if the fields name and structure are correct.
 		tinyxml2::XMLElement* cpu = fDocument->NewElement("CPUS");
 		tinyxml2::XMLElement* manufacturer = fDocument->NewElement("MANUFACTURER");
 		tinyxml2::XMLElement* serial = fDocument->NewElement("SERIAL");
