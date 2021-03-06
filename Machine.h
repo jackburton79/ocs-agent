@@ -12,8 +12,6 @@
 #include <string>
 #include <vector>
 
-typedef std::map<int, std::map<std::string, std::string> > dmi_db;
-
 
 struct bios_info {
 	std::string vendor;
@@ -142,7 +140,7 @@ private:
 	bool _GetGraphicsCardInfo();
 	bool _GetDMIDecodeData();
 	bool _GetLSHWData();
-	void _ExtractDataFromDMIDB(dmi_db dmiDb);
+	//void _ExtractDataFromDMIDB(dmi_db dmiDb);
 
 	std::vector<memory_device_info> fMemoryInfo;
 

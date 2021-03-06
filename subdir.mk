@@ -6,6 +6,7 @@
 CPP_SRCS += \
 ../Agent.cpp \
 ../Configuration.cpp \
+../DMIDecode.cpp \
 ../Inventory.cpp \
 ../Logger.cpp \
 ../Machine.cpp \
