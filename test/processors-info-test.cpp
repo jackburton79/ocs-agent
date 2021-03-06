@@ -14,7 +14,7 @@ int main()
 	processor_info cpuInfo;
 	Processors CPUs;
 	while (CPUs.GetNext(cpuInfo)) {
-		std::cout << "MANUFACTURER:" << cpuInfo.manufacturer << std::endl;
+		std::cout << "MANUFACTURER:" << cpuInfo.Manufacturer() << "(" << cpuInfo.manufacturer << ")" << std::endl;
 		std::cout << "SERIAL:" << cpuInfo.serial << std::endl;
 		std::cout << "SPEED:" << cpuInfo.Speed() << std::endl;
 		std::cout << "TYPE:" << cpuInfo.type << std::endl;
