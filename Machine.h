@@ -100,6 +100,22 @@ private:
 };
 
 
+class Component {
+public:
+	std::string name;
+	std::string vendor;
+	std::string serial;
+	std::string type;
+	std::string version;
+	std::string release_date;
+	std::string uuid;
+	std::string asset_tag;
+	void MergeWith(Component& component);
+};
+
+typedef std::map<std::string, Component> components_map;
+extern components_map gComponents;
+
 class Machine {
 public:
 	static Machine* Get();

@@ -40,6 +40,29 @@ const char* kMemoryDevice = "Memory Device";
 static Machine* sMachine = NULL;
 
 
+std::map<std::string, Component> gComponents;
+
+
+void
+Component::MergeWith(Component& component)
+{
+	if (name.empty())
+		name = component.name;
+	if (asset_tag.empty())
+		asset_tag = component.asset_tag;
+	if (serial.empty())
+		serial = component.serial;
+	if (vendor.empty())
+		vendor = component.vendor;
+	if (release_date.empty())
+		release_date = component.release_date;
+	if (version.empty())
+		version = component.version;
+	if (type.empty())
+		type = component.type;
+
+};
+
 
 /*
 static std::string
@@ -231,12 +254,22 @@ Machine::_RetrieveData()
 {
 	try {
 		// Try /sys/devices/virtual/dmi/id tree, then 'dmidecode', then 'lshw'
-		_GetDMIData();
-		_GetGraphicsCardInfo();
+		//_GetDMIData();
+		//_GetGraphicsCardInfo();
 		//_GetDMIDecodeData();
 		_GetLSHWData();
 	} catch (...) {
 		std::cerr << "Failed to get hardware info." << std::endl;
+	}
+
+	components_map::const_iterator i;
+	for (i = gComponents.begin(); i != gComponents.end(); i++) {
+		std::cout << (*i).second.name << std::endl;
+		std::cout << (*i).second.release_date << std::endl;
+		std::cout << (*i).second.vendor << std::endl;
+		std::cout << (*i).second.serial << std::endl;
+		std::cout << (*i).second.version << std::endl;
+		std::cout << (*i).second.type << std::endl;
 	}
 }
 
@@ -406,29 +439,29 @@ Machine::MemorySerialNumber(int num)
 bool
 Machine::_GetDMIData()
 {
+	// DMIDataBackend
 	try {
-		fBIOSInfo.release_date = trimmed(ProcReader("/sys/devices/virtual/dmi/id/bios_date").ReadLine());
-		fBIOSInfo.vendor = trimmed(ProcReader("/sys/devices/virtual/dmi/id/bios_vendor").ReadLine());
-		fBIOSInfo.version = trimmed(ProcReader("/sys/devices/virtual/dmi/id/bios_version").ReadLine());
+		gComponents["BIOS"].release_date = trimmed(ProcReader("/sys/devices/virtual/dmi/id/bios_date").ReadLine());
+		gComponents["BIOS"].vendor = trimmed(ProcReader("/sys/devices/virtual/dmi/id/bios_vendor").ReadLine());
+		gComponents["BIOS"].version = trimmed(ProcReader("/sys/devices/virtual/dmi/id/bios_version").ReadLine());
 
-		fSystemInfo.name = trimmed(ProcReader("/sys/devices/virtual/dmi/id/product_name").ReadLine());
-		fSystemInfo.version = trimmed(ProcReader("/sys/devices/virtual/dmi/id/product_version").ReadLine());
-		fSystemInfo.uuid = trimmed(ProcReader("/sys/devices/virtual/dmi/id/product_uuid").ReadLine());
-		fSystemInfo.serial = trimmed(ProcReader("/sys/devices/virtual/dmi/id/product_serial").ReadLine());
+		gComponents["SYSTEM"].name = trimmed(ProcReader("/sys/devices/virtual/dmi/id/product_name").ReadLine());
+		gComponents["SYSTEM"].version = trimmed(ProcReader("/sys/devices/virtual/dmi/id/product_version").ReadLine());
+		gComponents["SYSTEM"].uuid = trimmed(ProcReader("/sys/devices/virtual/dmi/id/product_uuid").ReadLine());
+		gComponents["SYSTEM"].serial = trimmed(ProcReader("/sys/devices/virtual/dmi/id/product_serial").ReadLine());
+		gComponents["SYSTEM"].vendor = trimmed(ProcReader("/sys/devices/virtual/dmi/id/sys_vendor").ReadLine());
 
-		fChassisInfo.asset_tag = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_asset_tag").ReadLine());
-		fChassisInfo.serial = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_serial").ReadLine());
-		//fChassisInfo.type = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_type").ReadLine());
-		fChassisInfo.vendor = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_vendor").ReadLine());
-		fChassisInfo.version = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_version").ReadLine());
+		gComponents["CHASSIS"].asset_tag = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_asset_tag").ReadLine());
+		gComponents["CHASSIS"].serial = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_serial").ReadLine());
+		gComponents["CHASSIS"].type = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_type").ReadLine());
+		gComponents["CHASSIS"].vendor = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_vendor").ReadLine());
+		gComponents["CHASSIS"].version = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_version").ReadLine());
 
-		fBoardInfo.asset_tag = trimmed(ProcReader("/sys/devices/virtual/dmi/id/board_asset_tag").ReadLine());
-		fBoardInfo.name = trimmed(ProcReader("/sys/devices/virtual/dmi/id/board_name").ReadLine());
-		fBoardInfo.serial = trimmed(ProcReader("/sys/devices/virtual/dmi/id/board_serial").ReadLine());
-		fBoardInfo.vendor = trimmed(ProcReader("/sys/devices/virtual/dmi/id/board_vendor").ReadLine());
-		fBoardInfo.version = trimmed(ProcReader("/sys/devices/virtual/dmi/id/board_version").ReadLine());
-
-		fSystemInfo.vendor = trimmed(ProcReader("/sys/devices/virtual/dmi/id/sys_vendor").ReadLine());
+		gComponents["BOARD"].asset_tag = trimmed(ProcReader("/sys/devices/virtual/dmi/id/board_asset_tag").ReadLine());
+		gComponents["BOARD"].name = trimmed(ProcReader("/sys/devices/virtual/dmi/id/board_name").ReadLine());
+		gComponents["BOARD"].serial = trimmed(ProcReader("/sys/devices/virtual/dmi/id/board_serial").ReadLine());
+		gComponents["BOARD"].vendor = trimmed(ProcReader("/sys/devices/virtual/dmi/id/board_vendor").ReadLine());
+		gComponents["BOARD"].version = trimmed(ProcReader("/sys/devices/virtual/dmi/id/board_version").ReadLine());
 	} catch (...) {
 		return false;
 	}
@@ -493,35 +526,35 @@ Machine::_GetLSHWData()
 	const tinyxml2::XMLElement* tmpElement = NULL;
 	element = XML::GetElementByAttribute(doc, "id", "firmware");
 	if (element != NULL) {
-		bios_info biosInfo;
+		Component biosInfo;
 		biosInfo.release_date = XML::GetFirstChildElementText(element, "date");
 		biosInfo.vendor = XML::GetFirstChildElementText(element, "vendor");
 		biosInfo.version = XML::GetFirstChildElementText(element, "version");
-		fBIOSInfo.MergeWith(biosInfo);
+		gComponents["BIOS"].MergeWith(biosInfo);
 	}
 
 	element = XML::GetElementByAttribute(doc, "class", "system");
 	if (element != NULL) {
-		system_info systemInfo;
+		Component systemInfo;
 		systemInfo.name = XML::GetFirstChildElementText(element, "product");
 		systemInfo.version = XML::GetFirstChildElementText(element, "version");
 		systemInfo.serial = XML::GetFirstChildElementText(element, "serial");
 		systemInfo.vendor = XML::GetFirstChildElementText(element, "vendor");
-		fSystemInfo.MergeWith(systemInfo);
+		gComponents["SYSTEM"].MergeWith(systemInfo);
 
-		chassis_info chassisInfo;
+		Component chassisInfo;
 		// TODO: Check if this is always correct
 		chassisInfo.type = XML::GetFirstChildElementText(element, "description");
-		fChassisInfo.MergeWith(chassisInfo);
+		gComponents["CHASSIS"].MergeWith(chassisInfo);
 	}
 
 	element = XML::GetElementByAttribute(doc, "id", "core");
 	if (element != NULL) {
-		board_info boardInfo;
+		Component boardInfo;
 		boardInfo.name = XML::GetFirstChildElementText(element, "product");
 		boardInfo.vendor = XML::GetFirstChildElementText(element, "vendor");
 		boardInfo.serial = XML::GetFirstChildElementText(element, "serial");
-		fBoardInfo.MergeWith(boardInfo);
+		gComponents["BOARD"].MergeWith(boardInfo);
 	}
 
 	element = XML::GetElementByAttribute(doc, "id", "display");
