@@ -8,6 +8,7 @@ CPP_SRCS += \
 ../Configuration.cpp \
 ../DataBackend.cpp \
 ../DMIDataBackend.cpp \
+../DMIDecodeBackend.cpp \
 ../Inventory.cpp \
 ../Logger.cpp \
 ../LSHWBackend.cpp \
@@ -32,6 +33,7 @@ OBJS += \
 ./Configuration.o \
 ./DataBackend.o \
 ./DMIDataBackend.o \
+./DMIDecodeBackend.o \
 ./Inventory.o \
 ./Logger.o \
 ./LSHWBackend.o \
@@ -56,6 +58,7 @@ CPP_DEPS += \
 ./Configuration.d \
 ./DataBackend.d \
 ./DMIDataBackend.d \
+./DMIDecodeBackend.d \
 ./Inventory.d \
 ./Logger.d \
 ./LSHWBackend.d \

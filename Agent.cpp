@@ -7,8 +7,11 @@
 
 #include "Agent.h"
 #include "Configuration.h"
+#include "DMIDataBackend.h"
+#include "DMIDecodeBackend.h"
 #include "Inventory.h"
 #include "Logger.h"
+#include "LSHWBackend.h"
 
 #include <cstdlib>
 #include <iostream>
@@ -33,6 +36,11 @@ Agent::~Agent()
 void
 Agent::Run()
 {
+	// TODO: Move these away from here
+	DMIDataBackend().Run();
+	LSHWBackend().Run();
+	DMIDecodeBackend().Run();
+
 	Configuration* config = Configuration::Get();
 
 	std::string deviceID = config->DeviceID();

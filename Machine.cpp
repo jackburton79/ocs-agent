@@ -32,9 +32,9 @@
 
 typedef std::map<std::string, std::string> string_map;
 
-const char* kBIOSInfo = "BIOS Information";
-const char* kSystemInfo = "System Information";
-const char* kProcessorInfo = "Processor Info";
+//const char* kBIOSInfo = "BIOS Information";
+//const char* kSystemInfo = "System Information";
+//const char* kProcessorInfo = "Processor Info";
 const char* kMemoryDevice = "Memory Device";
 
 static Machine* sMachine = NULL;
@@ -46,6 +46,8 @@ std::map<std::string, Component> gComponents;
 void
 Component::MergeWith(Component& component)
 {
+	if (name.empty())
+		name = component.name;
 	if (asset_tag.empty())
 		asset_tag = component.asset_tag;
 	if (serial.empty())
@@ -58,30 +60,10 @@ Component::MergeWith(Component& component)
 		version = component.version;
 	if (type.empty())
 		type = component.type;
-
+	if (uuid.empty())
+		uuid = component.uuid;
 };
 
-
-/*
-static std::string
-GetValueFromMap(dmi_db &db, std::string key, std::string context)
-{
-	DMIExtractor extractor(db);
-	if (extractor.CountEntries(context) <= 0)
-		return "";
-
-	std::vector<string_map> entryVector
-		= extractor.ExtractEntry(context);
-
-	string_map &map = entryVector[0];
-	string_map::const_iterator i;
-	i = map.find(key);
-	if (i != map.end())
-		return i->second;
-
-	return "";
-}
-*/
 
 // Returns size, in MBytes,
 // starting from a string like '3GB' or '1024 KB'
@@ -238,119 +220,11 @@ Machine::Get()
 
 Machine::Machine()
 {
-	_RetrieveData();
 }
 
 
 Machine::~Machine()
 {
-}
-
-
-void
-Machine::_RetrieveData()
-{
-	try {
-		//_GetGraphicsCardInfo();
-		//_GetDMIDecodeData();
-		//_GetLSHWData();
-	} catch (...) {
-		std::cerr << "Failed to get hardware info." << std::endl;
-	}
-/*
-	components_map::const_iterator i;
-	for (i = gComponents.begin(); i != gComponents.end(); i++) {
-		std::cout << (*i).second.name << std::endl;
-		std::cout << (*i).second.release_date << std::endl;
-		std::cout << (*i).second.vendor << std::endl;
-		std::cout << (*i).second.serial << std::endl;
-		std::cout << (*i).second.version << std::endl;
-		std::cout << (*i).second.type << std::endl;
-	}*/
-}
-
-
-std::string
-Machine::AssetTag() const
-{
-	return gComponents["CHASSIS"].asset_tag;
-}
-
-
-std::string
-Machine::BIOSVersion() const
-{
-	return gComponents["BIOS"].version;
-}
-
-
-std::string
-Machine::BIOSManufacturer() const
-{
-	return gComponents["BIOS"].vendor;
-}
-
-
-std::string
-Machine::BIOSDate() const
-{
-	return gComponents["BIOS"].release_date;
-}
-
-
-std::string
-Machine::SystemManufacturer() const
-{
-	return gComponents["SYSTEM"].vendor;
-}
-
-
-std::string
-Machine::SystemModel() const
-{
-	return gComponents["SYSTEM"].name;
-}
-
-
-std::string
-Machine::SystemSerialNumber() const
-{
-	// Some systems have this empty, or, like our MCP79s,
-	// "To Be Filled by O.E.M.", which is pretty much useless,
-	// so in that case we use the baseboard serial number
-	if (gComponents["SYSTEM"].serial.empty()
-		|| gComponents["SYSTEM"].serial == "To Be Filled By O.E.M.")
-		return MachineSerialNumber();
-
-	return gComponents["SYSTEM"].serial;
-}
-
-
-std::string
-Machine::SystemUUID() const
-{
-	return gComponents["SYSTEM"].uuid;
-}
-
-
-std::string
-Machine::SystemType() const
-{
-	return gComponents["CHASSIS"].type;
-}
-
-
-std::string
-Machine::MachineSerialNumber() const
-{
-	return gComponents["BOARD"].serial;
-}
-
-
-std::string
-Machine::MachineManufacturer() const
-{
-	return gComponents["BOARD"].vendor;
 }
 
 

@@ -79,20 +79,6 @@ class Machine {
 public:
 	static Machine* Get();
 
-	std::string AssetTag() const;
-	std::string BIOSManufacturer() const;
-	std::string BIOSDate() const;
-	std::string BIOSVersion() const;
-
-	std::string MachineManufacturer() const;
-	std::string MachineSerialNumber() const;
-
-	std::string SystemModel() const;
-	std::string SystemSerialNumber() const;
-	std::string SystemUUID() const;
-	std::string SystemManufacturer() const;
-	std::string SystemType() const;
-
 	int CountMemories();
 	std::string MemoryCaption(int num);
 	std::string MemoryDescription(int num);
@@ -110,12 +96,8 @@ private:
 	Machine();
 	~Machine();
 
-	void _RetrieveData();
-	bool _GetDMIData();
 	bool _GetGraphicsCardInfo();
-	bool _GetDMIDecodeData();
-	bool _GetLSHWData();
-	//void _ExtractDataFromDMIDB(dmi_db dmiDb);
+
 
 	std::vector<memory_device_info> fMemoryInfo;
 

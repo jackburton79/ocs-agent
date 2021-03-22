@@ -9,7 +9,6 @@
 
 #include "Agent.h"
 #include "Configuration.h"
-#include "DMIDataBackend.h"
 #include "Logger.h"
 #include "Machine.h"
 #include "NetworkInterface.h"
@@ -57,10 +56,6 @@ Inventory::Initialize()
 	Logger& logger = Logger::GetDefault();
 
 	Clear();
-
-	// TODO: Move these away from here
-
-	DMIDataBackend().Run();
 
     std::string deviceID = Configuration::Get()->DeviceID();
 	logger.LogFormat(LOG_INFO, "Inventory::Initialize(): Device ID: %s...", deviceID.c_str());
@@ -691,7 +686,7 @@ Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 	hardware->LinkEndChild(userID);
 
 	tinyxml2::XMLElement* uuid = fDocument->NewElement("UUID");
-	uuid->LinkEndChild(fDocument->NewText(fMachine->SystemUUID().c_str()));
+	uuid->LinkEndChild(fDocument->NewText(gComponents["SYSTEM"].uuid.c_str()));
 	hardware->LinkEndChild(uuid);
 
 	tinyxml2::XMLElement* vmSystem = fDocument->NewElement("VMSYSTEM");

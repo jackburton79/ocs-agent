@@ -1,24 +1,29 @@
 /*
- * DMIDecode.h
+ * DMIDecodeBackend.h
  *
  *  Created on: 6 mar 2021
  *      Author: Stefano Ceccherini
  */
 
-#ifndef DMIDECODE_H_
-#define DMIDECODE_H_
+#ifndef DMIDECODEBACKEND_H_
+#define DMIDECODEBACKEND_H_
 
 #include <map>
 #include <string>
+#include <vector>
+
+#include "DataBackend.h"
 
 typedef std::map<int, std::map<std::string, std::string> > dmi_db;
+typedef std::map<std::string, std::string> string_map;
 
-class DMIDecode {
+class DMIDecodeBackend : public DataBackend {
 public:
-	DMIDecode();
-	~DMIDecode();
+	DMIDecodeBackend();
+	virtual ~DMIDecodeBackend();
+	virtual int Run();
 private:
-	bool _GetDMIDecodeData();
+	void _ExtractDataFromDMIDB(dmi_db dmiDb);
 };
 
 
@@ -35,4 +40,4 @@ private:
 };
 
 
-#endif /* DMIDECODE_H_ */
+#endif /* DMIDECODEBACKEND_H_ */
