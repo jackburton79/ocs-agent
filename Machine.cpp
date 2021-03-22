@@ -31,9 +31,6 @@
 
 typedef std::map<std::string, std::string> string_map;
 
-//const char* kBIOSInfo = "BIOS Information";
-//const char* kSystemInfo = "System Information";
-//const char* kProcessorInfo = "Processor Info";
 const char* kMemoryDevice = "Memory Device";
 
 static Machine* sMachine = NULL;
@@ -88,18 +85,25 @@ RAM_type_from_description(const std::string& description)
 }
 
 
-// OSInfo
-OSInfo::OSInfo()
+// OSInfoBackend
+OSInfoBackend::OSInfoBackend()
 {
-	description = _OSDescription();
 }
 
 
-std::string
-OSInfo::_OSDescription()
+/* virtual */
+OSInfoBackend::~OSInfoBackend()
+{
+}
+
+
+/* virtual */
+int
+OSInfoBackend::Run()
 {
 	std::string line;
 	std::string osDescription;
+	Component os;
 	if (::access("/etc/os-release", F_OK) != -1) {
 		ProcReader osReader("/etc/os-release");
 		try {
@@ -147,7 +151,9 @@ OSInfo::_OSDescription()
 		}
 	}
 
-	return osDescription;
+	os.fields["description"] = osDescription;
+	gComponents["OS"].MergeWith(os);
+	return 0;
 }
 
 

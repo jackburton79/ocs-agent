@@ -12,6 +12,7 @@
 #include <string>
 #include <vector>
 
+#include "DataBackend.h"
 
 struct memory_device_info {
 	memory_device_info();
@@ -32,19 +33,11 @@ struct memory_device_info {
 };
 
 
-class OSInfo {
+class OSInfoBackend : public DataBackend {
 public:
-    OSInfo();
-	std::string description;
-    std::string release;
-	std::string hostname;
-    std::string domainname;
-	std::string architecture;
-	std::string memory;
-	std::string swap;
-    std::string comments;
-private:
-    std::string _OSDescription();
+	OSInfoBackend();
+	virtual ~OSInfoBackend();
+    virtual int Run();
 };
 
 

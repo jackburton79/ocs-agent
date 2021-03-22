@@ -12,6 +12,7 @@
 #include "Inventory.h"
 #include "Logger.h"
 #include "LSHWBackend.h"
+#include "Machine.h"
 #include "MemInfoBackend.h"
 #include "UnameBackend.h"
 
@@ -41,6 +42,7 @@ Agent::Run()
 	// TODO: Move these away from here
 	DMIDataBackend().Run();
 	DMIDecodeBackend().Run();
+	OSInfoBackend().Run();
 	LSHWBackend().Run();
 	MemInfoBackend().Run();
 	UnameBackend().Run();

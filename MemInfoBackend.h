@@ -2,7 +2,7 @@
  * MemInfoBackend.h
  *
  *  Created on: 22 mar 2021
- *      Author: stefano
+ *      Author: Stefano Ceccherini
  */
 
 #ifndef MEMINFOBACKEND_H_
