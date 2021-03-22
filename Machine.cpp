@@ -46,26 +46,7 @@ std::map<std::string, Component> gComponents;
 void
 Component::MergeWith(Component& component)
 {
-	if (name.empty())
-		name = component.name;
-	if (asset_tag.empty())
-		asset_tag = component.asset_tag;
-	if (serial.empty())
-		serial = component.serial;
-	if (vendor.empty())
-		vendor = component.vendor;
-	if (release_date.empty())
-		release_date = component.release_date;
-	if (version.empty())
-		version = component.version;
-	if (type.empty())
-		type = component.type;
-	if (uuid.empty())
-		uuid = component.uuid;
-	if (memory_size.empty())
-		memory_size = component.memory_size;
-	if (specific.empty())
-		specific = component.specific;
+	fields.insert(component.fields.begin(), component.fields.end());
 };
 
 

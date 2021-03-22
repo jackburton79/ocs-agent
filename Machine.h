@@ -50,16 +50,7 @@ private:
 
 class Component {
 public:
-	std::string name;
-	std::string vendor;
-	std::string serial;
-	std::string type;
-	std::string version;
-	std::string release_date;
-	std::string uuid;
-	std::string asset_tag;
-	std::string memory_size;
-	std::string specific;
+	std::map<std::string, std::string> fields;
 	void MergeWith(Component& component);
 };
 

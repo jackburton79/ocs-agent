@@ -328,44 +328,44 @@ Inventory::_AddBIOSInfo(tinyxml2::XMLElement* parent)
 	tinyxml2::XMLElement* bios = fDocument->NewElement("BIOS");
 
 	tinyxml2::XMLElement* assettag = fDocument->NewElement("ASSETTAG");
-	assettag->LinkEndChild(fDocument->NewText(gComponents["CHASSIS"].asset_tag.c_str()));
+	assettag->LinkEndChild(fDocument->NewText(gComponents["CHASSIS"].fields["asset_tag"].c_str()));
 
 	tinyxml2::XMLElement* bdate = fDocument->NewElement("BDATE");
-	bdate->LinkEndChild(fDocument->NewText(gComponents["BIOS"].release_date.c_str()));
+	bdate->LinkEndChild(fDocument->NewText(gComponents["BIOS"].fields["release_date"].c_str()));
 
 	tinyxml2::XMLElement* bmanufacturer = fDocument->NewElement("BMANUFACTURER");
-	bmanufacturer->LinkEndChild(fDocument->NewText(gComponents["BIOS"].vendor.c_str()));
+	bmanufacturer->LinkEndChild(fDocument->NewText(gComponents["BIOS"].fields["vendor"].c_str()));
 
 	tinyxml2::XMLElement* bversion = fDocument->NewElement("BVERSION");
-	bversion->LinkEndChild(fDocument->NewText(gComponents["BIOS"].version.c_str()));
+	bversion->LinkEndChild(fDocument->NewText(gComponents["BIOS"].fields["version"].c_str()));
 
 	tinyxml2::XMLElement* mmanufacturer = fDocument->NewElement("MMANUFACTURER");
-	mmanufacturer->LinkEndChild(fDocument->NewText(gComponents["BOARD"].vendor.c_str()));
+	mmanufacturer->LinkEndChild(fDocument->NewText(gComponents["BOARD"].fields["vendor"].c_str()));
 
 	tinyxml2::XMLElement* mSerial = fDocument->NewElement("MSN");
-	mSerial->LinkEndChild(fDocument->NewText(gComponents["BOARD"].serial.c_str()));
+	mSerial->LinkEndChild(fDocument->NewText(gComponents["BOARD"].fields["serial"].c_str()));
 
 	tinyxml2::XMLElement* sManufacturer = fDocument->NewElement("SMANUFACTURER");
-	sManufacturer->LinkEndChild(fDocument->NewText(gComponents["SYSTEM"].vendor.c_str()));
+	sManufacturer->LinkEndChild(fDocument->NewText(gComponents["SYSTEM"].fields["vendor"].c_str()));
 
 	tinyxml2::XMLElement* systemModel = fDocument->NewElement("SMODEL");
-	systemModel->LinkEndChild(fDocument->NewText(gComponents["SYSTEM"].name.c_str()));
+	systemModel->LinkEndChild(fDocument->NewText(gComponents["SYSTEM"].fields["name"].c_str()));
 
 	// TODO: Move into backend(s)
 	// Some systems have this empty, or, like our MCP79s,
 	// "To Be Filled by O.E.M.", which is pretty much useless,
 	// so in that case we use the baseboard serial number
 	std::string systemSerial;
-	if (gComponents["SYSTEM"].serial.empty()
-		|| gComponents["SYSTEM"].serial == "To Be Filled By O.E.M.")
-		systemSerial = gComponents["BOARD"].serial;
-	systemSerial = gComponents["SYSTEM"].serial;
+	if (gComponents["SYSTEM"].fields["serial"].empty()
+		|| gComponents["SYSTEM"].fields["serial"] == "To Be Filled By O.E.M.")
+		systemSerial = gComponents["BOARD"].fields["serial"];
+	systemSerial = gComponents["SYSTEM"].fields["serial"];
 
 	tinyxml2::XMLElement* ssn = fDocument->NewElement("SSN");
 	ssn->LinkEndChild(fDocument->NewText(systemSerial.c_str()));
 
 	tinyxml2::XMLElement* type = fDocument->NewElement("TYPE");
-	type->LinkEndChild(fDocument->NewText(gComponents["CHASSIS"].type.c_str()));
+	type->LinkEndChild(fDocument->NewText(gComponents["CHASSIS"].fields["type"].c_str()));
 
 	bios->LinkEndChild(assettag);
 	bios->LinkEndChild(bdate);
@@ -686,7 +686,7 @@ Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 	hardware->LinkEndChild(userID);
 
 	tinyxml2::XMLElement* uuid = fDocument->NewElement("UUID");
-	uuid->LinkEndChild(fDocument->NewText(gComponents["SYSTEM"].uuid.c_str()));
+	uuid->LinkEndChild(fDocument->NewText(gComponents["SYSTEM"].fields["uuid"].c_str()));
 	hardware->LinkEndChild(uuid);
 
 	tinyxml2::XMLElement* vmSystem = fDocument->NewElement("VMSYSTEM");
@@ -913,16 +913,16 @@ Inventory::_AddVideosInfo(tinyxml2::XMLElement* parent)
 
 		// OCSInventory uses the name as chipset, and the chipset as name
 		tinyxml2::XMLElement* chipset = fDocument->NewElement("CHIPSET");
-		chipset->LinkEndChild(fDocument->NewText(info.name.c_str()));
+		chipset->LinkEndChild(fDocument->NewText(info.fields["name"].c_str()));
 
 		tinyxml2::XMLElement* memory = fDocument->NewElement("MEMORY");
-		memory->LinkEndChild(fDocument->NewText(info.memory_size.c_str()));
+		memory->LinkEndChild(fDocument->NewText(info.fields["memory_size"].c_str()));
 
 		tinyxml2::XMLElement* name = fDocument->NewElement("NAME");
-		name->LinkEndChild(fDocument->NewText(info.type.c_str()));
+		name->LinkEndChild(fDocument->NewText(info.fields["type"].c_str()));
 
 		tinyxml2::XMLElement* resolution = fDocument->NewElement("RESOLUTION");
-		resolution->LinkEndChild(fDocument->NewText(info.specific.c_str()));
+		resolution->LinkEndChild(fDocument->NewText(info.fields["specific"].c_str()));
 
 		video->LinkEndChild(chipset);
 		video->LinkEndChild(memory);

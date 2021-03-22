@@ -254,7 +254,7 @@ void
 Configuration::_GenerateDeviceID()
 {
 	// Try system UUID.
-	std::string deviceID = gComponents["SYSTEM"].uuid;
+	std::string deviceID = gComponents["SYSTEM"].fields["uuid"];
 
 	// If it's empty, use the MAC address of the first NIC
 	if (deviceID.length() <= 1) {
@@ -281,7 +281,7 @@ Configuration::_GenerateDeviceID()
 		time_t rawtime = time(NULL);
 		localtime_r(&rawtime, &biosDate);
 	} else {
-		std::string biosDateString = gComponents["BIOS"].release_date;
+		std::string biosDateString = gComponents["BIOS"].fields["release_date"];
 		// On some machines, this can be empty. So use an harcoded
 		// value, since we need a correct date for the device id
 		if (biosDateString.length() <= 1)

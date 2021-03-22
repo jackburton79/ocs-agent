@@ -163,33 +163,33 @@ void
 DMIDecodeBackend::_ExtractDataFromDMIDB(dmi_db dmiDb)
 {
 	Component biosInfo;
-	biosInfo.release_date = GetValueFromMap(dmiDb, "Release Date", kBIOSInfo);
-	biosInfo.vendor = GetValueFromMap(dmiDb, "Vendor", kBIOSInfo);
-	biosInfo.version = GetValueFromMap(dmiDb, "Version", kBIOSInfo);
+	biosInfo.fields["release_date"] = GetValueFromMap(dmiDb, "Release Date", kBIOSInfo);
+	biosInfo.fields["vendor"] = GetValueFromMap(dmiDb, "Vendor", kBIOSInfo);
+	biosInfo.fields["version"] = GetValueFromMap(dmiDb, "Version", kBIOSInfo);
 	gComponents["BIOS"].MergeWith(biosInfo);
 
 	Component systemInfo;
-	systemInfo.name = GetValueFromMap(dmiDb, "Product Name", kSystemInfo);
-	systemInfo.version = GetValueFromMap(dmiDb, "Version", kSystemInfo);
-	systemInfo.uuid = GetValueFromMap(dmiDb, "UUID", kSystemInfo);
-	systemInfo.serial = GetValueFromMap(dmiDb, "Serial Number", kSystemInfo);
-	systemInfo.vendor = GetValueFromMap(dmiDb, "Manufacturer", kSystemInfo);
+	systemInfo.fields["name"] = GetValueFromMap(dmiDb, "Product Name", kSystemInfo);
+	systemInfo.fields["version"] = GetValueFromMap(dmiDb, "Version", kSystemInfo);
+	systemInfo.fields["uuid"] = GetValueFromMap(dmiDb, "UUID", kSystemInfo);
+	systemInfo.fields["serial"] = GetValueFromMap(dmiDb, "Serial Number", kSystemInfo);
+	systemInfo.fields["vendor"] = GetValueFromMap(dmiDb, "Manufacturer", kSystemInfo);
 	gComponents["SYSTEM"].MergeWith(systemInfo);
 
 	Component chassisInfo;
-	chassisInfo.asset_tag = GetValueFromMap(dmiDb, "Asset Tag", "Chassis Information");
-	chassisInfo.serial = GetValueFromMap(dmiDb, "Serial Number", "Chassis Information");
-	chassisInfo.type = GetValueFromMap(dmiDb, "Type", "Chassis Information");
-	chassisInfo.vendor = GetValueFromMap(dmiDb, "Manufacturer", "Chassis Information");
-	chassisInfo.version = GetValueFromMap(dmiDb, "Version",  "Chassis Information");
+	chassisInfo.fields["asset_tag"] = GetValueFromMap(dmiDb, "Asset Tag", "Chassis Information");
+	chassisInfo.fields["serial"] = GetValueFromMap(dmiDb, "Serial Number", "Chassis Information");
+	chassisInfo.fields["type"] = GetValueFromMap(dmiDb, "Type", "Chassis Information");
+	chassisInfo.fields["vendor"] = GetValueFromMap(dmiDb, "Manufacturer", "Chassis Information");
+	chassisInfo.fields["version"] = GetValueFromMap(dmiDb, "Version",  "Chassis Information");
 	gComponents["CHASSIS"].MergeWith(chassisInfo);
 
 	Component boardInfo;
-	boardInfo.asset_tag = GetValueFromMap(dmiDb, "Asset Tag", "Base Board Information");
-	boardInfo.name = GetValueFromMap(dmiDb, "Product Name", "Base Board Information");
-	boardInfo.vendor = GetValueFromMap(dmiDb, "Manufacturer", "Base Board Information");
-	boardInfo.version = GetValueFromMap(dmiDb, "Version", "Base Board Information");
-	boardInfo.serial = GetValueFromMap(dmiDb, "Serial Number", "Base Board Information");
+	boardInfo.fields["asset_tag"] = GetValueFromMap(dmiDb, "Asset Tag", "Base Board Information");
+	boardInfo.fields["name"] = GetValueFromMap(dmiDb, "Product Name", "Base Board Information");
+	boardInfo.fields["vendor"] = GetValueFromMap(dmiDb, "Manufacturer", "Base Board Information");
+	boardInfo.fields["version"] = GetValueFromMap(dmiDb, "Version", "Base Board Information");
+	boardInfo.fields["serial"] = GetValueFromMap(dmiDb, "Serial Number", "Base Board Information");
 	gComponents["BOARD"].MergeWith(boardInfo);
 
 	/*
