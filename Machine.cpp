@@ -305,14 +305,6 @@ Machine::MemorySerialNumber(int num)
 }
 
 
-// private
-bool
-Machine::_GetDMIData()
-{
-	// DMIDataBackend
-	return false;
-}
-
 
 bool
 Machine::_GetGraphicsCardInfo()
@@ -349,13 +341,6 @@ Machine::_GetGraphicsCardInfo()
 }
 
 
-
-
-bool
-Machine::_GetLSHWData()
-{
-	return false;
-}
 
 /*
 void
