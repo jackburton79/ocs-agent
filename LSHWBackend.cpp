@@ -77,20 +77,17 @@ LSHWBackend::Run()
 		gComponents["BOARD"].MergeWith(boardInfo);
 	}
 
-	/*element = XML::GetElementByAttribute(doc, "id", "display");
+	element = XML::GetElementByAttribute(doc, "id", "display");
 	if (element != NULL) {
 		// TODO: there could be multiple displays
-		video_info info;
+		Component info;
 		info.name = XML::GetFirstChildElementText(element, "description");
 		info.vendor = XML::GetFirstChildElementText(element, "vendor");
-		info.chipset = XML::GetFirstChildElementText(element, "product");
-		if (fVideoInfo.size() == 0)
-			fVideoInfo.push_back(info);
-		else
-			fVideoInfo[0].MergeWith(info);
+		info.type = XML::GetFirstChildElementText(element, "product");
+		gComponents["GRAPHICS"].MergeWith(info);
 	}
 
-	if (fMemoryInfo.size() == 0) {
+	/*if (fMemoryInfo.size() == 0) {
 		const size_t memoryLength = ::strlen("memory");
 		element = XML::GetElementByAttribute(doc, "id", "memory", XML::match_partial);
 		while (element != NULL) {

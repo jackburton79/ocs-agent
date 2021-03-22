@@ -62,6 +62,10 @@ Component::MergeWith(Component& component)
 		type = component.type;
 	if (uuid.empty())
 		uuid = component.uuid;
+	if (memory_size.empty())
+		memory_size = component.memory_size;
+	if (specific.empty())
+		specific = component.specific;
 };
 
 
@@ -229,20 +233,6 @@ Machine::~Machine()
 
 
 int
-Machine::CountVideos() const
-{
-	return fVideoInfo.size();
-}
-
-
-video_info
-Machine::VideoInfoFor(int numVideo) const
-{
-	return fVideoInfo[numVideo];
-}
-
-
-int
 Machine::CountMemories()
 {
 	return fMemoryInfo.size();
@@ -302,42 +292,6 @@ std::string
 Machine::MemorySerialNumber(int num)
 {
 	return fMemoryInfo.at(num).serial;
-}
-
-
-
-bool
-Machine::_GetGraphicsCardInfo()
-{
-	// TODO: Does not work with multiple video cards. And does not work well in general
-	struct video_info videoInfo;
-	try {
-		videoInfo.name = trimmed(ProcReader("/sys/class/graphics/fb0/device/oem_product_name").ReadLine());
-	} catch (...) {
-	}
-	try {
-		videoInfo.vendor = trimmed(ProcReader("/sys/class/graphics/fb0/device/oem_vendor").ReadLine());
-	} catch (...) {
-	}
-	try {
-		videoInfo.chipset = trimmed(ProcReader("/sys/class/graphics/fb0/device/oem_string").ReadLine());
-	} catch (...) {
-	}
-	try {
-		videoInfo.resolution = trimmed(ProcReader("/sys/class/graphics/fb0/virtual_size").ReadLine());
-	} catch (...) {
-	}
-	// try this other path
-	try {
-		videoInfo.resolution = trimmed(ProcReader("/sys/class/graphics/fb0/device/graphics/fb0/virtual_size").ReadLine());
-	} catch (...) {
-	}
-	std::replace(videoInfo.resolution.begin(), videoInfo.resolution.end(), ',', 'x');
-	if (videoInfo.resolution.empty() && videoInfo.name.empty() && videoInfo.chipset.empty())
-		return false;
-
-	fVideoInfo.push_back(videoInfo);
-	return true;
 }
 
 
@@ -462,22 +416,6 @@ Machine::_ExtractDataFromDMIDB(dmi_db dmiDb)
 	}
 }
 */
-
-
-void
-video_info::MergeWith(const video_info& info)
-{
-	if (name.empty())
-		name = info.name;
-	if (vendor.empty())
-		vendor = info.vendor;
-	if (chipset.empty())
-		chipset = info.chipset;
-	if (memory.empty())
-		memory = info.memory;
-	if (resolution.empty())
-		resolution = info.resolution;
-}
 
 
 // memory_device_info

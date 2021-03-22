@@ -53,5 +53,32 @@ DMIDataBackend::Run()
 	} catch (...) {
 		return -1;
 	}
+
+	// TODO: Does not work with multiple video cards. And does not work well in general
+	Component videoInfo;
+	try {
+		videoInfo.name = trimmed(ProcReader("/sys/class/graphics/fb0/device/oem_product_name").ReadLine());
+	} catch (...) {
+	}
+	try {
+		videoInfo.vendor = trimmed(ProcReader("/sys/class/graphics/fb0/device/oem_vendor").ReadLine());
+	} catch (...) {
+	}
+	try {
+		videoInfo.type = trimmed(ProcReader("/sys/class/graphics/fb0/device/oem_string").ReadLine());
+	} catch (...) {
+	}
+	try {
+		videoInfo.specific = trimmed(ProcReader("/sys/class/graphics/fb0/virtual_size").ReadLine());
+	} catch (...) {
+	}
+	// try this other path
+	try {
+		videoInfo.specific = trimmed(ProcReader("/sys/class/graphics/fb0/device/graphics/fb0/virtual_size").ReadLine());
+	} catch (...) {
+	}
+	std::replace(videoInfo.specific.begin(), videoInfo.specific.end(), ',', 'x');
+	if (!videoInfo.specific.empty() || !videoInfo.name.empty() || !videoInfo.type.empty())
+		gComponents["GRAPHICS"] = videoInfo;
 	return 0;
 }

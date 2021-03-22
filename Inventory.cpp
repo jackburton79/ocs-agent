@@ -905,8 +905,9 @@ Inventory::_AddVideosInfo(tinyxml2::XMLElement* parent)
 {
 	Logger& logger = Logger::GetDefault();
 
-	for (int i = 0; i < fMachine->CountVideos(); i++) {
-		video_info info = fMachine->VideoInfoFor(i);
+	// TODO: Multiple video cards
+	for (int i = 0; i < 1; i++) {
+		Component& info = gComponents["GRAPHICS"];
 
 		tinyxml2::XMLElement* video = fDocument->NewElement("VIDEOS");
 
@@ -915,13 +916,13 @@ Inventory::_AddVideosInfo(tinyxml2::XMLElement* parent)
 		chipset->LinkEndChild(fDocument->NewText(info.name.c_str()));
 
 		tinyxml2::XMLElement* memory = fDocument->NewElement("MEMORY");
-		memory->LinkEndChild(fDocument->NewText(info.memory.c_str()));
+		memory->LinkEndChild(fDocument->NewText(info.memory_size.c_str()));
 
 		tinyxml2::XMLElement* name = fDocument->NewElement("NAME");
-		name->LinkEndChild(fDocument->NewText(info.chipset.c_str()));
+		name->LinkEndChild(fDocument->NewText(info.type.c_str()));
 
 		tinyxml2::XMLElement* resolution = fDocument->NewElement("RESOLUTION");
-		resolution->LinkEndChild(fDocument->NewText(info.resolution.c_str()));
+		resolution->LinkEndChild(fDocument->NewText(info.specific.c_str()));
 
 		video->LinkEndChild(chipset);
 		video->LinkEndChild(memory);

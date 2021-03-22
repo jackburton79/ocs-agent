@@ -13,17 +13,6 @@
 #include <vector>
 
 
-
-struct video_info {
-	std::string vendor;
-	std::string chipset;
-	std::string memory;
-	std::string name;
-	std::string resolution;
-	void MergeWith(const video_info& info);
-};
-
-
 struct memory_device_info {
 	memory_device_info();
 
@@ -69,6 +58,8 @@ public:
 	std::string release_date;
 	std::string uuid;
 	std::string asset_tag;
+	std::string memory_size;
+	std::string specific;
 	void MergeWith(Component& component);
 };
 
@@ -89,19 +80,11 @@ public:
 	std::string MemoryNumSlot(int num);
 	std::string MemorySerialNumber(int num);
 
-	int CountVideos() const;
-	video_info VideoInfoFor(int numVideo) const;
-
 private:
 	Machine();
 	~Machine();
 
-	bool _GetGraphicsCardInfo();
-
-
 	std::vector<memory_device_info> fMemoryInfo;
-
-	std::vector<struct video_info> fVideoInfo;
 };
 
 #endif /* MACHINE_H_ */
