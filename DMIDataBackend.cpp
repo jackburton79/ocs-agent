@@ -77,16 +77,16 @@ DMIDataBackend::Run()
 	} catch (...) {
 	}
 	try {
-		videoInfo.fields["specific"] = trimmed(ProcReader("/sys/class/graphics/fb0/virtual_size").ReadLine());
+		videoInfo.fields["resolution"] = trimmed(ProcReader("/sys/class/graphics/fb0/virtual_size").ReadLine());
 	} catch (...) {
 	}
 	// try this other path
 	try {
-		videoInfo.fields["specific"] = trimmed(ProcReader("/sys/class/graphics/fb0/device/graphics/fb0/virtual_size").ReadLine());
+		videoInfo.fields["resolution"] = trimmed(ProcReader("/sys/class/graphics/fb0/device/graphics/fb0/virtual_size").ReadLine());
 	} catch (...) {
 	}
-	std::replace(videoInfo.fields["specific"].begin(), videoInfo.fields["specific"].end(), ',', 'x');
-	if (!videoInfo.fields["specific"].empty()
+	std::replace(videoInfo.fields["resolution"].begin(), videoInfo.fields["resolution"].end(), ',', 'x');
+	if (!videoInfo.fields["resolution"].empty()
 			|| !videoInfo.fields["name"].empty()
 			|| !videoInfo.fields["type"].empty())
 		gComponents["GRAPHICS"].MergeWith(videoInfo);

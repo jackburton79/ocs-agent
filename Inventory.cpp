@@ -922,7 +922,7 @@ Inventory::_AddVideosInfo(tinyxml2::XMLElement* parent)
 		name->LinkEndChild(fDocument->NewText(info.fields["type"].c_str()));
 
 		tinyxml2::XMLElement* resolution = fDocument->NewElement("RESOLUTION");
-		resolution->LinkEndChild(fDocument->NewText(info.fields["specific"].c_str()));
+		resolution->LinkEndChild(fDocument->NewText(info.fields["resolution"].c_str()));
 
 		video->LinkEndChild(chipset);
 		video->LinkEndChild(memory);
