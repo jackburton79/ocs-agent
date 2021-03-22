@@ -5,9 +5,11 @@
  *      Author: Stefano Ceccherini
  */
 
+#include "Inventory.h"
+
 #include "Agent.h"
 #include "Configuration.h"
-#include "Inventory.h"
+#include "DMIDataBackend.h"
 #include "Logger.h"
 #include "Machine.h"
 #include "NetworkInterface.h"
@@ -55,6 +57,10 @@ Inventory::Initialize()
 	Logger& logger = Logger::GetDefault();
 
 	Clear();
+
+	// TODO: Move these away from here
+
+	DMIDataBackend().Run();
 
     std::string deviceID = Configuration::Get()->DeviceID();
 	logger.LogFormat(LOG_INFO, "Inventory::Initialize(): Device ID: %s...", deviceID.c_str());
@@ -327,34 +333,44 @@ Inventory::_AddBIOSInfo(tinyxml2::XMLElement* parent)
 	tinyxml2::XMLElement* bios = fDocument->NewElement("BIOS");
 
 	tinyxml2::XMLElement* assettag = fDocument->NewElement("ASSETTAG");
-	assettag->LinkEndChild(fDocument->NewText(fMachine->AssetTag().c_str()));
+	assettag->LinkEndChild(fDocument->NewText(gComponents["CHASSIS"].asset_tag.c_str()));
 
 	tinyxml2::XMLElement* bdate = fDocument->NewElement("BDATE");
-	bdate->LinkEndChild(fDocument->NewText(fMachine->BIOSDate().c_str()));
+	bdate->LinkEndChild(fDocument->NewText(gComponents["BIOS"].release_date.c_str()));
 
 	tinyxml2::XMLElement* bmanufacturer = fDocument->NewElement("BMANUFACTURER");
-	bmanufacturer->LinkEndChild(fDocument->NewText(fMachine->BIOSManufacturer().c_str()));
+	bmanufacturer->LinkEndChild(fDocument->NewText(gComponents["BIOS"].vendor.c_str()));
 
 	tinyxml2::XMLElement* bversion = fDocument->NewElement("BVERSION");
-	bversion->LinkEndChild(fDocument->NewText(fMachine->BIOSVersion().c_str()));
+	bversion->LinkEndChild(fDocument->NewText(gComponents["BIOS"].version.c_str()));
 
 	tinyxml2::XMLElement* mmanufacturer = fDocument->NewElement("MMANUFACTURER");
-	mmanufacturer->LinkEndChild(fDocument->NewText(fMachine->MachineManufacturer().c_str()));
+	mmanufacturer->LinkEndChild(fDocument->NewText(gComponents["BOARD"].vendor.c_str()));
 
 	tinyxml2::XMLElement* mSerial = fDocument->NewElement("MSN");
-	mSerial->LinkEndChild(fDocument->NewText(fMachine->MachineSerialNumber().c_str()));
+	mSerial->LinkEndChild(fDocument->NewText(gComponents["BOARD"].serial.c_str()));
 
 	tinyxml2::XMLElement* sManufacturer = fDocument->NewElement("SMANUFACTURER");
-	sManufacturer->LinkEndChild(fDocument->NewText(fMachine->SystemManufacturer().c_str()));
+	sManufacturer->LinkEndChild(fDocument->NewText(gComponents["SYSTEM"].vendor.c_str()));
 
 	tinyxml2::XMLElement* systemModel = fDocument->NewElement("SMODEL");
-	systemModel->LinkEndChild(fDocument->NewText(fMachine->SystemModel().c_str()));
+	systemModel->LinkEndChild(fDocument->NewText(gComponents["SYSTEM"].name.c_str()));
+
+	// TODO: Move into backend(s)
+	// Some systems have this empty, or, like our MCP79s,
+	// "To Be Filled by O.E.M.", which is pretty much useless,
+	// so in that case we use the baseboard serial number
+	std::string systemSerial;
+	if (gComponents["SYSTEM"].serial.empty()
+		|| gComponents["SYSTEM"].serial == "To Be Filled By O.E.M.")
+		systemSerial = gComponents["BOARD"].serial;
+	systemSerial = gComponents["SYSTEM"].serial;
 
 	tinyxml2::XMLElement* ssn = fDocument->NewElement("SSN");
-	ssn->LinkEndChild(fDocument->NewText(fMachine->SystemSerialNumber().c_str()));
+	ssn->LinkEndChild(fDocument->NewText(systemSerial.c_str()));
 
 	tinyxml2::XMLElement* type = fDocument->NewElement("TYPE");
-	type->LinkEndChild(fDocument->NewText(fMachine->SystemType().c_str()));
+	type->LinkEndChild(fDocument->NewText(gComponents["CHASSIS"].type.c_str()));
 
 	bios->LinkEndChild(assettag);
 	bios->LinkEndChild(bdate);

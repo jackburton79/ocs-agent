@@ -6,9 +6,11 @@
 CPP_SRCS += \
 ../Agent.cpp \
 ../Configuration.cpp \
-../DMIDecode.cpp \
+../DataBackend.cpp \
+../DMIDataBackend.cpp \
 ../Inventory.cpp \
 ../Logger.cpp \
+../LSHWBackend.cpp \
 ../Machine.cpp \
 ../NetworkInterface.cpp \
 ../NetworkRoster.cpp \
@@ -28,8 +30,11 @@ CPP_SRCS += \
 OBJS += \
 ./Agent.o \
 ./Configuration.o \
+./DataBackend.o \
+./DMIDataBackend.o \
 ./Inventory.o \
 ./Logger.o \
+./LSHWBackend.o \
 ./Machine.o \
 ./NetworkInterface.o \
 ./NetworkRoster.o \
@@ -49,8 +54,11 @@ OBJS += \
 CPP_DEPS += \
 ./Agent.d \
 ./Configuration.d \
+./DataBackend.d \
+./DMIDataBackend.d \
 ./Inventory.d \
 ./Logger.d \
+./LSHWBackend.d \
 ./Machine.d \
 ./NetworkInterface.d \
 ./NetworkRoster.d \
