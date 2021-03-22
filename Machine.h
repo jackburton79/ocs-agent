@@ -13,47 +13,6 @@
 #include <vector>
 
 
-struct bios_info {
-	std::string vendor;
-	std::string release_date;
-	std::string version;
-	void MergeWith(const bios_info& info);
-	int Score() const;
-};
-
-
-struct system_info {
-	std::string name;
-	std::string vendor;
-	std::string serial;
-	std::string version;
-	std::string uuid;
-	void MergeWith(const system_info& info);
-	int Score() const;
-};
-
-
-struct board_info {
-	std::string asset_tag;
-	std::string name;
-	std::string serial;
-	std::string vendor;
-	std::string version;
-	void MergeWith(const board_info& info);
-	int Score() const;
-};
-
-
-struct chassis_info {
-	std::string asset_tag;
-	std::string serial;
-	std::string type;
-	std::string vendor;
-	std::string version;
-	void MergeWith(const chassis_info& info);
-	int Score() const;
-};
-
 
 struct video_info {
 	std::string vendor;
@@ -159,11 +118,6 @@ private:
 	//void _ExtractDataFromDMIDB(dmi_db dmiDb);
 
 	std::vector<memory_device_info> fMemoryInfo;
-
-	bios_info fBIOSInfo;
-	chassis_info fChassisInfo;
-	board_info fBoardInfo;
-	system_info fSystemInfo;
 
 	std::vector<struct video_info> fVideoInfo;
 };

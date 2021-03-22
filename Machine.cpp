@@ -46,8 +46,6 @@ std::map<std::string, Component> gComponents;
 void
 Component::MergeWith(Component& component)
 {
-	if (name.empty())
-		name = component.name;
 	if (asset_tag.empty())
 		asset_tag = component.asset_tag;
 	if (serial.empty())
@@ -254,14 +252,14 @@ Machine::_RetrieveData()
 {
 	try {
 		// Try /sys/devices/virtual/dmi/id tree, then 'dmidecode', then 'lshw'
-		//_GetDMIData();
+		_GetDMIData();
 		//_GetGraphicsCardInfo();
 		//_GetDMIDecodeData();
 		_GetLSHWData();
 	} catch (...) {
 		std::cerr << "Failed to get hardware info." << std::endl;
 	}
-
+/*
 	components_map::const_iterator i;
 	for (i = gComponents.begin(); i != gComponents.end(); i++) {
 		std::cout << (*i).second.name << std::endl;
@@ -270,49 +268,49 @@ Machine::_RetrieveData()
 		std::cout << (*i).second.serial << std::endl;
 		std::cout << (*i).second.version << std::endl;
 		std::cout << (*i).second.type << std::endl;
-	}
+	}*/
 }
 
 
 std::string
 Machine::AssetTag() const
 {
-	return fChassisInfo.asset_tag;
+	return gComponents["CHASSIS"].asset_tag;
 }
 
 
 std::string
 Machine::BIOSVersion() const
 {
-	return fBIOSInfo.version;
+	return gComponents["BIOS"].version;
 }
 
 
 std::string
 Machine::BIOSManufacturer() const
 {
-	return fBIOSInfo.vendor;
+	return gComponents["BIOS"].vendor;
 }
 
 
 std::string
 Machine::BIOSDate() const
 {
-	return fBIOSInfo.release_date;
+	return gComponents["BIOS"].release_date;
 }
 
 
 std::string
 Machine::SystemManufacturer() const
 {
-	return fSystemInfo.vendor;
+	return gComponents["SYSTEM"].vendor;
 }
 
 
 std::string
 Machine::SystemModel() const
 {
-	return fSystemInfo.name;
+	return gComponents["SYSTEM"].name;
 }
 
 
@@ -322,39 +320,39 @@ Machine::SystemSerialNumber() const
 	// Some systems have this empty, or, like our MCP79s,
 	// "To Be Filled by O.E.M.", which is pretty much useless,
 	// so in that case we use the baseboard serial number
-	if (fSystemInfo.serial.empty()
-		|| fSystemInfo.serial == "To Be Filled By O.E.M.")
+	if (gComponents["SYSTEM"].serial.empty()
+		|| gComponents["SYSTEM"].serial == "To Be Filled By O.E.M.")
 		return MachineSerialNumber();
 
-	return fSystemInfo.serial;
+	return gComponents["SYSTEM"].serial;
 }
 
 
 std::string
 Machine::SystemUUID() const
 {
-	return fSystemInfo.uuid;
+	return gComponents["SYSTEM"].uuid;
 }
 
 
 std::string
 Machine::SystemType() const
 {
-	return fChassisInfo.type;
+	return gComponents["CHASSIS"].type;
 }
 
 
 std::string
 Machine::MachineSerialNumber() const
 {
-	return fBoardInfo.serial;
+	return gComponents["BOARD"].serial;
 }
 
 
 std::string
 Machine::MachineManufacturer() const
 {
-	return fBoardInfo.vendor;
+	return gComponents["BOARD"].vendor;
 }
 
 
@@ -453,7 +451,7 @@ Machine::_GetDMIData()
 
 		gComponents["CHASSIS"].asset_tag = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_asset_tag").ReadLine());
 		gComponents["CHASSIS"].serial = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_serial").ReadLine());
-		gComponents["CHASSIS"].type = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_type").ReadLine());
+		//gComponents["CHASSIS"].type = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_type").ReadLine());
 		gComponents["CHASSIS"].vendor = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_vendor").ReadLine());
 		gComponents["CHASSIS"].version = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_version").ReadLine());
 
@@ -747,119 +745,6 @@ Machine::_ExtractDataFromDMIDB(dmi_db dmiDb)
 	}
 }
 */
-
-// bios_info
-void
-bios_info::MergeWith(const bios_info& info)
-{
-	if (vendor.empty())
-		vendor = info.vendor;
-	if (release_date.empty())
-		release_date = info.release_date;
-	if (version.empty())
-		version = info.version;
-}
-
-
-int
-bios_info::Score() const
-{
-	int score = 0;
-	score += vendor.empty() ? 0 : 34;
-	score += release_date.empty() ? 0 : 34;
-	score += version.empty() ? 0 : 34;
-	return score;
-}
-
-
-// system_info
-void
-system_info::MergeWith(const system_info& info)
-{
-	if (name.empty())
-		name = info.name;
-	if (vendor.empty())
-		vendor = info.vendor;
-	if (serial.empty())
-		serial = info.serial;
-	if (version.empty())
-		version = info.version;
-	if (uuid.empty())
-		uuid = info.uuid;
-}
-
-
-int
-system_info::Score() const
-{
-	int score = 0;
-	score += name.empty() ? 0 : 20;
-	score += vendor.empty() ? 0 : 20;
-	score += serial.empty() ? 0 : 20;
-	score += version.empty() ? 0 : 20;
-	score += uuid.empty() ? 0 : 20;
-	return score;
-}
-
-
-// board_info
-void
-board_info::MergeWith(const board_info& info)
-{
-	if (asset_tag.empty())
-		asset_tag = info.asset_tag;
-	if (name.empty())
-		name = info.name;
-	if (serial.empty())
-		serial = info.serial;
-	if (vendor.empty())
-		vendor = info.vendor;
-	if (version.empty())
-		version = info.version;
-}
-
-
-int
-board_info::Score() const
-{
-	int score = 0;
-	score += asset_tag.empty() ? 0 : 20;
-	score += name.empty() ? 0 : 20;
-	score += serial.empty() ? 0 : 20;
-	score += vendor.empty() ? 0 : 20;
-	score += version.empty() ? 0 : 20;
-	return score;
-}
-
-
-// chassis_info
-void
-chassis_info::MergeWith(const chassis_info& info)
-{
-	if (asset_tag.empty())
-		asset_tag = info.asset_tag;
-	if (serial.empty())
-		serial = info.serial;
-	if (type.empty())
-		type = info.type;
-	if (vendor.empty())
-		vendor = info.vendor;
-	if (version.empty())
-		version = info.version;
-}
-
-
-int
-chassis_info::Score() const
-{
-	int score = 0;
-	score += asset_tag.empty() ? 0 : 20;
-	score += serial.empty() ? 0 : 20;
-	score += type.empty() ? 0 : 20;
-	score += vendor.empty() ? 0 : 20;
-	score += version.empty() ? 0 : 20;
-	return score;
-}
 
 
 void
