@@ -16,7 +16,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <sys/utsname.h>
 
 #include <iostream>
 #include <fstream>
@@ -92,46 +91,6 @@ RAM_type_from_description(const std::string& description)
 // OSInfo
 OSInfo::OSInfo()
 {
-	struct utsname uName;
-	if (::uname(&uName) != 0) {
-		std::string errorString = "OSInfo::_GetOsInfo(): uname() failed with error ";
-		errorString.append(::strerror(errno));
-		throw std::runtime_error(errorString);
-	}
-
-	hostname = uName.nodename;
-	comments = uName.version;
-	release = uName.release;
-	domainname = uName.domainname;
-	architecture = uName.machine;
-
-	//Feed domain name from host name when possible.
-	if (domainname == "" || domainname == "(none)") {
-		size_t dotPos = hostname.find('.');
-		if (dotPos != std::string::npos) {
-			domainname = hostname.substr(dotPos + 1);
-		}
-	}
-
-	ProcReader proc("/proc/meminfo");
-	std::istream stream(&proc);
-
-	std::string string;
-	while (std::getline(stream, string)) {
-		size_t pos;
-		if ((pos = string.find("SwapTotal:")) != std::string::npos) {
-			pos = string.find(":");
-			std::string swapString = string.substr(pos + 1, std::string::npos);
-			int swapInt = ::strtol(trim(swapString).c_str(), NULL, 10) / 1000;
-			swap = int_to_string(swapInt);
-		} else if ((pos = string.find("MemTotal:")) != std::string::npos) {
-			pos = string.find(":");
-			std::string memString = string.substr(pos + 1, std::string::npos);
-			int memInt = ::strtol(trim(memString).c_str(), NULL, 10) / 1000;
-			memory = int_to_string(memInt);
-		}
-	}
-
 	description = _OSDescription();
 }
 

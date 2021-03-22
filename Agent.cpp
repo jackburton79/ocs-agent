@@ -12,6 +12,8 @@
 #include "Inventory.h"
 #include "Logger.h"
 #include "LSHWBackend.h"
+#include "MemInfoBackend.h"
+#include "UnameBackend.h"
 
 #include <cstdlib>
 #include <iostream>
@@ -38,8 +40,10 @@ Agent::Run()
 {
 	// TODO: Move these away from here
 	DMIDataBackend().Run();
-	LSHWBackend().Run();
 	DMIDecodeBackend().Run();
+	LSHWBackend().Run();
+	MemInfoBackend().Run();
+	UnameBackend().Run();
 
 	Configuration* config = Configuration::Get();
 
