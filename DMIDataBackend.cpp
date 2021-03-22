@@ -28,28 +28,36 @@ int
 DMIDataBackend::Run()
 {
 	try {
-		gComponents["BIOS"].release_date = trimmed(ProcReader("/sys/devices/virtual/dmi/id/bios_date").ReadLine());
-		gComponents["BIOS"].vendor = trimmed(ProcReader("/sys/devices/virtual/dmi/id/bios_vendor").ReadLine());
-		gComponents["BIOS"].version = trimmed(ProcReader("/sys/devices/virtual/dmi/id/bios_version").ReadLine());
+		Component bios;
+		bios.release_date = trimmed(ProcReader("/sys/devices/virtual/dmi/id/bios_date").ReadLine());
+		bios.vendor = trimmed(ProcReader("/sys/devices/virtual/dmi/id/bios_vendor").ReadLine());
+		bios.version = trimmed(ProcReader("/sys/devices/virtual/dmi/id/bios_version").ReadLine());
+		gComponents["BIOS"].MergeWith(bios);
 
-		gComponents["SYSTEM"].name = trimmed(ProcReader("/sys/devices/virtual/dmi/id/product_name").ReadLine());
-		gComponents["SYSTEM"].version = trimmed(ProcReader("/sys/devices/virtual/dmi/id/product_version").ReadLine());
-		gComponents["SYSTEM"].uuid = trimmed(ProcReader("/sys/devices/virtual/dmi/id/product_uuid").ReadLine());
-		gComponents["SYSTEM"].serial = trimmed(ProcReader("/sys/devices/virtual/dmi/id/product_serial").ReadLine());
-		gComponents["SYSTEM"].vendor = trimmed(ProcReader("/sys/devices/virtual/dmi/id/sys_vendor").ReadLine());
+		Component system;
+		system.name = trimmed(ProcReader("/sys/devices/virtual/dmi/id/product_name").ReadLine());
+		system.version = trimmed(ProcReader("/sys/devices/virtual/dmi/id/product_version").ReadLine());
+		system.uuid = trimmed(ProcReader("/sys/devices/virtual/dmi/id/product_uuid").ReadLine());
+		system.serial = trimmed(ProcReader("/sys/devices/virtual/dmi/id/product_serial").ReadLine());
+		system.vendor = trimmed(ProcReader("/sys/devices/virtual/dmi/id/sys_vendor").ReadLine());
+		gComponents["SYSTEM"].MergeWith(system);
 
-		gComponents["CHASSIS"].asset_tag = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_asset_tag").ReadLine());
-		gComponents["CHASSIS"].serial = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_serial").ReadLine());
-		gComponents["CHASSIS"].vendor = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_vendor").ReadLine());
-		gComponents["CHASSIS"].version = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_version").ReadLine());
+		Component chassis;
+		chassis.asset_tag = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_asset_tag").ReadLine());
+		chassis.serial = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_serial").ReadLine());
+		chassis.vendor = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_vendor").ReadLine());
+		chassis.version = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_version").ReadLine());
 		// TODO: This is a numeric "type", so no.
-		//gComponents["CHASSIS"].type = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_type").ReadLine());
+		//chassis.type = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_type").ReadLine());
+		gComponents["CHASSIS"].MergeWith(chassis);
 
-		gComponents["BOARD"].asset_tag = trimmed(ProcReader("/sys/devices/virtual/dmi/id/board_asset_tag").ReadLine());
-		gComponents["BOARD"].name = trimmed(ProcReader("/sys/devices/virtual/dmi/id/board_name").ReadLine());
-		gComponents["BOARD"].serial = trimmed(ProcReader("/sys/devices/virtual/dmi/id/board_serial").ReadLine());
-		gComponents["BOARD"].vendor = trimmed(ProcReader("/sys/devices/virtual/dmi/id/board_vendor").ReadLine());
-		gComponents["BOARD"].version = trimmed(ProcReader("/sys/devices/virtual/dmi/id/board_version").ReadLine());
+		Component board;
+		board.asset_tag = trimmed(ProcReader("/sys/devices/virtual/dmi/id/board_asset_tag").ReadLine());
+		board.name = trimmed(ProcReader("/sys/devices/virtual/dmi/id/board_name").ReadLine());
+		board.serial = trimmed(ProcReader("/sys/devices/virtual/dmi/id/board_serial").ReadLine());
+		board.vendor = trimmed(ProcReader("/sys/devices/virtual/dmi/id/board_vendor").ReadLine());
+		board.version = trimmed(ProcReader("/sys/devices/virtual/dmi/id/board_version").ReadLine());
+		gComponents["BOARD"].MergeWith(board);
 	} catch (...) {
 		return -1;
 	}
@@ -79,6 +87,6 @@ DMIDataBackend::Run()
 	}
 	std::replace(videoInfo.specific.begin(), videoInfo.specific.end(), ',', 'x');
 	if (!videoInfo.specific.empty() || !videoInfo.name.empty() || !videoInfo.type.empty())
-		gComponents["GRAPHICS"] = videoInfo;
+		gComponents["GRAPHICS"].MergeWith(videoInfo);
 	return 0;
 }
