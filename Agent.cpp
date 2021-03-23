@@ -5,21 +5,24 @@
  *      Author: Stefano Ceccherini
  */
 
+
 #include "Agent.h"
 #include "Configuration.h"
-#include "DMIDataBackend.h"
-#include "DMIDecodeBackend.h"
 #include "Inventory.h"
 #include "Logger.h"
-#include "LSHWBackend.h"
 #include "Machine.h"
-#include "MemInfoBackend.h"
-#include "UnameBackend.h"
+
+#include "backends/LSHWBackend.h"
+#include "backends/DMIDecodeBackend.h"
+#include "backends/MemInfoBackend.h"
+#include "backends/DMIDataBackend.h"
+#include "backends/UnameBackend.h"
 
 #include <cstdlib>
 #include <iostream>
 #include <stdexcept>
 #include <unistd.h>
+
 
 const char* kVersion = "1.9.9-dev";
 

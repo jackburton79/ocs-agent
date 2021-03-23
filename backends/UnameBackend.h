@@ -5,8 +5,8 @@
  *      Author: stefano
  */
 
-#ifndef UNAMEBACKEND_H_
-#define UNAMEBACKEND_H_
+#ifndef BACKENDS_UNAMEBACKEND_H_
+#define BACKENDS_UNAMEBACKEND_H_
 
 #include "DataBackend.h"
 
@@ -17,4 +17,4 @@ public:
 	virtual int Run();
 };
 
-#endif /* UNAMEBACKEND_H_ */
+#endif /* BACKENDS_UNAMEBACKEND_H_ */

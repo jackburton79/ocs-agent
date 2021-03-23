@@ -6,14 +6,9 @@
 CPP_SRCS += \
 ../Agent.cpp \
 ../Configuration.cpp \
-../DataBackend.cpp \
-../DMIDataBackend.cpp \
-../DMIDecodeBackend.cpp \
 ../Inventory.cpp \
 ../Logger.cpp \
-../LSHWBackend.cpp \
 ../Machine.cpp \
-../MemInfoBackend.cpp \
 ../NetworkInterface.cpp \
 ../NetworkRoster.cpp \
 ../Processors.cpp \
@@ -23,7 +18,6 @@ CPP_SRCS += \
 ../Softwares.cpp \
 ../StorageRoster.cpp \
 ../Support.cpp \
-../UnameBackend.cpp \
 ../UsersRoster.cpp \
 ../VolumeRoster.cpp \
 ../XML.cpp \
@@ -33,14 +27,9 @@ CPP_SRCS += \
 OBJS += \
 ./Agent.o \
 ./Configuration.o \
-./DataBackend.o \
-./DMIDataBackend.o \
-./DMIDecodeBackend.o \
 ./Inventory.o \
 ./Logger.o \
-./LSHWBackend.o \
 ./Machine.o \
-./MemInfoBackend.o \
 ./NetworkInterface.o \
 ./NetworkRoster.o \
 ./Processors.o \
@@ -50,7 +39,6 @@ OBJS += \
 ./Softwares.o \
 ./StorageRoster.o \
 ./Support.o \
-./UnameBackend.o \
 ./UsersRoster.o \
 ./VolumeRoster.o \
 ./XML.o \
@@ -60,14 +48,9 @@ OBJS += \
 CPP_DEPS += \
 ./Agent.d \
 ./Configuration.d \
-./DataBackend.d \
-./DMIDataBackend.d \
-./DMIDecodeBackend.d \
 ./Inventory.d \
 ./Logger.d \
-./LSHWBackend.d \
 ./Machine.d \
-./MemInfoBackend.d \
 ./NetworkInterface.d \
 ./NetworkRoster.d \
 ./Processors.d \
@@ -77,7 +60,6 @@ CPP_DEPS += \
 ./Sofwares.d \
 ./StorageRoster.d \
 ./Support.d \
-./UnameBackend.d \
 ./UsersRoster.d \
 ./VolumeRoster.d \
 ./XML.d \
