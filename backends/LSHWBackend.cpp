@@ -136,6 +136,8 @@ LSHWBackend::Run()
 				tmpElement = bankElement->FirstChildElement("size");
 				if (tmpElement != NULL) {
 					unsigned long ramSize = ::strtoul(tmpElement->GetText(), NULL, 10) / (1024 * 1024);
+					if (ramSize == 0)
+						ramSlot.fields["type"] = "Empty slot";
 					ramSlot.fields["size"] = int_to_string(ramSize);
 					std::ostringstream s;
 					s << "MEMORY" << slotNum;

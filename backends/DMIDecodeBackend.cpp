@@ -241,19 +241,24 @@ DMIDecodeBackend::_ExtractDataFromDMIDB(dmi_db dmiDb)
 		memory_device_info info;
 		try {
 			string_map::const_iterator mapIter;
+			mapIter = entry.find("Type");
+			if (mapIter != entry.end())
+				ramSlot.fields["type"] = mapIter->second;
+
 			mapIter = entry.find("Size");
 			if (mapIter != entry.end()) {
 				ramSlot.fields["size"] = int_to_string(convert_to_MBytes(mapIter->second));
 			} else
 				ramSlot.fields["size"] = "0";
 
+			// if size == 0, it's an empty slot
+			if (ramSlot.fields["size"] == "0")
+				ramSlot.fields["type"] = "Empty Slot";
+
 			mapIter = entry.find("Locator");
 			if (mapIter != entry.end())
 				ramSlot.fields["description"] = mapIter->second;
 
-			mapIter = entry.find("Type");
-			if (mapIter != entry.end())
-				ramSlot.fields["type"] = mapIter->second;
 
 			mapIter = entry.find("Speed");
 			if (mapIter != entry.end()) {
