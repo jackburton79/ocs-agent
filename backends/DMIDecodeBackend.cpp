@@ -6,6 +6,7 @@
  */
 
 #include "DMIDecodeBackend.h"
+#include "Logger.h"
 #include "Machine.h"
 #include "Support.h"
 
@@ -227,8 +228,11 @@ DMIDecodeBackend::_ExtractDataFromDMIDB(dmi_db dmiDb)
 	s << "MEMORY" << slotNum;
 	std::map<std::string, Component>::iterator ramSlotIterator = gComponents.find(s.str());
 	// already some slot info, bail out
-	if (ramSlotIterator != gComponents.end())
-		return;
+	if (ramSlotIterator != gComponents.end()) {
+		// just log. dmidecode's output is usually better than other backends's
+		Logger& logger = Logger::GetDefault();
+		logger.LogFormat(LOG_INFO, "DMIDecodeBackend: will overwrite memory info");
+	}
 
 	valuesVector = dmiExtractor.ExtractEntry(kMemoryDevice);
 	for (i = valuesVector.begin(); i != valuesVector.end(); i++) {
