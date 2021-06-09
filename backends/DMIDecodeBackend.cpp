@@ -238,7 +238,6 @@ DMIDecodeBackend::_ExtractDataFromDMIDB(dmi_db dmiDb)
 	for (i = valuesVector.begin(); i != valuesVector.end(); i++) {
 		Component ramSlot;
 		string_map& entry = *i;
-		memory_device_info info;
 		try {
 			string_map::const_iterator mapIter;
 			mapIter = entry.find("Type");

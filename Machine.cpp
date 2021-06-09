@@ -5,7 +5,6 @@
  *      Author: Stefano Ceccherini
  */
 
-// TODO: Reorganize code.
 
 #include "Machine.h"
 #include "ProcReader.h"
@@ -30,8 +29,6 @@
 #include <XML.h>
 
 typedef std::map<std::string, std::string> string_map;
-
-
 
 std::map<std::string, Component> gComponents;
 
@@ -113,158 +110,4 @@ OSInfoBackend::Run()
 	os.fields["description"] = osDescription;
 	gComponents["OS"].MergeWith(os);
 	return 0;
-}
-
-
-/*
-void
-Machine::_ExtractDataFromDMIDB(dmi_db dmiDb)
-{
-	bios_info biosInfo;
-	biosInfo.release_date = GetValueFromMap(dmiDb, "Release Date", kBIOSInfo);
-	biosInfo.vendor = GetValueFromMap(dmiDb, "Vendor", kBIOSInfo);
-	biosInfo.version = GetValueFromMap(dmiDb, "Version", kBIOSInfo);
-	fBIOSInfo.MergeWith(biosInfo);
-
-	system_info systemInfo;
-	systemInfo.name = GetValueFromMap(dmiDb, "Product Name", kSystemInfo);
-	systemInfo.version = GetValueFromMap(dmiDb, "Version", kSystemInfo);
-	systemInfo.uuid = GetValueFromMap(dmiDb, "UUID", kSystemInfo);
-	systemInfo.serial = GetValueFromMap(dmiDb, "Serial Number", kSystemInfo);
-	systemInfo.vendor = GetValueFromMap(dmiDb, "Manufacturer", kSystemInfo);
-	fSystemInfo.MergeWith(systemInfo);
-
-	chassis_info chassisInfo;
-	chassisInfo.asset_tag = GetValueFromMap(dmiDb, "Asset Tag", "Chassis Information");
-	chassisInfo.serial = GetValueFromMap(dmiDb, "Serial Number", "Chassis Information");
-	chassisInfo.type = GetValueFromMap(dmiDb, "Type", "Chassis Information");
-	chassisInfo.vendor = GetValueFromMap(dmiDb, "Manufacturer", "Chassis Information");
-	chassisInfo.version = GetValueFromMap(dmiDb, "Version",  "Chassis Information");
-	fChassisInfo.MergeWith(chassisInfo);
-
-	board_info boardInfo;
-	boardInfo.asset_tag = GetValueFromMap(dmiDb, "Asset Tag", "Base Board Information");
-	boardInfo.name = GetValueFromMap(dmiDb, "Product Name", "Base Board Information");
-	boardInfo.vendor = GetValueFromMap(dmiDb, "Manufacturer", "Base Board Information");
-	boardInfo.version = GetValueFromMap(dmiDb, "Version", "Base Board Information");
-	boardInfo.serial = GetValueFromMap(dmiDb, "Serial Number", "Base Board Information");
-	fBoardInfo.MergeWith(boardInfo);
-
-	std::vector<string_map> valuesVector;
-	DMIExtractor dmiExtractor(dmiDb);
-	std::vector<string_map>::iterator i;
-
-	// Graphics cards
-	if (fVideoInfo.size() == 0) {
-		valuesVector = dmiExtractor.ExtractEntry("Display");
-		for (i = valuesVector.begin(); i != valuesVector.end(); i++) {
-			string_map& entry = *i;
-			video_info info;
-			try {
-				string_map::const_iterator mapIter;
-				mapIter = entry.find("Manufacturer");
-				if (mapIter != entry.end())
-					info.vendor = mapIter->second;
-				mapIter = entry.find("Product Name");
-				if (mapIter != entry.end())
-					info.name = mapIter->second;
-				mapIter = entry.find("description");
-				if (mapIter != entry.end())
-					info.chipset = mapIter->second;
-				fVideoInfo.push_back(info);
-			} catch (...) {
-			}
-		}
-	}
-
-	// Memory slots
-	if (fMemoryInfo.size() > 0)
-		return;
-
-	valuesVector = dmiExtractor.ExtractEntry(kMemoryDevice);
-	for (i = valuesVector.begin(); i != valuesVector.end(); i++) {
-		string_map& entry = *i;
-		memory_device_info info;
-		try {
-			string_map::const_iterator mapIter;
-			mapIter = entry.find("Size");
-			if (mapIter != entry.end()) {
-				info.size = convert_to_MBytes(mapIter->second);
-			} else
-				info.size = 0;
-
-			mapIter = entry.find("Locator");
-			if (mapIter != entry.end())
-				info.description = mapIter->second;
-
-			mapIter = entry.find("Type");
-			if (mapIter != entry.end())
-				info.type = mapIter->second;
-
-			mapIter = entry.find("Speed");
-			if (mapIter != entry.end())
-				info.speed = ::strtoul(mapIter->second.c_str(), NULL, 10);
-
-			mapIter = entry.find("Manufacturer");
-			if (mapIter != entry.end())
-				info.vendor = mapIter->second;
-			mapIter = entry.find("Asset Tag");
-			if (mapIter != entry.end())
-				info.asset_tag = mapIter->second;
-			mapIter = entry.find("Serial Number");
-			if (mapIter != entry.end())
-				info.serial = mapIter->second;
-
-			mapIter = entry.find("Array Handle");
-			if (mapIter != entry.end()) {
-				std::string parentHandle = mapIter->second;
-				string_map arrayHandle = dmiExtractor.ExtractHandle(parentHandle);
-				mapIter = arrayHandle.find("Use");
-				if (mapIter != arrayHandle.end())
-					info.purpose = mapIter->second;
-				mapIter = arrayHandle.find("Use");
-				if (mapIter != arrayHandle.end())
-					info.caption = mapIter->second;
-			}
-		} catch (...) {
-		}
-
-		// Make sure we have at least some valid info
-		if (info.caption != "" || info.purpose != ""
-			|| info.type != "" || info.serial != "" || info.speed != 0)
-			fMemoryInfo.push_back(info);
-	}
-}
-*/
-
-
-// memory_device_info
-memory_device_info::memory_device_info()
-	:
-	speed(0),
-	size(0)
-{
-}
-
-
-std::string
-memory_device_info::Type() const
-{
-	if (size == 0)
-		return "Empty slot";
-	return type;
-}
-
-
-std::string
-memory_device_info::Speed() const
-{
-	return int_to_string(speed);
-}
-
-
-std::string
-memory_device_info::Size() const
-{
-	return int_to_string(size);
 }

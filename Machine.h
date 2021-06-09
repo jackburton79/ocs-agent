@@ -14,24 +14,6 @@
 
 #include "backends/DataBackend.h"
 
-struct memory_device_info {
-	memory_device_info();
-
-	std::string Type() const;
-	std::string Speed() const;
-	std::string Size() const;
-
-	std::string description;
-	std::string caption;
-	std::string purpose;
-	std::string type;
-	std::string vendor;
-	std::string serial;
-	std::string asset_tag;
-	unsigned int speed;
-	unsigned int size;
-};
-
 
 class OSInfoBackend : public DataBackend {
 public:
