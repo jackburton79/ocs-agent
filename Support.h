@@ -35,6 +35,7 @@ private:
 bool CommandExists(const char* command);
 
 std::string RAM_type_from_description(const std::string& description);
+unsigned int convert_to_MBytes(const std::string& string);
 
 static inline std::string& ltrim(std::string& s) {
 	s.erase(s.begin(), std::find_if(s.begin(), s.end(), std::not1(std::ptr_fun<int, int>(std::isspace))));

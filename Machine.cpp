@@ -31,7 +31,6 @@
 
 typedef std::map<std::string, std::string> string_map;
 
-const char* kMemoryDevice = "Memory Device";
 
 
 std::map<std::string, Component> gComponents;
@@ -42,27 +41,6 @@ Component::MergeWith(Component& component)
 {
 	fields.insert(component.fields.begin(), component.fields.end());
 };
-
-
-// Returns size, in MBytes,
-// starting from a string like '3GB' or '1024 KB'
-unsigned int
-convert_to_MBytes(const std::string& string)
-{
-	char *memoryUnit = NULL;
-	unsigned int memorySize = ::strtol(string.c_str(), &memoryUnit, 10);
-	std::string unit = memoryUnit;
-	trim(unit);
-	if (::strcasecmp(unit.c_str(), "KB") == 0
-		|| ::strcasecmp(unit.c_str(), "KiB") == 0)
-		memorySize /= 1024;
-	else if (::strcasecmp(unit.c_str(), "GB") == 0
-		 || ::strcasecmp(unit.c_str(), "GiB") == 0)
-		memorySize *= 1024;
-	return memorySize;
-}
-
-
 
 
 

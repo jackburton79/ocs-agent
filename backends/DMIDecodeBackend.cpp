@@ -14,6 +14,7 @@ typedef std::map<std::string, std::string> string_map;
 const char* kBIOSInfo = "BIOS Information";
 const char* kSystemInfo = "System Information";
 const char* kProcessorInfo = "Processor Info";
+const char* kMemoryDevice = "Memory Device";
 
 DMIDecodeBackend::DMIDecodeBackend()
 {
@@ -192,11 +193,11 @@ DMIDecodeBackend::_ExtractDataFromDMIDB(dmi_db dmiDb)
 	boardInfo.fields["serial"] = GetValueFromMap(dmiDb, "Serial Number", "Base Board Information");
 	gComponents["BOARD"].MergeWith(boardInfo);
 
-	/*
+
 	std::vector<string_map> valuesVector;
 	DMIExtractor dmiExtractor(dmiDb);
 	std::vector<string_map>::iterator i;
-
+	/*
 	// Graphics cards
 	if (fVideoInfo.size() == 0) {
 		valuesVector = dmiExtractor.ExtractEntry("Display");
@@ -219,44 +220,52 @@ DMIDecodeBackend::_ExtractDataFromDMIDB(dmi_db dmiDb)
 			}
 		}
 	}
-
+*/
 	// Memory slots
-	if (fMemoryInfo.size() > 0)
+	int slotNum = 0;
+	std::ostringstream s;
+	s << "MEMORY" << slotNum;
+	std::map<std::string, Component>::iterator ramSlotIterator = gComponents.find(s.str());
+	// already some slot info, bail out
+	if (ramSlotIterator != gComponents.end())
 		return;
 
 	valuesVector = dmiExtractor.ExtractEntry(kMemoryDevice);
 	for (i = valuesVector.begin(); i != valuesVector.end(); i++) {
+		Component ramSlot;
 		string_map& entry = *i;
 		memory_device_info info;
 		try {
 			string_map::const_iterator mapIter;
 			mapIter = entry.find("Size");
 			if (mapIter != entry.end()) {
-				info.size = convert_to_MBytes(mapIter->second);
+				ramSlot.fields["size"] = int_to_string(convert_to_MBytes(mapIter->second));
 			} else
-				info.size = 0;
+				ramSlot.fields["size"] = "0";
 
 			mapIter = entry.find("Locator");
 			if (mapIter != entry.end())
-				info.description = mapIter->second;
+				ramSlot.fields["description"] = mapIter->second;
 
 			mapIter = entry.find("Type");
 			if (mapIter != entry.end())
-				info.type = mapIter->second;
+				ramSlot.fields["type"] = mapIter->second;
 
 			mapIter = entry.find("Speed");
-			if (mapIter != entry.end())
-				info.speed = ::strtoul(mapIter->second.c_str(), NULL, 10);
+			if (mapIter != entry.end()) {
+				unsigned long ramSpeed = ::strtoul(mapIter->second.c_str(), NULL, 10);
+				ramSlot.fields["speed"] = int_to_string(ramSpeed);
+			}
 
 			mapIter = entry.find("Manufacturer");
 			if (mapIter != entry.end())
-				info.vendor = mapIter->second;
+				ramSlot.fields["vendor"] = mapIter->second;
 			mapIter = entry.find("Asset Tag");
 			if (mapIter != entry.end())
-				info.asset_tag = mapIter->second;
+				ramSlot.fields["asset_tag"] = mapIter->second;
 			mapIter = entry.find("Serial Number");
 			if (mapIter != entry.end())
-				info.serial = mapIter->second;
+				ramSlot.fields["serial"] = mapIter->second;
 
 			mapIter = entry.find("Array Handle");
 			if (mapIter != entry.end()) {
@@ -264,18 +273,25 @@ DMIDecodeBackend::_ExtractDataFromDMIDB(dmi_db dmiDb)
 				string_map arrayHandle = dmiExtractor.ExtractHandle(parentHandle);
 				mapIter = arrayHandle.find("Use");
 				if (mapIter != arrayHandle.end())
-					info.purpose = mapIter->second;
+					ramSlot.fields["purpose"] = mapIter->second;
 				mapIter = arrayHandle.find("Use");
 				if (mapIter != arrayHandle.end())
-					info.caption = mapIter->second;
+					ramSlot.fields["caption"] = mapIter->second;
 			}
 		} catch (...) {
 		}
 
 		// Make sure we have at least some valid info
-		if (info.caption != "" || info.purpose != ""
-			|| info.type != "" || info.serial != "" || info.speed != 0)
-			fMemoryInfo.push_back(info);
-	}*/
+		if (ramSlot.fields.find("caption") != ramSlot.fields.end()
+			|| ramSlot.fields.find("purpose") != ramSlot.fields.end()
+			|| ramSlot.fields.find("type") != ramSlot.fields.end()
+			|| ramSlot.fields.find("serial") != ramSlot.fields.end()
+			|| ramSlot.fields.find("speed") != ramSlot.fields.end()) {
+				std::ostringstream s;
+				s << "MEMORY" << slotNum;
+				gComponents[s.str().c_str()] = ramSlot;
+				slotNum++;
+		}
+	}
 }
 
