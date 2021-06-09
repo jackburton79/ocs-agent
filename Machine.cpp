@@ -65,24 +65,7 @@ convert_to_MBytes(const std::string& string)
 }
 
 
-std::string
-RAM_type_from_description(const std::string& description)
-{
-	std::string type;
-	if (!description.empty()) {
-		// TODO: Not the cleanest approach, but lshw doesn't
-		// seem to return this in any other field
-		if (description.find("SDRAM") != std::string::npos)
-			type = "SDRAM";
-		else if (description.find("FLASH") != std::string::npos)
-			type = "FLASH";
-		else if (description.find("DDR") != std::string::npos)
-			type = "DDR";
-		// TODO: Yeah, and DDR2 ? DDR3 ?
-		// TODO: Handle empty slots like we do for dmidecode
-	}
-	return type;
-}
+
 
 
 // OSInfoBackend

@@ -117,17 +117,19 @@ LSHWBackend::Run()
 					ramSlot.fields["caption"] = memoryCaption;
 					ramSlot.fields["purpose"] = memoryCaption;
 					ramSlot.fields["description"] = XML::GetFirstChildElementText(bankElement, "description");
-					//info.type = RAM_type_from_description(info.description);
+					ramSlot.fields["type"] = RAM_type_from_description(ramSlot.fields["description"]);
 					ramSlot.fields["serial"] = XML::GetFirstChildElementText(bankElement, "serial");
 
 					tmpElement = bankElement->FirstChildElement("clock");
 					if (tmpElement != NULL) {
 						// In Hz, usually, but we should check the unit
-						ramSlot.fields["speed"] = ::strtoul(tmpElement->GetText(), NULL, 10) / (1000 * 1000);
+						unsigned long ramSpeed = ::strtoul(tmpElement->GetText(), NULL, 10) / (1000 * 1000);
+						ramSlot.fields["speed"] = int_to_string(ramSpeed);
 					}
 					tmpElement = bankElement->FirstChildElement("size");
 					if (tmpElement != NULL) {
-						ramSlot.fields["size"] = ::strtoul(tmpElement->GetText(), NULL, 10) / (1024 * 1024);
+						unsigned long ramSize = ::strtoul(tmpElement->GetText(), NULL, 10) / (1024 * 1024);
+						ramSlot.fields["size"] = int_to_string(ramSize);
 						std::ostringstream s;
 						s << "MEMORY" << slotNum;
 						gComponents[s.str().c_str()] = ramSlot;
