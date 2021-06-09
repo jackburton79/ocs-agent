@@ -37,8 +37,7 @@
 Inventory::Inventory()
 	:
 	fDocument(NULL),
-	fContent(NULL),
-	fMachine(NULL)
+	fContent(NULL)
 {
 	fDocument = new tinyxml2::XMLDocument;
 }
@@ -97,8 +96,6 @@ Inventory::Build(bool noSoftware)
 
 	tinyxml2::XMLElement* content = fContent;
 
-	fMachine = Machine::Get();
-
 	try {
 		_AddAccountInfo(content);
 		_AddBIOSInfo(content);
@@ -117,8 +114,6 @@ Inventory::Build(bool noSoftware)
 	} catch (...) {
 		// Something failed.
 	}
-
-	fMachine = NULL;
 
 	logger.Log(LOG_INFO, "Building inventory... Done!");
 	return true;

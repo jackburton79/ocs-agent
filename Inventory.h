@@ -50,7 +50,6 @@ private:
 
     tinyxml2::XMLDocument* fDocument;
     tinyxml2::XMLElement* fContent;
-	Machine* fMachine;
 };
 
 #endif /* INVENTORY_H_ */

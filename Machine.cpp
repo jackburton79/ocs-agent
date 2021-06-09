@@ -33,8 +33,6 @@ typedef std::map<std::string, std::string> string_map;
 
 const char* kMemoryDevice = "Memory Device";
 
-static Machine* sMachine = NULL;
-
 
 std::map<std::string, Component> gComponents;
 
@@ -138,91 +136,6 @@ OSInfoBackend::Run()
 	gComponents["OS"].MergeWith(os);
 	return 0;
 }
-
-
-// Machine
-/* static */
-Machine*
-Machine::Get()
-{
-	if (sMachine == NULL)
-		sMachine = new Machine();
-	return sMachine;
-}
-
-
-Machine::Machine()
-{
-}
-
-
-Machine::~Machine()
-{
-}
-
-
-int
-Machine::CountMemories()
-{
-	return fMemoryInfo.size();
-}
-
-
-std::string
-Machine::MemoryCaption(int num)
-{
-	return fMemoryInfo.at(num).caption;
-}
-
-
-std::string
-Machine::MemoryDescription(int num)
-{
-	return fMemoryInfo.at(num).description;
-}
-
-
-std::string
-Machine::MemoryCapacity(int num)
-{
-	return fMemoryInfo.at(num).Size();
-}
-
-
-std::string
-Machine::MemoryPurpose(int num)
-{
-	return fMemoryInfo.at(num).purpose;
-}
-
-
-std::string
-Machine::MemoryType(int num)
-{
-	return fMemoryInfo.at(num).Type();
-}
-
-
-std::string
-Machine::MemorySpeed(int num)
-{
-	return fMemoryInfo.at(num).Speed();
-}
-
-
-std::string
-Machine::MemoryNumSlot(int num)
-{
-	return int_to_string(num + 1);
-}
-
-
-std::string
-Machine::MemorySerialNumber(int num)
-{
-	return fMemoryInfo.at(num).serial;
-}
-
 
 
 /*

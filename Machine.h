@@ -50,25 +50,5 @@ public:
 typedef std::map<std::string, Component> components_map;
 extern components_map gComponents;
 
-class Machine {
-public:
-	static Machine* Get();
-
-	int CountMemories();
-	std::string MemoryCaption(int num);
-	std::string MemoryDescription(int num);
-	std::string MemoryCapacity(int num);
-	std::string MemoryPurpose(int num);
-	std::string MemoryType(int num);
-	std::string MemorySpeed(int num);
-	std::string MemoryNumSlot(int num);
-	std::string MemorySerialNumber(int num);
-
-private:
-	Machine();
-	~Machine();
-
-	std::vector<memory_device_info> fMemoryInfo;
-};
 
 #endif /* MACHINE_H_ */
