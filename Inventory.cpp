@@ -544,9 +544,7 @@ Inventory::_AddMemoriesInfo(tinyxml2::XMLElement* parent)
 		speed->LinkEndChild(fDocument->NewText(ramSlot.fields["speed"].c_str()));
 		memory->LinkEndChild(speed);
 
-		std::ostringstream numSlotString;
-		numSlotString << (slotNum + 1);
-		numSlots->LinkEndChild(fDocument->NewText(numSlotString.str().c_str()));
+		numSlots->LinkEndChild(fDocument->NewText(int_to_string(slotNum + 1).c_str()));
 		memory->LinkEndChild(numSlots);
 
 		serial->LinkEndChild(fDocument->NewText(ramSlot.fields["serial"].c_str()));
