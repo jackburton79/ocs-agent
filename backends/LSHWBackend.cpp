@@ -87,7 +87,8 @@ LSHWBackend::Run()
 		gComponents["GRAPHICS"].MergeWith(info);
 	}
 
-	/*if (fMemoryInfo.size() == 0) {
+	int slotNum = 0;
+	{
 		const size_t memoryLength = ::strlen("memory");
 		element = XML::GetElementByAttribute(doc, "id", "memory", XML::match_partial);
 		while (element != NULL) {
@@ -98,36 +99,39 @@ LSHWBackend::Run()
 			const tinyxml2::XMLElement* bankElement
 				= XML::GetElementByAttribute(*element, "id", "bank", XML::match_partial);
 			if (bankElement == NULL) {
+				Component ramSlot;
 				// In some cases (VMs for example), there is no "bank" element
-				memory_device_info info;
-				info.caption = memoryCaption;
-				info.purpose = info.caption;
+				ramSlot.fields["caption"] = memoryCaption;
+				ramSlot.fields["purpose"] = ramSlot.fields["caption"];
 				tmpElement = element->FirstChildElement("size");
 				if (tmpElement != NULL) {
-					memory_device_info info;
-					info.caption = memoryCaption;
-					info.purpose = info.caption;
-					info.size = ::strtoul(tmpElement->GetText(), NULL, 10) / (1024 * 1024);
-					fMemoryInfo.push_back(info);
+					ramSlot.fields["size"] = ::strtoul(tmpElement->GetText(), NULL, 10) / (1024 * 1024);
+					std::ostringstream s;
+					s << "MEMORY" << slotNum;
+					gComponents[s.str().c_str()] = ramSlot;
+					slotNum++;
 				}
 			} else {
 				while (bankElement != NULL) {
-					memory_device_info info;
-					info.caption = memoryCaption;
-					info.purpose = info.caption;
-					info.description = XML::GetFirstChildElementText(bankElement, "description");
-					info.type = RAM_type_from_description(info.description);
-					info.serial = XML::GetFirstChildElementText(bankElement, "serial");
+					Component ramSlot;
+					ramSlot.fields["caption"] = memoryCaption;
+					ramSlot.fields["purpose"] = memoryCaption;
+					ramSlot.fields["description"] = XML::GetFirstChildElementText(bankElement, "description");
+					//info.type = RAM_type_from_description(info.description);
+					ramSlot.fields["serial"] = XML::GetFirstChildElementText(bankElement, "serial");
 
 					tmpElement = bankElement->FirstChildElement("clock");
 					if (tmpElement != NULL) {
 						// In Hz, usually, but we should check the unit
-						info.speed = ::strtoul(tmpElement->GetText(), NULL, 10) / (1000 * 1000);
+						ramSlot.fields["speed"] = ::strtoul(tmpElement->GetText(), NULL, 10) / (1000 * 1000);
 					}
 					tmpElement = bankElement->FirstChildElement("size");
 					if (tmpElement != NULL) {
-						info.size = ::strtoul(tmpElement->GetText(), NULL, 10) / (1024 * 1024);
-						fMemoryInfo.push_back(info);
+						ramSlot.fields["size"] = ::strtoul(tmpElement->GetText(), NULL, 10) / (1024 * 1024);
+						std::ostringstream s;
+						s << "MEMORY" << slotNum;
+						gComponents[s.str().c_str()] = ramSlot;
+						slotNum++;
 					}
 					bankElement = bankElement->NextSiblingElement();
 				}
@@ -139,7 +143,7 @@ LSHWBackend::Run()
 					break;
 			}
 		}
-	}*/
+	}
 
 	return 0;
 }

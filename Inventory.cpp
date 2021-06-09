@@ -506,7 +506,14 @@ Inventory::_AddMemoriesInfo(tinyxml2::XMLElement* parent)
 {
 	Logger& logger = Logger::GetDefault();
 
-	for (int i = 0; i < fMachine->CountMemories(); i++) {
+	int slotNum = 0;
+	for (;;) {
+		std::ostringstream s;
+		s << "MEMORY" << slotNum;
+		std::map<std::string, Component>::iterator i = gComponents.find(s.str());
+		if (i == gComponents.end())
+			break;
+
 		tinyxml2::XMLElement* memory = fDocument->NewElement("MEMORIES");
 
 		tinyxml2::XMLElement* description = fDocument->NewElement("DESCRIPTION");
@@ -518,31 +525,35 @@ Inventory::_AddMemoriesInfo(tinyxml2::XMLElement* parent)
 		tinyxml2::XMLElement* numSlots = fDocument->NewElement("NUMSLOTS");
 		tinyxml2::XMLElement* serial = fDocument->NewElement("SERIALNUMBER");
 
-		description->LinkEndChild(fDocument->NewText(fMachine->MemoryDescription(i).c_str()));
+		Component ramSlot = i->second;
+		description->LinkEndChild(fDocument->NewText(ramSlot.fields["description"].c_str()));
 		memory->LinkEndChild(description);
 
-		caption->LinkEndChild(fDocument->NewText(fMachine->MemoryCaption(i).c_str()));
+		caption->LinkEndChild(fDocument->NewText(ramSlot.fields["caption"].c_str()));
 		memory->LinkEndChild(caption);
 
-		capacity->LinkEndChild(fDocument->NewText(fMachine->MemoryCapacity(i).c_str()));
+		capacity->LinkEndChild(fDocument->NewText(ramSlot.fields["size"].c_str()));
 		memory->LinkEndChild(capacity);
 
-		purpose->LinkEndChild(fDocument->NewText(fMachine->MemoryPurpose(i).c_str()));
+		purpose->LinkEndChild(fDocument->NewText(ramSlot.fields["purpose"].c_str()));
 		memory->LinkEndChild(purpose);
 
-		type->LinkEndChild(fDocument->NewText(fMachine->MemoryType(i).c_str()));
+		type->LinkEndChild(fDocument->NewText(ramSlot.fields["type"].c_str()));
 		memory->LinkEndChild(type);
 
-		speed->LinkEndChild(fDocument->NewText(fMachine->MemorySpeed(i).c_str()));
+		speed->LinkEndChild(fDocument->NewText(ramSlot.fields["speed"].c_str()));
 		memory->LinkEndChild(speed);
 
-		numSlots->LinkEndChild(fDocument->NewText(fMachine->MemoryNumSlot(i).c_str()));
+		std::ostringstream numSlotString;
+		numSlotString << (slotNum + 1);
+		numSlots->LinkEndChild(fDocument->NewText(numSlotString.str().c_str()));
 		memory->LinkEndChild(numSlots);
 
-		serial->LinkEndChild(fDocument->NewText(fMachine->MemorySerialNumber(i).c_str()));
+		serial->LinkEndChild(fDocument->NewText(ramSlot.fields["serial"].c_str()));
 		memory->LinkEndChild(serial);
 
 		parent->LinkEndChild(memory);
+		slotNum++;
 	}
 	logger.Log(LOG_DEBUG, "\tAdded Memory Info!");
 }
