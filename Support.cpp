@@ -144,9 +144,14 @@ RAM_type_from_description(const std::string& description)
 			type = "SDRAM";
 		else if (description.find("FLASH") != std::string::npos)
 			type = "FLASH";
+		else if (description.find("DDR4") != std::string::npos)
+			type = "DDR4";
+		else if (description.find("DDR3") != std::string::npos)
+			type = "DDR3";
+		else if (description.find("DDR2") != std::string::npos)
+			type = "DDR2";
 		else if (description.find("DDR") != std::string::npos)
 			type = "DDR";
-		// TODO: Yeah, and DDR2 ? DDR3 ?
 		// TODO: Handle empty slots like we do for dmidecode
 	}
 	return type;
