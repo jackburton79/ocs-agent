@@ -235,7 +235,7 @@ DMIDecodeBackend::_ExtractDataFromDMIDB(dmi_db dmiDb)
 	int slotNum = 0;
 	std::ostringstream s;
 	s << "MEMORY" << slotNum;
-	std::map<std::string, Component>::iterator ramSlotIterator = gComponents.find(s.str());
+	components_map::iterator ramSlotIterator = gComponents.find(s.str());
 	// already some slot info, bail out
 	if (ramSlotIterator != gComponents.end()) {
 		// just log. dmidecode's output is usually better than other backends's

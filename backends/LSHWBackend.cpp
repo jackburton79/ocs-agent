@@ -100,7 +100,7 @@ LSHWBackend::Run()
 	int slotNum = 0;
 	std::ostringstream s;
 	s << "MEMORY" << slotNum;
-	std::map<std::string, Component>::iterator ramSlotIterator = gComponents.find(s.str());
+	components_map::iterator ramSlotIterator = gComponents.find(s.str());
 	// already some slot info, bail out: from experience, LSHW's output
 	// for ram slots is less nice than dmidecode's
 	if (ramSlotIterator != gComponents.end())
