@@ -15,7 +15,7 @@ public:
 	DMIDataBackend();
 	~DMIDataBackend();
 
-	int Run();
+	virtual int Run();
 };
 
 #endif /* DMIDATABACKEND_H_ */

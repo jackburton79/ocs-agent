@@ -13,6 +13,7 @@ public:
 	DataBackend();
 	virtual ~DataBackend();
 
+	virtual bool IsAvailable() const { return true; };
 	virtual int Run() = 0;
 };
 

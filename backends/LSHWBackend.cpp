@@ -26,11 +26,21 @@ LSHWBackend::~LSHWBackend()
 
 
 /* virtual */
-int
-LSHWBackend::Run()
+bool
+LSHWBackend::IsAvailable() const
 {
 	if (!CommandExists("lshw"))
 		return false;
+	return true;
+}
+
+
+/* virtual */
+int
+LSHWBackend::Run()
+{
+	if (!IsAvailable())
+		return -1;
 
 	// Load command output into "string"
 	CommandStreamBuffer lshw("lshw -xml", "r");

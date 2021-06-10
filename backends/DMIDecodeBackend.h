@@ -21,6 +21,7 @@ class DMIDecodeBackend : public DataBackend {
 public:
 	DMIDecodeBackend();
 	virtual ~DMIDecodeBackend();
+	virtual bool IsAvailable() const;
 	virtual int Run();
 private:
 	void _ExtractDataFromDMIDB(dmi_db dmiDb);

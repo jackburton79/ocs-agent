@@ -27,12 +27,21 @@ DMIDecodeBackend::~DMIDecodeBackend()
 }
 
 
+/* virtual */
+bool
+DMIDecodeBackend::IsAvailable() const
+{
+	if (!CommandExists("dmidecode"))
+		return false;
+	return true;
+}
+
 
 /* virtual */
 int
 DMIDecodeBackend::Run()
 {
-	if (!CommandExists("dmidecode"))
+	if (!IsAvailable())
 		return -1;
 
 	try {

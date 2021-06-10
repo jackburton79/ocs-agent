@@ -15,6 +15,7 @@ public:
 	LSHWBackend();
 	virtual ~LSHWBackend();
 
+	virtual bool IsAvailable() const;
 	virtual int Run();
 };
 
