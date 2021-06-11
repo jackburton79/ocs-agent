@@ -16,7 +16,7 @@ when the terminal is powered off, since it's a in-RAM filesystem).
 So I decided to write a small agent in C++ to be able to inventory also those machines which I was not able to do with the official agent.
 The agent is not complete yet, but it can already produce an inventory of the machine and send it to the 
 OCSInventory server, or save it locally.
-The compiled program weights around 300kb on disk for now, and only has zlib and openssl as dependency, which are already present on any Thinstation installation.
+The compiled program weights around 500kb on disk, and only has zlib and openssl as dependency, which are already present on any Thinstation installation.
 It also uses [tinyxml2](http://www.grinninglizard.com/tinyxml2), a very small and efficient XML parsing/writing library, linked statically into the executable.
 This is not the official OCSInventory NG agent, which can be found here: https://github.com/OCSInventory-NG/UnixAgent
 
