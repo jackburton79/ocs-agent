@@ -2907,7 +2907,7 @@ static int edid_from_file(const char *from_file, struct edid_info* info)
 	unsigned char *edid;
 	unsigned char *x;
 	time_t the_time;
-	struct tm *ptm;
+	struct tm *ptm, ptm_struct;
 	int analog, i;
 	unsigned col_x, col_y;
 
@@ -2972,7 +2972,7 @@ static int edid_from_file(const char *from_file, struct edid_info* info)
 	int year = 0;
 
 	time(&the_time);
-	ptm = localtime(&the_time);
+	ptm = localtime_r(&the_time, &ptm_struct);
 	if (edid[0x10] < 55 || (edid[0x10] == 0xff && claims_one_point_four)) {
 		has_valid_week = 1;
 		if (edid[0x11] > 0x0f) {
