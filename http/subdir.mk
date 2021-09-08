@@ -3,7 +3,7 @@
 ################################################################################
 
 # Add inputs and outputs from these tool invocations to the build variables 
-CPP_SRCS += \
+LOCAL_CPP_SRCS = \
 ../http/HTTP.cpp \
 ../http/HTTPDefines.cpp \
 ../http/HTTPHeader.cpp \
@@ -15,29 +15,12 @@ CPP_SRCS += \
 ../http/URL.cpp \
 ../http/Utils.cpp 
 
-OBJS += \
-./http/HTTP.o \
-./http/HTTPDefines.o \
-./http/HTTPHeader.o \
-./http/HTTPRequestHeader.o \
-./http/HTTPResponseHeader.o \
-./http/Socket.o \
-./http/SocketGetter.o \
-./http/SSLSocket.o \
-./http/URL.o \
-./http/Utils.o 
+LOCALOBJECTS= $(addprefix ./http/, $(notdir $(LOCAL_CPP_SRCS:.cpp=.o)))
+LOCALDEPS= $(addprefix ./http/, $(notdir $(LOCALOBJECTS:.o=.d)))
 
-CPP_DEPS += \
-./http/HTTP.d \
-./http/HTTPDefines.d \
-./http/HTTPHeader.d \
-./http/HTTPRequestHeader.d \
-./http/HTTPResponseHeader.d \
-./http/Socket.d \
-./http/SocketGetter.d \
-./http/SSLSocket.d \
-./http/URL.d \
-./http/Utils.d
+SOURCES+= $(LOCAL_CPP_SRCS)
+OBJS += $(LOCALOBJECTS)
+DEPS += $(LOCALDEPS)
 
 
 # Each subdirectory must supply rules for building sources it contributes

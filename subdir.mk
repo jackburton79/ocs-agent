@@ -3,7 +3,7 @@
 ################################################################################
 
 # Add inputs and outputs from these tool invocations to the build variables 
-CPP_SRCS += \
+LOCAL_CPP_SRCS = \
 ../Agent.cpp \
 ../Configuration.cpp \
 ../Inventory.cpp \
@@ -21,50 +21,18 @@ CPP_SRCS += \
 ../UsersRoster.cpp \
 ../VolumeRoster.cpp \
 ../XML.cpp \
-../ZLibCompressor.cpp \
+../ZLibCompressor.cpp
+
+LOCAL_C_SRCS = \
 ../edid-decode.c
 
-OBJS += \
-./Agent.o \
-./Configuration.o \
-./Inventory.o \
-./Logger.o \
-./Machine.o \
-./NetworkInterface.o \
-./NetworkRoster.o \
-./Processors.o \
-./ProcReader.o \
-./ProcessRoster.o \
-./Screens.o \
-./Softwares.o \
-./StorageRoster.o \
-./Support.o \
-./UsersRoster.o \
-./VolumeRoster.o \
-./XML.o \
-./ZLibCompressor.o \
-./edid-decode.o 
+LOCALOBJECTS= $(addprefix ./, $(notdir $(LOCAL_CPP_SRCS:.cpp=.o)))
+LOCALOBJECTS+= $(addprefix ./, $(notdir $(LOCAL_C_SRCS:.c=.o)))
+LOCALDEPS= $(addprefix ./, $(notdir $(LOCALOBJECTS:.o=.d)))
 
-CPP_DEPS += \
-./Agent.d \
-./Configuration.d \
-./Inventory.d \
-./Logger.d \
-./Machine.d \
-./NetworkInterface.d \
-./NetworkRoster.d \
-./Processors.d \
-./ProcReader.d \
-./ProcessRoster.d \
-./Screens.d \
-./Sofwares.d \
-./StorageRoster.d \
-./Support.d \
-./UsersRoster.d \
-./VolumeRoster.d \
-./XML.d \
-./ZLibCompressor.d \
-./edid-decode.d 
+SOURCES+= $(LOCALSOURCES)
+OBJS += $(LOCALOBJECTS)
+DEPS += $(LOCALDEPS)
 
 
 # Each subdirectory must supply rules for building sources it contributes

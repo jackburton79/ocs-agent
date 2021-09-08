@@ -3,7 +3,7 @@
 ################################################################################
 
 # Add inputs and outputs from these tool invocations to the build variables 
-CPP_SRCS += \
+LOCAL_CPP_SRCS = \
 ../backends/DataBackend.cpp \
 ../backends/DMIDataBackend.cpp \
 ../backends/DMIDecodeBackend.cpp \
@@ -11,21 +11,12 @@ CPP_SRCS += \
 ../backends/MemInfoBackend.cpp \
 ../backends/UnameBackend.cpp \
 
-OBJS += \
-./backends/DataBackend.o \
-./backends/DMIDataBackend.o \
-./backends/DMIDecodeBackend.o \
-./backends/LSHWBackend.o \
-./backends/MemInfoBackend.o \
-./backends/UnameBackend.o \
+LOCALOBJECTS= $(addprefix ./backends/, $(notdir $(LOCAL_CPP_SRCS:.cpp=.o)))
+LOCALDEPS= $(addprefix ./backends/, $(notdir $(LOCALOBJECTS:.o=.d)))
 
-CPP_DEPS += \
-./backends/DataBackend.d \
-./backends/DMIDataBackend.d \
-./backends/DMIDecodeBackend.d \
-./backends/LSHWBackend.d \
-./backends/MemInfoBackend.d \
-./backends/UnameBackend.d \
+SOURCES+= $(LOCAL_CPP_SRCS)
+OBJS += $(LOCALOBJECTS)
+DEPS += $(LOCALDEPS)
 
 # Each subdirectory must supply rules for building sources it contributes
 backends/%.o: ../backends/%.cpp
