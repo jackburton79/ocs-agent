@@ -14,7 +14,7 @@ typedef std::map<std::string, std::string> string_map;
 
 const char* kBIOSInfo = "BIOS Information";
 const char* kSystemInfo = "System Information";
-const char* kProcessorInfo = "Processor Info";
+const char* kProcessorInfo = "Processor Information";
 const char* kMemoryDevice = "Memory Device";
 
 DMIDecodeBackend::DMIDecodeBackend()
@@ -203,6 +203,14 @@ DMIDecodeBackend::_ExtractDataFromDMIDB(dmi_db dmiDb)
 	boardInfo.fields["serial"] = GetValueFromMap(dmiDb, "Serial Number", "Base Board Information");
 	gComponents["BOARD"].MergeWith(boardInfo);
 
+	// TODO: multiple cpus
+	Component cpuInfo;
+	cpuInfo.fields["manufacturer"] = GetValueFromMap(dmiDb, "Manufacturer", kProcessorInfo);
+	cpuInfo.fields["speed"] = GetValueFromMap(dmiDb, "Max Speed", kProcessorInfo);
+	cpuInfo.fields["type"] = GetValueFromMap(dmiDb, "Version", kProcessorInfo);
+	cpuInfo.fields["serial"] = GetValueFromMap(dmiDb, "Serial Number", kProcessorInfo);
+	cpuInfo.fields["cores"] = GetValueFromMap(dmiDb, "Core Count", kProcessorInfo);
+	gComponents["CPU"].MergeWith(cpuInfo);
 
 	std::vector<string_map> valuesVector;
 	DMIExtractor dmiExtractor(dmiDb);
