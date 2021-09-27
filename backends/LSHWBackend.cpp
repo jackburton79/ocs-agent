@@ -87,6 +87,16 @@ LSHWBackend::Run()
 		gComponents["BOARD"].MergeWith(boardInfo);
 	}
 
+	// TODO: multiple cpus
+	element = XML::GetElementByAttribute(doc, "class", "system");
+	if (element != NULL) {
+		Component cpuInfo;
+		cpuInfo.fields["manufacturer"] = XML::GetFirstChildElementText(element, "vendor");
+		cpuInfo.fields["speed"] = XML::GetFirstChildElementText(element, "capacity");
+		cpuInfo.fields["type"] = XML::GetFirstChildElementText(element, "product");
+		cpuInfo.fields["serial"] = XML::GetFirstChildElementText(element, "serial");
+		gComponents["CPU"].MergeWith(cpuInfo);
+	}
 	element = XML::GetElementByAttribute(doc, "id", "display");
 	if (element != NULL) {
 		// TODO: there could be multiple displays
