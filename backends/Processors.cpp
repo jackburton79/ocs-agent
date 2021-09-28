@@ -4,24 +4,39 @@
  *      Author: Stefano Ceccherini
  */
 
-#include "Processors.h"
-
+#include <backends/Processors.h>
 #include "ProcReader.h"
 #include "Support.h"
 
 #include <iostream>
 #include <map>
 
+struct processor_info {
+       int physical_id;
+       std::string manufacturer;
+       std::string Manufacturer() const;
+       std::string type;
+       std::string arch;
+       std::string Speed() const;
+       std::string cores;
+       std::string logical_cpus;
+       std::string cache_size;
+       std::string serial;
+       std::string speed;
+};
+
 Processors::Processors()
 {
 	_GetCPUInfo();
-	Rewind();
 }
 
 
 void
 Processors::_GetCPUInfo()
 {
+#if 1
+	return;
+#else
 	ProcReader cpuReader("/proc/cpuinfo");
 	std::istream iStream(&cpuReader);
 
@@ -100,6 +115,7 @@ Processors::_GetCPUInfo()
 			*it = processorInfo;
 		}
 	}
+#endif
 }
 
 
