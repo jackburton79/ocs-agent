@@ -97,6 +97,10 @@ LSHWBackend::Run()
 		cpuInfo.fields["speed"] = CPUSpeed;
 		cpuInfo.fields["type"] = XML::GetFirstChildElementText(element, "product");
 		cpuInfo.fields["serial"] = XML::GetFirstChildElementText(element, "serial");
+
+		std::string dataWidthString = XML::GetFirstChildElementText(element, "width");
+		std::string dataWidth = int_to_string(::strtol(dataWidthString.c_str(), NULL, 0));
+		cpuInfo.fields["width"] = dataWidth;
 		gComponents.Merge("CPU", cpuInfo);
 	}
 	element = XML::GetElementByAttribute(doc, "id", "display");
