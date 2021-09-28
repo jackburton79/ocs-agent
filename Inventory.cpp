@@ -411,8 +411,10 @@ Inventory::_AddCPUsInfo(tinyxml2::XMLElement* parent)
 			fDocument->NewText(cpuInfo.fields["manufacturer"].c_str()));
 		serial->LinkEndChild(
 			fDocument->NewText(cpuInfo.fields["serial"].c_str()));
+
+		std::string CPUSpeed = int_to_string(::strtol(cpuInfo.fields["speed"].c_str(), NULL, 0));
 		speed->LinkEndChild(
-			fDocument->NewText(cpuInfo.fields["speed"].c_str()));
+			fDocument->NewText(CPUSpeed.c_str()));
 		model->LinkEndChild(
 			fDocument->NewText(cpuInfo.fields["type"].c_str()));
 		cores->LinkEndChild(
