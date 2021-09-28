@@ -383,62 +383,65 @@ Inventory::_AddCPUsInfo(tinyxml2::XMLElement* parent)
 {
 	Logger& logger = Logger::GetDefault();
 
-	Component& cpuInfo = gComponents["CPU"];
-	// TODO: This is not completely correct: We could have a 64 bit capable CPU on
-	// a 32 bit OS.
-	//TODO: multiple CPUs
-	// TODO: Need something like "AddElement("NAME", "VALUE");
-	tinyxml2::XMLElement* cpu = fDocument->NewElement("CPUS");
-	tinyxml2::XMLElement* manufacturer = fDocument->NewElement("MANUFACTURER");
-	tinyxml2::XMLElement* serial = fDocument->NewElement("SERIAL");
-	tinyxml2::XMLElement* speed = fDocument->NewElement("SPEED");
-	tinyxml2::XMLElement* model = fDocument->NewElement("TYPE");
-	tinyxml2::XMLElement* arch = fDocument->NewElement("CPUARCH");
-	tinyxml2::XMLElement* dataWidth = fDocument->NewElement("DATA_WIDTH");
-	tinyxml2::XMLElement* currentAddressWidth = fDocument->NewElement("CURRENT_ADDRESS_WIDTH");
-	tinyxml2::XMLElement* cores = fDocument->NewElement("CORES");
-	tinyxml2::XMLElement* cacheSize = fDocument->NewElement("L2CACHESIZE");
-	tinyxml2::XMLElement* logicalCpu = fDocument->NewElement("LOGICAL_CPUS");
+	std::pair<components_map::iterator, components_map::iterator> CPUs = gComponents.equal_range("CPU");
+	size_t cpuCount = 0;
+	for (components_map::iterator i = CPUs.first; i != CPUs.second; i++) {
+		cpuCount++;
+		Component& cpuInfo = (*i).second;
+		// TODO: This is not completely correct: We could have a 64 bit capable CPU on
+		// a 32 bit OS.
+		// TODO: Need something like "AddElement("NAME", "VALUE");
+		tinyxml2::XMLElement* cpu = fDocument->NewElement("CPUS");
+		tinyxml2::XMLElement* manufacturer = fDocument->NewElement("MANUFACTURER");
+		tinyxml2::XMLElement* serial = fDocument->NewElement("SERIAL");
+		tinyxml2::XMLElement* speed = fDocument->NewElement("SPEED");
+		tinyxml2::XMLElement* model = fDocument->NewElement("TYPE");
+		tinyxml2::XMLElement* arch = fDocument->NewElement("CPUARCH");
+		tinyxml2::XMLElement* dataWidth = fDocument->NewElement("DATA_WIDTH");
+		tinyxml2::XMLElement* currentAddressWidth = fDocument->NewElement("CURRENT_ADDRESS_WIDTH");
+		tinyxml2::XMLElement* cores = fDocument->NewElement("CORES");
+		tinyxml2::XMLElement* cacheSize = fDocument->NewElement("L2CACHESIZE");
+		tinyxml2::XMLElement* logicalCpu = fDocument->NewElement("LOGICAL_CPUS");
 
-	std::string dataWidthString = "32";
-	if (gComponents["OS"].fields["architecture"] == "x86_64")
-		dataWidthString = "64";
+		std::string dataWidthString = "32";
+		if (gComponents["OS"].fields["architecture"] == "x86_64")
+			dataWidthString = "64";
 
-	manufacturer->LinkEndChild(
-		fDocument->NewText(cpuInfo.fields["manufacturer"].c_str()));
-	serial->LinkEndChild(
-		fDocument->NewText(cpuInfo.fields["serial"].c_str()));
-	speed->LinkEndChild(
-		fDocument->NewText(cpuInfo.fields["speed"].c_str()));
-	model->LinkEndChild(
-		fDocument->NewText(cpuInfo.fields["type"].c_str()));
-	cores->LinkEndChild(
-		fDocument->NewText(cpuInfo.fields["cores"].c_str()));
-	arch->LinkEndChild(
-		fDocument->NewText(gComponents["OS"].fields["architecture"].c_str()));
-	dataWidth->LinkEndChild(
-		fDocument->NewText(dataWidthString.c_str()));
-	// Not a copy/paste error: the fields are the same
-	currentAddressWidth->LinkEndChild(
+		manufacturer->LinkEndChild(
+			fDocument->NewText(cpuInfo.fields["manufacturer"].c_str()));
+		serial->LinkEndChild(
+			fDocument->NewText(cpuInfo.fields["serial"].c_str()));
+		speed->LinkEndChild(
+			fDocument->NewText(cpuInfo.fields["speed"].c_str()));
+		model->LinkEndChild(
+			fDocument->NewText(cpuInfo.fields["type"].c_str()));
+		cores->LinkEndChild(
+			fDocument->NewText(cpuInfo.fields["cores"].c_str()));
+		arch->LinkEndChild(
+			fDocument->NewText(gComponents["OS"].fields["architecture"].c_str()));
+		dataWidth->LinkEndChild(
 			fDocument->NewText(dataWidthString.c_str()));
-	cacheSize->LinkEndChild(
-		fDocument->NewText(cpuInfo.fields["cache_size"].c_str()));
-	logicalCpu->LinkEndChild(
-		fDocument->NewText(cpuInfo.fields["logical_cpus"].c_str()));
+		// Not a copy/paste error: the fields are the same
+		currentAddressWidth->LinkEndChild(
+				fDocument->NewText(dataWidthString.c_str()));
+		cacheSize->LinkEndChild(
+			fDocument->NewText(cpuInfo.fields["cache_size"].c_str()));
+		logicalCpu->LinkEndChild(
+			fDocument->NewText(cpuInfo.fields["logical_cpus"].c_str()));
 
-	cpu->LinkEndChild(model);
-	cpu->LinkEndChild(manufacturer);
-	cpu->LinkEndChild(serial);
-	cpu->LinkEndChild(speed);
-	cpu->LinkEndChild(cores);
-	cpu->LinkEndChild(arch);
-	cpu->LinkEndChild(dataWidth);
-	cpu->LinkEndChild(currentAddressWidth);
-	cpu->LinkEndChild(cacheSize);
-	cpu->LinkEndChild(logicalCpu);
+		cpu->LinkEndChild(model);
+		cpu->LinkEndChild(manufacturer);
+		cpu->LinkEndChild(serial);
+		cpu->LinkEndChild(speed);
+		cpu->LinkEndChild(cores);
+		cpu->LinkEndChild(arch);
+		cpu->LinkEndChild(dataWidth);
+		cpu->LinkEndChild(currentAddressWidth);
+		cpu->LinkEndChild(cacheSize);
+		cpu->LinkEndChild(logicalCpu);
 
-	parent->LinkEndChild(cpu);
-
+		parent->LinkEndChild(cpu);
+	}
 	logger.Log(LOG_DEBUG, "\tAdded CPUs Info!");
 }
 
