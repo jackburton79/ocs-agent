@@ -4,12 +4,12 @@
  *      Author: Stefano Ceccherini
  */
 
-#include <backends/Processors.h>
 #include "ProcReader.h"
 #include "Support.h"
 
 #include <iostream>
 #include <map>
+#include "CPUInfoBackend.h"
 
 struct processor_info {
        int physical_id;

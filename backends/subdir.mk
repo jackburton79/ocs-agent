@@ -4,6 +4,7 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 LOCAL_CPP_SRCS = \
+../backends/CPUInfoBackend.cpp \
 ../backends/DataBackend.cpp \
 ../backends/DMIDataBackend.cpp \
 ../backends/DMIDecodeBackend.cpp \

@@ -11,7 +11,6 @@ LOCAL_CPP_SRCS = \
 ../Machine.cpp \
 ../NetworkInterface.cpp \
 ../NetworkRoster.cpp \
-../Processors.cpp \
 ../ProcReader.cpp \
 ../ProcessRoster.cpp \
 ../Screens.cpp \
