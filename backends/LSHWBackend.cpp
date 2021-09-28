@@ -92,7 +92,9 @@ LSHWBackend::Run()
 	if (element != NULL) {
 		Component cpuInfo;
 		cpuInfo.fields["manufacturer"] = XML::GetFirstChildElementText(element, "vendor");
-		cpuInfo.fields["speed"] = XML::GetFirstChildElementText(element, "capacity");
+		std::string CPUSpeedWithUnit = XML::GetFirstChildElementText(element, "capacity");
+		std::string CPUSpeed = int_to_string(::strtol(CPUSpeedWithUnit.c_str(), NULL, 0));
+		cpuInfo.fields["speed"] = CPUSpeed;
 		cpuInfo.fields["type"] = XML::GetFirstChildElementText(element, "product");
 		cpuInfo.fields["serial"] = XML::GetFirstChildElementText(element, "serial");
 		gComponents.Merge("CPU", cpuInfo);
