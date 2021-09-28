@@ -91,7 +91,7 @@ LSHWBackend::Run()
 	element = XML::GetElementByAttribute(doc, "class", "system");
 	if (element != NULL) {
 		Component cpuInfo;
-		cpuInfo.fields["manufacturer"] = XML::GetFirstChildElementText(element, "vendor");
+		cpuInfo.fields["vendor"] = XML::GetFirstChildElementText(element, "vendor");
 		std::string CPUSpeedWithUnit = XML::GetFirstChildElementText(element, "capacity");
 		std::string CPUSpeed = int_to_string(::strtol(CPUSpeedWithUnit.c_str(), NULL, 0));
 		cpuInfo.fields["speed"] = CPUSpeed;

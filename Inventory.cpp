@@ -408,7 +408,7 @@ Inventory::_AddCPUsInfo(tinyxml2::XMLElement* parent)
 			dataWidthString = "64";
 
 		manufacturer->LinkEndChild(
-			fDocument->NewText(cpuInfo.fields["manufacturer"].c_str()));
+			fDocument->NewText(cpuInfo.fields["vendor"].c_str()));
 		serial->LinkEndChild(
 			fDocument->NewText(cpuInfo.fields["serial"].c_str()));
 
