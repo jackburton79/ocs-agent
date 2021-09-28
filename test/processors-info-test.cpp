@@ -5,21 +5,28 @@
  *      Author: Stefano Ceccherini
  */
 
-#include <backends/Processors.h>
+#include "backends/DMIDecodeBackend.h"
+#include "backends/LSHWBackend.h"
+#include "Machine.h"
 #include <iostream>
 
 int main()
 {
-	processor_info cpuInfo;
-	Processors CPUs;
-	while (CPUs.GetNext(cpuInfo)) {
-		std::cout << "MANUFACTURER:" << cpuInfo.Manufacturer() << "(" << cpuInfo.manufacturer << ")" << std::endl;
-		std::cout << "SERIAL:" << cpuInfo.serial << std::endl;
-		std::cout << "SPEED:" << cpuInfo.Speed() << std::endl;
-		std::cout << "TYPE:" << cpuInfo.type << std::endl;
-		std::cout << "CORES:" << cpuInfo.cores << std::endl;
-		std::cout << "LOGICAL CPUs:" << cpuInfo.logical_cpus << std::endl;
-		std::cout << "L2CACHESIZE:" << cpuInfo.cache_size << std::endl;
+	DMIDecodeBackend().Run();
+	LSHWBackend().Run();
+	std::pair<components_map::iterator, components_map::iterator> CPUs = gComponents.equal_range("CPU");
+	size_t cpuCount = 0;
+	for (components_map::iterator i = CPUs.first; i != CPUs.second; i++) {
+		Component& cpuInfo = i->second;
+		cpuCount++;
+		std::cout << "CPU " << cpuCount << ":" << std::endl;
+		std::cout << "MANUFACTURER:" << cpuInfo.fields["vendor"] << std::endl;
+		std::cout << "SERIAL:" << cpuInfo.fields["serial"] << std::endl;
+		std::cout << "SPEED:" << cpuInfo.fields["speed"] << std::endl;
+		std::cout << "TYPE:" << cpuInfo.fields["type"] << std::endl;
+		std::cout << "CORES:" << cpuInfo.fields["cores"] << std::endl;
+		std::cout << "LOGICAL CPUs:" << cpuInfo.fields["logical_cpus"] << std::endl;
+		std::cout << "L2CACHESIZE:" << cpuInfo.fields["cache_size"] << std::endl;
 	}
 }
 
