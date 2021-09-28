@@ -29,7 +29,23 @@ public:
 	void MergeWith(Component& component);
 };
 
-typedef std::map<std::string, Component> components_map;
+class components_map : public std::multimap<std::string, Component> {
+public:
+	void Merge(const std::string& string, Component c) {
+		components_map::iterator i = find(string);
+		if (i != end())
+			(*i).second.MergeWith(c);
+		else
+			insert( { string, c } );
+	};
+	Component& operator[](const std::string& string) {
+		components_map::iterator i = find(string);
+		if (i != end())
+			return (*i).second;
+		throw std::runtime_error("operator[]: no element");
+	}
+};
+
 extern components_map gComponents;
 
 

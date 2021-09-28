@@ -50,7 +50,7 @@ MemInfoBackend::Run()
 		}
 	}
 
-	gComponents["OS"].MergeWith(os);
+	gComponents.Merge("OS", os);
 
 	return 0;
 }

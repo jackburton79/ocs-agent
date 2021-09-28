@@ -177,7 +177,7 @@ DMIDecodeBackend::_ExtractDataFromDMIDB(dmi_db dmiDb)
 	biosInfo.fields["release_date"] = GetValueFromMap(dmiDb, "Release Date", kBIOSInfo);
 	biosInfo.fields["vendor"] = GetValueFromMap(dmiDb, "Vendor", kBIOSInfo);
 	biosInfo.fields["version"] = GetValueFromMap(dmiDb, "Version", kBIOSInfo);
-	gComponents["BIOS"].MergeWith(biosInfo);
+	gComponents.Merge("BIOS", biosInfo);
 
 	Component systemInfo;
 	systemInfo.fields["name"] = GetValueFromMap(dmiDb, "Product Name", kSystemInfo);
@@ -185,7 +185,7 @@ DMIDecodeBackend::_ExtractDataFromDMIDB(dmi_db dmiDb)
 	systemInfo.fields["uuid"] = GetValueFromMap(dmiDb, "UUID", kSystemInfo);
 	systemInfo.fields["serial"] = GetValueFromMap(dmiDb, "Serial Number", kSystemInfo);
 	systemInfo.fields["vendor"] = GetValueFromMap(dmiDb, "Manufacturer", kSystemInfo);
-	gComponents["SYSTEM"].MergeWith(systemInfo);
+	gComponents.Merge("SYSTEM", systemInfo);
 
 	Component chassisInfo;
 	chassisInfo.fields["asset_tag"] = GetValueFromMap(dmiDb, "Asset Tag", "Chassis Information");
@@ -193,7 +193,7 @@ DMIDecodeBackend::_ExtractDataFromDMIDB(dmi_db dmiDb)
 	chassisInfo.fields["type"] = GetValueFromMap(dmiDb, "Type", "Chassis Information");
 	chassisInfo.fields["vendor"] = GetValueFromMap(dmiDb, "Manufacturer", "Chassis Information");
 	chassisInfo.fields["version"] = GetValueFromMap(dmiDb, "Version",  "Chassis Information");
-	gComponents["CHASSIS"].MergeWith(chassisInfo);
+	gComponents.Merge("CHASSIS", chassisInfo);
 
 	Component boardInfo;
 	boardInfo.fields["asset_tag"] = GetValueFromMap(dmiDb, "Asset Tag", "Base Board Information");
@@ -201,7 +201,7 @@ DMIDecodeBackend::_ExtractDataFromDMIDB(dmi_db dmiDb)
 	boardInfo.fields["vendor"] = GetValueFromMap(dmiDb, "Manufacturer", "Base Board Information");
 	boardInfo.fields["version"] = GetValueFromMap(dmiDb, "Version", "Base Board Information");
 	boardInfo.fields["serial"] = GetValueFromMap(dmiDb, "Serial Number", "Base Board Information");
-	gComponents["BOARD"].MergeWith(boardInfo);
+	gComponents.Merge("BOARD", boardInfo);
 
 	// TODO: multiple cpus
 	Component cpuInfo;
@@ -210,7 +210,7 @@ DMIDecodeBackend::_ExtractDataFromDMIDB(dmi_db dmiDb)
 	cpuInfo.fields["type"] = GetValueFromMap(dmiDb, "Version", kProcessorInfo);
 	cpuInfo.fields["serial"] = GetValueFromMap(dmiDb, "Serial Number", kProcessorInfo);
 	cpuInfo.fields["cores"] = GetValueFromMap(dmiDb, "Core Count", kProcessorInfo);
-	gComponents["CPU"].MergeWith(cpuInfo);
+	gComponents.Merge("CPU", cpuInfo);
 
 	std::vector<string_map> valuesVector;
 	DMIExtractor dmiExtractor(dmiDb);
@@ -314,7 +314,7 @@ DMIDecodeBackend::_ExtractDataFromDMIDB(dmi_db dmiDb)
 			|| ramSlot.fields.find("speed") != ramSlot.fields.end()) {
 				std::ostringstream s;
 				s << "MEMORY" << slotNum;
-				gComponents[s.str().c_str()] = ramSlot;
+				gComponents.Merge(s.str().c_str(), ramSlot);
 				slotNum++;
 		}
 	}

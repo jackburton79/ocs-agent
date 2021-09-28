@@ -60,7 +60,7 @@ LSHWBackend::Run()
 		biosInfo.fields["release_date"] = XML::GetFirstChildElementText(element, "date");
 		biosInfo.fields["vendor"] = XML::GetFirstChildElementText(element, "vendor");
 		biosInfo.fields["version"] = XML::GetFirstChildElementText(element, "version");
-		gComponents["BIOS"].MergeWith(biosInfo);
+		gComponents.Merge("BIOS", biosInfo);
 	}
 
 	element = XML::GetElementByAttribute(doc, "class", "system");
@@ -70,12 +70,12 @@ LSHWBackend::Run()
 		systemInfo.fields["version"] = XML::GetFirstChildElementText(element, "version");
 		systemInfo.fields["serial"] = XML::GetFirstChildElementText(element, "serial");
 		systemInfo.fields["vendor"] = XML::GetFirstChildElementText(element, "vendor");
-		gComponents["SYSTEM"].MergeWith(systemInfo);
+		gComponents.Merge("SYSTEM", systemInfo);
 
 		Component chassisInfo;
 		// TODO: Check if this is always correct
 		chassisInfo.fields["type"] = XML::GetFirstChildElementText(element, "description");
-		gComponents["CHASSIS"].MergeWith(chassisInfo);
+		gComponents.Merge("CHASSIS", chassisInfo);
 	}
 
 	element = XML::GetElementByAttribute(doc, "id", "core");
@@ -84,7 +84,7 @@ LSHWBackend::Run()
 		boardInfo.fields["name"] = XML::GetFirstChildElementText(element, "product");
 		boardInfo.fields["vendor"] = XML::GetFirstChildElementText(element, "vendor");
 		boardInfo.fields["serial"] = XML::GetFirstChildElementText(element, "serial");
-		gComponents["BOARD"].MergeWith(boardInfo);
+		gComponents.Merge("BOARD", boardInfo);
 	}
 
 	// TODO: multiple cpus
@@ -95,7 +95,7 @@ LSHWBackend::Run()
 		cpuInfo.fields["speed"] = XML::GetFirstChildElementText(element, "capacity");
 		cpuInfo.fields["type"] = XML::GetFirstChildElementText(element, "product");
 		cpuInfo.fields["serial"] = XML::GetFirstChildElementText(element, "serial");
-		gComponents["CPU"].MergeWith(cpuInfo);
+		gComponents.Merge("CPU", cpuInfo);
 	}
 	element = XML::GetElementByAttribute(doc, "id", "display");
 	if (element != NULL) {
@@ -104,7 +104,7 @@ LSHWBackend::Run()
 		info.fields["name"] = XML::GetFirstChildElementText(element, "description");
 		info.fields["vendor"] = XML::GetFirstChildElementText(element, "vendor");
 		info.fields["type"] = XML::GetFirstChildElementText(element, "product");
-		gComponents["GRAPHICS"].MergeWith(info);
+		gComponents.Merge("GRAPHICS", info);
 	}
 
 	int slotNum = 0;
@@ -135,7 +135,7 @@ LSHWBackend::Run()
 				ramSlot.fields["size"] = ::strtoul(tmpElement->GetText(), NULL, 10) / (1024 * 1024);
 				std::ostringstream s;
 				s << "MEMORY" << slotNum;
-				gComponents[s.str().c_str()] = ramSlot;
+				gComponents.Merge(s.str().c_str(), ramSlot);
 				slotNum++;
 			}
 		} else {
@@ -161,7 +161,7 @@ LSHWBackend::Run()
 					ramSlot.fields["size"] = int_to_string(ramSize);
 					std::ostringstream s;
 					s << "MEMORY" << slotNum;
-					gComponents[s.str().c_str()] = ramSlot;
+					gComponents.Merge(s.str().c_str(), ramSlot);
 					slotNum++;
 				}
 				bankElement = bankElement->NextSiblingElement();

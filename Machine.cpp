@@ -30,7 +30,7 @@
 
 typedef std::map<std::string, std::string> string_map;
 
-std::map<std::string, Component> gComponents;
+components_map gComponents;
 
 
 void
@@ -108,6 +108,6 @@ OSInfoBackend::Run()
 	}
 
 	os.fields["description"] = osDescription;
-	gComponents["OS"].MergeWith(os);
+	gComponents.Merge("OS", os);
 	return 0;
 }

@@ -13,7 +13,6 @@
 #include "Machine.h"
 #include "NetworkInterface.h"
 #include "NetworkRoster.h"
-#include "Processors.h"
 #include "ProcessRoster.h"
 #include "Screens.h"
 #include "Softwares.h"
@@ -656,23 +655,23 @@ Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 	osVersion->LinkEndChild(fDocument->NewText(osInfo.fields["release"].c_str()));
 	hardware->LinkEndChild(osVersion);
 
-	Processors CPUs;
-	size_t cpuCount = CPUs.Count();
+	std::pair<components_map::iterator, components_map::iterator> CPUs = gComponents.equal_range("CPU");
+	size_t cpuCount = 0;
+	for (components_map::iterator i = CPUs.first; i != CPUs.second; i++) {
+		cpuCount++;
+		Component cpuInfo = (*i).second;
+		tinyxml2::XMLElement* processorS = fDocument->NewElement("PROCESSORS");
+		processorS->LinkEndChild(fDocument->NewText(cpuInfo.fields["speed"].c_str()));
+		hardware->LinkEndChild(processorS);
+
+		tinyxml2::XMLElement* processorT = fDocument->NewElement("PROCESSORT");
+		processorT->LinkEndChild(fDocument->NewText(cpuInfo.fields["type"].c_str()));
+		hardware->LinkEndChild(processorT);
+	}
 	tinyxml2::XMLElement* processorN = fDocument->NewElement("PROCESSORN");
 	processorN->LinkEndChild(fDocument->NewText(int_to_string(cpuCount).c_str()));
 	hardware->LinkEndChild(processorN);
 
-	processor_info cpuInfo;
-	if (cpuCount) {
-		CPUs.GetNext(cpuInfo);
-		tinyxml2::XMLElement* processorS = fDocument->NewElement("PROCESSORS");
-		processorS->LinkEndChild(fDocument->NewText(cpuInfo.Speed().c_str()));
-		hardware->LinkEndChild(processorS);
-
-		tinyxml2::XMLElement* processorT = fDocument->NewElement("PROCESSORT");
-		processorT->LinkEndChild(fDocument->NewText(cpuInfo.type.c_str()));
-		hardware->LinkEndChild(processorT);
-	}
 	tinyxml2::XMLElement* arch = fDocument->NewElement("ARCH");
 	arch->LinkEndChild(fDocument->NewText(osInfo.fields["architecture"].c_str()));
 	hardware->LinkEndChild(arch);

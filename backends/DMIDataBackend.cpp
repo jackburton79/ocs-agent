@@ -14,7 +14,6 @@
 
 DMIDataBackend::DMIDataBackend()
 {
-
 }
 
 
@@ -32,7 +31,7 @@ DMIDataBackend::Run()
 		bios.fields["release_date"] = trimmed(ProcReader("/sys/devices/virtual/dmi/id/bios_date").ReadLine());
 		bios.fields["vendor"] = trimmed(ProcReader("/sys/devices/virtual/dmi/id/bios_vendor").ReadLine());
 		bios.fields["version"] = trimmed(ProcReader("/sys/devices/virtual/dmi/id/bios_version").ReadLine());
-		gComponents["BIOS"].MergeWith(bios);
+		gComponents.Merge("BIOS", bios);
 
 		Component system;
 		system.fields["name"] = trimmed(ProcReader("/sys/devices/virtual/dmi/id/product_name").ReadLine());
@@ -40,7 +39,7 @@ DMIDataBackend::Run()
 		system.fields["uuid"] = trimmed(ProcReader("/sys/devices/virtual/dmi/id/product_uuid").ReadLine());
 		system.fields["serial"] = trimmed(ProcReader("/sys/devices/virtual/dmi/id/product_serial").ReadLine());
 		system.fields["vendor"] = trimmed(ProcReader("/sys/devices/virtual/dmi/id/sys_vendor").ReadLine());
-		gComponents["SYSTEM"].MergeWith(system);
+		gComponents.Merge("SYSTEM", system);
 
 		Component chassis;
 		chassis.fields["asset_tag"] = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_asset_tag").ReadLine());
@@ -49,7 +48,7 @@ DMIDataBackend::Run()
 		chassis.fields["version"] = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_version").ReadLine());
 		// TODO: This is a numeric "type", so no.
 		//chassis.type = trimmed(ProcReader("/sys/devices/virtual/dmi/id/chassis_type").ReadLine());
-		gComponents["CHASSIS"].MergeWith(chassis);
+		gComponents.Merge("CHASSIS", chassis);
 
 		Component board;
 		board.fields["asset_tag"] = trimmed(ProcReader("/sys/devices/virtual/dmi/id/board_asset_tag").ReadLine());
@@ -57,7 +56,7 @@ DMIDataBackend::Run()
 		board.fields["serial"] = trimmed(ProcReader("/sys/devices/virtual/dmi/id/board_serial").ReadLine());
 		board.fields["vendor"] = trimmed(ProcReader("/sys/devices/virtual/dmi/id/board_vendor").ReadLine());
 		board.fields["version"] = trimmed(ProcReader("/sys/devices/virtual/dmi/id/board_version").ReadLine());
-		gComponents["BOARD"].MergeWith(board);
+		gComponents.Merge("BOARD", board);
 	} catch (...) {
 		return -1;
 	}
@@ -89,6 +88,6 @@ DMIDataBackend::Run()
 	if (!videoInfo.fields["resolution"].empty()
 			|| !videoInfo.fields["name"].empty()
 			|| !videoInfo.fields["type"].empty())
-		gComponents["GRAPHICS"].MergeWith(videoInfo);
+		gComponents.Merge("GRAPHICS", videoInfo);
 	return 0;
 }

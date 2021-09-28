@@ -51,7 +51,7 @@ UnameBackend::Run()
 		}
 	}
 
-	gComponents["OS"].MergeWith(osInfo);
+	gComponents.Merge("OS", osInfo);
 
 	return 0;
 }
