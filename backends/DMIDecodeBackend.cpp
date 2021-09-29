@@ -10,8 +10,6 @@
 #include "Machine.h"
 #include "Support.h"
 
-typedef std::map<std::string, std::string> string_map;
-
 const char* kBIOSInfo = "BIOS Information";
 const char* kSystemInfo = "System Information";
 const char* kProcessorInfo = "Processor Information";

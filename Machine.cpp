@@ -28,7 +28,6 @@
 
 #include <XML.h>
 
-typedef std::map<std::string, std::string> string_map;
 
 components_map gComponents;
 

@@ -15,6 +15,7 @@
 
 #include "backends/DataBackend.h"
 
+typedef std::map<std::string, std::string> string_map;
 
 class OSInfoBackend : public DataBackend {
 public:
@@ -26,7 +27,7 @@ public:
 
 class Component {
 public:
-	std::map<std::string, std::string> fields;
+	string_map fields;
 	void MergeWith(Component& component);
 };
 
