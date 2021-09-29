@@ -9,6 +9,7 @@
 #define MACHINE_H_
 
 #include <map>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -35,8 +36,9 @@ public:
 		components_map::iterator i = find(string);
 		if (i != end())
 			(*i).second.MergeWith(c);
-		else
-			insert( { string, c } );
+		else {
+			insert(std::make_pair(string, c));
+		}
 	};
 	Component& operator[](const std::string& string) {
 		components_map::iterator i = find(string);
