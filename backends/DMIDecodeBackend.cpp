@@ -61,7 +61,7 @@ DMIDecodeBackend::Run()
 				std::string name;
 				std::getline(iStream, name);
 
-				std::map<std::string, std::string> dbEntry;
+				string_map dbEntry;
 				dbEntry["DMIHANDLE"] = trimmed(handle);
 				dbEntry["NAME"] = trimmed(name);
 

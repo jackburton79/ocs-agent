@@ -15,7 +15,7 @@
 #include "DataBackend.h"
 #include "Machine.h"
 
-typedef std::map<int, std::map<std::string, std::string> > dmi_db;
+typedef std::map<int, string_map> dmi_db;
 
 class DMIDecodeBackend : public DataBackend {
 public:
