@@ -98,7 +98,8 @@ LSHWBackend::Run()
 		// we report it in MHZ
 		std::string CPUSpeedString = XML::GetFirstChildElementText(element, "capacity");
 		unsigned int CPUSpeedNumber = ::strtoul(CPUSpeedString.c_str(), NULL, 0) / (1000 * 1000);
-		cpuInfo.fields["speed"] = uint_to_string(CPUSpeedNumber);
+		if (CPUSpeedNumber > 0)
+			cpuInfo.fields["speed"] = uint_to_string(CPUSpeedNumber);
 		cpuInfo.fields["type"] = XML::GetFirstChildElementText(element, "product");
 		cpuInfo.fields["serial"] = XML::GetFirstChildElementText(element, "serial");
 
