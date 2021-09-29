@@ -207,9 +207,9 @@ DMIDecodeBackend::_ExtractDataFromDMIDB(dmi_db dmiDb)
 	Component cpuInfo;
 	cpuInfo.fields["vendor"] = GetValueFromMap(dmiDb, "Manufacturer", kProcessorInfo);
 
-	std::string CPUSpeedWithUnit = GetValueFromMap(dmiDb, "Max Speed", kProcessorInfo);
-	std::string CPUSpeed = int_to_string(::strtol(CPUSpeedWithUnit.c_str(), NULL, 0));
-	cpuInfo.fields["speed"] = CPUSpeed;
+	std::string CPUSpeedString = GetValueFromMap(dmiDb, "Max Speed", kProcessorInfo);
+	unsigned int CPUSpeedNumber = ::strtoul(CPUSpeedString.c_str(), NULL, 0);
+	cpuInfo.fields["speed"] = uint_to_string(CPUSpeedNumber);
 	cpuInfo.fields["type"] = GetValueFromMap(dmiDb, "Version", kProcessorInfo);
 	cpuInfo.fields["serial"] = GetValueFromMap(dmiDb, "Serial Number", kProcessorInfo);
 	cpuInfo.fields["cores"] = GetValueFromMap(dmiDb, "Core Count", kProcessorInfo);
