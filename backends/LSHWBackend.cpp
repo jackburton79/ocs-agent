@@ -13,6 +13,8 @@
 
 #include <tinyxml2/tinyxml2.h>
 
+#include <iostream>
+
 #include <XML.h>
 
 LSHWBackend::LSHWBackend()
@@ -88,12 +90,14 @@ LSHWBackend::Run()
 	}
 
 	// TODO: multiple cpus
-	element = XML::GetElementByAttribute(doc, "class", "system");
+	element = XML::GetElementByAttribute(doc, "class", "processor");
 	if (element != NULL) {
 		Component cpuInfo;
 		cpuInfo.fields["vendor"] = XML::GetFirstChildElementText(element, "vendor");
+		// In Hz, usually, but we should check the unit
+		// we report it in MHZ
 		std::string CPUSpeedWithUnit = XML::GetFirstChildElementText(element, "capacity");
-		std::string CPUSpeed = int_to_string(::strtol(CPUSpeedWithUnit.c_str(), NULL, 0));
+		std::string CPUSpeed = uint_to_string(::strtoul(CPUSpeedWithUnit.c_str(), NULL, 0) / (1000 * 1000));
 		cpuInfo.fields["speed"] = CPUSpeed;
 		cpuInfo.fields["type"] = XML::GetFirstChildElementText(element, "product");
 		cpuInfo.fields["serial"] = XML::GetFirstChildElementText(element, "serial");
