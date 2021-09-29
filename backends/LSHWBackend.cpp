@@ -162,14 +162,14 @@ LSHWBackend::Run()
 				if (tmpElement != NULL) {
 					// In Hz, usually, but we should check the unit
 					unsigned long ramSpeed = ::strtoul(tmpElement->GetText(), NULL, 10) / (1000 * 1000);
-					ramSlot.fields["speed"] = int_to_string(ramSpeed);
+					ramSlot.fields["speed"] = uint_to_string(ramSpeed);
 				}
 				tmpElement = bankElement->FirstChildElement("size");
 				if (tmpElement != NULL) {
 					unsigned long ramSize = ::strtoul(tmpElement->GetText(), NULL, 10) / (1024 * 1024);
 					if (ramSize == 0)
 						ramSlot.fields["type"] = "Empty slot";
-					ramSlot.fields["size"] = int_to_string(ramSize);
+					ramSlot.fields["size"] = uint_to_string(ramSize);
 					std::ostringstream s;
 					s << "MEMORY" << slotNum;
 					gComponents.Merge(s.str().c_str(), ramSlot);
