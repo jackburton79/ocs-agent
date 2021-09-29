@@ -64,4 +64,10 @@ static inline std::string int_to_string(int i) {
 	return stream.str();
 }
 
+static inline std::string uint_to_string(unsigned int i) {
+	std::ostringstream stream;
+	stream << i;
+	return stream.str();
+}
+
 #endif /* SUPPORT_H_ */
