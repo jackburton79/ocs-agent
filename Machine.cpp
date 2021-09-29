@@ -38,10 +38,15 @@ Component::MergeWith(Component& component)
 {
 	string_map::iterator i;
 	for (i = component.fields.begin(); i != component.fields.end(); i++) {
-		if (!i->second.empty() && i->second != "" )
-			fields.insert(*i);
+		if (!i->second.empty() && i->second != "") {
+			string_map::iterator c = fields.find(i->first);
+			if (c == fields.end())
+				fields.insert(*i);
+			else if (c->second.empty())
+				c->second = i->second;
+		}
 	}
-};
+}
 
 
 
