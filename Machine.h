@@ -45,7 +45,9 @@ public:
 		components_map::iterator i = find(string);
 		if (i != end())
 			return (*i).second;
-		throw std::runtime_error("operator[]: no element");
+		std::string errorString;
+		errorString << "operator[]: no element for " << string;
+		throw std::runtime_error(errorString);
 	}
 };
 
