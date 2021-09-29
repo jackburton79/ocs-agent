@@ -36,7 +36,11 @@ components_map gComponents;
 void
 Component::MergeWith(Component& component)
 {
-	fields.insert(component.fields.begin(), component.fields.end());
+	string_map::iterator i;
+	for (i = component.fields.begin(); i != component.fields.end(); i++) {
+		if (!i->second.empty() && i->second != "" )
+			fields.insert(*i);
+	}
 };
 
 
