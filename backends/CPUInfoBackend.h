@@ -1,22 +1,23 @@
 /*
- * CPU.h
+ * CPUINFOBACKEND.h
  *
  *      Author: Stefano Ceccherini
  */
 
-#ifndef PROCESSOR_H_
-#define PROCESSOR_H_
+#ifndef CPUINFOBACKEND_H_
+#define CPUINFOBACKEND_H_
 
 #include "DataBackend.h"
 
 #include <string>
 
 
-class Processors : public DataBackend {
+class CPUInfoBackend : public DataBackend {
 public:
-	Processors();
+	CPUInfoBackend();
+	virtual int Run();
 private:
 	void _GetCPUInfo();
 };
 
-#endif // PROCESSOR_H_
+#endif // CPUINFOBACKEND_H_

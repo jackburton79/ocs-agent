@@ -4,12 +4,16 @@
  *      Author: Stefano Ceccherini
  */
 
+#include "CPUInfoBackend.h"
+
+#include "Machine.h"
 #include "ProcReader.h"
 #include "Support.h"
 
 #include <iostream>
+#include <list>
 #include <map>
-#include "CPUInfoBackend.h"
+
 
 struct processor_info {
        int physical_id;
@@ -25,18 +29,15 @@ struct processor_info {
        std::string speed;
 };
 
-Processors::Processors()
+CPUInfoBackend::CPUInfoBackend()
 {
-	_GetCPUInfo();
 }
 
 
-void
-Processors::_GetCPUInfo()
+/* virtual */
+int
+CPUInfoBackend::Run()
 {
-#if 1
-	return;
-#else
 	ProcReader cpuReader("/proc/cpuinfo");
 	std::istream iStream(&cpuReader);
 
@@ -91,6 +92,7 @@ Processors::_GetCPUInfo()
 		}
 	}
 
+	std::list<processor_info> CPUs;
 	std::map<int, processor_info>::const_iterator i;
 	for (i = tmpCPUInfo.begin(); i != tmpCPUInfo.end(); i++) {
 		const processor_info& cpu = i->second;
@@ -103,19 +105,30 @@ Processors::_GetCPUInfo()
 		processorInfo.manufacturer = cpu.manufacturer;
 		processorInfo.cache_size = cpu.cache_size;
 		processorInfo.logical_cpus = cpu.logical_cpus;
-		if (size_t(CPUPhysID) >= fItems.size()) {
+		if (size_t(CPUPhysID) >= CPUs.size()) {
 			processorInfo.physical_id = CPUPhysID;
-			fItems.push_back(processorInfo);
+			CPUs.push_back(processorInfo);
 		} else {
 			// TODO: Find out why it doesn't recognize the [] operator
-			std::list<processor_info>::iterator it = fItems.begin();
+			std::list<processor_info>::iterator it = CPUs.begin();
 			std::advance(it, CPUPhysID);
 			// TODO: we are overwriting a full processor_info struct with
 			// an incomplete one (physical_id is not set here)
 			*it = processorInfo;
 		}
 	}
-#endif
+
+	// TODO: Multi cpu
+	processor_info& cpuInfo = CPUs.back();
+	Component cpu;
+	cpu.fields["vendor"] = cpuInfo.manufacturer;
+	cpu.fields["cores"] = cpuInfo.cores;
+	cpu.fields["current_speed"] = cpuInfo.Speed();
+	cpu.fields["type"] = cpuInfo.type;
+	cpu.fields["cache_size"] = cpuInfo.cache_size;
+	gComponents.Merge("CPU", cpu);
+
+	return 0;
 }
 
 
