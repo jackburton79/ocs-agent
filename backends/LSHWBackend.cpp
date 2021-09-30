@@ -73,6 +73,15 @@ LSHWBackend::_GetCPUInfo(const tinyxml2::XMLDocument& doc)
 		std::string dataWidth = uint_to_string(
 				::strtoul(dataWidthString.c_str(), NULL, 0));
 		cpuInfo.fields["width"] = dataWidth;
+
+		const tinyxml2::XMLElement* cfgElement = element->FirstChildElement("configuration");
+		if (cfgElement != NULL) {
+			const tinyxml2::XMLElement* coresElement
+						= XML::GetElementByAttribute(*cfgElement, "id", "cores", XML::match_full);
+			if (coresElement != NULL)
+				cpuInfo.fields["cores"] = coresElement->FindAttribute("value")->Value();
+		}
+
 		gComponents.Merge("CPU", cpuInfo);
 	}
 }
