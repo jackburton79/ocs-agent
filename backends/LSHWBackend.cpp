@@ -38,6 +38,45 @@ LSHWBackend::IsAvailable() const
 }
 
 
+void
+LSHWBackend::_GetCPUInfo(const tinyxml2::XMLDocument& doc)
+{
+	// TODO: multiple cpus
+	const tinyxml2::XMLElement* element = XML::GetElementByAttribute(doc, "class", "processor");
+	if (element != NULL) {
+		Component cpuInfo;
+		cpuInfo.fields["vendor"] = XML::GetFirstChildElementText(element,
+																	"vendor");
+		// In Hz, usually, but we should check the unit
+		// we report it in MHZ
+		std::string CPUSpeedString = XML::GetFirstChildElementText(element,
+																	"capacity");
+		unsigned int CPUSpeedNumber = ::strtoul(CPUSpeedString.c_str(), NULL, 0)
+				/ (1000 * 1000);
+		if (CPUSpeedNumber > 0)
+			cpuInfo.fields["speed"] = uint_to_string(CPUSpeedNumber);
+
+		std::string CPUCurrentSpeedString = XML::GetFirstChildElementText(
+				element, "size");
+		unsigned int CPUCurrentSpeedNumber = ::strtoul(
+				CPUCurrentSpeedString.c_str(), NULL, 0) / (1000 * 1000);
+		if (CPUCurrentSpeedNumber > 0)
+			cpuInfo.fields["current_speed"] = uint_to_string(
+					CPUCurrentSpeedNumber);
+
+		cpuInfo.fields["type"] = XML::GetFirstChildElementText(element,
+																"product");
+		cpuInfo.fields["serial"] = XML::GetFirstChildElementText(element,
+																	"serial");
+		std::string dataWidthString = XML::GetFirstChildElementText(element,
+																	"width");
+		std::string dataWidth = uint_to_string(
+				::strtoul(dataWidthString.c_str(), NULL, 0));
+		cpuInfo.fields["width"] = dataWidth;
+		gComponents.Merge("CPU", cpuInfo);
+	}
+}
+
 /* virtual */
 int
 LSHWBackend::Run()
@@ -91,30 +130,8 @@ LSHWBackend::Run()
 	}
 
 	// TODO: multiple cpus
-	element = XML::GetElementByAttribute(doc, "class", "processor");
-	if (element != NULL) {
-		Component cpuInfo;
-		cpuInfo.fields["vendor"] = XML::GetFirstChildElementText(element, "vendor");
-		// In Hz, usually, but we should check the unit
-		// we report it in MHZ
-		std::string CPUSpeedString = XML::GetFirstChildElementText(element, "capacity");
-		unsigned int CPUSpeedNumber = ::strtoul(CPUSpeedString.c_str(), NULL, 0) / (1000 * 1000);
-		if (CPUSpeedNumber > 0)
-			cpuInfo.fields["speed"] = uint_to_string(CPUSpeedNumber);
+	_GetCPUInfo(doc);
 
-		std::string CPUCurrentSpeedString = XML::GetFirstChildElementText(element, "size");
-		unsigned int CPUCurrentSpeedNumber = ::strtoul(CPUCurrentSpeedString.c_str(), NULL, 0) / (1000 * 1000);
-		if (CPUCurrentSpeedNumber > 0)
-			cpuInfo.fields["current_speed"] = uint_to_string(CPUCurrentSpeedNumber);
-
-		cpuInfo.fields["type"] = XML::GetFirstChildElementText(element, "product");
-		cpuInfo.fields["serial"] = XML::GetFirstChildElementText(element, "serial");
-
-		std::string dataWidthString = XML::GetFirstChildElementText(element, "width");
-		std::string dataWidth = uint_to_string(::strtoul(dataWidthString.c_str(), NULL, 0));
-		cpuInfo.fields["width"] = dataWidth;
-		gComponents.Merge("CPU", cpuInfo);
-	}
 	element = XML::GetElementByAttribute(doc, "id", "display");
 	if (element != NULL) {
 		// TODO: there could be multiple displays

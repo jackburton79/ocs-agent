@@ -10,6 +10,10 @@
 
 #include "DataBackend.h"
 
+namespace tinyxml2 {
+	class XMLDocument;
+};
+
 class LSHWBackend : public DataBackend {
 public:
 	LSHWBackend();
@@ -17,6 +21,9 @@ public:
 
 	virtual bool IsAvailable() const;
 	virtual int Run();
+
+private:
+	void _GetCPUInfo(const tinyxml2::XMLDocument& doc);
 };
 
 #endif /* LSHWBACKEND_H_ */
