@@ -80,6 +80,10 @@ LSHWBackend::_GetCPUInfo(const tinyxml2::XMLDocument& doc)
 						= XML::GetElementByAttribute(*cfgElement, "id", "cores", XML::match_full);
 			if (coresElement != NULL)
 				cpuInfo.fields["cores"] = coresElement->FindAttribute("value")->Value();
+			else {
+				// There is no "cores" field, let's assume there is only one core
+				cpuInfo.fields["cores"] = "1";
+			}
 		}
 
 		gComponents.Merge("CPU", cpuInfo);
