@@ -17,6 +17,7 @@
 
 #include <XML.h>
 
+
 LSHWBackend::LSHWBackend()
 {
 }
@@ -100,11 +101,17 @@ LSHWBackend::Run()
 		unsigned int CPUSpeedNumber = ::strtoul(CPUSpeedString.c_str(), NULL, 0) / (1000 * 1000);
 		if (CPUSpeedNumber > 0)
 			cpuInfo.fields["speed"] = uint_to_string(CPUSpeedNumber);
+
+		std::string CPUCurrentSpeedString = XML::GetFirstChildElementText(element, "size");
+		unsigned int CPUCurrentSpeedNumber = ::strtoul(CPUCurrentSpeedString.c_str(), NULL, 0) / (1000 * 1000);
+		if (CPUCurrentSpeedNumber > 0)
+			cpuInfo.fields["current_speed"] = uint_to_string(CPUCurrentSpeedNumber);
+
 		cpuInfo.fields["type"] = XML::GetFirstChildElementText(element, "product");
 		cpuInfo.fields["serial"] = XML::GetFirstChildElementText(element, "serial");
 
 		std::string dataWidthString = XML::GetFirstChildElementText(element, "width");
-		std::string dataWidth = int_to_string(::strtol(dataWidthString.c_str(), NULL, 0));
+		std::string dataWidth = uint_to_string(::strtoul(dataWidthString.c_str(), NULL, 0));
 		cpuInfo.fields["width"] = dataWidth;
 		gComponents.Merge("CPU", cpuInfo);
 	}
