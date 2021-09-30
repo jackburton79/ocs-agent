@@ -395,6 +395,7 @@ Inventory::_AddCPUsInfo(tinyxml2::XMLElement* parent)
 		tinyxml2::XMLElement* manufacturer = fDocument->NewElement("MANUFACTURER");
 		tinyxml2::XMLElement* serial = fDocument->NewElement("SERIAL");
 		tinyxml2::XMLElement* speed = fDocument->NewElement("SPEED");
+		tinyxml2::XMLElement* currentSpeed = fDocument->NewElement("CURRENT_SPEED");
 		tinyxml2::XMLElement* model = fDocument->NewElement("TYPE");
 		tinyxml2::XMLElement* arch = fDocument->NewElement("CPUARCH");
 		tinyxml2::XMLElement* dataWidth = fDocument->NewElement("DATA_WIDTH");
@@ -403,10 +404,13 @@ Inventory::_AddCPUsInfo(tinyxml2::XMLElement* parent)
 		tinyxml2::XMLElement* cacheSize = fDocument->NewElement("L2CACHESIZE");
 		tinyxml2::XMLElement* logicalCpu = fDocument->NewElement("LOGICAL_CPUS");
 
-		std::string dataWidthString = "32";
-		if (gComponents["OS"].fields["architecture"] == "x86_64")
-			dataWidthString = "64";
-
+		std::string dataWidthString = gComponents["CPU"].fields["width"];
+		if (dataWidthString.empty()) {
+			if (gComponents["OS"].fields["architecture"] == "x86_64")
+				dataWidthString = "64";
+			else
+				dataWidthString = "32";
+		}
 		manufacturer->LinkEndChild(
 			fDocument->NewText(cpuInfo.fields["vendor"].c_str()));
 		serial->LinkEndChild(
@@ -414,6 +418,8 @@ Inventory::_AddCPUsInfo(tinyxml2::XMLElement* parent)
 
 		speed->LinkEndChild(
 			fDocument->NewText(cpuInfo.fields["speed"].c_str()));
+		currentSpeed->LinkEndChild(
+			fDocument->NewText(cpuInfo.fields["current_speed"].c_str()));
 		model->LinkEndChild(
 			fDocument->NewText(cpuInfo.fields["type"].c_str()));
 		cores->LinkEndChild(
@@ -424,7 +430,7 @@ Inventory::_AddCPUsInfo(tinyxml2::XMLElement* parent)
 			fDocument->NewText(dataWidthString.c_str()));
 		// Not a copy/paste error: the fields are the same
 		currentAddressWidth->LinkEndChild(
-				fDocument->NewText(dataWidthString.c_str()));
+			fDocument->NewText(dataWidthString.c_str()));
 		cacheSize->LinkEndChild(
 			fDocument->NewText(cpuInfo.fields["cache_size"].c_str()));
 		logicalCpu->LinkEndChild(
@@ -434,6 +440,7 @@ Inventory::_AddCPUsInfo(tinyxml2::XMLElement* parent)
 		cpu->LinkEndChild(manufacturer);
 		cpu->LinkEndChild(serial);
 		cpu->LinkEndChild(speed);
+		cpu->LinkEndChild(currentSpeed);
 		cpu->LinkEndChild(cores);
 		cpu->LinkEndChild(arch);
 		cpu->LinkEndChild(dataWidth);
