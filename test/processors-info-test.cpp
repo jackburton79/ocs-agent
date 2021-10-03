@@ -5,6 +5,7 @@
  *      Author: Stefano Ceccherini
  */
 
+#include "backends/CPUInfoBackend.h"
 #include "backends/DMIDecodeBackend.h"
 #include "backends/LSHWBackend.h"
 #include "Machine.h"
@@ -12,6 +13,7 @@
 
 int main()
 {
+	CPUInfoBackend().Run();
 	DMIDecodeBackend().Run();
 	LSHWBackend().Run();
 	std::pair<components_map::iterator, components_map::iterator> CPUs = gComponents.equal_range("CPU");
