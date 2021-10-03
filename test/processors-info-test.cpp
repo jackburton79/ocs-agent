@@ -27,6 +27,7 @@ int main()
 		std::cout << "CORES:" << cpuInfo.fields["cores"] << std::endl;
 		std::cout << "DATA WIDTH:" << cpuInfo.fields["width"] << std::endl;
 		std::cout << "LOGICAL CPUs:" << cpuInfo.fields["logical_cpus"] << std::endl;
+		std::cout << "VOLTAGE:" << cpuInfo.fields["voltage"] << std::endl;
 		std::cout << "L2CACHESIZE:" << cpuInfo.fields["cache_size"] << std::endl;
 	}
 }
