@@ -213,6 +213,7 @@ DMIDecodeBackend::_ExtractDataFromDMIDB(dmi_db dmiDb)
 	cpuInfo.fields["serial"] = GetValueFromMap(dmiDb, "Serial Number", kProcessorInfo);
 	cpuInfo.fields["cores"] = GetValueFromMap(dmiDb, "Core Count", kProcessorInfo);
 	cpuInfo.fields["logical_cpus"] = GetValueFromMap(dmiDb, "Thread Count", kProcessorInfo);
+	cpuInfo.fields["voltage"] = GetValueFromMap(dmiDb, "Voltage", kProcessorInfo);
 	gComponents.Merge("CPU", cpuInfo);
 
 	std::vector<string_map> valuesVector;
