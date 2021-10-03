@@ -12,10 +12,11 @@
 #include "Logger.h"
 #include "Machine.h"
 
-#include "backends/LSHWBackend.h"
-#include "backends/DMIDecodeBackend.h"
-#include "backends/MemInfoBackend.h"
+#include "backends/CPUInfoBackend.h"
 #include "backends/DMIDataBackend.h"
+#include "backends/DMIDecodeBackend.h"
+#include "backends/LSHWBackend.h"
+#include "backends/MemInfoBackend.h"
 #include "backends/UnameBackend.h"
 
 #include <cstdlib>
@@ -45,6 +46,7 @@ Agent::Run()
 	// TODO: Move these away from here
 	DMIDataBackend().Run();
 	DMIDecodeBackend().Run();
+	CPUInfoBackend().Run();
 	OSInfoBackend().Run();
 	LSHWBackend().Run();
 	MemInfoBackend().Run();
