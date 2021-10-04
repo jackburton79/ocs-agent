@@ -353,7 +353,8 @@ Inventory::_AddBIOSInfo(tinyxml2::XMLElement* parent)
 	if (gComponents["SYSTEM"].fields["serial"].empty()
 		|| gComponents["SYSTEM"].fields["serial"] == "To Be Filled By O.E.M.")
 		systemSerial = gComponents["BOARD"].fields["serial"];
-	systemSerial = gComponents["SYSTEM"].fields["serial"];
+	else
+		systemSerial = gComponents["SYSTEM"].fields["serial"];
 
 	tinyxml2::XMLElement* ssn = fDocument->NewElement("SSN");
 	ssn->LinkEndChild(fDocument->NewText(systemSerial.c_str()));
