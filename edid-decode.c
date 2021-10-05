@@ -1553,73 +1553,6 @@ static int parse_cta(const unsigned char *x)
 	return ret;
 }
 
-static int parse_displayid_detailed_timing(const unsigned char *x)
-{
-	int ha, hbl, hso, hspw;
-	int va, vbl, vso, vspw;
-	char phsync, pvsync, *stereo;
-	int pix_clock;
-	char *aspect;
-
-	switch (x[3] & 0xf) {
-	case 0:
-		aspect = "1:1";
-		break;
-	case 1:
-		aspect = "5:4";
-		break;
-	case 2:
-		aspect = "4:3";
-		break;
-	case 3:
-		aspect = "15:9";
-		break;
-	case 4:
-		aspect = "16:9";
-		break;
-	case 5:
-		aspect = "16:10";
-		break;
-	case 6:
-		aspect = "64:27";
-		break;
-	case 7:
-		aspect = "256:135";
-		break;
-	default:
-		aspect = "undefined";
-		break;
-	}
-	switch ((x[3] >> 5) & 0x3) {
-	case 0:
-		stereo = "";
-		break;
-	case 1:
-		stereo = "stereo";
-		break;
-	case 2:
-		stereo = "user action";
-		break;
-	case 3:
-		stereo = "reserved";
-		break;
-	}
-	pix_clock = x[0] + (x[1] << 8) + (x[2] << 16);
-	ha = x[4] | (x[5] << 8);
-	hbl = x[6] | (x[7] << 8);
-	hso = x[8] | ((x[9] & 0x7f) << 8);
-	phsync = ((x[9] >> 7) & 0x1) ? '+' : '-';
-	hspw = x[10] | (x[11] << 8);
-	va = x[12] | (x[13] << 8);
-	vbl = x[14] | (x[15] << 8);
-	vso = x[16] | ((x[17] & 0x7f) << 8);
-	vspw = x[18] | (x[19] << 8);
-	pvsync = ((x[17] >> 7) & 0x1 ) ? '+' : '-';
-
-	
-	return 1;
-}
-
 static int parse_displayid(const unsigned char *x)
 {
 	int version = x[1];
@@ -1646,12 +1579,8 @@ static int parse_displayid(const unsigned char *x)
 			break;
 		case 2:
 			break;
-		case 3: {
-			for (i = 0; i < len / 20; i++) {
-				parse_displayid_detailed_timing(&x[offset + 3 + (i * 20)]);
-			}
+		case 3:
 			break;
-		}
 		case 4:
 			break;
 		case 5:
@@ -2000,7 +1929,6 @@ static int edid_from_file(const char *from_file, struct edid_info* info)
 	time_t the_time;
 	struct tm *ptm, ptm_struct;
 	int analog, i;
-	unsigned col_x, col_y;
 
 	info->description[0] = '\0';
 	
@@ -2126,18 +2054,6 @@ static int edid_from_file(const char *from_file, struct edid_info* info)
 		has_preferred_timing = 1;
 	}
 
-	col_x = (edid[0x1b] << 2) | (edid[0x19] >> 6);
-	col_y = (edid[0x1c] << 2) | ((edid[0x19] >> 4) & 3);
-
-	col_x = (edid[0x1d] << 2) | ((edid[0x19] >> 2) & 3);
-	col_y = (edid[0x1e] << 2) | (edid[0x19] & 3);
-
-	col_x = (edid[0x1f] << 2) | (edid[0x1a] >> 6);
-	col_y = (edid[0x20] << 2) | ((edid[0x1a] >> 4) & 3);
-
-	col_x = (edid[0x21] << 2) | ((edid[0x1a] >> 2) & 3);
-	col_y = (edid[0x22] << 2) | (edid[0x1a] & 3);
-
 	for (i = 0; i < 17; i++) {
 		if (edid[0x23 + i / 8] & (1 << (7 - i % 8))) {
 			min_vert_freq_hz = min(min_vert_freq_hz, established_timings[i].refresh);
@@ -2182,7 +2098,8 @@ static int edid_from_file(const char *from_file, struct edid_info* info)
 	else
 		snprintf(info->type, sizeof(info->type), "Digital display");
 	free(edid);
-	return conformant ? 0 : -2;
+
+	return 0;
 }
 
 
