@@ -898,61 +898,6 @@ static int do_checksum(const unsigned char *x, size_t len)
 
 /* CTA extension */
 
-static const char *audio_ext_format(unsigned char x)
-{
-	switch (x) {
-	case 4: return "MPEG-4 HE AAC";
-	case 5: return "MPEG-4 HE AAC v2";
-	case 6: return "MPEG-4 AAC LC";
-	case 7: return "DRA";
-	case 8: return "MPEG-4 HE AAC + MPEG Surround";
-	case 10: return "MPEG-4 AAC LC + MPEG Surround";
-	case 11: return "MPEG-H 3D Audio";
-	case 12: return "AC-4";
-	case 13: return "L-PCM 3D Audio";
-	default: return "RESERVED";
-	}
-	return "BROKEN"; /* can't happen */
-}
-
-static const char *audio_format(unsigned char x)
-{
-	switch (x) {
-	case 0: return "RESERVED";
-	case 1: return "Linear PCM";
-	case 2: return "AC-3";
-	case 3: return "MPEG 1 (Layers 1 & 2)";
-	case 4: return "MPEG 1 Layer 3 (MP3)";
-	case 5: return "MPEG2 (multichannel)";
-	case 6: return "AAC";
-	case 7: return "DTS";
-	case 8: return "ATRAC";
-	case 9: return "One Bit Audio";
-	case 10: return "Dolby Digital+";
-	case 11: return "DTS-HD";
-	case 12: return "MAT (MLP)";
-	case 13: return "DST";
-	case 14: return "WMA Pro";
-	case 15: return "RESERVED";
-	}
-	return "BROKEN"; /* can't happen */
-}
-
-static const char *mpeg_h_3d_audio_level(unsigned char x)
-{
-	switch (x) {
-	case 0: return "Unspecified";
-	case 1: return "Level 1";
-	case 2: return "Level 2";
-	case 3: return "Level 3";
-	case 4: return "Level 4";
-	case 5: return "Level 5";
-	case 6: return "Reserved";
-	case 7: return "Reserved";
-	}
-	return "BROKEN"; /* can't happen */
-}
-
 struct edid_cta_mode {
 	const char *name;
 	int refresh, hor_freq_hz, pixclk_khz;
