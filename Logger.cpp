@@ -112,6 +112,8 @@ Logger::Get(int loggerType)
 				break;
 		}
 	}
+	if (sDefaultLogger == NULL)
+		throw std::runtime_error("Logger::Get(): cannot instantiate logger!");
 
 	return *sDefaultLogger;
 }
