@@ -126,6 +126,7 @@ CPUInfoBackend::Run()
 	cpu.fields["current_speed"] = cpuInfo.Speed();
 	cpu.fields["type"] = cpuInfo.type;
 	cpu.fields["cache_size"] = cpuInfo.cache_size;
+	cpu.fields["logical_cpus"] = cpuInfo.logical_cpus;
 	gComponents.Merge("CPU", cpu);
 
 	return 0;
