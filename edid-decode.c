@@ -65,7 +65,6 @@ static int has_valid_cvt = 1;
 static int has_valid_dummy_block = 1;
 static int has_valid_serial_number = 0;
 static int has_valid_serial_string = 0;
-static int has_valid_ascii_string = 0;
 static int has_valid_name_descriptor = 0;
 static int has_valid_week = 0;
 static int has_valid_year = 0;
@@ -84,12 +83,10 @@ static int manufacturer_name_well_formed = 0;
 static int seen_non_detailed_descriptor = 0;
 
 static int warning_excessive_dotclock_correction = 0;
-static int warning_zero_preferred_refresh = 0;
 static int nonconformant_hf_vsdb_position = 0;
 static int nonconformant_srgb_chromaticity = 0;
 static int nonconformant_cta861_640x480 = 0;
 static int nonconformant_hdmi_vsdb_tmds_rate = 0;
-static int nonconformant_hf_vsdb_tmds_rate = 0;
 
 static int min_hor_freq_hz = 0xfffffff;
 static int max_hor_freq_hz = 0;
@@ -102,9 +99,6 @@ static int mon_min_vert_freq_hz = 0;
 static int mon_max_vert_freq_hz = 0;
 static int mon_max_pixclk_khz = 0;
 static unsigned supported_hdmi_vic_codes = 0;
-static unsigned supported_hdmi_vic_vsb_codes = 0;
-
-static int conformant = 1;
 
 static char serial_string[13];
 static char model_string[13];
@@ -328,13 +322,11 @@ static void edid_cvt_mode(int HDisplay, int VDisplay,
 static int detailed_cvt_descriptor(const unsigned char *x, int first)
 {
 	const unsigned char empty[3] = { 0, 0, 0 };
-	const char *ratio;
-	char *names[] = { "50", "60", "75", "85" };
 	int width, height;
 	int valid = 1;
 	int fifty = 0, sixty = 0, seventyfive = 0, eightyfive = 0, reduced = 0;
 	int min_refresh = 0xfffffff, max_refresh = 0;
-
+	char* ratio = "";
 	if (!first && !memcmp(x, empty, 3))
 		return valid;
 
@@ -402,6 +394,8 @@ static int detailed_cvt_descriptor(const unsigned char *x, int first)
 			edid_cvt_mode(width, height, 60, 1,
 				      &min_hfreq, &max_hfreq, &max_clock);
 	}
+
+	(void)ratio;
 
 	return valid;
 }
@@ -532,91 +526,12 @@ static const struct {
 	{1920, 1440, 75, 4, 3, 112500, 297000},
 };
 
-static void print_standard_timing(uint8_t b1, uint8_t b2)
-{
-	int ratio_w, ratio_h;
-	unsigned int x, y, refresh;
-	int pixclk_khz = 0, hor_freq_hz = 0;
-	int i;
-
-	if (b1 == 0x01 && b2 == 0x01)
-		return;
-
-	if (b1 == 0) {
-		return;
-	}
-	x = (b1 + 31) * 8;
-	switch ((b2 >> 6) & 0x3) {
-	case 0x00:
-		if (claims_one_point_three) {
-			y = x * 10 / 16;
-			ratio_w = 16;
-			ratio_h = 10;
-		} else {
-			y = x;
-			ratio_w = 1;
-			ratio_h = 1;
-		}
-		break;
-	case 0x01:
-		y = x * 3 / 4;
-		ratio_w = 4;
-		ratio_h = 3;
-		break;
-	case 0x02:
-		y = x * 4 / 5;
-		ratio_w = 5;
-		ratio_h = 4;
-		break;
-	case 0x03:
-		y = x * 9 / 16;
-		ratio_w = 16;
-		ratio_h = 9;
-		break;
-	}
-	refresh = 60 + (b2 & 0x3f);
-
-	min_vert_freq_hz = min(min_vert_freq_hz, refresh);
-	max_vert_freq_hz = max(max_vert_freq_hz, refresh);
-	for (i = 0; i < ARRAY_SIZE(established_timings); i++) {
-		if (established_timings[i].x == x &&
-		    established_timings[i].y == y &&
-		    established_timings[i].refresh == refresh &&
-		    established_timings[i].ratio_w == ratio_w &&
-		    established_timings[i].ratio_h == ratio_h) {
-			pixclk_khz = established_timings[i].pixclk_khz;
-			hor_freq_hz = established_timings[i].hor_freq_hz;
-			break;
-		}
-	}
-	if (pixclk_khz == 0) {
-		for (i = 0; i < ARRAY_SIZE(established_timings3); i++) {
-			if (established_timings3[i].x == x &&
-			    established_timings3[i].y == y &&
-			    established_timings3[i].refresh == refresh &&
-			    established_timings3[i].ratio_w == ratio_w &&
-			    established_timings3[i].ratio_h == ratio_h) {
-				pixclk_khz = established_timings3[i].pixclk_khz;
-				hor_freq_hz = established_timings3[i].hor_freq_hz;
-				break;
-			}
-		}
-	}
-	/* TODO: this should also check DMT timings and GTF/CVT */
-	if (pixclk_khz) {
-		min_hor_freq_hz = min(min_hor_freq_hz, hor_freq_hz);
-		max_hor_freq_hz = max(max_hor_freq_hz, hor_freq_hz);
-		max_pixclk_khz = max(max_pixclk_khz, pixclk_khz);
-	}
-}
-
 /* 1 means valid data */
 static int detailed_block(const unsigned char *x, int in_extension)
 {
-	int ha, hbl, hso, hspw, hborder, va, vbl, vso, vspw, vborder;
+	int ha, hbl, va, vbl;
 	int refresh, pixclk_khz;
 	int i;
-	char phsync, pvsync, *syncmethod, *stereo;
 
 	if (x[0] == 0 && x[1] == 0) {
 		/* Monitor descriptor block, not detailed timing descriptor. */
@@ -684,7 +599,6 @@ static int detailed_block(const unsigned char *x, int in_extension)
 			int v_max_offset = 0, v_min_offset = 0;
 			int is_cvt = 0;
 			has_range_descriptor = 1;
-			char *range_class = "";
 			/* 
 			 * XXX todo: implement feature flags, vtd blocks
 			 * XXX check: ranges are well-formed; block termination if no vtd
@@ -704,33 +618,6 @@ static int detailed_block(const unsigned char *x, int in_extension)
 				}
 			} else if (x[4]) {
 				has_valid_range_descriptor = 0;
-			}
-
-			/*
-			 * despite the values, this is not a bitfield.
-			 */
-			switch (x[10]) {
-			case 0x00: /* default gtf */
-				range_class = "GTF";
-				break;
-			case 0x01: /* range limits only */
-				range_class = "bare limits";
-				if (!claims_one_point_four)
-					has_valid_range_descriptor = 0;
-				break;
-			case 0x02: /* secondary gtf curve */
-				range_class = "GTF with icing";
-				break;
-			case 0x04: /* cvt */
-				range_class = "CVT";
-				is_cvt = 1;
-				if (!claims_one_point_four)
-					has_valid_range_descriptor = 0;
-				break;
-			default: /* invalid */
-				has_valid_range_descriptor = 0;
-				range_class = "invalid";
-				break;
 			}
 
 			if (x[5] + v_min_offset > x[6] + v_max_offset)
@@ -805,53 +692,9 @@ static int detailed_block(const unsigned char *x, int in_extension)
 	did_detailed_timing = 1;
 	ha = (x[2] + ((x[4] & 0xF0) << 4));
 	hbl = (x[3] + ((x[4] & 0x0F) << 8));
-	hso = (x[8] + ((x[11] & 0xC0) << 2));
-	hspw = (x[9] + ((x[11] & 0x30) << 4));
-	hborder = x[15];
+	
 	va = (x[5] + ((x[7] & 0xF0) << 4));
 	vbl = (x[6] + ((x[7] & 0x0F) << 8));
-	vso = ((x[10] >> 4) + ((x[11] & 0x0C) << 2));
-	vspw = ((x[10] & 0x0F) + ((x[11] & 0x03) << 4));
-	vborder = x[16];
-	switch ((x[17] & 0x18) >> 3) {
-	case 0x00:
-		syncmethod = " analog composite";
-		break;
-	case 0x01:
-		syncmethod = " bipolar analog composite";
-		break;
-	case 0x02:
-		syncmethod = " digital composite";
-		break;
-	case 0x03:
-		syncmethod = "";
-		break;
-	}
-	pvsync = (x[17] & (1 << 2)) ? '+' : '-';
-	phsync = (x[17] & (1 << 1)) ? '+' : '-';
-	switch (x[17] & 0x61) {
-	case 0x20:
-		stereo = "field sequential L/R";
-		break;
-	case 0x40:
-		stereo = "field sequential R/L";
-		break;
-	case 0x21:
-		stereo = "interleaved right even";
-		break;
-	case 0x41:
-		stereo = "interleaved left even";
-		break;
-	case 0x60:
-		stereo = "four way interleaved";
-		break;
-	case 0x61:
-		stereo = "side by side interleaved";
-		break;
-	default:
-		stereo = "";
-		break;
-	}
 
 	pixclk_khz = (x[0] + (x[1] << 8)) * 10;
 	refresh = (pixclk_khz * 1000) / ((ha + hbl) * (va + vbl));
@@ -887,282 +730,6 @@ struct edid_cta_mode {
 	const char *name;
 	int refresh, hor_freq_hz, pixclk_khz;
 };
-
-static struct edid_cta_mode edid_cta_modes1[] = {
-	/* VIC 1 */
-	{"640x480@60Hz 4:3", 60, 31469, 25175},
-	{"720x480@60Hz 4:3", 60, 31469, 27000},
-	{"720x480@60Hz 16:9", 60, 31469, 27000},
-	{"1280x720@60Hz 16:9", 60, 45000, 74250},
-	{"1920x1080i@60Hz 16:9", 60, 33750, 74250},
-	{"1440x480i@60Hz 4:3", 60, 15734, 27000},
-	{"1440x480i@60Hz 16:9", 60, 15734, 27000},
-	{"1440x240@60Hz 4:3", 60, 15734, 27000},
-	{"1440x240@60Hz 16:9", 60, 15734, 27000},
-	{"2880x480i@60Hz 4:3", 60, 15734, 54000},
-	/* VIC 11 */
-	{"2880x480i@60Hz 16:9", 60, 15734, 54000},
-	{"2880x240@60Hz 4:3", 60, 15734, 54000},
-	{"2880x240@60Hz 16:9", 60, 15734, 54000},
-	{"1440x480@60Hz 4:3", 60, 31469, 54000},
-	{"1440x480@60Hz 16:9", 60, 31469, 54000},
-	{"1920x1080@60Hz 16:9", 60, 67500, 148500},
-	{"720x576@50Hz 4:3", 50, 31250, 27000},
-	{"720x576@50Hz 16:9", 50, 31250, 27000},
-	{"1280x720@50Hz 16:9", 50, 37500, 74250},
-	{"1920x1080i@50Hz 16:9", 50, 28125, 74250},
-	/* VIC 21 */
-	{"1440x576i@50Hz 4:3", 50, 15625, 27000},
-	{"1440x576i@50Hz 16:9", 50, 15625, 27000},
-	{"1440x288@50Hz 4:3", 50, 15625, 27000},
-	{"1440x288@50Hz 16:9", 50, 15625, 27000},
-	{"2880x576i@50Hz 4:3", 50, 15625, 54000},
-	{"2880x576i@50Hz 16:9", 50, 15625, 54000},
-	{"2880x288@50Hz 4:3", 50, 15625, 54000},
-	{"2880x288@50Hz 16:9", 50, 15625, 54000},
-	{"1440x576@50Hz 4:3", 50, 31250, 54000},
-	{"1440x576@50Hz 16:9", 50, 31250, 54000},
-	/* VIC 31 */
-	{"1920x1080@50Hz 16:9", 50, 56250, 148500},
-	{"1920x1080@24Hz 16:9", 24, 27000, 74250},
-	{"1920x1080@25Hz 16:9", 25, 28125, 74250},
-	{"1920x1080@30Hz 16:9", 30, 33750, 74250},
-	{"2880x480@60Hz 4:3", 60, 31469, 108000},
-	{"2880x480@60Hz 16:9", 60, 31469, 108000},
-	{"2880x576@50Hz 4:3", 50, 31250, 108000},
-	{"2880x576@50Hz 16:9", 50, 31250, 108000},
-	{"1920x1080i@50Hz 16:9", 50, 31250, 72000},
-	{"1920x1080i@100Hz 16:9", 100, 56250, 148500},
-	/* VIC 41 */
-	{"1280x720@100Hz 16:9", 100, 75000, 148500},
-	{"720x576@100Hz 4:3", 100, 62500, 54000},
-	{"720x576@100Hz 16:9", 100, 62500, 54000},
-	{"1440x576@100Hz 4:3", 100, 31250, 54000},
-	{"1440x576@100Hz 16:9", 100, 31250, 54000},
-	{"1920x1080i@120Hz 16:9", 120, 67500, 148500},
-	{"1280x720@120Hz 16:9", 120, 90000, 148500},
-	{"720x480@120Hz 4:3", 120, 62937, 54000},
-	{"720x480@120Hz 16:9", 120, 62937, 54000},
-	{"1440x480i@120Hz 4:3", 120, 31469, 54000},
-	/* VIC 51 */
-	{"1440x480i@120Hz 16:9", 120, 31469, 54000},
-	{"720x576@200Hz 4:3", 200, 125000, 108000},
-	{"720x576@200Hz 16:9", 200, 125000, 108000},
-	{"1440x576i@200Hz 4:3", 200, 62500, 108000},
-	{"1440x576i@200Hz 16:9", 200, 62500, 108000},
-	{"720x480@240Hz 4:3", 240, 125874, 108000},
-	{"720x480@240Hz 16:9", 240, 125874, 108000},
-	{"1440x480i@240Hz 4:3", 240, 62937, 108000},
-	{"1440x480i@240Hz 16:9", 240, 62937, 108000},
-	{"1280x720@24Hz 16:9", 24, 18000, 59400},
-	/* VIC 61 */
-	{"1280x720@25Hz 16:9", 25, 18750, 74250},
-	{"1280x720@30Hz 16:9", 30, 22500, 74250},
-	{"1920x1080@120Hz 16:9", 120, 135000, 297000},
-	{"1920x1080@100Hz 16:9", 100, 112500, 297000},
-	{"1280x720@24Hz 64:27", 24, 18000, 59400},
-	{"1280x720@25Hz 64:27", 25, 18750, 74250},
-	{"1280x720@30Hz 64:27", 30, 22500, 74250},
-	{"1280x720@50Hz 64:27", 50, 37500, 74250},
-	{"1280x720@60Hz 64:27", 60, 45000, 74250},
-	{"1280x720@100Hz 64:27", 100, 75000, 148500},
-	/* VIC 71 */
-	{"1280x720@120Hz 64:27", 120, 91000, 148500},
-	{"1920x1080@24Hz 64:27", 24, 27000, 74250},
-	{"1920x1080@25Hz 64:27", 25, 28125, 74250},
-	{"1920x1080@30Hz 64:27", 30, 33750, 74250},
-	{"1920x1080@50Hz 64:27", 50, 56250, 148500},
-	{"1920x1080@60Hz 64:27", 60, 67500, 148500},
-	{"1920x1080@100Hz 64:27", 100, 112500, 297000},
-	{"1920x1080@120Hz 64:27", 120, 135000, 297000},
-	{"1680x720@24Hz 64:27", 24, 18000, 59400},
-	{"1680x720@25Hz 64:27", 25, 18750, 59400},
-	/* VIC 81 */
-	{"1680x720@30Hz 64:27", 30, 22500, 59400},
-	{"1680x720@50Hz 64:27", 50, 37500, 82500},
-	{"1680x720@60Hz 64:27", 60, 45000, 99000},
-	{"1680x720@100Hz 64:27", 100, 82500, 165000},
-	{"1680x720@120Hz 64:27", 120, 99000, 198000},
-	{"2560x1080@24Hz 64:27", 24, 26400, 99000},
-	{"2560x1080@25Hz 64:27", 25, 28125, 90000},
-	{"2560x1080@30Hz 64:27", 30, 33750, 118800},
-	{"2560x1080@50Hz 64:27", 50, 56250, 185625},
-	{"2560x1080@60Hz 64:27", 60, 66000, 198000},
-	/* VIC 91 */
-	{"2560x1080@100Hz 64:27", 100, 125000, 371250},
-	{"2560x1080@120Hz 64:27", 120, 150000, 495000},
-	{"3840x2160@24Hz 16:9", 24, 54000, 297000},
-	{"3840x2160@25Hz 16:9", 25, 56250, 297000},
-	{"3840x2160@30Hz 16:9", 30, 67500, 297000},
-	{"3840x2160@50Hz 16:9", 50, 112500, 594000},
-	{"3840x2160@60Hz 16:9", 60, 135000, 594000},
-	{"4096x2160@24Hz 256:135", 24, 54000, 297000},
-	{"4096x2160@25Hz 256:135", 25, 56250, 297000},
-	{"4096x2160@30Hz 256:135", 30, 67500, 297000},
-	/* VIC 101 */
-	{"4096x2160@50Hz 256:135", 50, 112500, 594000},
-	{"4096x2160@60Hz 256:135", 60, 135000, 594000},
-	{"3840x2160@24Hz 64:27", 24, 54000, 297000},
-	{"3840x2160@25Hz 64:27", 25, 56250, 297000},
-	{"3840x2160@30Hz 64:27", 30, 67500, 297000},
-	{"3840x2160@50Hz 64:27", 50, 112500, 594000},
-	{"3840x2160@60Hz 64:27", 60, 135000, 594000},
-	{"1280x720@48Hz 16:9", 48, 36000, 90000},
-	{"1280x720@48Hz 64:27", 48, 36000, 90000},
-	{"1680x720@48Hz 64:27", 48, 36000, 99000},
-	/* VIC 111 */
-	{"1920x1080@48Hz 16:9", 48, 54000, 148500},
-	{"1920x1080@48Hz 64:27", 48, 54000, 148500},
-	{"2560x1080@48Hz 64:27", 48, 52800, 198000},
-	{"3840x2160@48Hz 16:9", 48, 108000, 594000},
-	{"4096x2160@48Hz 256:135", 48, 108000, 594000},
-	{"3840x2160@48Hz 64:27", 48, 108000, 594000},
-	{"3840x2160@100Hz 16:9", 100, 225000, 1188000},
-	{"3840x2160@120Hz 16:9", 120, 270000, 1188000},
-	{"3840x2160@100Hz 64:27", 100, 225000, 1188000},
-	{"3840x2160@120Hz 64:27", 120, 270000, 1188000},
-	/* VIC 121 */
-	{"5120x2160@24Hz 64:27", 24, 52800, 396000},
-	{"5120x2160@25Hz 64:27", 25, 55000, 396000},
-	{"5120x2160@30Hz 64:27", 30, 66000, 396000},
-	{"5120x2160@48Hz 64:27", 48, 118800, 742500},
-	{"5120x2160@50Hz 64:27", 50, 112500, 742500},
-	{"5120x2160@60Hz 64:27", 60, 135000, 742500},
-	{"5120x2160@100Hz 64:27", 100, 225000, 1485000},
-};
-
-static struct edid_cta_mode edid_cta_modes2[] = {
-	/* VIC 193 */
-	{"5120x2160@120Hz 64:27", 120, 270000, 1485000},
-	{"7680x4320@24Hz 16:9", 24, 108000, 1188000},
-	{"7680x4320@25Hz 16:9", 25, 110000, 1188000},
-	{"7680x4320@30Hz 16:9", 30, 132000, 1188000},
-	{"7680x4320@48Hz 16:9", 48, 216000, 2376000},
-	{"7680x4320@50Hz 16:9", 50, 220000, 2376000},
-	{"7680x4320@60Hz 16:9", 60, 264000, 2376000},
-	{"7680x4320@100Hz 16:9", 100, 450000, 4752000},
-	/* VIC 201 */
-	{"7680x4320@120Hz 16:9", 120, 540000, 4752000},
-	{"7680x4320@24Hz 64:27", 24, 108000, 1188000},
-	{"7680x4320@25Hz 64:27", 25, 110000, 1188000},
-	{"7680x4320@30Hz 64:27", 30, 132000, 1188000},
-	{"7680x4320@48Hz 64:27", 48, 216000, 2376000},
-	{"7680x4320@50Hz 64:27", 50, 220000, 2376000},
-	{"7680x4320@60Hz 64:27", 60, 264000, 2376000},
-	{"7680x4320@100Hz 64:27", 100, 450000, 4752000},
-	{"7680x4320@120Hz 64:27", 120, 540000, 4752000},
-	{"10240x4320@24Hz 64:27", 24, 118800, 1485000},
-	/* VIC 211 */
-	{"10240x4320@25Hz 64:27", 25, 110000, 1485000},
-	{"10240x4320@30Hz 64:27", 30, 135000, 1485000},
-	{"10240x4320@48Hz 64:27", 48, 237600, 2970000},
-	{"10240x4320@50Hz 64:27", 50, 220000, 2970000},
-	{"10240x4320@60Hz 64:27", 60, 270000, 2970000},
-	{"10240x4320@100Hz 64:27", 100, 450000, 5940000},
-	{"10240x4320@120Hz 64:27", 120, 540000, 5940000},
-	{"4096x2160@100Hz 256:135", 100, 225000, 1188000},
-	{"4096x2160@120Hz 256:135", 120, 270000, 1188000},
-};
-
-static const struct edid_cta_mode *vic_to_mode(unsigned char vic)
-{
-	if (vic > 0 && vic <= ARRAY_SIZE(edid_cta_modes1))
-		return edid_cta_modes1 + vic - 1;
-	if (vic >= 193 && vic <= ARRAY_SIZE(edid_cta_modes2) + 193)
-		return edid_cta_modes2 + vic - 193;
-	return NULL;
-}
-
-static void cta_svd(const unsigned char *x, int n, int for_ycbcr420)
-{
-	int i;
-
-	for (i = 0; i < n; i++)  {
-		const struct edid_cta_mode *vicmode = NULL;
-		unsigned char svd = x[i];
-		unsigned char native;
-		unsigned char vic;
-		const char *mode;
-		unsigned hfreq = 0;
-		unsigned clock_khz = 0;
-
-		if ((svd & 0x7f) == 0)
-			continue;
-
-		if ((svd - 1) & 0x40) {
-			vic = svd;
-			native = 0;
-		} else {
-			vic = svd & 0x7f;
-			native = svd & 0x80;
-		}
-
-		vicmode = vic_to_mode(vic);
-		if (vicmode) {
-			switch (vic) {
-			case 95:
-				supported_hdmi_vic_vsb_codes |= 1 << 0;
-				break;
-			case 94:
-				supported_hdmi_vic_vsb_codes |= 1 << 1;
-				break;
-			case 93:
-				supported_hdmi_vic_vsb_codes |= 1 << 2;
-				break;
-			case 98:
-				supported_hdmi_vic_vsb_codes |= 1 << 3;
-				break;
-			}
-			mode = vicmode->name;
-			min_vert_freq_hz = min(min_vert_freq_hz, vicmode->refresh);
-			max_vert_freq_hz = max(max_vert_freq_hz, vicmode->refresh);
-			hfreq = vicmode->hor_freq_hz;
-			min_hor_freq_hz = min(min_hor_freq_hz, hfreq);
-			max_hor_freq_hz = max(max_hor_freq_hz, hfreq);
-			clock_khz = vicmode->pixclk_khz / (for_ycbcr420 ? 2 : 1);
-			max_pixclk_khz = max(max_pixclk_khz, clock_khz);
-		} else {
-			mode = "Unknown mode";
-		}
-
-		if (vic == 1)
-			has_cta861_vic_1 = 1;
-	}
-}
-
-static void cta_video_block(const unsigned char *x, unsigned int length)
-{
-	cta_svd(x, length, 0);
-}
-
-static void cta_y420vdb(const unsigned char *x, unsigned int length)
-{
-	cta_svd(x, length, 1);
-}
-
-static void cta_vfpdb(const unsigned char *x, unsigned int length)
-{
-	int i;
-
-	for (i = 0; i < length; i++)  {
-		unsigned char svr = x[i];
-
-		if ((svr > 0 && svr < 128) || (svr > 192 && svr < 254)) {
-			const struct edid_cta_mode *vicmode;
-			unsigned char vic;
-			const char *mode;
-
-			vic = svr;
-
-			vicmode = vic_to_mode(vic);
-			if (vicmode)
-				mode = vicmode->name;
-			else
-				mode = "Unknown mode";			
-		} else if (svr > 128 && svr < 145) {			
-		}
-	}
-}
 
 static struct {
 	const char *name;
@@ -1230,11 +797,9 @@ static void cta_hdmi_block(const unsigned char *x, unsigned int length)
 
 		for (i = 0; i < len_vic; i++) {
 			unsigned char vic = x[8 + b + i];
-			const char *mode;
-
 			if (vic && vic <= ARRAY_SIZE(edid_hdmi_modes)) {
 				supported_hdmi_vic_codes |= 1 << (vic - 1);
-				mode = edid_hdmi_modes[vic - 1].name;
+				
 				min_vert_freq_hz = min(min_vert_freq_hz, edid_hdmi_modes[vic - 1].refresh);
 				max_vert_freq_hz = max(max_vert_freq_hz, edid_hdmi_modes[vic - 1].refresh);
 				hfreq = edid_hdmi_modes[vic - 1].hor_freq_hz;
@@ -1242,8 +807,6 @@ static void cta_hdmi_block(const unsigned char *x, unsigned int length)
 				max_hor_freq_hz = max(max_hor_freq_hz, hfreq);
 				clock_khz = edid_hdmi_modes[vic - 1].pixclk_khz;
 				max_pixclk_khz = max(max_pixclk_khz, clock_khz);
-			} else {
-				mode = "Unknown mode";
 			}
 		}
 
@@ -1256,9 +819,6 @@ static void cta_hdmi_block(const unsigned char *x, unsigned int length)
 			len_3d -= 2;
 		}
 		if (mask) {
-			int i;
-			/* worst bit ordering ever */
-			
 			b += 2;
 			len_3d -= 2;
 		}
@@ -1293,27 +853,6 @@ static void cta_hdmi_block(const unsigned char *x, unsigned int length)
 	}
 }
 
-static const char *max_frl_rates[] = {
-	"Not Supported",
-	"3 Gbps per lane on 3 lanes",
-	"3 and 6 Gbps per lane on 3 lanes",
-	"3 and 6 Gbps per lane on 3 lanes, 6 Gbps on 4 lanes",
-	"3 and 6 Gbps per lane on 3 lanes, 6 and 8 Gbps on 4 lanes",
-	"3 and 6 Gbps per lane on 3 lanes, 6, 8 and 10 Gbps on 4 lanes",
-	"3 and 6 Gbps per lane on 3 lanes, 6, 8, 10 and 12 Gbps on 4 lanes",
-};
-
-static const char *dsc_max_slices[] = {
-	"Not Supported",
-	"up to 1 slice and up to (340 MHz/Ksliceadjust) pixel clock per slice",
-	"up to 2 slices and up to (340 MHz/Ksliceadjust) pixel clock per slice",
-	"up to 4 slices and up to (340 MHz/Ksliceadjust) pixel clock per slice",
-	"up to 8 slices and up to (340 MHz/Ksliceadjust) pixel clock per slice",
-	"up to 8 slices and up to (400 MHz/Ksliceadjust) pixel clock per slice",
-	"up to 12 slices and up to (400 MHz/Ksliceadjust) pixel clock per slice",
-	"up to 16 slices and up to (400 MHz/Ksliceadjust) pixel clock per slice",
-};
-
 
 DEFINE_FIELD("YCbCr quantization", YCbCr_quantization, 7, 7,
 	     { 0, "No Data" },
@@ -1345,70 +884,6 @@ static struct field *vcdb_fields[] = {
 	&CE_scan,
 };
 
-static const char *speaker_map[] = {
-	"FL/FR - Front Left/Right",
-	"LFE1 - Low Frequency Effects 1",
-	"FC - Front Center",
-	"BL/BR - Back Left/Right",
-	"BC - Back Center",
-	"FLc/FRc - Front Left/Right of Center",
-	"RLC/RRC - Rear Left/Right of Center (Deprecated)",
-	"FLw/FRw - Front Left/Right Wide",
-	"TpFL/TpFR - Top Front Left/Right",
-	"TpC - Top Center",
-	"TpFC - Top Front Center",
-	"LS/RS - Left/Right Surround",
-	"LFE2 - Low Frequency Effects 2",
-	"TpBC - Top Back Center",
-	"SiL/SiR - Side Left/Right",
-	"TpSiL/TpSiR - Top Side Left/Right",
-	"TpBL/TpBR - Top Back Left/Right",
-	"BtFC - Bottom Front Center",
-	"BtFL/BtFR - Bottom Front Left/Right",
-	"TpLS/TpRS - Top Left/Right Surround (Deprecated for CTA-861)",
-	"LSd/RSd - Left/Right Surround Direct (HDMI only)",
-};
-
-
-static float decode_uchar_as_float(unsigned char x)
-{
-	signed char s = (signed char)x;
-
-	return s / 64.0;
-}
-
-
-static const char *speaker_location[] = {
-	"FL - Front Left",
-	"FR - Front Right",
-	"FC - Front Center",
-	"LFE1 - Low Frequency Effects 1",
-	"BL - Back Left",
-	"BR - Back Right",
-	"FLC - Front Left of Center",
-	"FRC - Front Right of Center",
-	"BC - Back Center",
-	"LFE2 - Low Frequency Effects 2",
-	"SiL - Side Left",
-	"SiR - Side Right",
-	"TpFL - Top Front Left",
-	"TpFR - Top Front Right",
-	"TpFC - Top Front Center",
-	"TpC - Top Center",
-	"TpBL - Top Back Left",
-	"TpBR - Top Back Right",
-	"TpSiL - Top Side Left",
-	"TpSiR - Top Side Right",
-	"TpBC - Top Back Center",
-	"BtFC - Bottom Front Center",
-	"BtFL - Bottom Front Left",
-	"BtFR - Bottom Front Right",
-	"FLW - Front Left Wide",
-	"FRW - Front Right Wide",
-	"LS - Left Surround",
-	"RS - Right Surround",
-};
-
 
 static void cta_vcdb(const unsigned char *x, unsigned int length)
 {
@@ -1416,29 +891,6 @@ static void cta_vcdb(const unsigned char *x, unsigned int length)
 
 	decode(vcdb_fields, d, "    ");
 }
-
-static const char *colorimetry_map[] = {
-	"xvYCC601",
-	"xvYCC709",
-	"sYCC601",
-	"opYCC601",
-	"opRGB",
-	"BT2020cYCC",
-	"BT2020YCC",
-	"BT2020RGB",
-};
-
-
-static const char *eotf_map[] = {
-	"Traditional gamma - SDR luminance range",
-	"Traditional gamma - HDR luminance range",
-	"SMPTE ST2084",
-	"Hybrid Log-Gamma",
-};
-
-
-
-
 
 static void cta_block(const unsigned char *x)
 {
@@ -1488,7 +940,6 @@ static void cta_block(const unsigned char *x)
 		case 0x07:
 			break;
 		case 0x0d:
-			cta_vfpdb(x + 2, length - 1);
 			break;
 		case 0x0e:
 			break;
@@ -1555,10 +1006,7 @@ static int parse_cta(const unsigned char *x)
 
 static int parse_displayid(const unsigned char *x)
 {
-	int version = x[1];
 	int length = x[2];
-	int ext_count = x[4];
-	int i;
 	/* DisplayID length field is number of following bytes
 	 * but checksum is calculated over the entire structure
 	 * (excluding DisplayID-in-EDID magic byte)
@@ -1607,16 +1055,8 @@ static int parse_displayid(const unsigned char *x)
 			break;
 		case 0x10:
 			break;
-		case 0x12: {
-			int capabilities = x[offset + 3];
-			int num_v_tile = (x[offset + 4] & 0xf) | (x[offset + 6] & 0x30);
-			int num_h_tile = (x[offset + 4] >> 4) | ((x[offset + 6] >> 2) & 0x30);
-			int tile_v_location = (x[offset + 5] & 0xf) | ((x[offset + 6] & 0x3) << 4);
-			int tile_h_location = (x[offset + 5] >> 4) | (((x[offset + 6] >> 2) & 0x3) << 4);
-			int tile_width = x[offset + 7] | (x[offset + 8] << 8);
-			int tile_height = x[offset + 9] | (x[offset + 10] << 8);
+		case 0x12:
 			break;
-		}
 		default:
 			break;
 		}
@@ -1889,41 +1329,10 @@ static unsigned char *extract_edid(int fd)
 	return out;
 }
 
-static unsigned char crc_calc(const unsigned char *b)
-{
-	unsigned char sum = 0;
-	int i;
-
-	for (i = 0; i < 127; i++)
-		sum += b[i];
-	return 256 - sum;
-}
-
-static int crc_ok(const unsigned char *b)
-{
-	return crc_calc(b) == b[127];
-}
-
-
-static void write_edid(FILE *f, const unsigned char *edid, unsigned size,
-		       enum output_format out_fmt)
-{
-	switch (out_fmt) {
-	default:
-	case OUT_FMT_HEX:
-		break;
-	case OUT_FMT_RAW:
-		fwrite(edid, size, 1, f);
-		break;
-	case OUT_FMT_CARRAY:
-		break;
-	}
-}
 
 static int edid_from_file(const char *from_file, struct edid_info* info)
 {
 	int fd;
-	FILE *out = NULL;
 	unsigned char *edid;
 	unsigned char *x;
 	time_t the_time;
@@ -1969,8 +1378,11 @@ static int edid_from_file(const char *from_file, struct edid_info* info)
 	}
 	
 	unsigned short model = (unsigned short)(edid[0x0A] + (edid[0x0B] << 8));
-	unsigned int serial = (unsigned int)(edid[0x0C] + (edid[0x0D] << 8));
+	unsigned int serial = (unsigned int)(edid[0x0C] + (edid[0x0D] << 8))
 			      + (edid[0x0E] << 16) + (edid[0x0F] << 24);
+	(void)model;
+	(void)serial;
+
 	has_valid_serial_number = edid[0x0C] || edid[0x0D] || edid[0x0E] || edid[0x0F];
 	
 	int week = 0;
