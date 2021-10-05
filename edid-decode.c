@@ -116,28 +116,6 @@ enum output_format {
 	OUT_FMT_CARRAY
 };			
 
-/*
- * Options
- * Please keep in alphabetical order of the short option.
- * That makes it easier to see which options are still free.
- */
-enum Option {
-	OptCheck = 'c',
-	OptExtract = 'e',
-	OptHelp = 'h',
-	OptOutputFormat = 'o',
-	OptLast = 256
-};
-
-static char options[OptLast];
-
-static struct option long_options[] = {
-	{ "help", no_argument, 0, OptHelp },
-	{ "output-format", required_argument, 0, OptOutputFormat },
-	{ "extract", no_argument, 0, OptExtract },
-	{ "check", no_argument, 0, OptCheck },
-	{ 0, 0, 0, 0 }
-};
 
 struct value {
 	int value;
@@ -2131,9 +2109,6 @@ static int edid_from_file(const char *from_file, struct edid_info* info)
 		}
 		claims_one_point_oh = 1;
 	}
-
-	// Manufacturer
-	strncpy(info->manufacturer, manufacturer_name(edid + 0x08), sizeof(info->manufacturer));
 	
 	unsigned short model = (unsigned short)(edid[0x0A] + (edid[0x0B] << 8));
 	unsigned int serial = (unsigned int)(edid[0x0C] + (edid[0x0D] << 8));
@@ -2168,17 +2143,12 @@ static int edid_from_file(const char *from_file, struct edid_info* info)
 			}
 		}
 	}
-
-	// TODO: find out what is the binary number after the %s.%x. I think
-	// it's the manufacturer code, but how is it generated ?
-	snprintf(info->description, sizeof(info->description), "%s.%x.000000000 (%hd/%hd)", info->manufacturer, model, week, year);
 	
 	/* display section */
 
 	if (edid[0x14] & 0x80) {
 		int conformance_mask;
 		analog = 0;
-		snprintf(info->type, sizeof(info->type), "Digital display");
 		if (claims_one_point_four) {
 			conformance_mask = 0;
 			if ((edid[0x14] & 0x70) == 0x00)
@@ -2203,9 +2173,6 @@ static int edid_from_file(const char *from_file, struct edid_info* info)
 			nonconformant_digital_display = edid[0x14] & conformance_mask;
 	} else {
 		analog = 1;
-		int voltage = (edid[0x14] & 0x60) >> 5;
-		int sync = (edid[0x14] & 0x0F);
-		snprintf(info->type, sizeof(info->type), "Analog display");
 	}
 
 	if (edid[0x18] & 0x04) {
@@ -2268,70 +2235,22 @@ static int edid_from_file(const char *from_file, struct edid_info* info)
 		nonconformant_extension += parse_extension(x);
 	}
 
+	// Fill edid_info struct
+	// Manufacturer
+	strncpy(info->manufacturer, manufacturer_name(edid + 0x08), sizeof(info->manufacturer));
+
+	// TODO: find out what is the binary number after the %s.%x. I think
+	// it's the manufacturer code, but how is it generated ?
+	snprintf(info->description, sizeof(info->description), "%s.%x.000000000 (%hd/%hd)", info->manufacturer, model, week, year);
+
 	// Model / Serial Number
 	strncpy(info->model, model_string, sizeof(info->model));
 	strncpy(info->serial_number, serial_string, sizeof(info->serial_number));
 	
-	if (!options[OptCheck]) {
-		free(edid);
-		return 0;
-	}
-
-	if (claims_one_point_three) {
-		if (nonconformant_digital_display ||
-		    nonconformant_hf_vsdb_position ||
-		    nonconformant_hdmi_vsdb_tmds_rate ||
-		    nonconformant_hf_vsdb_tmds_rate ||
-		    nonconformant_srgb_chromaticity ||
-		    nonconformant_cta861_640x480 ||
-		    !has_valid_string_termination ||
-		    !has_valid_descriptor_pad ||
-		    !has_name_descriptor ||
-		    !has_preferred_timing ||
-		    (!claims_one_point_four && !has_range_descriptor))
-			conformant = 0;
-		
-	} else if (claims_one_point_two) {
-		if (nonconformant_digital_display)
-			conformant = 0;
-	} else if (claims_one_point_oh) {
-		if (seen_non_detailed_descriptor)
-			conformant = 0;
-	}
-
-	if (has_range_descriptor && has_valid_range_descriptor &&
-	    (min_vert_freq_hz < mon_min_vert_freq_hz ||
-	     max_vert_freq_hz > mon_max_vert_freq_hz ||
-	     min_hor_freq_hz < mon_min_hor_freq_hz ||
-	     max_hor_freq_hz > mon_max_hor_freq_hz ||
-	     max_pixclk_khz > mon_max_pixclk_khz)) {
-		/*
-		 * EDID 1.4 states (in an Errata) that explicitly defined
-		 * timings supersede the monitor range definition.
-		 */
-		if (!claims_one_point_four)
-			conformant = 0;
-	}
-
-	if (nonconformant_extension ||
-	    !has_valid_checksum ||
-	    !has_valid_cvt ||
-	    !has_valid_year ||
-	    !has_valid_week ||
-	    (has_cta861 && has_valid_serial_number && has_valid_serial_string) ||
-	    !has_valid_detailed_blocks ||
-	    !has_valid_dummy_block ||
-	    !has_valid_descriptor_ordering ||
-	    !has_valid_range_descriptor ||
-	    !manufacturer_name_well_formed ||
-	    (has_name_descriptor && !has_valid_name_descriptor) ||
-	    (has_serial_string && !has_valid_serial_string) ||
-	    (has_ascii_string && !has_valid_ascii_string) ||
-	    empty_string ||
-	    trailing_space) {
-		conformant = 0;
-	}
-	
+	if (analog)
+		snprintf(info->type, sizeof(info->type), "Analog display");
+	else
+		snprintf(info->type, sizeof(info->type), "Digital display");
 	free(edid);
 	return conformant ? 0 : -2;
 }
