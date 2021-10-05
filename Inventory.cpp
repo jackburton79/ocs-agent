@@ -389,8 +389,6 @@ Inventory::_AddCPUsInfo(tinyxml2::XMLElement* parent)
 	for (components_map::iterator i = CPUs.first; i != CPUs.second; i++) {
 		cpuCount++;
 		Component& cpuInfo = (*i).second;
-		// TODO: This is not completely correct: We could have a 64 bit capable CPU on
-		// a 32 bit OS.
 		// TODO: Need something like "AddElement("NAME", "VALUE");
 		tinyxml2::XMLElement* cpu = fDocument->NewElement("CPUS");
 		tinyxml2::XMLElement* manufacturer = fDocument->NewElement("MANUFACTURER");
@@ -407,6 +405,8 @@ Inventory::_AddCPUsInfo(tinyxml2::XMLElement* parent)
 
 		std::string dataWidthString = gComponents["CPU"].fields["width"];
 		if (dataWidthString.empty()) {
+			// TODO: This is not completely correct:
+			// We could have a 64 bit capable CPU on a 32 bit OS.
 			if (gComponents["OS"].fields["architecture"] == "x86_64")
 				dataWidthString = "64";
 			else
