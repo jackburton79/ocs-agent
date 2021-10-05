@@ -671,17 +671,8 @@ static int detailed_block(const unsigned char *x, int in_extension)
 		case 0xFA:
 			return 1;
 		case 0xFB: {
-			unsigned w_x, w_y;
-			unsigned gamma;
-
-			w_x = (x[7] << 2) | ((x[6] >> 2) & 3);
-			w_y = (x[8] << 2) | (x[6] & 3);
-			gamma = x[9];
 			if (x[10] == 0)
 				return 1;
-			w_x = (x[12] << 2) | ((x[11] >> 2) & 3);
-			w_y = (x[13] << 2) | (x[11] & 3);
-			gamma = x[14];
 			return 1;
 		}
 		case 0xFC:
@@ -758,18 +749,12 @@ static int detailed_block(const unsigned char *x, int in_extension)
 			}
 
 			if (is_cvt) {
-				int max_h_pixels = 0;
-
 				if (x[12] & 0xfc) {
 					int raw_offset = (x[12] & 0xfc) >> 2;
 					if (raw_offset >= 40)
 						warning_excessive_dotclock_correction = 1;
 				}
 
-				max_h_pixels = x[12] & 0x03;
-				max_h_pixels <<= 8;
-				max_h_pixels |= x[13];
-				max_h_pixels *= 8;
 				if (x[14] & 0x07)
 					has_valid_range_descriptor = 0;
 
