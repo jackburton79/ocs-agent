@@ -127,7 +127,7 @@ CommandExists(const char* command)
 	int result = -1;
 	int systemStatus = ::system(fullCommand.c_str());
 	if (systemStatus == 0)
-		result = WEXITSTATUS(systemStatus);
+		result = 0;
 		
 	return result == 0;
 }
