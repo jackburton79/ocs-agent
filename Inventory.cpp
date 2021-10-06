@@ -402,6 +402,7 @@ Inventory::_AddCPUsInfo(tinyxml2::XMLElement* parent)
 		tinyxml2::XMLElement* cores = fDocument->NewElement("CORES");
 		tinyxml2::XMLElement* cacheSize = fDocument->NewElement("L2CACHESIZE");
 		tinyxml2::XMLElement* logicalCpu = fDocument->NewElement("LOGICAL_CPUS");
+		tinyxml2::XMLElement* voltage = fDocument->NewElement("VOLTAGE");
 
 		std::string dataWidthString = gComponents["CPU"].fields["width"];
 		if (dataWidthString.empty()) {
@@ -436,6 +437,8 @@ Inventory::_AddCPUsInfo(tinyxml2::XMLElement* parent)
 			fDocument->NewText(cpuInfo.fields["cache_size"].c_str()));
 		logicalCpu->LinkEndChild(
 			fDocument->NewText(cpuInfo.fields["logical_cpus"].c_str()));
+		voltage->LinkEndChild(
+			fDocument->NewText(cpuInfo.fields["voltage"].c_str()));
 
 		cpu->LinkEndChild(model);
 		cpu->LinkEndChild(manufacturer);
@@ -448,6 +451,7 @@ Inventory::_AddCPUsInfo(tinyxml2::XMLElement* parent)
 		cpu->LinkEndChild(currentAddressWidth);
 		cpu->LinkEndChild(cacheSize);
 		cpu->LinkEndChild(logicalCpu);
+		cpu->LinkEndChild(voltage);
 
 		parent->LinkEndChild(cpu);
 	}
