@@ -415,8 +415,13 @@ Inventory::_AddCPUsInfo(tinyxml2::XMLElement* parent)
 		}
 		manufacturer->LinkEndChild(
 			fDocument->NewText(cpuInfo.fields["vendor"].c_str()));
+
+		// OCSInventory always reports "CPU Enabled" here
+		std::string cpuSerial = cpuInfo.fields["serial"];
+		if (cpuSerial.empty())
+			cpuSerial = "CPU Enabled";
 		serial->LinkEndChild(
-			fDocument->NewText(cpuInfo.fields["serial"].c_str()));
+			fDocument->NewText(cpuSerial.c_str()));
 
 		speed->LinkEndChild(
 			fDocument->NewText(cpuInfo.fields["speed"].c_str()));
