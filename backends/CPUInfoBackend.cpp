@@ -13,6 +13,7 @@
 #include <iostream>
 #include <list>
 #include <map>
+#include <unistd.h>
 
 
 struct processor_info {
@@ -35,9 +36,20 @@ CPUInfoBackend::CPUInfoBackend()
 
 
 /* virtual */
+bool
+CPUInfoBackend::IsAvailable() const
+{
+	return ::access("/proc/cpuinfo", F_OK) != -1;
+}
+
+
+/* virtual */
 int
 CPUInfoBackend::Run()
 {
+	if (!IsAvailable())
+		return -1;
+
 	ProcReader cpuReader("/proc/cpuinfo");
 	std::istream iStream(&cpuReader);
 

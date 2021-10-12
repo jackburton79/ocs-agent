@@ -15,6 +15,7 @@
 class CPUInfoBackend : public DataBackend {
 public:
 	CPUInfoBackend();
+	virtual bool IsAvailable() const;
 	virtual int Run();
 private:
 	void _GetCPUInfo();

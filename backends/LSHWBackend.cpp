@@ -92,7 +92,6 @@ LSHWBackend::_GetCPUInfo(const tinyxml2::XMLDocument& doc)
 				// There is no "threads" field, let's assume same number as cores
 				cpuInfo.fields["logical_cpus"] = cpuInfo.fields["cores"];
 			}
-
 		}
 
 		gComponents.Merge("CPU", cpuInfo);

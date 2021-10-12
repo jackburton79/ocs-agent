@@ -14,6 +14,7 @@ class MemInfoBackend : public DataBackend {
 public:
 	MemInfoBackend();
 	virtual ~MemInfoBackend();
+	virtual bool IsAvailable() const;
 	virtual int Run();
 };
 

@@ -14,6 +14,7 @@
 #include <cstdio>
 #include <fstream>
 #include <iostream>
+#include <unistd.h>
 
 
 MemInfoBackend::MemInfoBackend()
@@ -27,9 +28,20 @@ MemInfoBackend::~MemInfoBackend()
 
 
 /* virtual */
+bool
+MemInfoBackend::IsAvailable() const
+{
+	return ::access("/proc/meminfo", F_OK) != -1;
+}
+
+
+/* virtual */
 int
 MemInfoBackend::Run()
 {
+	if (!IsAvailable())
+		return -1;
+
 	ProcReader proc("/proc/meminfo");
 	std::istream stream(&proc);
 
