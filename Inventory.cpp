@@ -392,7 +392,7 @@ Inventory::_AddCPUsInfo(tinyxml2::XMLElement* parent)
 		// TODO: Need something like "AddElement("NAME", "VALUE");
 		tinyxml2::XMLElement* cpu = fDocument->NewElement("CPUS");
 		tinyxml2::XMLElement* manufacturer = fDocument->NewElement("MANUFACTURER");
-		tinyxml2::XMLElement* serial = fDocument->NewElement("SERIAL");
+		tinyxml2::XMLElement* serial = fDocument->NewElement("SERIALNUMBER");
 		tinyxml2::XMLElement* speed = fDocument->NewElement("SPEED");
 		tinyxml2::XMLElement* currentSpeed = fDocument->NewElement("CURRENT_SPEED");
 		tinyxml2::XMLElement* model = fDocument->NewElement("TYPE");
