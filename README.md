@@ -1,6 +1,6 @@
 [![build](https://github.com/jackburton79/ocs-agent/actions/workflows/ccpp.yml/badge.svg)](https://github.com/jackburton79/ocs-agent/actions/workflows/ccpp.yml)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/6c35f5798f2341b3b1c9d2cfac43b8a3)](https://app.codacy.com/gh/jackburton79/ocs-agent?utm_source=github.com&utm_medium=referral&utm_content=jackburton79/ocs-agent&utm_campaign=Badge_Grade_Settings)
-[![Codiga](https://api.codiga.io/project/29885/score/svg)](https://api.codiga.io/project/29885/score/svg)
+[![Codiga](https://api.codiga.io/project/29885/score/svg)](https://app.codiga.io/public/project/29885/ocs-agent/dashboard)
 [![CodeFactor](https://www.codefactor.io/repository/github/jackburton79/ocs-agent/badge)](https://www.codefactor.io/repository/github/jackburton79/ocs-agent)
 [![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/g/jackburton79/ocs-agent.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/jackburton79/ocs-agent/context:cpp)
 
