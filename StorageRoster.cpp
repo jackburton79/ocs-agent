@@ -24,7 +24,6 @@ StorageRoster::_ReadStoragesInfo()
 		ProcReader procReader("/proc/scsi/scsi");
 
 		std::istream stream(&procReader);
-		std::string line;
 
 		for (;;) {
 			std::string dummy;

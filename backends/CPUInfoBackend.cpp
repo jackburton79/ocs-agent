@@ -131,7 +131,7 @@ CPUInfoBackend::Run()
 	}
 
 	// TODO: Multi cpu
-	processor_info& cpuInfo = CPUs.back();
+	const processor_info& cpuInfo = CPUs.back();
 	Component cpu;
 	cpu.fields["vendor"] = cpuInfo.manufacturer;
 	cpu.fields["cores"] = cpuInfo.cores;
