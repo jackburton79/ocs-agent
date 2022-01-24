@@ -2489,3 +2489,8 @@
  {"Nextorage Corporation","NXR"},
  {"Netvio Ltd.","NVO"},
  {"Beijing Guochengwantong Information Technology Co., Ltd.","STV"},
+ {"Kopin Corporation","KOP"},
+ {"Anker Innovations Limited","AKR"},
+ {"SAMPO CORPORATION","SPO"},
+ {"Shiftall Inc.","SFL"},
+ {"AudioControl","AUD"},
