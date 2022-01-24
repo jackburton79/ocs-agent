@@ -6,6 +6,7 @@
  */
 
 #include "NetworkRoster.h"
+
 #include "NetworkInterface.h"
 #include "Support.h"
 
