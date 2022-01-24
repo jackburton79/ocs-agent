@@ -1040,7 +1040,6 @@ Inventory::_GenerateDeviceID() const
 	if (deviceID == "")
 		deviceID = gComponents["SYSTEM"].fields["hostname"];
 
-	char targetString[256];
 	struct tm biosDate;
 	if (Configuration::Get()->UseCurrentTimeInDeviceID()) {
 		time_t rawtime = time(NULL);
@@ -1056,9 +1055,10 @@ Inventory::_GenerateDeviceID() const
 
 	// DeviceID needs to have a date appended in this very format,
 	// otherwise OCSInventoryNG will reject the inventory
-	::strftime(targetString, sizeof(targetString), "-%Y-%m-%d-00-00-00", &biosDate);
+	char dateString[256];
+	::strftime(dateString, sizeof(dateString), "-%Y-%m-%d-00-00-00", &biosDate);
 
-    deviceID.append(targetString);
+    deviceID.append(dateString);
 
     return deviceID;
 }
