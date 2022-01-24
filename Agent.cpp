@@ -54,7 +54,6 @@ Agent::Run()
 
 	Configuration* config = Configuration::Get();
 
-	std::string deviceID = config->DeviceID();
 	Inventory inventory;
 	if (!inventory.Initialize())
 		throw std::runtime_error("Cannot initialize Inventory");
@@ -77,7 +76,7 @@ Agent::Run()
 	else if (config->LocalInventory()) {
 		std::string fullFileName = config->OutputFileName();
 		if (fullFileName[fullFileName.length() - 1] == '/')
-			fullFileName.append(deviceID).append(".xml");
+			fullFileName.append(config->DeviceID()).append(".xml");
 		inventory.Save(fullFileName.c_str());
 	} else {
 		inventory.Send(config->ServerURL().c_str());

@@ -6,18 +6,12 @@
  */
 
 #include "Configuration.h"
-#include "NetworkInterface.h"
-#include "NetworkRoster.h"
 
 #include <algorithm>
-#include <cerrno>
-#include <ctime>
 #include <iostream>
 #include <fstream>
 
 #include <assert.h>
-#include <Components.h>
-#include <unistd.h>
 
 
 const static char* kServer = "server";
@@ -62,10 +56,6 @@ Configuration::Load(const char* fileName)
 		}
 	} catch (...) {
 	}
-
-	// Generate a DeviceID if we don't have one
-	if (fValues.find(kDeviceID) == fValues.end())
-		_GenerateDeviceID();
 
 	return true;
 }
@@ -191,13 +181,17 @@ Configuration::DeviceID() const
 {
 	std::map<std::string, std::string>::const_iterator i;
 	i = fValues.find(kDeviceID);
-	if (i == fValues.end()) {
-		const_cast<Configuration*>(this)->_GenerateDeviceID();
-		i = fValues.find(kDeviceID);
-	}
+	if (i == fValues.end())
+		return "";
 
-	assert(i->second != "");
 	return i->second;
+}
+
+
+void
+Configuration::SetDeviceID(const char* deviceID)
+{
+	fValues[kDeviceID] = deviceID;
 }
 
 
@@ -247,55 +241,6 @@ void
 Configuration::SetUseCurrentTimeInDeviceID(bool use)
 {
 	fValues[kUseCurrentTimeInDeviceID] = _BooleanToString(use);
-}
-
-
-void
-Configuration::_GenerateDeviceID()
-{
-	// Try system UUID.
-	std::string deviceID = gComponents["SYSTEM"].fields["uuid"];
-
-	// If it's empty, use the MAC address of the first NIC
-	if (deviceID.length() <= 1) {
-		NetworkRoster roster;
-		NetworkInterface interface;
-		unsigned int cookie = 0;
-		while (roster.GetNextInterface(&cookie, interface) == 0) {
-			if (!interface.IsLoopback()) {
-				deviceID = interface.HardwareAddress();
-				deviceID.erase(std::remove(deviceID.begin(), deviceID.end(), ':'),
-						deviceID.end());
-				break;
-			}
-		}
-	}
-
-	// If it's empty (unlikely), just use the hostname
-	if (deviceID == "")
-		deviceID = gComponents["SYSTEM"].fields["hostname"];
-
-	char targetString[256];
-	struct tm biosDate;
-	if (UseCurrentTimeInDeviceID()) {
-		time_t rawtime = time(NULL);
-		localtime_r(&rawtime, &biosDate);
-	} else {
-		std::string biosDateString = gComponents["BIOS"].fields["release_date"];
-		// On some machines, this can be empty. So use an harcoded
-		// value, since we need a correct date for the device id
-		if (biosDateString.length() <= 1)
-			biosDateString = "01/01/2017";
-		::strptime(biosDateString.c_str(), "%m/%d/%Y", &biosDate);
-	}
-
-	// DeviceID needs to have a date appended in this very format,
-	// otherwise OCSInventoryNG will reject the inventory
-	::strftime(targetString, sizeof(targetString), "-%Y-%m-%d-00-00-00", &biosDate);
-
-    deviceID.append(targetString);
-
-    fValues[kDeviceID] = deviceID;
 }
 
 

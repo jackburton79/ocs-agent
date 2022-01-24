@@ -48,6 +48,8 @@ private:
 
     bool _WriteProlog(tinyxml2::XMLDocument& document) const;
 
+    std::string _GenerateDeviceID() const;
+
     tinyxml2::XMLDocument* fDocument;
     tinyxml2::XMLElement* fContent;
 };

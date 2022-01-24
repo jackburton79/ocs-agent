@@ -56,6 +56,11 @@ Inventory::Initialize()
 	Clear();
 
     std::string deviceID = Configuration::Get()->DeviceID();
+    if (deviceID.empty()) {
+    	deviceID = _GenerateDeviceID();
+    	Configuration::Get()->SetDeviceID(deviceID.c_str());
+    }
+
 	logger.LogFormat(LOG_INFO, "Inventory::Initialize(): Device ID: %s...", deviceID.c_str());
 	tinyxml2::XMLDeclaration* declaration = fDocument->NewDeclaration();
 	tinyxml2::XMLElement* request = fDocument->NewElement("REQUEST");
@@ -1007,4 +1012,53 @@ Inventory::_WriteProlog(tinyxml2::XMLDocument& document) const
 	request->LinkEndChild(query);
 
 	return true;
+}
+
+
+std::string
+Inventory::_GenerateDeviceID() const
+{
+	// Try system UUID.
+	std::string deviceID = gComponents["SYSTEM"].fields["uuid"];
+
+	// If it's empty, use the MAC address of the first NIC
+	if (deviceID.length() <= 1) {
+		NetworkRoster roster;
+		NetworkInterface interface;
+		unsigned int cookie = 0;
+		while (roster.GetNextInterface(&cookie, interface) == 0) {
+			if (!interface.IsLoopback()) {
+				deviceID = interface.HardwareAddress();
+				deviceID.erase(std::remove(deviceID.begin(), deviceID.end(), ':'),
+						deviceID.end());
+				break;
+			}
+		}
+	}
+
+	// If it's empty (unlikely), just use the hostname
+	if (deviceID == "")
+		deviceID = gComponents["SYSTEM"].fields["hostname"];
+
+	char targetString[256];
+	struct tm biosDate;
+	if (Configuration::Get()->UseCurrentTimeInDeviceID()) {
+		time_t rawtime = time(NULL);
+		localtime_r(&rawtime, &biosDate);
+	} else {
+		std::string biosDateString = gComponents["BIOS"].fields["release_date"];
+		// On some machines, this can be empty. So use an harcoded
+		// value, since we need a correct date for the device id
+		if (biosDateString.length() <= 1)
+			biosDateString = "01/01/2017";
+		::strptime(biosDateString.c_str(), "%m/%d/%Y", &biosDate);
+	}
+
+	// DeviceID needs to have a date appended in this very format,
+	// otherwise OCSInventoryNG will reject the inventory
+	::strftime(targetString, sizeof(targetString), "-%Y-%m-%d-00-00-00", &biosDate);
+
+    deviceID.append(targetString);
+
+    return deviceID;
 }

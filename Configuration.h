@@ -43,7 +43,9 @@ public:
 	void SetVolatileKeyValue(const char* key, const char* value);
 	std::string KeyValue(const char* key) const;
 	
-	std::string DeviceID() const;	
+	std::string DeviceID() const;
+	void SetDeviceID(const char* deviceID);
+
 	bool LocalInventory() const;
 
 	void SetUseCurrentTimeInDeviceID(bool use);
@@ -52,8 +54,6 @@ public:
 private:
 	Configuration();
 	~Configuration();
-
-	void _GenerateDeviceID();
 
 	static std::string _BooleanToString(bool value);
 	static bool _StringToBoolean(const std::string& string);
