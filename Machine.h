@@ -13,16 +13,8 @@
 #include <string>
 #include <vector>
 
-#include "backends/DataBackend.h"
 
 typedef std::map<std::string, std::string> string_map;
-
-class OSInfoBackend : public DataBackend {
-public:
-	OSInfoBackend();
-	virtual ~OSInfoBackend();
-    virtual int Run();
-};
 
 
 class Component {

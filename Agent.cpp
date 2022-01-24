@@ -17,6 +17,7 @@
 #include "backends/DMIDecodeBackend.h"
 #include "backends/LSHWBackend.h"
 #include "backends/MemInfoBackend.h"
+#include "backends/OSInfoBackend.h"
 #include "backends/UnameBackend.h"
 
 #include <cstdlib>
