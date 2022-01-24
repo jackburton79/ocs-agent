@@ -5,10 +5,12 @@
  *      Author: Stefano Ceccherini
  */
 
+#include "Components.h"
+
 #include "backends/CPUInfoBackend.h"
 #include "backends/DMIDecodeBackend.h"
 #include "backends/LSHWBackend.h"
-#include "Machine.h"
+
 #include <iostream>
 
 int main()

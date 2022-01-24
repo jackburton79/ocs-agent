@@ -6,7 +6,6 @@
  */
 
 #include "Configuration.h"
-#include "Machine.h"
 #include "NetworkInterface.h"
 #include "NetworkRoster.h"
 
@@ -17,6 +16,7 @@
 #include <fstream>
 
 #include <assert.h>
+#include <Components.h>
 #include <unistd.h>
 
 

@@ -12,8 +12,8 @@
 #include <string>
 #include <vector>
 
+#include "../Components.h"
 #include "DataBackend.h"
-#include "Machine.h"
 
 typedef std::map<int, string_map> dmi_db;
 

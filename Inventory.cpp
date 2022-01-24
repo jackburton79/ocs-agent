@@ -5,12 +5,12 @@
  *      Author: Stefano Ceccherini
  */
 
+#include <Components.h>
 #include "Inventory.h"
 
 #include "Agent.h"
 #include "Configuration.h"
 #include "Logger.h"
-#include "Machine.h"
 #include "NetworkInterface.h"
 #include "NetworkRoster.h"
 #include "ProcessRoster.h"

@@ -5,10 +5,10 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 LOCAL_CPP_SRCS = \
 ../Agent.cpp \
+../Components.cpp \
 ../Configuration.cpp \
 ../Inventory.cpp \
 ../Logger.cpp \
-../Machine.cpp \
 ../NetworkInterface.cpp \
 ../NetworkRoster.cpp \
 ../ProcReader.cpp \

@@ -1,12 +1,12 @@
 /*
- * Machine.cpp
+ * Components.cpp
  *
  *  Created on: 11/lug/2013
  *      Author: Stefano Ceccherini
  */
 
 
-#include "Machine.h"
+#include <Components.h>
 
 
 

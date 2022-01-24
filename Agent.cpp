@@ -6,12 +6,11 @@
  */
 
 
+#include <Components.h>
 #include "Agent.h"
 #include "Configuration.h"
 #include "Inventory.h"
 #include "Logger.h"
-#include "Machine.h"
-
 #include "backends/CPUInfoBackend.h"
 #include "backends/DMIDataBackend.h"
 #include "backends/DMIDecodeBackend.h"

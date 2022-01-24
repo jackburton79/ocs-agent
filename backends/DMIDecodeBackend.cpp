@@ -6,8 +6,9 @@
  */
 
 #include "DMIDecodeBackend.h"
+
+#include "Components.h"
 #include "Logger.h"
-#include "Machine.h"
 #include "Support.h"
 
 const char* kBIOSInfo = "BIOS Information";
