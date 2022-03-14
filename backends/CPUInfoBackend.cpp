@@ -6,7 +6,7 @@
 
 #include "CPUInfoBackend.h"
 
-#include "Machine.h"
+#include "Components.h"
 #include "ProcReader.h"
 #include "Support.h"
 
@@ -43,21 +43,17 @@ CPUInfoBackend::IsAvailable() const
 }
 
 
-/* virtual */
-int
-CPUInfoBackend::Run()
+static
+std::map<int, processor_info>
+GetCoresFromCPUInfo()
 {
-	if (!IsAvailable())
-		return -1;
-
 	ProcReader cpuReader("/proc/cpuinfo");
 	std::istream iStream(&cpuReader);
-
 	// First pass: we get every processor info into a map,
 	// based on processor number. Then we examine the map and 
 	// check if some cpu share the physical_id. If so, we merge
 	// them into the same processor (later).
-	std::map<int, processor_info> tmpCPUInfo;
+	std::map<int, processor_info> CPUInfo;
 	std::string string;
 	int processorNum = 0;
 	while (std::getline(iStream, string)) {
@@ -66,14 +62,14 @@ CPUInfoBackend::Run()
 			size_t pos = string.find(":");
 			if (pos == std::string::npos)
 				continue;
+
 			std::string valueString = string.substr(pos + 2, std::string::npos);
 			trim(valueString);
 			processorNum = ::strtol(valueString.c_str(), NULL, 10);
-
 			processor_info newInfo;
 			newInfo.physical_id = 0;
 			newInfo.cores = "1";
-			tmpCPUInfo[processorNum] = newInfo;
+			CPUInfo[processorNum] = newInfo;
 		} else {
 			size_t pos = string.find(":");
 			if (pos == std::string::npos)
@@ -85,25 +81,33 @@ CPUInfoBackend::Run()
 				trim(name);
 				trim(value);
 				if (name == "model name")
-					tmpCPUInfo[processorNum].type = value;
+					CPUInfo[processorNum].type = value;
 				else if (name == "cpu MHz")
-					tmpCPUInfo[processorNum].speed = value;
+					CPUInfo[processorNum].speed = value;
 				else if (name == "vendor_id")
-					tmpCPUInfo[processorNum].manufacturer = value;
+					CPUInfo[processorNum].manufacturer = value;
 				else if (name == "cpu cores")
-					tmpCPUInfo[processorNum].cores = value;
+					CPUInfo[processorNum].cores = value;
 				else if (name == "physical id")
-					tmpCPUInfo[processorNum].physical_id =
-						::strtol(value.c_str(), NULL, 0);
+					CPUInfo[processorNum].physical_id = ::strtol(
+							value.c_str(), NULL, 0);
 				else if (name == "cache size")
-					tmpCPUInfo[processorNum].cache_size = value;
+					CPUInfo[processorNum].cache_size = value;
 				else if (name == "siblings")
-					tmpCPUInfo[processorNum].logical_cpus = value;
-			} catch (...) {
+					CPUInfo[processorNum].logical_cpus = value;
+			}
+			catch (...) {
 			}
 		}
 	}
+	return CPUInfo;
+}
 
+
+static
+std::list<processor_info>
+BuildProcessorsList(std::map<int, processor_info>& tmpCPUInfo)
+{
 	std::list<processor_info> CPUs;
 	std::map<int, processor_info>::const_iterator i;
 	for (i = tmpCPUInfo.begin(); i != tmpCPUInfo.end(); i++) {
@@ -129,9 +133,27 @@ CPUInfoBackend::Run()
 			*it = processorInfo;
 		}
 	}
+	return CPUs;
+}
+
+
+/* virtual */
+int
+CPUInfoBackend::Run()
+{
+	if (!IsAvailable())
+		return -1;
+
+	std::map<int, processor_info> tmpCPUInfo = GetCoresFromCPUInfo();
+	if (tmpCPUInfo.size() == 0)
+		return -1;
+
+	std::list<processor_info> CPUs = BuildProcessorsList(tmpCPUInfo);
+	if (CPUs.size() == 0)
+		return -1;
 
 	// TODO: Multi cpu
-	processor_info& cpuInfo = CPUs.back();
+	const processor_info& cpuInfo = CPUs.back();
 	Component cpu;
 	cpu.fields["vendor"] = cpuInfo.manufacturer;
 	cpu.fields["cores"] = cpuInfo.cores;

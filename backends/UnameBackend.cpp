@@ -5,8 +5,9 @@
  *      Author: stefano
  */
 
-#include <backends/UnameBackend.h>
-#include "Machine.h"
+#include "UnameBackend.h"
+
+#include "Components.h"
 
 #include <cstring>
 #include <errno.h>

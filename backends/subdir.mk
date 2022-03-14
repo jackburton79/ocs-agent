@@ -10,6 +10,7 @@ LOCAL_CPP_SRCS = \
 ../backends/DMIDecodeBackend.cpp \
 ../backends/LSHWBackend.cpp \
 ../backends/MemInfoBackend.cpp \
+../backends/OSInfoBackend.cpp \
 ../backends/UnameBackend.cpp \
 
 LOCALOBJECTS= $(addprefix ./backends/, $(notdir $(LOCAL_CPP_SRCS:.cpp=.o)))

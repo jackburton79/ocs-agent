@@ -9,6 +9,7 @@
 
 #include "DataBackend.h"
 
+#include <map>
 #include <string>
 
 
@@ -17,8 +18,6 @@ public:
 	CPUInfoBackend();
 	virtual bool IsAvailable() const;
 	virtual int Run();
-private:
-	void _GetCPUInfo();
 };
 
 #endif // CPUINFOBACKEND_H_

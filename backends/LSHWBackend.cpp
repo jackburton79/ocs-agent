@@ -7,7 +7,7 @@
 
 #include "LSHWBackend.h"
 
-#include "Machine.h"
+#include "Components.h"
 #include "ProcReader.h"
 #include "Support.h"
 

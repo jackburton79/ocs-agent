@@ -1,52 +1,17 @@
 /*
- * Machine.cpp
+ * OSInfoBackend.cpp
  *
- *  Created on: 11/lug/2013
+ *  Created on: 24 gen 2022
  *      Author: Stefano Ceccherini
  */
 
+#include "OSInfoBackend.h"
 
-#include "Machine.h"
+#include "Components.h"
 #include "ProcReader.h"
 #include "Support.h"
 
-#include <errno.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <unistd.h>
-
-#include <iostream>
-#include <fstream>
-#include <map>
-#include <stdexcept>
-#include <string>
-#include <sstream>
-#include <vector>
-
-#include <tinyxml2/tinyxml2.h>
-
-#include <XML.h>
-
-
-components_map gComponents;
-
-
-void
-Component::MergeWith(Component& component)
-{
-	string_map::iterator i;
-	for (i = component.fields.begin(); i != component.fields.end(); i++) {
-		if (!i->second.empty() && i->second != "") {
-			string_map::iterator c = fields.find(i->first);
-			if (c == fields.end())
-				fields.insert(*i);
-			else if (c->second.empty())
-				c->second = i->second;
-		}
-	}
-}
-
 
 
 // OSInfoBackend
@@ -119,3 +84,5 @@ OSInfoBackend::Run()
 	gComponents.Merge("OS", os);
 	return 0;
 }
+
+

@@ -4,12 +4,14 @@
  *      Author: Stefano Ceccherini
  */
 
-#include <StorageRoster.h>
+#include "StorageRoster.h"
+
 #include "ProcReader.h"
 #include "Support.h"
 
 #include <iostream>
 #include <istream>
+
 
 StorageRoster::StorageRoster()
 {
@@ -24,7 +26,6 @@ StorageRoster::_ReadStoragesInfo()
 		ProcReader procReader("/proc/scsi/scsi");
 
 		std::istream stream(&procReader);
-		std::string line;
 
 		for (;;) {
 			std::string dummy;

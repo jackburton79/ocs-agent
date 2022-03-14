@@ -1,28 +1,20 @@
 /*
- * Machine.h
+ * Components.h
  *
  *  Created on: 11/lug/2013
  *      Author: Stefano Ceccherini
  */
 
-#ifndef MACHINE_H_
-#define MACHINE_H_
+#ifndef COMPONENTS_H_
+#define COMPONENTS_H_
 
 #include <map>
 #include <stdexcept>
 #include <string>
 #include <vector>
 
-#include "backends/DataBackend.h"
 
 typedef std::map<std::string, std::string> string_map;
-
-class OSInfoBackend : public DataBackend {
-public:
-	OSInfoBackend();
-	virtual ~OSInfoBackend();
-    virtual int Run();
-};
 
 
 class Component {
@@ -54,4 +46,4 @@ public:
 extern components_map gComponents;
 
 
-#endif /* MACHINE_H_ */
+#endif /* COMPONENTS_H_ */
