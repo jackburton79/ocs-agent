@@ -1256,7 +1256,7 @@
  { "Matrox", "MTX" },
  { "Mat&#039;s Computers", "MCQ" },
  { "Matsushita Communication Industrial Co., Ltd.", "WPA" },
- { "Matsushita Electric Ind. Company Ltd", "MAT" },
+ { "Panasonic Connect Co.,Ltd.", "MAT" },
  { "MaxCom Technical Inc", "MTI" },
  { "MaxData Computer AG", "VOB" },
  { "MaxData Computer GmbH &amp; Co.KG", "MXD" },
@@ -2495,3 +2495,4 @@
  { "SAMPO CORPORATION", "SPO" },
  { "Shiftall Inc.", "SFL" },
  { "AudioControl", "AUD" },
+ { "Schneider Consumer Group", "SCA" },
