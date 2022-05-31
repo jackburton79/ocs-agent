@@ -15,8 +15,8 @@
 #include <string>
 
 struct pnp_id {
-	const char* manufacturer;
 	const char* id;
+	const char* manufacturer;
 	bool operator==(const pnp_id& a) const { return ::strcasecmp(a.id, id) == 0; };
 	bool operator()(const pnp_id& a, const pnp_id& b) const { return ::strcasecmp(a.id, b.id) < 0; };
 };
@@ -45,8 +45,7 @@ Screens::Screens()
 			}
 		}
 	}
-	const size_t numElements = sizeof(kPNPIDs) / sizeof(kPNPIDs[0]);
-	std::sort(kPNPIDs, kPNPIDs + numElements, kPNPIDs[0]);
+
 	Rewind();
 }
 
@@ -54,8 +53,9 @@ Screens::Screens()
 std::string
 GetManufacturerFromID(const std::string& string)
 {
+	// We assume the array is sorted
 	const size_t numElements = sizeof(kPNPIDs) / sizeof(kPNPIDs[0]);
-	const struct pnp_id key = { "dummy", string.c_str() };
+	const struct pnp_id key = { string.c_str(), "dummy" };
 	const pnp_id* element = std::find(kPNPIDs, kPNPIDs + numElements, key);
 
 	return element->manufacturer;
