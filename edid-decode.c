@@ -100,7 +100,7 @@ static int mon_max_vert_freq_hz = 0;
 static int mon_max_pixclk_khz = 0;
 static unsigned supported_hdmi_vic_codes = 0;
 
-static char serial_string[13];
+static char serial_string[26];
 static char model_string[13];
 
 enum output_format {
@@ -1495,6 +1495,7 @@ static int edid_from_file(const char *from_file, struct edid_info* info)
 
 	// Fill edid_info struct
 	// Manufacturer
+
 	strncpy(info->manufacturer, manufacturer_name(edid + 0x08), sizeof(info->manufacturer));
 
 	// TODO: find out what is the binary number after the %s.%x. I think
@@ -1503,8 +1504,24 @@ static int edid_from_file(const char *from_file, struct edid_info* info)
 
 	// Model / Serial Number
 	strncpy(info->model, model_string, sizeof(info->model));
-	strncpy(info->serial_number, serial_string, sizeof(info->serial_number));
-	
+
+	int acer = strcmp(manufacturer_name(edid + 0x08), "ACR") == 0;
+	if (acer != 0) {
+		/* (Certain?) ACER displays have the serial number scattered in two places:
+		 * The first 8 characters is encoded as a hex string immediately after the 000000ff00 flag
+		 * the last 4 characters are encoded after this first 8 characters
+		 * the middle part is encoded as 4 strings earlier in the EDID block
+		 */
+		strncpy(info->serial_number, serial_string, 8);
+		char middle[9];
+		sprintf(middle, "%02x%02x%02x%02x%02x%02x%02x%02x", edid[15], edid[14], edid[13], edid[12],
+														edid[11], edid[10], edid[9], edid[8]);
+		middle[8] = '\0';
+		strcat(info->serial_number, middle);
+		strcat(info->serial_number, &serial_string[8]);
+	} else
+		strncpy(info->serial_number, serial_string, sizeof(info->serial_number));
+
 	if (analog)
 		snprintf(info->type, sizeof(info->type), "Analog display");
 	else
