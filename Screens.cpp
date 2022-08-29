@@ -21,7 +21,7 @@ struct pnp_id {
 	bool operator()(const pnp_id& a, const pnp_id& b) const { return ::strcasecmp(a.id, b.id) < 0; };
 };
 
-static struct pnp_id kPNPIDs[] = {
+static const struct pnp_id kPNPIDs[] = {
 #include "pnp_ids.h"
 };
 
@@ -49,16 +49,17 @@ Screens::Screens()
 	Rewind();
 }
 
+
 std::string
 GetManufacturerFromID(const std::string& string)
 {
 	// We assume the array is sorted
 	const size_t numElements = sizeof(kPNPIDs) / sizeof(kPNPIDs[0]);
 	const struct pnp_id key = { string.c_str(), "dummy" };
-	pnp_id* lastElement = kPNPIDs + numElements;
+	const pnp_id* lastElement = kPNPIDs + numElements;
 	const pnp_id* element = std::find(kPNPIDs, lastElement, key);
 	if (element == lastElement) {
-		//  can't find the vendor string, return the code
+		//  can't find the supplied vendor code, return it as is
 		return string;
 	}
 
