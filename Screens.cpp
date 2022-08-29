@@ -49,15 +49,15 @@ Screens::Screens()
 	Rewind();
 }
 
-
 std::string
 GetManufacturerFromID(const std::string& string)
 {
 	// We assume the array is sorted
 	const size_t numElements = sizeof(kPNPIDs) / sizeof(kPNPIDs[0]);
 	const struct pnp_id key = { string.c_str(), "dummy" };
-	const pnp_id* element = std::find(kPNPIDs, kPNPIDs + numElements, key);
-	if (element == NULL) {
+	pnp_id* lastElement = kPNPIDs + numElements;
+	const pnp_id* element = std::find(kPNPIDs, lastElement, key);
+	if (element == lastElement) {
 		//  can't find the vendor string, return the code
 		return string;
 	}
