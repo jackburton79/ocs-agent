@@ -43,11 +43,11 @@ Inventory::Initialize()
 
 	logger.LogFormat(LOG_INFO, "Inventory::Initialize(): Device ID: %s...", deviceID.c_str());
 
-	fFormat->Initialize();
+	bool result = fFormat->Initialize();
 
 	logger.LogFormat(LOG_INFO, "Inventory::Initialize(): Device ID: %s... OK!", deviceID.c_str());
 
-	return true;
+	return result;
 }
 
 
@@ -65,10 +65,10 @@ Inventory::Build(bool noSoftware)
 
 	logger.Log(LOG_INFO, "Building inventory...");
 
-	fFormat->Build(noSoftware);
+	bool result = fFormat->Build(noSoftware);
 
 	logger.Log(LOG_INFO, "Building inventory... Done!");
-	return true;
+	return result;
 }
 
 
