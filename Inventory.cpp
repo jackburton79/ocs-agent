@@ -98,23 +98,21 @@ Inventory::Build(bool noSoftware)
 
 	logger.Log(LOG_INFO, "Building inventory...");
 
-	tinyxml2::XMLElement* content = fContent;
-
 	try {
-		_AddAccountInfo(content);
-		_AddBIOSInfo(content);
-		_AddCPUsInfo(content);
-		_AddStoragesInfo(content);
-		_AddDrivesInfo(content);
-		_AddMemoriesInfo(content);
-		_AddHardwareInfo(content);
-		_AddNetworksInfo(content);
-		_AddProcessesInfo(content);
+		_AddAccountInfo();
+		_AddBIOSInfo();
+		_AddCPUsInfo();
+		_AddStoragesInfo();
+		_AddDrivesInfo();
+		_AddMemoriesInfo();
+		_AddHardwareInfo();
+		_AddNetworksInfo();
+		_AddProcessesInfo();
 		if (!noSoftware)
-			_AddSoftwaresInfo(content);
-		_AddUsersInfo(content);
-		_AddVideosInfo(content);
-		_AddMonitorsInfo(content);
+			_AddSoftwaresInfo();
+		_AddUsersInfo();
+		_AddVideosInfo();
+		_AddMonitorsInfo();
 	} catch (...) {
 		// Something failed.
 	}
@@ -295,7 +293,7 @@ Inventory::Checksum() const
 
 // Private
 void
-Inventory::_AddAccountInfo(tinyxml2::XMLElement* parent)
+Inventory::_AddAccountInfo()
 {
 	Logger& logger = Logger::GetDefault();
 
@@ -314,13 +312,13 @@ Inventory::_AddAccountInfo(tinyxml2::XMLElement* parent)
 	accountInfo->LinkEndChild(keyName);
 	accountInfo->LinkEndChild(keyValue);
 
-	parent->LinkEndChild(accountInfo);
+	fContent->LinkEndChild(accountInfo);
 	logger.Log(LOG_DEBUG, "\tAdded Account Info!");
 }
 
 
 void
-Inventory::_AddBIOSInfo(tinyxml2::XMLElement* parent)
+Inventory::_AddBIOSInfo()
 {
 	Logger& logger = Logger::GetDefault();
 
@@ -378,14 +376,14 @@ Inventory::_AddBIOSInfo(tinyxml2::XMLElement* parent)
 	bios->LinkEndChild(ssn);
 	bios->LinkEndChild(type);
 
-	parent->LinkEndChild(bios);
+	fContent->LinkEndChild(bios);
 
 	logger.Log(LOG_DEBUG, "\tAdded BIOS Info!");
 }
 
 
 void
-Inventory::_AddCPUsInfo(tinyxml2::XMLElement* parent)
+Inventory::_AddCPUsInfo()
 {
 	Logger& logger = Logger::GetDefault();
 
@@ -463,14 +461,14 @@ Inventory::_AddCPUsInfo(tinyxml2::XMLElement* parent)
 		cpu->LinkEndChild(logicalCpu);
 		cpu->LinkEndChild(voltage);
 
-		parent->LinkEndChild(cpu);
+		fContent->LinkEndChild(cpu);
 	}
 	logger.Log(LOG_DEBUG, "\tAdded CPUs Info!");
 }
 
 
 void
-Inventory::_AddStoragesInfo(tinyxml2::XMLElement* parent)
+Inventory::_AddStoragesInfo()
 {
 	Logger& logger = Logger::GetDefault();
 
@@ -512,7 +510,7 @@ Inventory::_AddStoragesInfo(tinyxml2::XMLElement* parent)
 		storage->LinkEndChild(serialNumber);
 		storage->LinkEndChild(firmware);
 
-		parent->LinkEndChild(storage);
+		fContent->LinkEndChild(storage);
 	}
 
 	logger.Log(LOG_DEBUG, "\tAdded Storage Info!");
@@ -520,7 +518,7 @@ Inventory::_AddStoragesInfo(tinyxml2::XMLElement* parent)
 
 
 void
-Inventory::_AddMemoriesInfo(tinyxml2::XMLElement* parent)
+Inventory::_AddMemoriesInfo()
 {
 	Logger& logger = Logger::GetDefault();
 
@@ -568,7 +566,7 @@ Inventory::_AddMemoriesInfo(tinyxml2::XMLElement* parent)
 		serial->LinkEndChild(fDocument->NewText(ramSlot.fields["serial"].c_str()));
 		memory->LinkEndChild(serial);
 
-		parent->LinkEndChild(memory);
+		fContent->LinkEndChild(memory);
 		slotNum++;
 	}
 	logger.Log(LOG_DEBUG, "\tAdded Memory Info!");
@@ -576,7 +574,7 @@ Inventory::_AddMemoriesInfo(tinyxml2::XMLElement* parent)
 
 
 void
-Inventory::_AddDrivesInfo(tinyxml2::XMLElement* parent)
+Inventory::_AddDrivesInfo()
 {
 	Logger& logger = Logger::GetDefault();
 
@@ -617,7 +615,7 @@ Inventory::_AddDrivesInfo(tinyxml2::XMLElement* parent)
 		drive->LinkEndChild(total);
 		drive->LinkEndChild(type);
 		drive->LinkEndChild(volumeName);
-		parent->LinkEndChild(drive);
+		fContent->LinkEndChild(drive);
 	}
 
 	logger.Log(LOG_DEBUG, "\tAdded Drives info!");
@@ -625,7 +623,7 @@ Inventory::_AddDrivesInfo(tinyxml2::XMLElement* parent)
 
 
 void
-Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
+Inventory::_AddHardwareInfo()
 {
 	Logger& logger = Logger::GetDefault();
 
@@ -734,14 +732,14 @@ Inventory::_AddHardwareInfo(tinyxml2::XMLElement* parent)
 		hardware->LinkEndChild(lastLoggedUser);
 	}
 
-	parent->LinkEndChild(hardware);
+	fContent->LinkEndChild(hardware);
 
 	logger.Log(LOG_DEBUG, "\tAdded Hardware info!");
 }
 
 
 void
-Inventory::_AddNetworksInfo(tinyxml2::XMLElement* parent)
+Inventory::_AddNetworksInfo()
 {
 	Logger& logger = Logger::GetDefault();
 
@@ -808,7 +806,7 @@ Inventory::_AddNetworksInfo(tinyxml2::XMLElement* parent)
 		virtualDevice->LinkEndChild(fDocument->NewText(""));
 		networks->LinkEndChild(virtualDevice);
 
-		parent->LinkEndChild(networks);
+		fContent->LinkEndChild(networks);
 	}
 
 	logger.Log(LOG_DEBUG, "\tAdded Networks info!");
@@ -816,7 +814,7 @@ Inventory::_AddNetworksInfo(tinyxml2::XMLElement* parent)
 
 
 void
-Inventory::_AddProcessesInfo(tinyxml2::XMLElement* parent)
+Inventory::_AddProcessesInfo()
 {
 	Logger& logger = Logger::GetDefault();
 
@@ -858,7 +856,7 @@ Inventory::_AddProcessesInfo(tinyxml2::XMLElement* parent)
 		process->LinkEndChild(user);
 		process->LinkEndChild(virtualMem);
 
-		parent->LinkEndChild(process);
+		fContent->LinkEndChild(process);
 	}
 
 	logger.Log(LOG_DEBUG, "\tAdded Processes list!");
@@ -866,7 +864,7 @@ Inventory::_AddProcessesInfo(tinyxml2::XMLElement* parent)
 
 
 void
-Inventory::_AddSoftwaresInfo(tinyxml2::XMLElement* parent)
+Inventory::_AddSoftwaresInfo()
 {
 	Logger& logger = Logger::GetDefault();
 
@@ -900,14 +898,14 @@ Inventory::_AddSoftwaresInfo(tinyxml2::XMLElement* parent)
 		software->LinkEndChild(installdate);
 		software->LinkEndChild(version);
 
-		parent->LinkEndChild(software);
+		fContent->LinkEndChild(software);
 	}
 	logger.Log(LOG_DEBUG, "\tAdded Software list!");
 }
 
 
 void
-Inventory::_AddUsersInfo(tinyxml2::XMLElement* parent)
+Inventory::_AddUsersInfo()
 {
 	Logger& logger = Logger::GetDefault();
 
@@ -920,14 +918,14 @@ Inventory::_AddUsersInfo(tinyxml2::XMLElement* parent)
 		login->LinkEndChild(fDocument->NewText(userEntry.login.c_str()));
 		users->LinkEndChild(login);
 	}
-	parent->LinkEndChild(users);
+	fContent->LinkEndChild(users);
 
 	logger.Log(LOG_DEBUG, "\tAdded User info!");
 }
 
 
 void
-Inventory::_AddVideosInfo(tinyxml2::XMLElement* parent)
+Inventory::_AddVideosInfo()
 {
 	Logger& logger = Logger::GetDefault();
 
@@ -955,14 +953,14 @@ Inventory::_AddVideosInfo(tinyxml2::XMLElement* parent)
 		video->LinkEndChild(name);
 		video->LinkEndChild(resolution);
 
-		parent->LinkEndChild(video);
+		fContent->LinkEndChild(video);
 	}
 	logger.Log(LOG_DEBUG, "\tAdded Video info!");
 }
 
 
 void
-Inventory::_AddMonitorsInfo(tinyxml2::XMLElement* parent)
+Inventory::_AddMonitorsInfo()
 {
 	Logger& logger = Logger::GetDefault();
 
@@ -988,7 +986,7 @@ Inventory::_AddMonitorsInfo(tinyxml2::XMLElement* parent)
 		monitor->LinkEndChild(manufacturer);
 		monitor->LinkEndChild(serial);
 
-		parent->LinkEndChild(monitor);
+		fContent->LinkEndChild(monitor);
 	}
 
 	logger.Log(LOG_DEBUG, "\tAdded Display info!");

@@ -32,19 +32,19 @@ public:
 	int Checksum() const;
 
 private:
-    void _AddAccountInfo(tinyxml2::XMLElement* parent);
-    void _AddBIOSInfo(tinyxml2::XMLElement* parent);
-    void _AddCPUsInfo(tinyxml2::XMLElement* parent);
-    void _AddStoragesInfo(tinyxml2::XMLElement* parent);
-    void _AddMemoriesInfo(tinyxml2::XMLElement* parent);
-    void _AddDrivesInfo(tinyxml2::XMLElement* parent);
-    void _AddHardwareInfo(tinyxml2::XMLElement* parent);
-    void _AddNetworksInfo(tinyxml2::XMLElement* parent);
-    void _AddProcessesInfo(tinyxml2::XMLElement* parent);
-    void _AddSoftwaresInfo(tinyxml2::XMLElement* parent);
-    void _AddUsersInfo(tinyxml2::XMLElement* parent);
-    void _AddVideosInfo(tinyxml2::XMLElement* parent);
-    void _AddMonitorsInfo(tinyxml2::XMLElement* parent);
+    void _AddAccountInfo();
+    void _AddBIOSInfo();
+    void _AddCPUsInfo();
+    void _AddStoragesInfo();
+    void _AddMemoriesInfo();
+    void _AddDrivesInfo();
+    void _AddHardwareInfo();
+    void _AddNetworksInfo();
+    void _AddProcessesInfo();
+    void _AddSoftwaresInfo();
+    void _AddUsersInfo();
+    void _AddVideosInfo();
+    void _AddMonitorsInfo();
 
     bool _WriteProlog(tinyxml2::XMLDocument& document) const;
 
