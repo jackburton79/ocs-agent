@@ -26,6 +26,7 @@ struct option sLongOptions[] = {
 		{ "server", required_argument, 0, 's' },
 		{ "local", required_argument, 0, 'l' },
 		{ "stdout", no_argument, 0, 0 },
+		{ "format", required_argument, 0, 0 },
 		{ "tag", required_argument, 0, 't' },
 		{ "nosoftware", no_argument, 0, 0 },
 		{ "daemonize", no_argument, 0, 'd' },
@@ -53,6 +54,7 @@ PrintHelpAndExit()
 	std::cout << "  -c, --conf <config_file>           Specify configuration file" << std::endl;
 	std::cout << "  -s, --server <server>              Specify OCSInventory server url" << std::endl;
 	std::cout << "                                     If the server needs authentication, use the standard syntax <user>:<password>@<host>" << std::endl;
+	std::cout << "      --format <format>              Specify the inventory format: FORMAT_OCS or FORMAT_JSON" << std::endl;
 	std::cout << "  -l, --local <folder>               Don't send inventory, instead save a local copy in the specified file or folder" << std::endl;
 	std::cout << "      --stdout                       Don't send inventory, print it to stdout" << std::endl;
 	std::cout << std::endl;
@@ -156,6 +158,8 @@ HandleArgs(int argc, char **argv)
 				std::string optName = sLongOptions[optIndex].name;
 				if (optName == "nosoftware")
 					config->SetVolatileKeyValue("nosoftware", "true");
+				else if (optName == "format")
+					config->SetVolatileKeyValue("format", optarg);
 				else if (optName == "stdout" && !daemonize)
 					config->SetVolatileKeyValue("stdout", "true");
 				else if (optName == "use-current-time-in-device-ID")
