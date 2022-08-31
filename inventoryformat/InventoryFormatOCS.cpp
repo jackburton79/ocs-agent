@@ -51,8 +51,6 @@ InventoryFormatOCS::~InventoryFormatOCS()
 bool
 InventoryFormatOCS::Initialize()
 {
-	Logger& logger = Logger::GetDefault();
-
 	std::string deviceID = Configuration::Get()->DeviceID();
 
 	tinyxml2::XMLDeclaration* declaration = fDocument->NewDeclaration();
@@ -71,8 +69,6 @@ InventoryFormatOCS::Initialize()
 	deviceIdElement->LinkEndChild(fDocument->NewText(deviceID.c_str()));
 	request->LinkEndChild(deviceIdElement);
 
-	logger.LogFormat(LOG_INFO, "InventoryFormatOCS::Initialize(): Device ID: %s... OK!", deviceID.c_str());
-
 	return true;
 }
 
@@ -87,10 +83,6 @@ InventoryFormatOCS::Clear()
 bool
 InventoryFormatOCS::Build(bool noSoftware)
 {
-	Logger& logger = Logger::GetDefault();
-
-	logger.Log(LOG_INFO, "Building inventory...");
-
 	try {
 		_AddAccountInfo();
 		_AddBIOSInfo();
@@ -110,7 +102,6 @@ InventoryFormatOCS::Build(bool noSoftware)
 		// Something failed.
 	}
 
-	logger.Log(LOG_INFO, "Building inventory... Done!");
 	return true;
 }
 
@@ -121,17 +112,7 @@ InventoryFormatOCS::Save(const char* fileName)
 	if (fileName == NULL)
 		return false;
 
-	Logger& logger = Logger::GetDefault();
-
-	logger.LogFormat(LOG_INFO, "Saving %s inventory as %s", Configuration::Get()->DeviceID().c_str(), fileName);
-
-	bool result = fDocument->SaveFile(fileName) == tinyxml2::XML_SUCCESS;
-	if (result)
-		logger.Log(LOG_INFO, "InventoryFormatOCS saved correctly!");
-	else
-		logger.Log(LOG_INFO, "Failed to save inventory!");
-
-	return result;
+	return fDocument->SaveFile(fileName) == tinyxml2::XML_SUCCESS;
 }
 
 
