@@ -6,9 +6,10 @@ RM := rm -rf
 
 # All of the sources participating in the build are defined here
 -include sources.mk
--include tinyxml2/subdir.mk
 -include backends/subdir.mk
 -include http/subdir.mk
+-include inventoryformat/subdir.mk
+-include tinyxml2/subdir.mk
 -include subdir.mk
 -include objects.mk
 

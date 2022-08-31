@@ -26,4 +26,4 @@ SUBDIRS := \
 tinyxml2 \
 backends \
 http \
-
+inventoryformat \
