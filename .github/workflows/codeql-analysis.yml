@@ -11,9 +11,6 @@
 #
 name: "CodeQL"
 
-paths-ignore:
-  - '**/tinyxml2/**'
-
 on:
   push:
     branches: [ master ]
@@ -72,3 +69,6 @@ jobs:
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
+      with:
+        paths-ignore: '**/tinyxml2/**'
+        category: "/language:${{matrix.language}}"
