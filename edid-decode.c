@@ -1513,12 +1513,15 @@ static int edid_from_file(const char *from_file, struct edid_info* info)
 		 * the middle part is encoded as 4 strings earlier in the EDID block
 		 */
 		strncpy(info->serial_number, serial_string, 8);
+		info->serial_number[8] = '\0';
+
 		char middle[9];
-		sprintf(middle, "%02x%02x%02x%02x%02x%02x%02x%02x", edid[15], edid[14], edid[13], edid[12],
+		sprintf(middle, "%x%x%x%x%x%x%x%x", edid[15], edid[14], edid[13], edid[12],
 														edid[11], edid[10], edid[9], edid[8]);
 		middle[8] = '\0';
-		strcat(info->serial_number, middle);
-		strcat(info->serial_number, &serial_string[8]);
+
+		strncat(info->serial_number, middle, 8);
+		strncat(info->serial_number, &serial_string[8], sizeof(serial_string) - 8);
 	} else
 		strncpy(info->serial_number, serial_string, sizeof(info->serial_number));
 
