@@ -22,6 +22,8 @@
 /* Author: Adam Jackson <ajax@nwnk.net> */
 /* Maintainer: Hans Verkuil <hverkuil-cisco@xs4all.nl> */
 
+/* Other changes by Stefano Ceccherini */
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -34,6 +36,7 @@
 #include <time.h>
 #include <ctype.h>
 #include <math.h>
+
 
 #include "EDID.h"
 
@@ -1495,18 +1498,18 @@ static int edid_from_file(const char *from_file, struct edid_info* info)
 
 	// Fill edid_info struct
 	// Manufacturer
-
 	strncpy(info->manufacturer, manufacturer_name(edid + 0x08), sizeof(info->manufacturer));
 
 	// TODO: find out what is the binary number after the %s.%x. I think
 	// it's the manufacturer code, but how is it generated ?
-	snprintf(info->description, sizeof(info->description), "%s.%x.000000000 (%hd/%hd)", info->manufacturer, model, week, year);
+	snprintf(info->description, sizeof(info->description), "%s.%x.000000000 (%hd/%hd)",
+			info->manufacturer, model, week, year);
 
 	// Model / Serial Number
 	strncpy(info->model, model_string, sizeof(info->model));
 
-	int acer = strcmp(manufacturer_name(edid + 0x08), "ACR") == 0;
-	if (acer != 0) {
+	int isAcer = strcmp(manufacturer_name(edid + 0x08), "ACR") == 0;
+	if (isAcer != 0) {
 		/* (Certain?) ACER displays have the serial number scattered in two places:
 		 * The first 8 characters is encoded as a hex string immediately after the 000000ff00 flag
 		 * the last 4 characters are encoded after this first 8 characters
@@ -1516,8 +1519,9 @@ static int edid_from_file(const char *from_file, struct edid_info* info)
 		info->serial_number[8] = '\0';
 
 		char middle[9];
-		sprintf(middle, "%x%x%x%x%x%x%x%x", edid[15], edid[14], edid[13], edid[12],
-														edid[11], edid[10], edid[9], edid[8]);
+		snprintf(middle, sizeof(middle), "%x%x%x%x%x%x%x%x",
+				edid[15], edid[14], edid[13], edid[12],
+				edid[11], edid[10], edid[9], edid[8]);
 		middle[8] = '\0';
 
 		strncat(info->serial_number, middle, 8);
