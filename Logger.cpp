@@ -17,61 +17,33 @@
 
 extern const char* __progname;
 
-static Logger* sDefaultLogger;
 
-class StdErrLogger : public Logger {
-public:
-	StdErrLogger(const char* logName);
-	virtual ~StdErrLogger();
-
-private:
-	virtual void DoLog(int level, const char* string);
-};
-
-
-class SyslogLogger : public Logger {
-public:
-	SyslogLogger(const char* logName);
-	virtual ~SyslogLogger();
-
-private:
-	virtual void DoLog(int level, const char* string);
-};
-
-
-Logger::Logger(const char* logName)
-	:
-	fLevel(LOG_INFO)
-{
-}
-
-
-Logger::~Logger()
-{
-}
-
+Logger::LOGGER_TYPE Logger::sLogType = LOGGER_TYPE_DEFAULT;
+int Logger::sLevel;
 
 void
 Logger::SetLevel(int level)
 {
-	fLevel = level;
+	sLevel = level;
 }
 
 
+/* static */
 void
 Logger::Log(int level, const char* const string)
 {
-	if (level > fLevel)
+	if (level > sLevel)
 		return;
 
-	DoLog(level, string);
+	_DoLog(level, string);
 }
 
 
+/* static */
 void
 Logger::LogFormat(int level, const char* fmtString, ...)
 {
-	if (level > fLevel)
+	if (level > sLevel)
 		return;
 
 	char logString[1024];
@@ -79,100 +51,50 @@ Logger::LogFormat(int level, const char* fmtString, ...)
 	::va_start(argp, fmtString);
 	::vsnprintf(logString, sizeof(logString), fmtString, argp);
 	::va_end(argp);
-	DoLog(level, logString);
+	_DoLog(level, logString);
 }
 
 
 /* static */
-Logger&
-Logger::GetDefault()
+void
+Logger::SetLogger(LOGGER_TYPE loggerType)
 {
-	return Get(LOGGER_TYPE_DEFAULT);
+	sLogType = loggerType;
 }
 
 
 /* static */
-Logger&
-Logger::Get(int loggerType)
-{
-	if (sDefaultLogger == NULL) {
-		switch (loggerType) {
-			case LOGGER_TYPE_SYSLOG:
-				sDefaultLogger = new SyslogLogger(__progname);
-				break;
-			case LOGGER_TYPE_STDERR:
-				sDefaultLogger = new StdErrLogger(__progname);
-				break;
-			case LOGGER_TYPE_DEFAULT:
-			default:
-				if (::isatty(STDIN_FILENO))
-					sDefaultLogger = new StdErrLogger(__progname);
-				else
-					sDefaultLogger = new SyslogLogger(__progname);
-				break;
-		}
-	}
-	if (sDefaultLogger == NULL)
-		throw std::runtime_error("Logger::Get(): cannot instantiate logger!");
-
-	return *sDefaultLogger;
-}
-
-
-/* static */
-Logger&
-Logger::Get(const std::string& loggerType)
+void
+Logger::SetLogger(const std::string& loggerType)
 {
 	if (::strcasecmp(loggerType.c_str(), "STDERR") == 0)
-		return Get(Logger::LOGGER_TYPE_STDERR);
+		SetLogger(Logger::LOGGER_TYPE_STDERR);
 	else if (::strcasecmp(loggerType.c_str(), "SYSLOG") == 0)
-		return Get(Logger::LOGGER_TYPE_SYSLOG);
+		SetLogger(Logger::LOGGER_TYPE_SYSLOG);
 	else
-		return Get(Logger::LOGGER_TYPE_DEFAULT);
+		SetLogger(Logger::LOGGER_TYPE_DEFAULT);
 }
 
 
-// StdErrLogger
-StdErrLogger::StdErrLogger(const char* logName)
-	:
-	Logger(logName)
-{
-}
-
-
-/* virtual */
-StdErrLogger::~StdErrLogger()
-{
-}
-
-
-/* virtual */
+/* static */
 void
-StdErrLogger::DoLog(int level, const char* string)
+Logger::_DoLog(int level, const char* string)
 {
-	std::cerr << string << std::endl;
+	switch (sLogType) {
+		case LOGGER_TYPE_SYSLOG:
+			::syslog(level|LOG_PID|LOG_CONS|LOG_USER, "%s", (const char* const)string);
+			break;
+		case LOGGER_TYPE_STDERR:
+			std::cerr << string << std::endl;
+			break;
+		case LOGGER_TYPE_DEFAULT:
+		default:
+			if (::isatty(STDIN_FILENO))
+				std::cerr << string << std::endl;
+			else
+				::syslog(level|LOG_PID|LOG_CONS|LOG_USER, "%s", (const char* const)string);
+			break;
+	}
+
 }
 
-
-// SyslogLogger
-SyslogLogger::SyslogLogger(const char* logName)
-	:
-	Logger(logName)
-{
-	::openlog(logName, LOG_PID|LOG_CONS, LOG_USER);
-}
-
-
-/* virtual */
-SyslogLogger::~SyslogLogger()
-{
-	::closelog();
-}
-
-
-/* virtual */
-void
-SyslogLogger::DoLog(int level, const char* string)
-{
-	::syslog(level, "%s", (const char* const)string);
-}

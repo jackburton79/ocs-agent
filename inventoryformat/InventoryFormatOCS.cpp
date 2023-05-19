@@ -121,16 +121,14 @@ InventoryFormatOCS::Send(const char* serverUrl)
 {
 	URL inventoryUrl(serverUrl);
 
-	Logger& logger = Logger::GetDefault();
-
 	// Prepare prolog
-	logger.LogFormat(LOG_INFO, "InventoryFormatOCS::Send(): server URL: %s", serverUrl);
+	Logger::LogFormat(LOG_INFO, "InventoryFormatOCS::Send(): server URL: %s", serverUrl);
 	tinyxml2::XMLDocument prolog;
 	_WriteProlog(prolog);
 	char* prologData = NULL;
 	size_t prologLength = 0;
 	if (!XML::Compress(prolog, prologData, prologLength)) {
-		logger.Log(LOG_ERR, "Error while compressing XML prolog!");
+		Logger::Log(LOG_ERR, "Error while compressing XML prolog!");
 		return false;
 	}
 
@@ -158,20 +156,20 @@ InventoryFormatOCS::Send(const char* serverUrl)
 			: Agent::LegacyAgentString();
 		requestHeader.SetUserAgent(userAgentString);
 
-		logger.Log(LOG_INFO, "InventoryFormatOCS::Send(): Prolog prepared!");
-		logger.LogFormat(LOG_DEBUG, "%s", requestHeader.ToString().c_str());
+		Logger::Log(LOG_INFO, "InventoryFormatOCS::Send(): Prolog prepared!");
+		Logger::LogFormat(LOG_DEBUG, "%s", requestHeader.ToString().c_str());
 		if (httpObject.Request(requestHeader, prologData, prologLength) != 0) {
 			delete[] prologData;
-			logger.LogFormat(LOG_INFO, "InventoryFormatOCS::Send(): Failed to send prolog: %s",
+			Logger::LogFormat(LOG_INFO, "InventoryFormatOCS::Send(): Failed to send prolog: %s",
 						httpObject.ErrorString().c_str());
 			return false;
 		}
 
-		logger.Log(LOG_INFO, "InventoryFormatOCS::Send(): Prolog Sent!");
+		Logger::Log(LOG_INFO, "InventoryFormatOCS::Send(): Prolog Sent!");
 		const HTTPResponseHeader& responseHeader = httpObject.LastResponse();
 		if (responseHeader.StatusCode() == HTTP_BAD_REQUEST) {
 			if (c == 0) {
-				logger.LogFormat(LOG_INFO, "Server didn't accept prolog. Try again with standard agent string.");
+				Logger::LogFormat(LOG_INFO, "Server didn't accept prolog. Try again with standard agent string.");
 				continue;
 			}
 		}
@@ -180,8 +178,8 @@ InventoryFormatOCS::Send(const char* serverUrl)
 
 		if (responseHeader.StatusCode() != HTTP_OK
 				|| !responseHeader.HasContentLength()) {
-			logger.LogFormat(LOG_ERR, "Server replied %s", responseHeader.StatusString().c_str());
-			logger.LogFormat(LOG_ERR, "%s", responseHeader.ToString().c_str());
+			Logger::LogFormat(LOG_ERR, "Server replied %s", responseHeader.StatusString().c_str());
+			Logger::LogFormat(LOG_ERR, "%s", responseHeader.ToString().c_str());
 			return false;
 		}
 
@@ -189,34 +187,34 @@ InventoryFormatOCS::Send(const char* serverUrl)
 		char* resultData = new char[contentLength];
 		if (httpObject.Read(resultData, contentLength) < (int)contentLength) {
 			delete[] resultData;
-			logger.LogFormat(LOG_ERR, "InventoryFormatOCS::Send(): failed to read XML response: %s",
+			Logger::LogFormat(LOG_ERR, "InventoryFormatOCS::Send(): failed to read XML response: %s",
 				httpObject.ErrorString().c_str());
 
 			return false;
 		}
 
-		logger.Log(LOG_INFO, "InventoryFormatOCS::Send(): Decompressing XML... ");
+		Logger::Log(LOG_INFO, "InventoryFormatOCS::Send(): Decompressing XML... ");
 		tinyxml2::XMLDocument document;
 		bool uncompress = XML::Uncompress(resultData, contentLength, document);
 		delete[] resultData;
 		if (!uncompress) {
-			logger.Log(LOG_ERR, "failed to decompress XML");
+			Logger::Log(LOG_ERR, "failed to decompress XML");
 			return false;
 		}
 
 		std::string serverResponse = XML::GetElementText(document, "RESPONSE");
-		logger.LogFormat(LOG_INFO, "InventoryFormatOCS::Send(): server replied %s", serverResponse.c_str());
+		Logger::LogFormat(LOG_INFO, "InventoryFormatOCS::Send(): server replied %s", serverResponse.c_str());
 		if (serverResponse == "SEND")
 			break;
-		logger.LogFormat(LOG_ERR, "Server not ready to accept inventory: %s", serverResponse.c_str());
+		Logger::LogFormat(LOG_ERR, "Server not ready to accept inventory: %s", serverResponse.c_str());
 		return false;
 	}
 
-	logger.Log(LOG_INFO, "InventoryFormatOCS::Send(): Compressing XML inventory data... ");
+	Logger::Log(LOG_INFO, "InventoryFormatOCS::Send(): Compressing XML inventory data... ");
 	char* compressedData = NULL;
 	size_t compressedSize;
 	if (!XML::Compress(*fDocument, compressedData, compressedSize)) {
-		logger.Log(LOG_ERR, "InventoryFormatOCS::Send(): error while compressing inventory XML data!");
+		Logger::Log(LOG_ERR, "InventoryFormatOCS::Send(): error while compressing inventory XML data!");
 		return false;
 	}
 
@@ -234,15 +232,15 @@ InventoryFormatOCS::Send(const char* serverUrl)
 						inventoryUrl.Username(), inventoryUrl.Password());
 	}
 
-	logger.LogFormat(LOG_DEBUG, "%s", requestHeader.ToString().c_str());
+	Logger::LogFormat(LOG_DEBUG, "%s", requestHeader.ToString().c_str());
 	if (httpObject.Request(requestHeader, compressedData, compressedSize) != 0) {
 		delete[] compressedData;
-		logger.LogFormat(LOG_ERR, "InventoryFormatOCS::Send(): error while sending inventory: %s",
+		Logger::LogFormat(LOG_ERR, "InventoryFormatOCS::Send(): error while sending inventory: %s",
 				httpObject.ErrorString().c_str());
 		return false;
 	}
 
-	logger.Log(LOG_INFO, "InventoryFormatOCS::Send(): InventoryFormatOCS sent correctly!");
+	Logger::Log(LOG_INFO, "InventoryFormatOCS::Send(): InventoryFormatOCS sent correctly!");
 
 	delete[] compressedData;
 
@@ -269,8 +267,6 @@ InventoryFormatOCS::Checksum() const
 void
 InventoryFormatOCS::_AddAccountInfo()
 {
-	Logger& logger = Logger::GetDefault();
-
 	tinyxml2::XMLElement* accountInfo = fDocument->NewElement("ACCOUNTINFO");
 
 	tinyxml2::XMLElement* keyName = fDocument->NewElement("KEYNAME");
@@ -287,15 +283,13 @@ InventoryFormatOCS::_AddAccountInfo()
 	accountInfo->LinkEndChild(keyValue);
 
 	fContent->LinkEndChild(accountInfo);
-	logger.Log(LOG_DEBUG, "\tAdded Account Info!");
+	Logger::Log(LOG_DEBUG, "\tAdded Account Info!");
 }
 
 
 void
 InventoryFormatOCS::_AddBIOSInfo()
 {
-	Logger& logger = Logger::GetDefault();
-
 	tinyxml2::XMLElement* bios = fDocument->NewElement("BIOS");
 
 	tinyxml2::XMLElement* assettag = fDocument->NewElement("ASSETTAG");
@@ -352,15 +346,13 @@ InventoryFormatOCS::_AddBIOSInfo()
 
 	fContent->LinkEndChild(bios);
 
-	logger.Log(LOG_DEBUG, "\tAdded BIOS Info!");
+	Logger::Log(LOG_DEBUG, "\tAdded BIOS Info!");
 }
 
 
 void
 InventoryFormatOCS::_AddCPUsInfo()
 {
-	Logger& logger = Logger::GetDefault();
-
 	std::pair<components_map::iterator, components_map::iterator> CPUs = gComponents.equal_range("CPU");
 	size_t cpuCount = 0;
 	for (components_map::iterator i = CPUs.first; i != CPUs.second; i++) {
@@ -437,15 +429,13 @@ InventoryFormatOCS::_AddCPUsInfo()
 
 		fContent->LinkEndChild(cpu);
 	}
-	logger.Log(LOG_DEBUG, "\tAdded CPUs Info!");
+	Logger::Log(LOG_DEBUG, "\tAdded CPUs Info!");
 }
 
 
 void
 InventoryFormatOCS::_AddStoragesInfo()
 {
-	Logger& logger = Logger::GetDefault();
-
 	StorageRoster storages;
 	storage_info info;
 	while (storages.GetNext(info)) {
@@ -487,15 +477,13 @@ InventoryFormatOCS::_AddStoragesInfo()
 		fContent->LinkEndChild(storage);
 	}
 
-	logger.Log(LOG_DEBUG, "\tAdded Storage Info!");
+	Logger::Log(LOG_DEBUG, "\tAdded Storage Info!");
 }
 
 
 void
 InventoryFormatOCS::_AddMemoriesInfo()
 {
-	Logger& logger = Logger::GetDefault();
-
 	int slotNum = 0;
 	for (;;) {
 		std::ostringstream s;
@@ -543,15 +531,13 @@ InventoryFormatOCS::_AddMemoriesInfo()
 		fContent->LinkEndChild(memory);
 		slotNum++;
 	}
-	logger.Log(LOG_DEBUG, "\tAdded Memory Info!");
+	Logger::Log(LOG_DEBUG, "\tAdded Memory Info!");
 }
 
 
 void
 InventoryFormatOCS::_AddDrivesInfo()
 {
-	Logger& logger = Logger::GetDefault();
-
 	VolumeRoster reader;
 	volume_info info;
 	while (reader.GetNext(info)) {
@@ -592,15 +578,13 @@ InventoryFormatOCS::_AddDrivesInfo()
 		fContent->LinkEndChild(drive);
 	}
 
-	logger.Log(LOG_DEBUG, "\tAdded Drives info!");
+	Logger::Log(LOG_DEBUG, "\tAdded Drives info!");
 }
 
 
 void
 InventoryFormatOCS::_AddHardwareInfo()
 {
-	Logger& logger = Logger::GetDefault();
-
 	tinyxml2::XMLElement* hardware = fDocument->NewElement("HARDWARE");
 
 	tinyxml2::XMLElement* checksum = fDocument->NewElement("CHECKSUM");
@@ -708,15 +692,13 @@ InventoryFormatOCS::_AddHardwareInfo()
 
 	fContent->LinkEndChild(hardware);
 
-	logger.Log(LOG_DEBUG, "\tAdded Hardware info!");
+	Logger::Log(LOG_DEBUG, "\tAdded Hardware info!");
 }
 
 
 void
 InventoryFormatOCS::_AddNetworksInfo()
 {
-	Logger& logger = Logger::GetDefault();
-
 	NetworkRoster roster;
 	NetworkInterface interface;
 	unsigned int cookie = 0;
@@ -783,15 +765,13 @@ InventoryFormatOCS::_AddNetworksInfo()
 		fContent->LinkEndChild(networks);
 	}
 
-	logger.Log(LOG_DEBUG, "\tAdded Networks info!");
+	Logger::Log(LOG_DEBUG, "\tAdded Networks info!");
 }
 
 
 void
 InventoryFormatOCS::_AddProcessesInfo()
 {
-	Logger& logger = Logger::GetDefault();
-
 	RunningProcessesList processList;
 	process_info processInfo;
 	while (processList.GetNext(processInfo)) {
@@ -833,15 +813,13 @@ InventoryFormatOCS::_AddProcessesInfo()
 		fContent->LinkEndChild(process);
 	}
 
-	logger.Log(LOG_DEBUG, "\tAdded Processes list!");
+	Logger::Log(LOG_DEBUG, "\tAdded Processes list!");
 }
 
 
 void
 InventoryFormatOCS::_AddSoftwaresInfo()
 {
-	Logger& logger = Logger::GetDefault();
-
 	Softwares softwares;
 	software_info info;
 	while (softwares.GetNext(info)) {
@@ -874,15 +852,13 @@ InventoryFormatOCS::_AddSoftwaresInfo()
 
 		fContent->LinkEndChild(software);
 	}
-	logger.Log(LOG_DEBUG, "\tAdded Software list!");
+	Logger::Log(LOG_DEBUG, "\tAdded Software list!");
 }
 
 
 void
 InventoryFormatOCS::_AddUsersInfo()
 {
-	Logger& logger = Logger::GetDefault();
-
 	tinyxml2::XMLElement* users = fDocument->NewElement("USERS");
 
 	UsersRoster usersInfo;
@@ -894,15 +870,13 @@ InventoryFormatOCS::_AddUsersInfo()
 	}
 	fContent->LinkEndChild(users);
 
-	logger.Log(LOG_DEBUG, "\tAdded User info!");
+	Logger::Log(LOG_DEBUG, "\tAdded User info!");
 }
 
 
 void
 InventoryFormatOCS::_AddVideosInfo()
 {
-	Logger& logger = Logger::GetDefault();
-
 	// TODO: Multiple video cards
 	for (int i = 0; i < 1; i++) {
 		Component& info = gComponents["GRAPHICS"];
@@ -929,15 +903,13 @@ InventoryFormatOCS::_AddVideosInfo()
 
 		fContent->LinkEndChild(video);
 	}
-	logger.Log(LOG_DEBUG, "\tAdded Video info!");
+	Logger::Log(LOG_DEBUG, "\tAdded Video info!");
 }
 
 
 void
 InventoryFormatOCS::_AddMonitorsInfo()
 {
-	Logger& logger = Logger::GetDefault();
-
 	Screens screens;
 	screen_info info;
 	while (screens.GetNext(info)) {
@@ -963,7 +935,7 @@ InventoryFormatOCS::_AddMonitorsInfo()
 		fContent->LinkEndChild(monitor);
 	}
 
-	logger.Log(LOG_DEBUG, "\tAdded Display info!");
+	Logger::Log(LOG_DEBUG, "\tAdded Display info!");
 }
 
 

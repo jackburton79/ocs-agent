@@ -167,7 +167,7 @@ HandleArgs(int argc, char **argv)
 				else if (optName == "agent-string")
 					config->SetVolatileKeyValue(CONF_AGENT_STRING, optarg);
 				else if (optName == "logger")
-					Logger::Get(optarg);
+					Logger::SetLogger(optarg);
 				else if (optName == "version")
 					PrintVersionAndExit();
 				break;
@@ -175,12 +175,10 @@ HandleArgs(int argc, char **argv)
 		}
 	}
 
-	// Get the already initialized logger, if any, otherwise the default one
-	Logger& logger = Logger::GetDefault();
 	if (verbose)
-		logger.SetLevel(LOG_DEBUG);
+		Logger::SetLevel(LOG_DEBUG);
 	else
-		logger.SetLevel(LOG_INFO);
+		Logger::SetLevel(LOG_INFO);
 
 	bool stdout = config->KeyValue("stdout") == CONF_VALUE_TRUE;
 	if (!stdout && config->ServerURL().empty()
@@ -195,7 +193,7 @@ Daemonize()
 {
 	pid_t processID = ::fork();
 	if (processID < 0) {
-		Logger::GetDefault().Log(LOG_ERR, "Failed to daemonize. Exiting...");
+		Logger::Log(LOG_ERR, "Failed to daemonize. Exiting...");
 		// Return failure in exit status
 		::exit(1);
 	}
@@ -227,8 +225,6 @@ main(int argc, char **argv)
 	if (Configuration::Get()->KeyValue("DAEMONIZE") == CONF_VALUE_TRUE)
 		Daemonize();
 
-	Logger& logger = Logger::GetDefault();
-
 	try {
 		Agent agent;
 		agent.Run();
@@ -237,10 +233,10 @@ main(int argc, char **argv)
 		std::cout << "Agent String: " << Agent::AgentString() << std::endl;
 #endif
 	} catch (std::exception& ex) {
-		logger.Log(LOG_ERR, ex.what());
+		Logger::Log(LOG_ERR, ex.what());
 		return 1;
 	} catch (...) {
-		logger.Log(LOG_ERR, "Unhandled exception.");
+		Logger::Log(LOG_ERR, "Unhandled exception.");
 		return 1;
 	}
 

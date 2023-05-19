@@ -19,26 +19,19 @@ public:
 		LOGGER_TYPE_SYSLOG = 2
 	};
 
-	Logger(const char* logName);
-	virtual ~Logger();
+	static void SetLevel(int level);
 
-	void SetLevel(int level);
+	static void Log(int level, const char* const string);
+	static void LogFormat(int level, const char* fmtString, ...);
 
-	void Log(int level, const char* const string);
-	void LogFormat(int level, const char* fmtString, ...);
-
-	// There can be only one logger per application.
-	// The first call will create the requested logger.
-	// Subsequent calls will return the previously created logger,
-	// even if called with different parameters.
-	static Logger& GetDefault();
-	static Logger& Get(int loggerType = LOGGER_TYPE_DEFAULT);
-	static Logger& Get(const std::string& loggerType);
+	static void SetLogger(LOGGER_TYPE loggerType = LOGGER_TYPE_DEFAULT);
+	static void SetLogger(const std::string& loggerType);
 	
 private:
-	virtual void DoLog(int level, const char* string) = 0;
+	static void _DoLog(int level, const char* string);
 
-	int fLevel;
+	static LOGGER_TYPE sLogType;
+	static int sLevel;
 };
 
 #endif /* LOGGER_H_ */

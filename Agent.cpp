@@ -62,9 +62,8 @@ Agent::Run()
 	unsigned long waitSeconds = ::strtoul(
 		config->KeyValue(CONF_WAIT_TIME).c_str(), NULL, 10);
 
-	Logger& logger = Logger::GetDefault();
 	if (waitSeconds > 0) {
-		logger.LogFormat(LOG_INFO, "Waiting %lu seconds...", waitSeconds);
+		Logger::LogFormat(LOG_INFO, "Waiting %lu seconds...", waitSeconds);
 		::sleep(waitSeconds);
 	}
 

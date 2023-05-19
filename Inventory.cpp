@@ -31,8 +31,6 @@ Inventory::~Inventory()
 bool
 Inventory::Initialize()
 {
-	Logger& logger = Logger::GetDefault();
-
 	fFormat->Clear();
 
     std::string deviceID = Configuration::Get()->DeviceID();
@@ -41,11 +39,11 @@ Inventory::Initialize()
     	Configuration::Get()->SetDeviceID(deviceID.c_str());
     }
 
-	logger.LogFormat(LOG_INFO, "Inventory::Initialize(): Device ID: %s...", deviceID.c_str());
+    Logger::LogFormat(LOG_INFO, "Inventory::Initialize(): Device ID: %s...", deviceID.c_str());
 
 	bool result = fFormat->Initialize();
 
-	logger.LogFormat(LOG_INFO, "Inventory::Initialize(): Device ID: %s... OK!", deviceID.c_str());
+	Logger::LogFormat(LOG_INFO, "Inventory::Initialize(): Device ID: %s... OK!", deviceID.c_str());
 
 	return result;
 }
@@ -61,13 +59,11 @@ Inventory::Clear()
 bool
 Inventory::Build(bool noSoftware)
 {
-	Logger& logger = Logger::GetDefault();
-
-	logger.Log(LOG_INFO, "Building inventory...");
+	Logger::Log(LOG_INFO, "Building inventory...");
 
 	bool result = fFormat->Build(noSoftware);
 
-	logger.Log(LOG_INFO, "Building inventory... Done!");
+	Logger::Log(LOG_INFO, "Building inventory... Done!");
 	return result;
 }
 
@@ -78,15 +74,13 @@ Inventory::Save(const char* fileName)
 	if (fileName == NULL)
 		return false;
 
-	Logger& logger = Logger::GetDefault();
-
-	logger.LogFormat(LOG_INFO, "Saving %s inventory as %s", Configuration::Get()->DeviceID().c_str(), fileName);
+	Logger::LogFormat(LOG_INFO, "Saving %s inventory as %s", Configuration::Get()->DeviceID().c_str(), fileName);
 
 	bool result = fFormat->Save(fileName);
 	if (result)
-		logger.Log(LOG_INFO, "Inventory saved correctly!");
+		Logger::Log(LOG_INFO, "Inventory saved correctly!");
 	else
-		logger.Log(LOG_INFO, "Failed to save inventory!");
+		Logger::Log(LOG_INFO, "Failed to save inventory!");
 
 	return result;
 }

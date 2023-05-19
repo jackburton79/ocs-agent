@@ -252,8 +252,7 @@ DMIDecodeBackend::_ExtractDataFromDMIDB(dmi_db dmiDb)
 	// already some slot info, bail out
 	if (ramSlotIterator != gComponents.end()) {
 		// just log. dmidecode's output is usually better than other backends's
-		Logger& logger = Logger::GetDefault();
-		logger.LogFormat(LOG_INFO, "DMIDecodeBackend: will overwrite memory info");
+		Logger::LogFormat(LOG_INFO, "DMIDecodeBackend: will overwrite memory info");
 	}
 
 	valuesVector = dmiExtractor.ExtractEntry(kMemoryDevice);
