@@ -66,8 +66,8 @@ SSLSocket::Connect(const struct sockaddr *address, socklen_t addrLen)
 	fSSLConnection = SSL_new(sSSLContext);
 	if (fSSLConnection == NULL)
 		return -1;
-    if (!HostName().empty())
-        SSL_set_tlsext_host_name(fSSLConnection, HostName().c_str());
+	if (!HostName().empty())
+		SSL_set_tlsext_host_name(fSSLConnection, HostName().c_str());
 	SSL_set_fd(fSSLConnection, FD());
 	status = SSL_connect(fSSLConnection);
 	if (status != 1) {
