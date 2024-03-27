@@ -78,7 +78,7 @@ SSLSocket::Connect(const struct sockaddr *address, socklen_t addrLen)
 
 	// Connection estabilished successfully.
 	if (!_CheckCertificate())
-        return -1;
+		return -1;
 	return 0;
 }
 
