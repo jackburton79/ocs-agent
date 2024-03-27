@@ -59,29 +59,31 @@ XML::ToString(const tinyxml2::XMLDocument& document)
 
 
 bool
-XML::Compress(const tinyxml2::XMLDocument& document, char*& destination, size_t& destLength)
+XML::Serialize(const tinyxml2::XMLDocument& document, char*& destination, size_t& destLength)
 {
 	tinyxml2::XMLPrinter memoryPrinter;
 	document.Print(&memoryPrinter);
 
-	return ZLibCompressor::Compress(memoryPrinter.CStr(), memoryPrinter.CStrSize() - 1,
-			destination, destLength);
+	destination = new char[memoryPrinter.CStrSize()];
+	memcpy(destination, memoryPrinter.CStr(), memoryPrinter.CStrSize() - 1);
+	destLength = memoryPrinter.CStrSize() - 1;
+
+	return true;
 }
 
 
 bool
-XML::Uncompress(const char* source, size_t sourceLen, tinyxml2::XMLDocument& document)
+XML::Deserialize(const char* source, size_t sourceLen, tinyxml2::XMLDocument& document)
 {
 	size_t destLength;
 	char* destination = NULL;
-	
-	if (!ZLibCompressor::Uncompress(source, sourceLen, destination, destLength))
-		return false;
+	destLength = sourceLen;
+	destination = (char*)source;
+	tinyxml2::XMLError result = document.Parse(destination, destLength);
 
-	tinyxml2::XMLError result = document.Parse(destination, destLength - 1);
-
-	delete[] destination;
-
+	tinyxml2::XMLPrinter memoryPrinter;
+	document.Print(&memoryPrinter);
+	std::cout << memoryPrinter.CStr() << std::endl;
 	return result == tinyxml2::XML_SUCCESS;
 }
 

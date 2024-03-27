@@ -21,6 +21,7 @@
 #include "UsersRoster.h"
 #include "VolumeRoster.h"
 #include "XML.h"
+#include "ZLibCompressor.h"
 
 #include "http/HTTP.h"
 #include "http/URL.h"
@@ -119,6 +120,9 @@ InventoryFormatOCS::Save(const char* fileName)
 bool
 InventoryFormatOCS::Send(const char* serverUrl)
 {
+	// TODO: OCSInventory supports compressed XML, while GLPI does not
+	bool compress = true;
+
 	URL inventoryUrl(serverUrl);
 
 	// Prepare prolog
@@ -127,9 +131,23 @@ InventoryFormatOCS::Send(const char* serverUrl)
 	_WriteProlog(prolog);
 	char* prologData = NULL;
 	size_t prologLength = 0;
-	if (!XML::Compress(prolog, prologData, prologLength)) {
-		Logger::Log(LOG_ERR, "Error while compressing XML prolog!");
+	if (!XML::Serialize(prolog, prologData, prologLength)) {
+		Logger::Log(LOG_ERR, "Error while serializing XML prolog!");
 		return false;
+	}
+
+	if (compress) {
+		Logger::Log(LOG_INFO, "Compressing prolog...");
+		size_t destLength;
+		char* destData = NULL;
+		if (!ZLibCompressor::Compress(prologData, prologLength, destData, destLength)) {
+			Logger::Log(LOG_ERR, "Error while compressing XML prolog!");
+			return false;
+		}
+		Logger::Log(LOG_INFO, "Prolog compressed correctly!");
+		delete[] prologData;
+		prologData = destData;
+		prologLength = destLength;
 	}
 
 	HTTPRequestHeader requestHeader;
@@ -137,8 +155,10 @@ InventoryFormatOCS::Send(const char* serverUrl)
 	requestHeader.SetValue("Pragma", "no-cache");
 	requestHeader.SetValue("Keep-Alive", "300");
 	requestHeader.SetValue("Connection", "Keep-Alive, TE");
-	requestHeader.SetValue("TE", "deflate, gzip");
-	requestHeader.SetContentType("application/x-compress");
+	if (compress) {
+		requestHeader.SetValue("TE", "deflate, gzip");
+		requestHeader.SetContentType("application/x-compress");
+	}
 	requestHeader.SetContentLength(prologLength);
 
 	// TODO: Improve.
@@ -147,6 +167,7 @@ InventoryFormatOCS::Send(const char* serverUrl)
 				inventoryUrl.Username(), inventoryUrl.Password());
 	}
 
+	std::string cookieValue;
 	HTTP httpObject;
 	std::string userAgentString;
 	for (int c = 0; c < 2; c++) {
@@ -193,14 +214,27 @@ InventoryFormatOCS::Send(const char* serverUrl)
 			return false;
 		}
 
-		Logger::Log(LOG_INFO, "InventoryFormatOCS::Send(): Decompressing XML... ");
+		if (compress) {
+			Logger::Log(LOG_INFO, "InventoryFormatOCS::Send(): Decompressing reply... ");
+			char* decompressedData = NULL;
+			size_t decompressedLength = 0;
+			bool uncompress = ZLibCompressor::Uncompress(resultData, contentLength, decompressedData, decompressedLength);
+			delete[] resultData;
+			if (!uncompress) {
+				Logger::Log(LOG_ERR, "failed to decompress data");
+				return false;
+			}
+			resultData = decompressedData;
+			contentLength = decompressedLength;
+		}
+
 		tinyxml2::XMLDocument document;
-		bool uncompress = XML::Uncompress(resultData, contentLength, document);
-		delete[] resultData;
-		if (!uncompress) {
-			Logger::Log(LOG_ERR, "failed to decompress XML");
+		bool deserializeResult = XML::Deserialize(resultData, contentLength, document);
+		if (!deserializeResult) {
+			Logger::Log(LOG_ERR, "failed to deserialize XML");
 			return false;
 		}
+		//cookieValue = responseHeader.Value("set-cookie");
 
 		std::string serverResponse = XML::GetElementText(document, "RESPONSE");
 		Logger::LogFormat(LOG_INFO, "InventoryFormatOCS::Send(): server replied %s", serverResponse.c_str());
@@ -210,39 +244,84 @@ InventoryFormatOCS::Send(const char* serverUrl)
 		return false;
 	}
 
-	Logger::Log(LOG_INFO, "InventoryFormatOCS::Send(): Compressing XML inventory data... ");
-	char* compressedData = NULL;
-	size_t compressedSize;
-	if (!XML::Compress(*fDocument, compressedData, compressedSize)) {
-		Logger::Log(LOG_ERR, "InventoryFormatOCS::Send(): error while compressing inventory XML data!");
+	char* inventoryData = NULL;
+	size_t inventoryLength;
+	Logger::Log(LOG_INFO, "InventoryFormatOCS::Send(): Serializing XML inventory data... ");
+	if (!XML::Serialize(prolog, inventoryData, inventoryLength)) {
+		Logger::Log(LOG_ERR, "Error while serializing XML data!");
 		return false;
 	}
+
+	if (compress) {
+		Logger::Log(LOG_INFO, "InventoryFormatOCS::Send(): Compressing inventory data... ");
+		size_t compressedLength;
+		char* compressedData = NULL;
+		if (!ZLibCompressor::Compress(inventoryData, inventoryLength, compressedData, compressedLength)) {
+			Logger::Log(LOG_ERR, "Error while compressing XML data!");
+			return false;
+		}
+		delete[] inventoryData;
+		inventoryData = compressedData;
+		inventoryLength = compressedLength;
+	}
+
 
 	requestHeader.Clear();
 	requestHeader.SetRequest("POST", inventoryUrl.URLString());
 	requestHeader.SetValue("Pragma", "no-cache");
 	requestHeader.SetValue("Keep-Alive", "300");
 	requestHeader.SetValue("Connection", "Keep-Alive, TE");
-	requestHeader.SetValue("TE", "deflate, gzip");
-	requestHeader.SetContentType("application/x-compress");
-	requestHeader.SetContentLength(compressedSize);
+	if (compress) {
+		requestHeader.SetValue("TE", "deflate, gzip");
+		requestHeader.SetContentType("application/x-compress");
+	}
+	requestHeader.SetContentLength(inventoryLength);
 	requestHeader.SetUserAgent(userAgentString);
 	if (inventoryUrl.Username() != "") {
 		requestHeader.SetAuthentication(HTTP_AUTH_TYPE_BASIC,
 						inventoryUrl.Username(), inventoryUrl.Password());
 	}
 
-	Logger::LogFormat(LOG_DEBUG, "%s", requestHeader.ToString().c_str());
-	if (httpObject.Request(requestHeader, compressedData, compressedSize) != 0) {
-		delete[] compressedData;
+	//requestHeader.SetValue("set-cookie", cookieValue);
+	if (httpObject.Request(requestHeader, inventoryData, inventoryLength) != 0) {
+		delete[] inventoryData;
 		Logger::LogFormat(LOG_ERR, "InventoryFormatOCS::Send(): error while sending inventory: %s",
 				httpObject.ErrorString().c_str());
 		return false;
 	}
 
+#if 1
+	const HTTPResponseHeader& responseHeader2 = httpObject.LastResponse();
+	if (responseHeader2.StatusCode() != HTTP_OK
+				|| !responseHeader2.HasContentLength()) {
+		Logger::LogFormat(LOG_ERR, "Server replied %s", responseHeader2.StatusString().c_str());
+		Logger::LogFormat(LOG_ERR, "%s", responseHeader2.ToString().c_str());
+		return false;
+	}
+
+	size_t contentLength = ::strtol(responseHeader2.Value(HTTPContentLength).c_str(), NULL, 10);
+	char* resultData = new char[contentLength];
+	if (httpObject.Read(resultData, contentLength) < (int)contentLength) {
+		delete[] resultData;
+		Logger::LogFormat(LOG_ERR, "InventoryFormatOCS::Send(): failed to read response: %s",
+			httpObject.ErrorString().c_str());
+			return false;
+	}
+#endif
+#if 0
+	Logger::Log(LOG_INFO, "InventoryFormatOCS::Send(): Decompressing XML... ");
+	tinyxml2::XMLDocument document;
+	bool uncompress = XML::Uncompress(resultData, contentLength, document);
+	delete[] resultData;
+	if (!uncompress) {
+		Logger::Log(LOG_ERR, "failed to decompress XML");
+		return false;
+	}
+
+#endif
 	Logger::Log(LOG_INFO, "InventoryFormatOCS::Send(): InventoryFormatOCS sent correctly!");
 
-	delete[] compressedData;
+	delete[] inventoryData;
 
 	return true;
 }
