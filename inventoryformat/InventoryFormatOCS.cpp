@@ -247,7 +247,7 @@ InventoryFormatOCS::Send(const char* serverUrl)
 	char* inventoryData = NULL;
 	size_t inventoryLength;
 	Logger::Log(LOG_INFO, "InventoryFormatOCS::Send(): Serializing XML inventory data... ");
-	if (!XML::Serialize(prolog, inventoryData, inventoryLength)) {
+	if (!XML::Serialize(*fDocument, inventoryData, inventoryLength)) {
 		Logger::Log(LOG_ERR, "Error while serializing XML data!");
 		return false;
 	}
@@ -270,11 +270,12 @@ InventoryFormatOCS::Send(const char* serverUrl)
 	requestHeader.SetRequest("POST", inventoryUrl.URLString());
 	requestHeader.SetValue("Pragma", "no-cache");
 	requestHeader.SetValue("Keep-Alive", "300");
-	requestHeader.SetValue("Connection", "Keep-Alive, TE");
+	requestHeader.SetValue("Connection", "Keep-Alive");
 	if (compress) {
 		requestHeader.SetValue("TE", "deflate, gzip");
 		requestHeader.SetContentType("application/x-compress");
-	}
+	} else
+		requestHeader.SetContentType("application/xml");
 	requestHeader.SetContentLength(inventoryLength);
 	requestHeader.SetUserAgent(userAgentString);
 	if (inventoryUrl.Username() != "") {
@@ -290,7 +291,7 @@ InventoryFormatOCS::Send(const char* serverUrl)
 		return false;
 	}
 
-#if 1
+#if 0
 	const HTTPResponseHeader& responseHeader2 = httpObject.LastResponse();
 	if (responseHeader2.StatusCode() != HTTP_OK
 				|| !responseHeader2.HasContentLength()) {
@@ -307,6 +308,7 @@ InventoryFormatOCS::Send(const char* serverUrl)
 			httpObject.ErrorString().c_str());
 			return false;
 	}
+
 #endif
 #if 0
 	Logger::Log(LOG_INFO, "InventoryFormatOCS::Send(): Decompressing XML... ");
