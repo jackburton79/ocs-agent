@@ -75,11 +75,7 @@ XML::Serialize(const tinyxml2::XMLDocument& document, char*& destination, size_t
 bool
 XML::Deserialize(const char* source, size_t sourceLen, tinyxml2::XMLDocument& document)
 {
-	size_t destLength;
-	char* destination = NULL;
-	destLength = sourceLen;
-	destination = (char*)source;
-	tinyxml2::XMLError result = document.Parse(destination, destLength);
+	tinyxml2::XMLError result = document.Parse(source, sourceLen - 1);
 
 	tinyxml2::XMLPrinter memoryPrinter;
 	document.Print(&memoryPrinter);
