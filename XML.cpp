@@ -79,7 +79,6 @@ XML::Deserialize(const char* source, size_t sourceLen, tinyxml2::XMLDocument& do
 
 	tinyxml2::XMLPrinter memoryPrinter;
 	document.Print(&memoryPrinter);
-	std::cout << memoryPrinter.CStr() << std::endl;
 	return result == tinyxml2::XML_SUCCESS;
 }
 
