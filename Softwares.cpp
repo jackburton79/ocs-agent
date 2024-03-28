@@ -25,7 +25,7 @@ Softwares::_ReadSoftwaresInfo()
 		if (!CommandExists("rpm"))
 			return;
 
-		CommandStreamBuffer rpms("rpm -qai", "r");
+		CommandStreamBuffer rpms("export LC_ALL=C; rpm -qai", "r");
 		std::istream iStreamRpms(&rpms);
 		std::string string;
 		std::string strtmp;
