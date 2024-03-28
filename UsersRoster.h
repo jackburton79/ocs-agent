@@ -15,6 +15,7 @@
 
 struct user_entry {
 	std::string login;
+	std::string logindomain;
 	std::string logintimestring;
 	time_t logintime;
 };
