@@ -37,6 +37,16 @@ SpeedToString(struct ethtool_cmd* edata)
 	int speed = ethtool_cmd_speed(edata);
 	if (speed == -1)
 		return "";
+	return int_to_string(speed);
+}
+
+
+static std::string
+SpeedToStringWithUnit(struct ethtool_cmd* edata)
+{
+	int speed = ethtool_cmd_speed(edata);
+	if (speed == -1)
+		return "";
 
 	std::string unit = "";
 	std::string count = "";
@@ -219,6 +229,7 @@ NetworkInterface::Type() const
 }
 
 
+
 std::string
 NetworkInterface::Speed() const
 {
@@ -233,6 +244,23 @@ NetworkInterface::Speed() const
 		return "0";
 
     return SpeedToString(&edata);
+}
+
+
+std::string
+NetworkInterface::SpeedWithUnit() const
+{
+	struct ifreq ifr;
+	struct ethtool_cmd edata;
+
+	ifr.ifr_data = (char*)&edata;
+
+	edata.cmd = ETHTOOL_GSET;
+
+	if (_DoRequest(SIOCETHTOOL, ifr) != 0)
+		return "0";
+
+    return SpeedToStringWithUnit(&edata);
 }
 
 

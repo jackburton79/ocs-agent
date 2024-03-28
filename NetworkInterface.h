@@ -41,6 +41,7 @@ public:
 
 	std::string Type() const;
 	std::string Speed() const;
+	std::string SpeedWithUnit() const;
 	std::string Status() const;
 
 	bool IsLoopback() const;
