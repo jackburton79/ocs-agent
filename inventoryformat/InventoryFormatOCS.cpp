@@ -319,7 +319,7 @@ InventoryFormatOCS::Send(const char* serverUrl)
 
 #endif
 #if 1
-	Logger::Log(LOG_INFO, "InventoryFormatOCS::Send(): Decompressing XML... ");
+	Logger::Log(LOG_INFO, "InventoryFormatOCS::Send(): Deserialize XML... ");
 	tinyxml2::XMLDocument reply;
 	bool uncompress = XML::Deserialize(resultData, contentLength, reply);
 	delete[] resultData;
