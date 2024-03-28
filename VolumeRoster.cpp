@@ -34,7 +34,7 @@ VolumeRoster::VolumeRoster(const char* options)
 		iss >> dummy;
 		iss >> info.type;
 
-		// TODO: filesystem, other
+		info.filesystem = info.name;
 		fItems.push_back(info);
 	}
 
