@@ -35,7 +35,8 @@ RunningProcessesList::RunningProcessesList()
 				fullName.append(procPid);
 				process_info info;
 				_ReadProcessInfo(info, procPid);
-				fItems.push_back(info);
+				if (!info.cmdline.empty())
+					fItems.push_back(info);
 			}
 		}
 		::closedir(dir);
