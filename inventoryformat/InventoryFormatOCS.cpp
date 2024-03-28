@@ -968,12 +968,15 @@ InventoryFormatOCS::_AddSoftwaresInfo()
 void
 InventoryFormatOCS::_AddUsersInfo()
 {
-	return;
 	tinyxml2::XMLElement* users = fDocument->NewElement("USERS");
 
 	UsersRoster usersInfo;
 	user_entry userEntry;
 	while (usersInfo.GetNext(userEntry)) {
+		tinyxml2::XMLElement* domain = fDocument->NewElement("DOMAIN");
+		domain->LinkEndChild(fDocument->NewText(userEntry.logindomain.c_str()));
+		users->LinkEndChild(domain);
+
 		tinyxml2::XMLElement* login = fDocument->NewElement("LOGIN");
 		login->LinkEndChild(fDocument->NewText(userEntry.login.c_str()));
 		users->LinkEndChild(login);
