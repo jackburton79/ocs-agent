@@ -62,7 +62,8 @@ InventoryFormatOCS::Initialize()
 	request->LinkEndChild(fContent);
 
 	tinyxml2::XMLElement* query = fDocument->NewElement("QUERY");
-		// TODO: We only do InventoryFormatOCS for now
+
+	// TODO: We only do Inventory
 	query->LinkEndChild(fDocument->NewText("INVENTORY"));
 	request->LinkEndChild(query);
 
@@ -85,6 +86,10 @@ bool
 InventoryFormatOCS::Build(bool noSoftware)
 {
 	try {
+		// TODO: For glpi only
+		tinyxml2::XMLElement* versionClient = fDocument->NewElement("VERSIONCLIENT");
+		versionClient->LinkEndChild(fDocument->NewText("1.7.0"));
+		fContent->LinkEndChild(versionClient);
 		_AddAccountInfo();
 		_AddBIOSInfo();
 		_AddCPUsInfo();
@@ -121,7 +126,7 @@ bool
 InventoryFormatOCS::Send(const char* serverUrl)
 {
 	// TODO: OCSInventory supports compressed XML, while GLPI does not
-	bool compress = true;
+	bool compress = false;
 
 	URL inventoryUrl(serverUrl);
 
@@ -236,6 +241,8 @@ InventoryFormatOCS::Send(const char* serverUrl)
 		}
 		//cookieValue = responseHeader.Value("set-cookie");
 
+		std::cout << XML::ToString(document) << std::endl;
+
 		std::string serverResponse = XML::GetElementText(document, "RESPONSE");
 		Logger::LogFormat(LOG_INFO, "InventoryFormatOCS::Send(): server replied %s", serverResponse.c_str());
 		if (serverResponse == "SEND")
@@ -265,7 +272,6 @@ InventoryFormatOCS::Send(const char* serverUrl)
 		inventoryLength = compressedLength;
 	}
 
-
 	requestHeader.Clear();
 	requestHeader.SetRequest("POST", inventoryUrl.URLString());
 	requestHeader.SetValue("Pragma", "no-cache");
@@ -283,6 +289,8 @@ InventoryFormatOCS::Send(const char* serverUrl)
 						inventoryUrl.Username(), inventoryUrl.Password());
 	}
 
+	Logger::LogFormat(LOG_INFO, "InventoryFormatOCS::Send(): Sending inventory data...");
+
 	//requestHeader.SetValue("set-cookie", cookieValue);
 	if (httpObject.Request(requestHeader, inventoryData, inventoryLength) != 0) {
 		delete[] inventoryData;
@@ -291,13 +299,13 @@ InventoryFormatOCS::Send(const char* serverUrl)
 		return false;
 	}
 
-#if 0
+#if 1
 	const HTTPResponseHeader& responseHeader2 = httpObject.LastResponse();
 	if (responseHeader2.StatusCode() != HTTP_OK
 				|| !responseHeader2.HasContentLength()) {
 		Logger::LogFormat(LOG_ERR, "Server replied %s", responseHeader2.StatusString().c_str());
 		Logger::LogFormat(LOG_ERR, "%s", responseHeader2.ToString().c_str());
-		return false;
+		//return false;
 	}
 
 	size_t contentLength = ::strtol(responseHeader2.Value(HTTPContentLength).c_str(), NULL, 10);
@@ -310,15 +318,17 @@ InventoryFormatOCS::Send(const char* serverUrl)
 	}
 
 #endif
-#if 0
+#if 1
 	Logger::Log(LOG_INFO, "InventoryFormatOCS::Send(): Decompressing XML... ");
-	tinyxml2::XMLDocument document;
-	bool uncompress = XML::Uncompress(resultData, contentLength, document);
+	tinyxml2::XMLDocument reply;
+	bool uncompress = XML::Deserialize(resultData, contentLength, reply);
 	delete[] resultData;
 	if (!uncompress) {
-		Logger::Log(LOG_ERR, "failed to decompress XML");
+		Logger::Log(LOG_ERR, "failed to deserialize XML");
 		return false;
 	}
+
+	std::cout << XML::ToString(reply) << std::endl;
 
 #endif
 	Logger::Log(LOG_INFO, "InventoryFormatOCS::Send(): InventoryFormatOCS sent correctly!");
@@ -441,19 +451,53 @@ InventoryFormatOCS::_AddCPUsInfo()
 		Component& cpuInfo = (*i).second;
 		// TODO: Need something like "AddElement("NAME", "VALUE");
 		tinyxml2::XMLElement* cpu = fDocument->NewElement("CPUS");
-		tinyxml2::XMLElement* manufacturer = fDocument->NewElement("MANUFACTURER");
-		tinyxml2::XMLElement* serial = fDocument->NewElement("SERIALNUMBER");
-		tinyxml2::XMLElement* speed = fDocument->NewElement("SPEED");
-		tinyxml2::XMLElement* currentSpeed = fDocument->NewElement("CURRENT_SPEED");
-		tinyxml2::XMLElement* model = fDocument->NewElement("TYPE");
-		tinyxml2::XMLElement* arch = fDocument->NewElement("CPUARCH");
-		tinyxml2::XMLElement* dataWidth = fDocument->NewElement("DATA_WIDTH");
-		tinyxml2::XMLElement* currentAddressWidth = fDocument->NewElement("CURRENT_ADDRESS_WIDTH");
-		tinyxml2::XMLElement* cores = fDocument->NewElement("CORES");
-		tinyxml2::XMLElement* cacheSize = fDocument->NewElement("L2CACHESIZE");
-		tinyxml2::XMLElement* logicalCpu = fDocument->NewElement("LOGICAL_CPUS");
-		tinyxml2::XMLElement* voltage = fDocument->NewElement("VOLTAGE");
+		fContent->LinkEndChild(cpu);
 
+		// OCSInventoryFormatOCS always reports "CPU Enabled" here
+#if 1
+		tinyxml2::XMLElement* serial = fDocument->NewElement("SERIALNUMBER");
+		std::string cpuSerial = cpuInfo.fields["serial"];
+		if (cpuSerial.empty())
+			cpuSerial = "CPU Enabled";
+		if (cpuSerial == "None")
+			cpuSerial = "";
+		serial->LinkEndChild(
+			fDocument->NewText(cpuSerial.c_str()));
+		cpu->LinkEndChild(serial);
+#endif
+		tinyxml2::XMLElement* manufacturer = fDocument->NewElement("MANUFACTURER");
+		cpu->LinkEndChild(manufacturer);
+		manufacturer->LinkEndChild(
+			fDocument->NewText(cpuInfo.fields["vendor"].c_str()));
+
+		tinyxml2::XMLElement* speed = fDocument->NewElement("SPEED");
+		speed->LinkEndChild(
+			fDocument->NewText(cpuInfo.fields["speed"].c_str()));
+		cpu->LinkEndChild(speed);
+#if 0
+		tinyxml2::XMLElement* currentSpeed = fDocument->NewElement("CURRENT_SPEED");
+		currentSpeed->LinkEndChild(
+			fDocument->NewText(cpuInfo.fields["current_speed"].c_str()));
+		cpu->LinkEndChild(currentSpeed);
+#endif
+		tinyxml2::XMLElement* model = fDocument->NewElement("TYPE");
+		model->LinkEndChild(
+			fDocument->NewText(cpuInfo.fields["type"].c_str()));
+		cpu->LinkEndChild(model);
+#if 0
+		tinyxml2::XMLElement* cores = fDocument->NewElement("CORES");
+		cores->LinkEndChild(
+			fDocument->NewText(cpuInfo.fields["cores"].c_str()));
+		cpu->LinkEndChild(cores);
+#endif
+#if 0
+		tinyxml2::XMLElement* arch = fDocument->NewElement("CPUARCH");
+		arch->LinkEndChild(
+			fDocument->NewText(gComponents["OS"].fields["architecture"].c_str()));
+		cpu->LinkEndChild(arch);
+#endif
+#if 0
+		tinyxml2::XMLElement* dataWidth = fDocument->NewElement("DATA_WIDTH");
 		std::string dataWidthString = gComponents["CPU"].fields["width"];
 		if (dataWidthString.empty()) {
 			// TODO: This is not completely correct:
@@ -463,52 +507,36 @@ InventoryFormatOCS::_AddCPUsInfo()
 			else
 				dataWidthString = "32";
 		}
-		manufacturer->LinkEndChild(
-			fDocument->NewText(cpuInfo.fields["vendor"].c_str()));
-
-		// OCSInventoryFormatOCS always reports "CPU Enabled" here
-		std::string cpuSerial = cpuInfo.fields["serial"];
-		if (cpuSerial.empty())
-			cpuSerial = "CPU Enabled";
-		serial->LinkEndChild(
-			fDocument->NewText(cpuSerial.c_str()));
-
-		speed->LinkEndChild(
-			fDocument->NewText(cpuInfo.fields["speed"].c_str()));
-		currentSpeed->LinkEndChild(
-			fDocument->NewText(cpuInfo.fields["current_speed"].c_str()));
-		model->LinkEndChild(
-			fDocument->NewText(cpuInfo.fields["type"].c_str()));
-		cores->LinkEndChild(
-			fDocument->NewText(cpuInfo.fields["cores"].c_str()));
-		arch->LinkEndChild(
-			fDocument->NewText(gComponents["OS"].fields["architecture"].c_str()));
 		dataWidth->LinkEndChild(
 			fDocument->NewText(dataWidthString.c_str()));
+		cpu->LinkEndChild(dataWidth);
 		// Not a copy/paste error: the fields are the same
+
+		tinyxml2::XMLElement* currentAddressWidth = fDocument->NewElement("CURRENT_ADDRESS_WIDTH");
 		currentAddressWidth->LinkEndChild(
 			fDocument->NewText(dataWidthString.c_str()));
+		cpu->LinkEndChild(currentAddressWidth);
+#endif
+#if 0
+		tinyxml2::XMLElement* cacheSize = fDocument->NewElement("L2CACHESIZE");
 		cacheSize->LinkEndChild(
 			fDocument->NewText(cpuInfo.fields["cache_size"].c_str()));
+		cpu->LinkEndChild(cacheSize);
+#endif
+#if 0
+		tinyxml2::XMLElement* logicalCpu = fDocument->NewElement("LOGICAL_CPUS");
 		logicalCpu->LinkEndChild(
 			fDocument->NewText(cpuInfo.fields["logical_cpus"].c_str()));
+		cpu->LinkEndChild(logicalCpu);
+#endif
+#if 0
+		tinyxml2::XMLElement* voltage = fDocument->NewElement("VOLTAGE");
 		voltage->LinkEndChild(
 			fDocument->NewText(cpuInfo.fields["voltage"].c_str()));
-
-		cpu->LinkEndChild(model);
-		cpu->LinkEndChild(manufacturer);
-		cpu->LinkEndChild(serial);
-		cpu->LinkEndChild(speed);
-		cpu->LinkEndChild(currentSpeed);
-		cpu->LinkEndChild(cores);
-		cpu->LinkEndChild(arch);
-		cpu->LinkEndChild(dataWidth);
-		cpu->LinkEndChild(currentAddressWidth);
-		cpu->LinkEndChild(cacheSize);
-		cpu->LinkEndChild(logicalCpu);
 		cpu->LinkEndChild(voltage);
+#endif
 
-		fContent->LinkEndChild(cpu);
+
 	}
 	Logger::Log(LOG_DEBUG, "\tAdded CPUs Info!");
 }
@@ -734,11 +762,11 @@ InventoryFormatOCS::_AddHardwareInfo()
 	tinyxml2::XMLElement* processorN = fDocument->NewElement("PROCESSORN");
 	processorN->LinkEndChild(fDocument->NewText(int_to_string(cpuCount).c_str()));
 	hardware->LinkEndChild(processorN);
-
+#if 0
 	tinyxml2::XMLElement* arch = fDocument->NewElement("ARCH");
 	arch->LinkEndChild(fDocument->NewText(osInfo.fields["architecture"].c_str()));
 	hardware->LinkEndChild(arch);
-
+#endif
 	tinyxml2::XMLElement* swap = fDocument->NewElement("SWAP");
 	swap->LinkEndChild(fDocument->NewText(osInfo.fields["swap"].c_str()));
 	hardware->LinkEndChild(swap);
@@ -857,41 +885,41 @@ InventoryFormatOCS::_AddProcessesInfo()
 	process_info processInfo;
 	while (processList.GetNext(processInfo)) {
 		tinyxml2::XMLElement* process = fDocument->NewElement("PROCESSES");
+		fContent->LinkEndChild(process);
 
 		tinyxml2::XMLElement* cmd = fDocument->NewElement("CMD");
 		cmd->LinkEndChild(fDocument->NewText(processInfo.cmdline.c_str()));
-
+		process->LinkEndChild(cmd);
+#if 0
 		tinyxml2::XMLElement* cpuUsage = fDocument->NewElement("CPUUSAGE");
 		cpuUsage->LinkEndChild(fDocument->NewText(""));
-
+		process->LinkEndChild(cpuUsage);
+#endif
 		tinyxml2::XMLElement* mem = fDocument->NewElement("MEM");
 		mem->LinkEndChild(fDocument->NewText(int_to_string(processInfo.memory).c_str()));
+		process->LinkEndChild(mem);
 
 		tinyxml2::XMLElement* pid = fDocument->NewElement("PID");
 		pid->LinkEndChild(fDocument->NewText(int_to_string(processInfo.pid).c_str()));
+		process->LinkEndChild(pid);
 
 		tinyxml2::XMLElement* started = fDocument->NewElement("STARTED");
 		started->LinkEndChild(fDocument->NewText(""));
+		process->LinkEndChild(started);
 
 		tinyxml2::XMLElement* tty = fDocument->NewElement("TTY");
 		tty->LinkEndChild(fDocument->NewText(""));
+		process->LinkEndChild(tty);
 
 		tinyxml2::XMLElement* user = fDocument->NewElement("USER");
-		user->LinkEndChild(fDocument->NewText(processInfo.user.c_str()));
+		//user->LinkEndChild(fDocument->NewText(processInfo.user.c_str()));
+		// TODO: for GLPI
+		user->LinkEndChild(fDocument->NewText("root"));
+		process->LinkEndChild(user);
 
 		tinyxml2::XMLElement* virtualMem = fDocument->NewElement("VIRTUALMEMORY");
 		virtualMem->LinkEndChild(fDocument->NewText(int_to_string(processInfo.virtualmem).c_str()));
-
-		process->LinkEndChild(cmd);
-		process->LinkEndChild(cpuUsage);
-		process->LinkEndChild(mem);
-		process->LinkEndChild(pid);
-		process->LinkEndChild(started);
-		process->LinkEndChild(tty);
-		process->LinkEndChild(user);
 		process->LinkEndChild(virtualMem);
-
-		fContent->LinkEndChild(process);
 	}
 
 	Logger::Log(LOG_DEBUG, "\tAdded Processes list!");
@@ -940,6 +968,7 @@ InventoryFormatOCS::_AddSoftwaresInfo()
 void
 InventoryFormatOCS::_AddUsersInfo()
 {
+	return;
 	tinyxml2::XMLElement* users = fDocument->NewElement("USERS");
 
 	UsersRoster usersInfo;
