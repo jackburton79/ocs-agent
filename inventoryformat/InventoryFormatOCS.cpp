@@ -88,7 +88,7 @@ InventoryFormatOCS::Build(bool noSoftware)
 	try {
 		// TODO: For glpi only
 		tinyxml2::XMLElement* versionClient = fDocument->NewElement("VERSIONCLIENT");
-		versionClient->LinkEndChild(fDocument->NewText("1.7.0"));
+		versionClient->LinkEndChild(fDocument->NewText("1.9.9"));
 		fContent->LinkEndChild(versionClient);
 		_AddAccountInfo();
 		_AddBIOSInfo();
@@ -454,7 +454,6 @@ InventoryFormatOCS::_AddCPUsInfo()
 		fContent->LinkEndChild(cpu);
 
 		// OCSInventoryFormatOCS always reports "CPU Enabled" here
-#if 1
 		tinyxml2::XMLElement* serial = fDocument->NewElement("SERIALNUMBER");
 		std::string cpuSerial = cpuInfo.fields["serial"];
 		if (cpuSerial.empty())
@@ -464,7 +463,7 @@ InventoryFormatOCS::_AddCPUsInfo()
 		serial->LinkEndChild(
 			fDocument->NewText(cpuSerial.c_str()));
 		cpu->LinkEndChild(serial);
-#endif
+
 		tinyxml2::XMLElement* manufacturer = fDocument->NewElement("MANUFACTURER");
 		cpu->LinkEndChild(manufacturer);
 		manufacturer->LinkEndChild(
@@ -484,6 +483,12 @@ InventoryFormatOCS::_AddCPUsInfo()
 		model->LinkEndChild(
 			fDocument->NewText(cpuInfo.fields["type"].c_str()));
 		cpu->LinkEndChild(model);
+
+		// Not a copy/paste error
+		tinyxml2::XMLElement* name = fDocument->NewElement("NAME");
+		name->LinkEndChild(
+			fDocument->NewText(cpuInfo.fields["type"].c_str()));
+		cpu->LinkEndChild(name);
 #if 0
 		tinyxml2::XMLElement* cores = fDocument->NewElement("CORES");
 		cores->LinkEndChild(
