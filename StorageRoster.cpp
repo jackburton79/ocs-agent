@@ -15,7 +15,7 @@
 
 StorageRoster::StorageRoster()
 {
-	_ReadStoragesInfo();	
+	_ReadStoragesInfo();
 }
 
 
