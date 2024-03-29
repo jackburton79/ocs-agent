@@ -39,6 +39,7 @@ private:
 
 	void _AddAccountInfo();
     void _AddBIOSInfo();
+    void _AddOperatingSystemInfo();
     void _AddCPUsInfo();
     void _AddStoragesInfo();
     void _AddMemoriesInfo();

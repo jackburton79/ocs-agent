@@ -92,6 +92,7 @@ InventoryFormat::Build(bool noSoftware)
 		fContent->LinkEndChild(versionClient);
 		_AddAccountInfo();
 		_AddBIOSInfo();
+		_AddOperatingSystemInfo();
 		_AddCPUsInfo();
 		_AddStoragesInfo();
 		_AddDrivesInfo();
@@ -442,6 +443,54 @@ InventoryFormat::_AddBIOSInfo()
 	fContent->LinkEndChild(bios);
 
 	Logger::Log(LOG_DEBUG, "\tAdded BIOS Info!");
+}
+
+
+void
+InventoryFormat::_AddOperatingSystemInfo()
+{
+	tinyxml2::XMLElement* os = fDocument->NewElement("OPERATINGSYSTEM");
+	fContent->LinkEndChild(os);
+
+	tinyxml2::XMLElement* arch = fDocument->NewElement("ARCH");
+	arch->LinkEndChild(fDocument->NewText(gComponents["OS"].fields["architecture"].c_str()));
+	os->LinkEndChild(arch);
+
+	tinyxml2::XMLElement* name = fDocument->NewElement("NAME");
+	name->LinkEndChild(fDocument->NewText(gComponents["OS"].fields["description"].c_str()));
+	os->LinkEndChild(name);
+
+	tinyxml2::XMLElement* kernelName = fDocument->NewElement("KERNEL_NAME");
+	kernelName->LinkEndChild(fDocument->NewText(gComponents["OS"].fields["kernelname"].c_str()));
+	os->LinkEndChild(kernelName);
+
+	tinyxml2::XMLElement* kernelVersion = fDocument->NewElement("KERNEL_VERSION");
+	kernelVersion->LinkEndChild(fDocument->NewText(gComponents["OS"].fields["release"].c_str()));
+	os->LinkEndChild(kernelVersion);
+
+	tinyxml2::XMLElement* dnsDomain = fDocument->NewElement("DNS_DOMAIN");
+	dnsDomain->LinkEndChild(fDocument->NewText(gComponents["OS"].fields["domainname"].c_str()));
+	os->LinkEndChild(dnsDomain);
+
+	tinyxml2::XMLElement* fqdn = fDocument->NewElement("FQDN");
+	std::string fqdnString;
+	fqdnString.append(gComponents["OS"].fields["hostname"]).append(gComponents["OS"].fields["domainname"]);
+	fqdn->LinkEndChild(fDocument->NewText(fqdnString.c_str()));
+	os->LinkEndChild(fqdn);
+
+#if 0
+	// TODO: Impelement these
+	<BOOT_TIME>2024-03-26 07:58:04</BOOT_TIME>
+	<FULL_NAME>
+	<HOSTID>
+	<INSTALL_DATE>
+	<NAME>
+	<SSH_KEY>
+	<TIMEZONE>
+	<NAME>Europe/Rome</NAME>
+	<OFFSET>+0100</OFFSET>
+	</TIMEZONE>
+#endif
 }
 
 
