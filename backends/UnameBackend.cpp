@@ -43,9 +43,14 @@ UnameBackend::Run()
 	osInfo.fields["release"] = uName.release;
 	osInfo.fields["domainname"] = uName.domainname;
 	osInfo.fields["architecture"] = uName.machine;
+	osInfo.fields["kernelname"] = uName.sysname;
+
+	// Better nothing than "(none)"
+	if (osInfo.fields["domainname"] == "(none)")
+		 osInfo.fields["domainname"] = "";
 
 	//Feed domain name from host name when possible.
-	if (osInfo.fields["domainname"] == "" || osInfo.fields["domainname"] == "(none)") {
+	if (osInfo.fields["domainname"] == "") {
 		size_t dotPos = osInfo.fields["hostname"].find('.');
 		if (dotPos != std::string::npos) {
 			osInfo.fields["domainname"] = osInfo.fields["hostname"].substr(dotPos + 1);
