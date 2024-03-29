@@ -239,10 +239,10 @@ InventoryFormatOCS::Send(const char* serverUrl)
 			Logger::Log(LOG_ERR, "failed to deserialize XML");
 			return false;
 		}
-		//cookieValue = responseHeader.Value("set-cookie");
 
+#if 0
 		std::cout << XML::ToString(document) << std::endl;
-
+#endif
 		std::string serverResponse = XML::GetElementText(document, "RESPONSE");
 		Logger::LogFormat(LOG_INFO, "InventoryFormatOCS::Send(): server replied %s", serverResponse.c_str());
 		if (serverResponse == "SEND")
@@ -299,13 +299,13 @@ InventoryFormatOCS::Send(const char* serverUrl)
 		return false;
 	}
 
-#if 1
 	const HTTPResponseHeader& responseHeader2 = httpObject.LastResponse();
 	if (responseHeader2.StatusCode() != HTTP_OK
 				|| !responseHeader2.HasContentLength()) {
 		Logger::LogFormat(LOG_ERR, "Server replied %s", responseHeader2.StatusString().c_str());
 		Logger::LogFormat(LOG_ERR, "%s", responseHeader2.ToString().c_str());
-		//return false;
+		// TODO: not correct: we could have an error 400 and then a XML file as a reply
+		return false;
 	}
 
 	size_t contentLength = ::strtol(responseHeader2.Value(HTTPContentLength).c_str(), NULL, 10);
@@ -317,8 +317,6 @@ InventoryFormatOCS::Send(const char* serverUrl)
 			return false;
 	}
 
-#endif
-#if 1
 	Logger::Log(LOG_INFO, "InventoryFormatOCS::Send(): Deserialize XML... ");
 	tinyxml2::XMLDocument reply;
 	bool uncompress = XML::Deserialize(resultData, contentLength, reply);
@@ -327,9 +325,8 @@ InventoryFormatOCS::Send(const char* serverUrl)
 		Logger::Log(LOG_ERR, "failed to deserialize XML");
 		return false;
 	}
-
+#if 0
 	std::cout << XML::ToString(reply) << std::endl;
-
 #endif
 	Logger::Log(LOG_INFO, "InventoryFormatOCS::Send(): InventoryFormatOCS sent correctly!");
 
