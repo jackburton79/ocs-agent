@@ -450,7 +450,9 @@ InventoryFormat::_AddCPUsInfo()
 		tinyxml2::XMLElement* cpu = fDocument->NewElement("CPUS");
 		fContent->LinkEndChild(cpu);
 
+#if 0
 		// OCSInventoryFormatOCS always reports "CPU Enabled" here
+		// TODO: GLPI doesn't really like serial number and rejects the inventory
 		tinyxml2::XMLElement* serial = fDocument->NewElement("SERIALNUMBER");
 		std::string cpuSerial = cpuInfo.fields["serial"];
 		if (cpuSerial.empty())
@@ -460,7 +462,7 @@ InventoryFormat::_AddCPUsInfo()
 		serial->LinkEndChild(
 			fDocument->NewText(cpuSerial.c_str()));
 		cpu->LinkEndChild(serial);
-
+#endif
 		tinyxml2::XMLElement* manufacturer = fDocument->NewElement("MANUFACTURER");
 		cpu->LinkEndChild(manufacturer);
 		manufacturer->LinkEndChild(
