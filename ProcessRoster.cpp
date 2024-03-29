@@ -13,6 +13,7 @@
 #include <cstdlib>
 #include <dirent.h>
 #include <iostream>
+#include <pwd.h>
 
 
 static bool
@@ -57,7 +58,15 @@ RunningProcessesList::_ReadProcessInfo(process_info& info, std::string pid)
 	info.pid = strtol(pid.c_str(), NULL, 10);
 	info.cmdline = ProcReader(("/proc/" + pid + std::string("/cmdline")).c_str()).ReadLine();
 
-	// TODO: Refactor, too much duplicated code
+	std::string loginUid = ProcReader(("/proc/" + pid + std::string("/loginuid")).c_str()).ReadLine();
+	struct passwd* passwdStruct = getpwuid(strtoull(loginUid.c_str(), NULL, 10));
+	if (passwdStruct != NULL)
+		info.user = passwdStruct->pw_name;
+	else {
+		// TODO: Not nice. What to do in this case ?
+		info.user = "root";
+	}
+		// TODO: Refactor, too much duplicated code
 	ProcReader status(("/proc/" + pid + std::string("/status")).c_str());
 
 	std::istream stream(&status);
