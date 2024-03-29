@@ -920,9 +920,12 @@ InventoryFormat::_AddProcessesInfo()
 		process->LinkEndChild(tty);
 
 		tinyxml2::XMLElement* user = fDocument->NewElement("USER");
-		user->LinkEndChild(fDocument->NewText(processInfo.user.c_str()));
-		// TODO: for GLPI
-		//user->LinkEndChild(fDocument->NewText("root"));
+		std::string userString = processInfo.user.c_str();
+		if (userString.empty()) {
+			// TODO: not nice. GLPI doesn't like if this is empty
+			userString = "root";
+		}
+		user->LinkEndChild(fDocument->NewText(userString.c_str()));
 		process->LinkEndChild(user);
 
 		tinyxml2::XMLElement* virtualMem = fDocument->NewElement("VIRTUALMEMORY");
