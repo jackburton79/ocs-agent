@@ -921,10 +921,6 @@ InventoryFormat::_AddProcessesInfo()
 
 		tinyxml2::XMLElement* user = fDocument->NewElement("USER");
 		std::string userString = processInfo.user.c_str();
-		if (userString.empty()) {
-			// TODO: not nice. GLPI doesn't like if this is empty
-			userString = "root";
-		}
 		user->LinkEndChild(fDocument->NewText(userString.c_str()));
 		process->LinkEndChild(user);
 
