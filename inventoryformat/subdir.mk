@@ -4,8 +4,7 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 LOCAL_CPP_SRCS = \
-../inventoryformat/InventoryFormat.cpp \
-../inventoryformat/InventoryFormatOCS.cpp \
+../inventoryformat/InventoryFormat.cpp
 
 
 LOCALOBJECTS= $(addprefix ./inventoryformat/, $(notdir $(LOCAL_CPP_SRCS:.cpp=.o)))

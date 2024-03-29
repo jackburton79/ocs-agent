@@ -10,7 +10,7 @@
 #include "Agent.h"
 #include "Configuration.h"
 #include "Logger.h"
-#include "inventoryformat/InventoryFormatOCS.h"
+#include "inventoryformat/InventoryFormat.h"
 
 #include <iostream>
 
@@ -18,7 +18,7 @@ Inventory::Inventory()
 	:
 	fFormat(NULL)
 {
-	fFormat = new InventoryFormatOCS();
+	fFormat = new InventoryFormat();
 }
 
 
