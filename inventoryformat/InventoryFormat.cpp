@@ -659,7 +659,7 @@ void
 InventoryFormat::_AddDrivesInfo()
 {
 	// Used "-l" to list only local fs
-	VolumeRoster reader(" -l");
+	VolumeRoster reader("-l");
 	volume_info info;
 	while (reader.GetNext(info)) {
 		tinyxml2::XMLElement* drive = fDocument->NewElement("DRIVES");

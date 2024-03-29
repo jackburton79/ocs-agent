@@ -16,7 +16,7 @@ VolumeRoster::VolumeRoster(const char* options)
 {
 	// TODO:
 	std::string string("export LC_ALL=C; ");
-	string.append("df ").append(options);
+	string.append("df -T ").append(options);
 	CommandStreamBuffer df(string.c_str(), "r");
 	std::istream stream(&df);
 
@@ -28,13 +28,13 @@ VolumeRoster::VolumeRoster(const char* options)
 		volume_info info;
 		std::string dummy;
 		iss >> info.name;
+		iss >> info.filesystem;
 		iss >> info.total;
 		iss >> dummy;
 		iss >> info.free;
 		iss >> dummy;
 		iss >> info.type;
 
-		info.filesystem = info.name;
 		info.label = info.name;
 		fItems.push_back(info);
 	}
