@@ -289,48 +289,55 @@ InventoryFormat::Send(const char* serverUrl)
 						inventoryUrl.Username(), inventoryUrl.Password());
 	}
 
-	Logger::LogFormat(LOG_INFO, "InventoryFormatOCS::Send(): Sending inventory data...");
+	Logger::LogFormat(LOG_INFO, "InventoryFormat::Send(): Sending inventory data...");
 
-	//requestHeader.SetValue("set-cookie", cookieValue);
 	if (httpObject.Request(requestHeader, inventoryData, inventoryLength) != 0) {
 		delete[] inventoryData;
-		Logger::LogFormat(LOG_ERR, "InventoryFormatOCS::Send(): error while sending inventory: %s",
+		Logger::LogFormat(LOG_ERR, "InventoryFormat::Send(): error while sending inventory: %s",
 				httpObject.ErrorString().c_str());
 		return false;
 	}
 
+	delete[] inventoryData;
+
 	const HTTPResponseHeader& responseHeader2 = httpObject.LastResponse();
-	if (responseHeader2.StatusCode() != HTTP_OK
-				|| !responseHeader2.HasContentLength()) {
-		Logger::LogFormat(LOG_ERR, "Server replied %s", responseHeader2.StatusString().c_str());
-		Logger::LogFormat(LOG_ERR, "%s", responseHeader2.ToString().c_str());
-		// TODO: not correct: we could have an error 400 and then a XML file as a reply
-		return false;
+	bool statusOk = responseHeader2.StatusCode() == HTTP_OK;
+	if (!responseHeader2.HasContentLength()) {
+		if (!statusOk) {
+			Logger::Log(LOG_ERR, "Sending inventory failed");
+			return false;
+		}
 	}
+
+	Logger::LogFormat(LOG_ERR, "Server replied %s", responseHeader2.StatusString().c_str());
+	Logger::LogFormat(LOG_ERR, "%s", responseHeader2.ToString().c_str());
 
 	size_t contentLength = ::strtol(responseHeader2.Value(HTTPContentLength).c_str(), NULL, 10);
 	char* resultData = new char[contentLength];
 	if (httpObject.Read(resultData, contentLength) < (int)contentLength) {
 		delete[] resultData;
-		Logger::LogFormat(LOG_ERR, "InventoryFormatOCS::Send(): failed to read response: %s",
+		Logger::LogFormat(LOG_ERR, "InventoryFormat::Send(): failed to read response: %s",
 			httpObject.ErrorString().c_str());
 			return false;
 	}
 
-	Logger::Log(LOG_INFO, "InventoryFormatOCS::Send(): Deserialize XML... ");
-	tinyxml2::XMLDocument reply;
-	bool uncompress = XML::Deserialize(resultData, contentLength, reply);
-	delete[] resultData;
-	if (!uncompress) {
-		Logger::Log(LOG_ERR, "failed to deserialize XML");
-		return false;
+	if (httpObject.LastResponse().Value(HTTPContentType) == "application/xml") {
+		Logger::Log(LOG_INFO, "InventoryFormatOCS::Send(): Deserialize XML... ");
+		tinyxml2::XMLDocument reply;
+		bool deserialized = XML::Deserialize(resultData, contentLength, reply);
+		delete[] resultData;
+		if (!deserialized) {
+			Logger::Log(LOG_ERR, "failed to deserialize XML");
+			return false;
+		}
+		Logger::Log(LOG_INFO, "Server replied:");
+		Logger::Log(LOG_INFO, XML::ToString(reply).c_str());
 	}
-#if 0
-	std::cout << XML::ToString(reply) << std::endl;
-#endif
-	Logger::Log(LOG_INFO, "InventoryFormatOCS::Send(): InventoryFormatOCS sent correctly!");
 
-	delete[] inventoryData;
+	if (statusOk)
+		Logger::Log(LOG_INFO, "InventoryFormatOCS::Send(): Inventory was accepted!");
+	else
+		Logger::Log(LOG_ERR, "InventoryFormatOCS::Send(): Inventory was rejected by server!");
 
 	return true;
 }
@@ -656,40 +663,39 @@ InventoryFormat::_AddDrivesInfo()
 	volume_info info;
 	while (reader.GetNext(info)) {
 		tinyxml2::XMLElement* drive = fDocument->NewElement("DRIVES");
+		fContent->LinkEndChild(drive);
 
 		tinyxml2::XMLElement* createDate = fDocument->NewElement("CREATEDATE");
 		createDate->LinkEndChild(fDocument->NewText(info.create_date.c_str()));
+		drive->LinkEndChild(createDate);
 
 		tinyxml2::XMLElement* fileSystem = fDocument->NewElement("FILESYSTEM");
 		fileSystem->LinkEndChild(fDocument->NewText(info.filesystem.c_str()));
+		drive->LinkEndChild(fileSystem);
 
 		tinyxml2::XMLElement* freeSpace = fDocument->NewElement("FREE");
 		freeSpace->LinkEndChild(fDocument->NewText(int_to_string(info.free).c_str()));
+		drive->LinkEndChild(freeSpace);
 
 		tinyxml2::XMLElement* label = fDocument->NewElement("LABEL");
 		label->LinkEndChild(fDocument->NewText(info.label.c_str()));
+		drive->LinkEndChild(label);
 
 		tinyxml2::XMLElement* serial = fDocument->NewElement("SERIAL");
 		serial->LinkEndChild(fDocument->NewText(info.serial.c_str()));
+		drive->LinkEndChild(serial);
 
 		tinyxml2::XMLElement* total = fDocument->NewElement("TOTAL");
 		total->LinkEndChild(fDocument->NewText(int_to_string(info.total).c_str()));
+		drive->LinkEndChild(total);
 
 		tinyxml2::XMLElement* type = fDocument->NewElement("TYPE");
 		type->LinkEndChild(fDocument->NewText(info.type.c_str()));
+		drive->LinkEndChild(type);
 
 		tinyxml2::XMLElement* volumeName = fDocument->NewElement("VOLUMN");
 		volumeName->LinkEndChild(fDocument->NewText(info.name.c_str()));
-
-		drive->LinkEndChild(createDate);
-		drive->LinkEndChild(fileSystem);
-		drive->LinkEndChild(freeSpace);
-		drive->LinkEndChild(label);
-		drive->LinkEndChild(serial);
-		drive->LinkEndChild(total);
-		drive->LinkEndChild(type);
 		drive->LinkEndChild(volumeName);
-		fContent->LinkEndChild(drive);
 	}
 
 	Logger::Log(LOG_DEBUG, "\tAdded Drives info!");
@@ -700,6 +706,7 @@ void
 InventoryFormat::_AddHardwareInfo()
 {
 	tinyxml2::XMLElement* hardware = fDocument->NewElement("HARDWARE");
+	fContent->LinkEndChild(hardware);
 
 	tinyxml2::XMLElement* checksum = fDocument->NewElement("CHECKSUM");
 	checksum->LinkEndChild(fDocument->NewText(int_to_string(Checksum()).c_str()));
@@ -804,8 +811,6 @@ InventoryFormat::_AddHardwareInfo()
 		hardware->LinkEndChild(lastLoggedUser);
 	}
 
-	fContent->LinkEndChild(hardware);
-
 	Logger::Log(LOG_DEBUG, "\tAdded Hardware info!");
 }
 
@@ -821,6 +826,7 @@ InventoryFormat::_AddNetworksInfo()
 			continue;
 
 		tinyxml2::XMLElement* networks = fDocument->NewElement("NETWORKS");
+		fContent->LinkEndChild(networks);
 
 		tinyxml2::XMLElement* description = fDocument->NewElement("DESCRIPTION");
 		description->LinkEndChild(fDocument->NewText(interface.Name().c_str()));
@@ -848,7 +854,6 @@ InventoryFormat::_AddNetworksInfo()
 		networks->LinkEndChild(ipMask);
 
 		tinyxml2::XMLElement* ipSubnet = fDocument->NewElement("IPSUBNET");
-
 		ipSubnet->LinkEndChild(fDocument->NewText(interface.Network().c_str()));
 		networks->LinkEndChild(ipSubnet);
 
@@ -875,8 +880,6 @@ InventoryFormat::_AddNetworksInfo()
 		tinyxml2::XMLElement* virtualDevice = fDocument->NewElement("VIRTUALDEV");
 		virtualDevice->LinkEndChild(fDocument->NewText(""));
 		networks->LinkEndChild(virtualDevice);
-
-		fContent->LinkEndChild(networks);
 	}
 
 	Logger::Log(LOG_DEBUG, "\tAdded Networks info!");
@@ -917,9 +920,9 @@ InventoryFormat::_AddProcessesInfo()
 		process->LinkEndChild(tty);
 
 		tinyxml2::XMLElement* user = fDocument->NewElement("USER");
-		//user->LinkEndChild(fDocument->NewText(processInfo.user.c_str()));
+		user->LinkEndChild(fDocument->NewText(processInfo.user.c_str()));
 		// TODO: for GLPI
-		user->LinkEndChild(fDocument->NewText("root"));
+		//user->LinkEndChild(fDocument->NewText("root"));
 		process->LinkEndChild(user);
 
 		tinyxml2::XMLElement* virtualMem = fDocument->NewElement("VIRTUALMEMORY");
@@ -938,33 +941,31 @@ InventoryFormat::_AddSoftwaresInfo()
 	software_info info;
 	while (softwares.GetNext(info)) {
 		tinyxml2::XMLElement* software = fDocument->NewElement("SOFTWARES");
+		fContent->LinkEndChild(software);
 
 		tinyxml2::XMLElement* comments = fDocument->NewElement("COMMENTS");
 		comments->LinkEndChild(fDocument->NewText(info.comments.c_str()));
+		software->LinkEndChild(comments);
 
 		tinyxml2::XMLElement* name = fDocument->NewElement("NAME");
 		name->LinkEndChild(fDocument->NewText(info.name.c_str()));
+		software->LinkEndChild(name);
 
 		tinyxml2::XMLElement* size = fDocument->NewElement("FILESIZE");
 		size->LinkEndChild(fDocument->NewText(info.size.c_str()));
+		software->LinkEndChild(size);
 
 		tinyxml2::XMLElement* from = fDocument->NewElement("FROM");
 		from->LinkEndChild(fDocument->NewText(info.from.c_str()));
+		software->LinkEndChild(from);
 
 		tinyxml2::XMLElement* installdate = fDocument->NewElement("INSTALLDATE");
 		installdate->LinkEndChild(fDocument->NewText(info.installdate.c_str()));
+		software->LinkEndChild(installdate);
 
 		tinyxml2::XMLElement* version = fDocument->NewElement("VERSION");
 		version->LinkEndChild(fDocument->NewText(info.version.c_str()));
-
-		software->LinkEndChild(comments);
-		software->LinkEndChild(name);
-		software->LinkEndChild(size);
-		software->LinkEndChild(from);
-		software->LinkEndChild(installdate);
 		software->LinkEndChild(version);
-
-		fContent->LinkEndChild(software);
 	}
 	Logger::Log(LOG_DEBUG, "\tAdded Software list!");
 }
@@ -974,6 +975,7 @@ void
 InventoryFormat::_AddUsersInfo()
 {
 	tinyxml2::XMLElement* users = fDocument->NewElement("USERS");
+	fContent->LinkEndChild(users);
 
 	UsersRoster usersInfo;
 	user_entry userEntry;
@@ -986,7 +988,6 @@ InventoryFormat::_AddUsersInfo()
 		login->LinkEndChild(fDocument->NewText(userEntry.login.c_str()));
 		users->LinkEndChild(login);
 	}
-	fContent->LinkEndChild(users);
 
 	Logger::Log(LOG_DEBUG, "\tAdded User info!");
 }
@@ -1000,26 +1001,25 @@ InventoryFormat::_AddVideosInfo()
 		Component& info = gComponents["GRAPHICS"];
 
 		tinyxml2::XMLElement* video = fDocument->NewElement("VIDEOS");
+		fContent->LinkEndChild(video);
 
 		// OCSInventoryFormatOCS uses the name as chipset, and the chipset as name
 		tinyxml2::XMLElement* chipset = fDocument->NewElement("CHIPSET");
 		chipset->LinkEndChild(fDocument->NewText(info.fields["name"].c_str()));
+		video->LinkEndChild(chipset);
 
 		tinyxml2::XMLElement* memory = fDocument->NewElement("MEMORY");
 		memory->LinkEndChild(fDocument->NewText(info.fields["memory_size"].c_str()));
+		video->LinkEndChild(memory);
 
 		tinyxml2::XMLElement* name = fDocument->NewElement("NAME");
 		name->LinkEndChild(fDocument->NewText(info.fields["type"].c_str()));
+		video->LinkEndChild(name);
 
 		tinyxml2::XMLElement* resolution = fDocument->NewElement("RESOLUTION");
 		resolution->LinkEndChild(fDocument->NewText(info.fields["resolution"].c_str()));
-
-		video->LinkEndChild(chipset);
-		video->LinkEndChild(memory);
-		video->LinkEndChild(name);
 		video->LinkEndChild(resolution);
 
-		fContent->LinkEndChild(video);
 	}
 	Logger::Log(LOG_DEBUG, "\tAdded Video info!");
 }
@@ -1032,25 +1032,27 @@ InventoryFormat::_AddMonitorsInfo()
 	screen_info info;
 	while (screens.GetNext(info)) {
 		tinyxml2::XMLElement* monitor = fDocument->NewElement("MONITORS");
-		tinyxml2::XMLElement* caption = fDocument->NewElement("CAPTION");
-		tinyxml2::XMLElement* description = fDocument->NewElement("DESCRIPTION");
-		tinyxml2::XMLElement* type = fDocument->NewElement("TYPE");
-		tinyxml2::XMLElement* manufacturer = fDocument->NewElement("MANUFACTURER");
-		tinyxml2::XMLElement* serial = fDocument->NewElement("SERIAL");
-
-		caption->LinkEndChild(fDocument->NewText(info.model.c_str()));
-		description->LinkEndChild(fDocument->NewText(info.description.c_str()));
-		type->LinkEndChild(fDocument->NewText(info.type.c_str()));
-		manufacturer->LinkEndChild(fDocument->NewText(info.manufacturer.c_str()));
-		serial->LinkEndChild(fDocument->NewText(info.serial_number.c_str()));
-
-		monitor->LinkEndChild(caption);
-		monitor->LinkEndChild(description);
-		monitor->LinkEndChild(type);
-		monitor->LinkEndChild(manufacturer);
-		monitor->LinkEndChild(serial);
-
 		fContent->LinkEndChild(monitor);
+
+		tinyxml2::XMLElement* caption = fDocument->NewElement("CAPTION");
+		caption->LinkEndChild(fDocument->NewText(info.model.c_str()));
+		monitor->LinkEndChild(caption);
+
+		tinyxml2::XMLElement* description = fDocument->NewElement("DESCRIPTION");
+		description->LinkEndChild(fDocument->NewText(info.description.c_str()));
+		monitor->LinkEndChild(description);
+
+		tinyxml2::XMLElement* type = fDocument->NewElement("TYPE");
+		type->LinkEndChild(fDocument->NewText(info.type.c_str()));
+		monitor->LinkEndChild(type);
+
+		tinyxml2::XMLElement* manufacturer = fDocument->NewElement("MANUFACTURER");
+		manufacturer->LinkEndChild(fDocument->NewText(info.manufacturer.c_str()));
+		monitor->LinkEndChild(manufacturer);
+
+		tinyxml2::XMLElement* serial = fDocument->NewElement("SERIAL");
+		serial->LinkEndChild(fDocument->NewText(info.serial_number.c_str()));
+		monitor->LinkEndChild(serial);
 	}
 
 	Logger::Log(LOG_DEBUG, "\tAdded Display info!");
@@ -1064,11 +1066,14 @@ InventoryFormat::_WriteProlog(tinyxml2::XMLDocument& document) const
 
 	tinyxml2::XMLDeclaration* declaration = document.NewDeclaration();
 	document.LinkEndChild(declaration);
+
 	tinyxml2::XMLElement* request = document.NewElement("REQUEST");
 	document.LinkEndChild(request);
+
 	tinyxml2::XMLElement* deviceID = document.NewElement("DEVICEID");
 	deviceID->LinkEndChild(document.NewText(config->DeviceID().c_str()));
 	request->LinkEndChild(deviceID);
+
 	tinyxml2::XMLElement* query = document.NewElement("QUERY");
 	query->LinkEndChild(document.NewText("PROLOG"));
 	request->LinkEndChild(query);
@@ -1120,7 +1125,7 @@ InventoryFormat::GenerateDeviceID() const
 	char dateString[256];
 	::strftime(dateString, sizeof(dateString), "-%Y-%m-%d-00-00-00", &biosDate);
 
-    deviceID.append(dateString);
+	deviceID.append(dateString);
 
-    return deviceID;
+	return deviceID;
 }
