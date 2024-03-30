@@ -148,6 +148,8 @@ Inventory::Save(const char* fileName)
 bool
 Inventory::Send(const char* serverUrl)
 {
+	// TODO: Refactor, this functions is too big!
+
 	// TODO: OCSInventory supports compressed XML, while GLPI does not
 	bool compress = false;
 
