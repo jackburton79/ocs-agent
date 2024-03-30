@@ -492,6 +492,9 @@ Inventory::_AddBIOSInfo()
 void
 Inventory::_AddOperatingSystemInfo()
 {
+	if (Configuration::Get()->KeyValue("format") != "FORMAT_GLPI")
+		return;
+
 	tinyxml2::XMLElement* os = fDocument->NewElement("OPERATINGSYSTEM");
 	fContent->LinkEndChild(os);
 
@@ -862,11 +865,13 @@ Inventory::_AddHardwareInfo()
 	tinyxml2::XMLElement* processorN = fDocument->NewElement("PROCESSORN");
 	processorN->LinkEndChild(fDocument->NewText(int_to_string(cpuCount).c_str()));
 	hardware->LinkEndChild(processorN);
-#if 0
-	tinyxml2::XMLElement* arch = fDocument->NewElement("ARCH");
-	arch->LinkEndChild(fDocument->NewText(osInfo.fields["architecture"].c_str()));
-	hardware->LinkEndChild(arch);
-#endif
+
+	if (Configuration::Get()->KeyValue("format") == "FORMAT_OCS") {
+		tinyxml2::XMLElement* arch = fDocument->NewElement("ARCH");
+		arch->LinkEndChild(fDocument->NewText(osInfo.fields["architecture"].c_str()));
+		hardware->LinkEndChild(arch);
+	}
+
 	tinyxml2::XMLElement* swap = fDocument->NewElement("SWAP");
 	swap->LinkEndChild(fDocument->NewText(osInfo.fields["swap"].c_str()));
 	hardware->LinkEndChild(swap);
