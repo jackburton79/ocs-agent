@@ -649,41 +649,39 @@ Inventory::_AddStoragesInfo()
 	storage_info info;
 	while (storages.GetNext(info)) {
 		tinyxml2::XMLElement* storage = fDocument->NewElement("STORAGES");
+		fContent->LinkEndChild(storage);
 
 		tinyxml2::XMLElement* manufacturer = fDocument->NewElement("MANUFACTURER");
 		manufacturer->LinkEndChild(fDocument->NewText(info.manufacturer.c_str()));
+		storage->LinkEndChild(manufacturer);
 
 		tinyxml2::XMLElement* name = fDocument->NewElement("NAME");
 		name->LinkEndChild(fDocument->NewText(info.name.c_str()));
+		storage->LinkEndChild(name);
 
 		tinyxml2::XMLElement* model = fDocument->NewElement("MODEL");
 		model->LinkEndChild(fDocument->NewText(info.model.c_str()));
+		storage->LinkEndChild(model);
 
 		tinyxml2::XMLElement* description = fDocument->NewElement("DESCRIPTION");
 		description->LinkEndChild(fDocument->NewText(info.description.c_str()));
+		storage->LinkEndChild(description);
 
 		tinyxml2::XMLElement* type = fDocument->NewElement("TYPE");
 		type->LinkEndChild(fDocument->NewText(info.type.c_str()));
+		storage->LinkEndChild(type);
 
 		tinyxml2::XMLElement* diskSize = fDocument->NewElement("DISKSIZE");
 		diskSize->LinkEndChild(fDocument->NewText(info.size.c_str()));
+		storage->LinkEndChild(diskSize);
 
 		tinyxml2::XMLElement* serialNumber = fDocument->NewElement("SERIALNUMBER");
 		serialNumber->LinkEndChild(fDocument->NewText(info.serial_number.c_str()));
+		storage->LinkEndChild(serialNumber);
 
 		tinyxml2::XMLElement* firmware = fDocument->NewElement("FIRMWARE");
 		firmware->LinkEndChild(fDocument->NewText(info.firmware.c_str()));
-
-		storage->LinkEndChild(manufacturer);
-		storage->LinkEndChild(name);
-		storage->LinkEndChild(model);
-		storage->LinkEndChild(description);
-		storage->LinkEndChild(type);
-		storage->LinkEndChild(diskSize);
-		storage->LinkEndChild(serialNumber);
 		storage->LinkEndChild(firmware);
-
-		fContent->LinkEndChild(storage);
 	}
 
 	Logger::Log(LOG_DEBUG, "\tAdded Storage Info!");
@@ -702,42 +700,41 @@ Inventory::_AddMemoriesInfo()
 			break;
 
 		tinyxml2::XMLElement* memory = fDocument->NewElement("MEMORIES");
+		fContent->LinkEndChild(memory);
 
 		tinyxml2::XMLElement* description = fDocument->NewElement("DESCRIPTION");
-		tinyxml2::XMLElement* caption = fDocument->NewElement("CAPTION");
-		tinyxml2::XMLElement* capacity = fDocument->NewElement("CAPACITY");
-		tinyxml2::XMLElement* purpose = fDocument->NewElement("PURPOSE");
-		tinyxml2::XMLElement* type = fDocument->NewElement("TYPE");
-		tinyxml2::XMLElement* speed = fDocument->NewElement("SPEED");
-		tinyxml2::XMLElement* numSlots = fDocument->NewElement("NUMSLOTS");
-		tinyxml2::XMLElement* serial = fDocument->NewElement("SERIALNUMBER");
-
 		Component ramSlot = i->second;
 		description->LinkEndChild(fDocument->NewText(ramSlot.fields["description"].c_str()));
 		memory->LinkEndChild(description);
 
+		tinyxml2::XMLElement* caption = fDocument->NewElement("CAPTION");
 		caption->LinkEndChild(fDocument->NewText(ramSlot.fields["caption"].c_str()));
 		memory->LinkEndChild(caption);
 
+		tinyxml2::XMLElement* capacity = fDocument->NewElement("CAPACITY");
 		capacity->LinkEndChild(fDocument->NewText(ramSlot.fields["size"].c_str()));
 		memory->LinkEndChild(capacity);
 
+		tinyxml2::XMLElement* purpose = fDocument->NewElement("PURPOSE");
 		purpose->LinkEndChild(fDocument->NewText(ramSlot.fields["purpose"].c_str()));
 		memory->LinkEndChild(purpose);
 
+		tinyxml2::XMLElement* type = fDocument->NewElement("TYPE");
 		type->LinkEndChild(fDocument->NewText(ramSlot.fields["type"].c_str()));
 		memory->LinkEndChild(type);
 
+		tinyxml2::XMLElement* speed = fDocument->NewElement("SPEED");
 		speed->LinkEndChild(fDocument->NewText(ramSlot.fields["speed"].c_str()));
 		memory->LinkEndChild(speed);
 
+		tinyxml2::XMLElement* numSlots = fDocument->NewElement("NUMSLOTS");
 		numSlots->LinkEndChild(fDocument->NewText(int_to_string(slotNum + 1).c_str()));
 		memory->LinkEndChild(numSlots);
 
+		tinyxml2::XMLElement* serial = fDocument->NewElement("SERIALNUMBER");
 		serial->LinkEndChild(fDocument->NewText(ramSlot.fields["serial"].c_str()));
 		memory->LinkEndChild(serial);
 
-		fContent->LinkEndChild(memory);
 		slotNum++;
 	}
 	Logger::Log(LOG_DEBUG, "\tAdded Memory Info!");
