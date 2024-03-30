@@ -136,6 +136,7 @@ Inventory::Save(const char* fileName)
 		Logger::Log(LOG_INFO, "Inventory saved correctly!");
 	else
 		Logger::Log(LOG_INFO, "Failed to save inventory!");
+	return result;
 }
 
 
@@ -208,7 +209,7 @@ Inventory::Send(const char* serverUrl)
 			return false;
 		}
 
-		Logger::Log(LOG_INFO, "InventoryFormatOCS::Send(): Prolog Sent!");
+		Logger::Log(LOG_INFO, "InventoryFormatOCS::Send(): Try to send prolog...");
 		const HTTPResponseHeader& responseHeader = httpObject.LastResponse();
 		if (responseHeader.StatusCode() == HTTP_BAD_REQUEST) {
 			if (c == 0) {
@@ -219,25 +220,38 @@ Inventory::Send(const char* serverUrl)
 
 		delete[] prologData;
 
-		if (responseHeader.StatusCode() != HTTP_OK
-				|| !responseHeader.HasContentLength()) {
-			Logger::LogFormat(LOG_ERR, "Server replied %s", responseHeader.StatusString().c_str());
-			Logger::LogFormat(LOG_ERR, "%s", responseHeader.ToString().c_str());
+		bool isOk = responseHeader.StatusCode() == HTTP_OK;
+		if (isOk)
+			Logger::LogFormat(LOG_INFO, "Prolog sent!");
+		else
+			Logger::LogFormat(LOG_ERR, "Sending prolog failed: %s", responseHeader.StatusString().c_str());
+
+		if (!responseHeader.HasContentLength()) {
+			Logger::Log(LOG_ERR, "Prolog sent, but server didn't reply correctly.");
 			return false;
 		}
 
 		size_t contentLength = ::strtol(responseHeader.Value(HTTPContentLength).c_str(), NULL, 10);
+		std::string contentType = responseHeader.Value(HTTPContentType);
+
+		Logger::LogFormat(LOG_INFO, "Got reply with content type: '%s', content length: %d",
+			contentType.c_str(), contentLength);
+
 		char* resultData = new char[contentLength];
 		if (httpObject.Read(resultData, contentLength) < (int)contentLength) {
 			delete[] resultData;
-			Logger::LogFormat(LOG_ERR, "InventoryFormatOCS::Send(): failed to read XML response: %s",
+			Logger::LogFormat(LOG_ERR, "Inventory::Send(): failed to read reply: %s",
 				httpObject.ErrorString().c_str());
-
 			return false;
 		}
 
-		if (compress) {
-			Logger::Log(LOG_INFO, "InventoryFormatOCS::Send(): Decompressing reply... ");
+		// TODO: OCS Inventory always use "application/x-compressed" but
+		// sends a non compressed XML if we didn't compress prolog
+		if (!compress && contentType == "application/x-compressed")
+			contentType = "application/xml";
+
+		if (contentType == "application/x-compressed") {
+			Logger::Log(LOG_INFO, "Inventory::Send(): Decompressing reply... ");
 			char* decompressedData = NULL;
 			size_t decompressedLength = 0;
 			bool uncompress = ZLibCompressor::Uncompress(resultData, contentLength, decompressedData, decompressedLength);
@@ -248,6 +262,10 @@ Inventory::Send(const char* serverUrl)
 			}
 			resultData = decompressedData;
 			contentLength = decompressedLength;
+		} else if (contentType != "application/xml") {
+			Logger::Log(LOG_ERR, "Unexpected reply");
+			Logger::Log(LOG_ERR, httpObject.LastResponse().ToString().c_str());
+			return false;
 		}
 
 		tinyxml2::XMLDocument document;
