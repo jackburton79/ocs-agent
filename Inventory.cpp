@@ -234,7 +234,7 @@ Inventory::Send(const char* serverUrl)
 		size_t contentLength = ::strtol(responseHeader.Value(HTTPContentLength).c_str(), NULL, 10);
 		std::string contentType = responseHeader.Value(HTTPContentType);
 
-		Logger::LogFormat(LOG_INFO, "Got reply with content type: '%s', content length: %d",
+		Logger::LogFormat(LOG_INFO, "Got reply with content type: '%s', content length: %ul",
 			contentType.c_str(), contentLength);
 
 		char* resultData = new char[contentLength];
@@ -405,9 +405,11 @@ void
 Inventory::_AddAccountInfo()
 {
 	tinyxml2::XMLElement* accountInfo = fDocument->NewElement("ACCOUNTINFO");
+	fContent->LinkEndChild(accountInfo);
 
 	tinyxml2::XMLElement* keyName = fDocument->NewElement("KEYNAME");
 	keyName->LinkEndChild(fDocument->NewText("TAG"));
+	accountInfo->LinkEndChild(keyName);
 
 	std::string tag = Configuration::Get()->KeyValue("TAG");
 	if (tag == "")
@@ -415,11 +417,8 @@ Inventory::_AddAccountInfo()
 
 	tinyxml2::XMLElement* keyValue = fDocument->NewElement("KEYVALUE");
 	keyValue->LinkEndChild(fDocument->NewText(tag.c_str()));
-
-	accountInfo->LinkEndChild(keyName);
 	accountInfo->LinkEndChild(keyValue);
 
-	fContent->LinkEndChild(accountInfo);
 	Logger::Log(LOG_DEBUG, "\tAdded Account Info!");
 }
 
