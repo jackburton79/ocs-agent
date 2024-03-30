@@ -52,11 +52,11 @@ PrintHelpAndExit()
 	std::cout << "Usage:" << std::endl;
 	std::cout << "  -h, --help                         Print usage" << std::endl;
 	std::cout << "  -c, --conf <config_file>           Specify configuration file" << std::endl;
-	std::cout << "  -s, --server <server>              Specify OCSInventory server url" << std::endl;
+	std::cout << "  -s, --server <server>              Specify OCSInventory/GLPI server url" << std::endl;
 	std::cout << "                                     If the server needs authentication, use the standard syntax <user>:<password>@<host>" << std::endl;
-	std::cout << "      --format <format>              Specify the inventory format: FORMAT_OCS or FORMAT_JSON" << std::endl;
-	std::cout << "  -l, --local <folder>               Don't send inventory, instead save a local copy in the specified file or folder" << std::endl;
-	std::cout << "      --stdout                       Don't send inventory, print it to stdout" << std::endl;
+	std::cout << "      --format <format>              Specify the inventory format: FORMAT_OCS or FORMAT_GLPI" << std::endl;
+	std::cout << "  -l, --local <folder>               Save a local inventory in the specified file or folder" << std::endl;
+	std::cout << "      --stdout                       Print inventory to stdout" << std::endl;
 	std::cout << std::endl;
 	std::cout << "  -t, --tag <TAG>                    Specify tag. Will be ignored by server if a value already exists" << std::endl;
 	std::cout << "      --nosoftware                   Do not retrieve installed software" << std::endl;
@@ -158,8 +158,12 @@ HandleArgs(int argc, char **argv)
 				std::string optName = sLongOptions[optIndex].name;
 				if (optName == "nosoftware")
 					config->SetVolatileKeyValue("nosoftware", "true");
-				else if (optName == "format")
-					config->SetVolatileKeyValue("format", optarg);
+				else if (optName == "format") {
+					if (::strcasecmp(optarg, "FORMAT_OCS") == 0 ||
+						::strcasecmp(optarg, "FORMAT_GLPI") == 0) {
+						config->SetVolatileKeyValue("format", optarg);
+					}
+				}
 				else if (optName == "stdout" && !daemonize)
 					config->SetVolatileKeyValue("stdout", "true");
 				else if (optName == "use-current-time-in-device-ID")

@@ -94,11 +94,16 @@ bool
 Inventory::Build(bool noSoftware)
 {
 	Logger::Log(LOG_INFO, "Building inventory...");
+	std::string inventoryFormat = Configuration::Get()->KeyValue("format");
+	if (inventoryFormat.empty()) {
+		Logger::Log(LOG_WARNING, "No inventory format specified. Using lowest common denominator.");
+	}
 	try {
-		// TODO: For glpi only
-		tinyxml2::XMLElement* versionClient = fDocument->NewElement("VERSIONCLIENT");
-		versionClient->LinkEndChild(fDocument->NewText("1.9.9"));
-		fContent->LinkEndChild(versionClient);
+		if (inventoryFormat == "FORMAT_GLPI") {
+			tinyxml2::XMLElement* versionClient = fDocument->NewElement("VERSIONCLIENT");
+			versionClient->LinkEndChild(fDocument->NewText("1.9.9"));
+			fContent->LinkEndChild(versionClient);
+		}
 		_AddAccountInfo();
 		_AddBIOSInfo();
 		_AddOperatingSystemInfo();
@@ -544,19 +549,75 @@ Inventory::_AddCPUsInfo()
 		tinyxml2::XMLElement* cpu = fDocument->NewElement("CPUS");
 		fContent->LinkEndChild(cpu);
 
-#if 0
-		// OCSInventoryFormatOCS always reports "CPU Enabled" here
-		// TODO: GLPI doesn't really like serial number and rejects the inventory
-		tinyxml2::XMLElement* serial = fDocument->NewElement("SERIALNUMBER");
-		std::string cpuSerial = cpuInfo.fields["serial"];
-		if (cpuSerial.empty())
-			cpuSerial = "CPU Enabled";
-		if (cpuSerial == "None")
-			cpuSerial = "";
-		serial->LinkEndChild(
-			fDocument->NewText(cpuSerial.c_str()));
-		cpu->LinkEndChild(serial);
-#endif
+		// OCS Inventory
+		if (Configuration::Get()->KeyValue("format") == "FORMAT_OCS") {
+			// The official OCSInventory linux Agent always reports "CPU Enabled" here
+			tinyxml2::XMLElement* serial = fDocument->NewElement("SERIALNUMBER");
+			std::string cpuSerial = cpuInfo.fields["serial"];
+			if (cpuSerial.empty())
+				cpuSerial = "CPU Enabled";
+			if (cpuSerial == "None")
+				cpuSerial = "";
+			serial->LinkEndChild(
+					fDocument->NewText(cpuSerial.c_str()));
+			cpu->LinkEndChild(serial);
+
+			tinyxml2::XMLElement* currentSpeed = fDocument->NewElement("CURRENT_SPEED");
+			currentSpeed->LinkEndChild(
+			fDocument->NewText(cpuInfo.fields["current_speed"].c_str()));
+			cpu->LinkEndChild(currentSpeed);
+
+			tinyxml2::XMLElement* cores = fDocument->NewElement("CORES");
+			cores->LinkEndChild(
+				fDocument->NewText(cpuInfo.fields["cores"].c_str()));
+			cpu->LinkEndChild(cores);
+			tinyxml2::XMLElement* arch = fDocument->NewElement("CPUARCH");
+			arch->LinkEndChild(
+				fDocument->NewText(gComponents["OS"].fields["architecture"].c_str()));
+			cpu->LinkEndChild(arch);
+			tinyxml2::XMLElement* dataWidth = fDocument->NewElement("DATA_WIDTH");
+			std::string dataWidthString = gComponents["CPU"].fields["width"];
+			if (dataWidthString.empty()) {
+				// TODO: This is not completely correct:
+				// We could have a 64 bit capable CPU on a 32 bit OS.
+				if (gComponents["OS"].fields["architecture"] == "x86_64")
+					dataWidthString = "64";
+				else
+					dataWidthString = "32";
+			}
+			dataWidth->LinkEndChild(
+				fDocument->NewText(dataWidthString.c_str()));
+			cpu->LinkEndChild(dataWidth);
+			// Not a copy/paste error: the fields are the same
+
+			tinyxml2::XMLElement* currentAddressWidth = fDocument->NewElement("CURRENT_ADDRESS_WIDTH");
+			currentAddressWidth->LinkEndChild(
+				fDocument->NewText(dataWidthString.c_str()));
+			cpu->LinkEndChild(currentAddressWidth);
+
+			tinyxml2::XMLElement* cacheSize = fDocument->NewElement("L2CACHESIZE");
+			cacheSize->LinkEndChild(
+				fDocument->NewText(cpuInfo.fields["cache_size"].c_str()));
+			cpu->LinkEndChild(cacheSize);
+
+			tinyxml2::XMLElement* logicalCpu = fDocument->NewElement("LOGICAL_CPUS");
+			logicalCpu->LinkEndChild(
+				fDocument->NewText(cpuInfo.fields["logical_cpus"].c_str()));
+			cpu->LinkEndChild(logicalCpu);
+
+			tinyxml2::XMLElement* voltage = fDocument->NewElement("VOLTAGE");
+			voltage->LinkEndChild(
+				fDocument->NewText(cpuInfo.fields["voltage"].c_str()));
+			cpu->LinkEndChild(voltage);
+
+		} else if (Configuration::Get()->KeyValue("format") == "FORMAT_GLPI") {
+			// GLPI
+			tinyxml2::XMLElement* cores = fDocument->NewElement("CORE");
+			cores->LinkEndChild(
+			fDocument->NewText(cpuInfo.fields["cores"].c_str()));
+			cpu->LinkEndChild(cores);
+		}
+
 		tinyxml2::XMLElement* manufacturer = fDocument->NewElement("MANUFACTURER");
 		cpu->LinkEndChild(manufacturer);
 		manufacturer->LinkEndChild(
@@ -566,12 +627,7 @@ Inventory::_AddCPUsInfo()
 		speed->LinkEndChild(
 			fDocument->NewText(cpuInfo.fields["speed"].c_str()));
 		cpu->LinkEndChild(speed);
-#if 0
-		tinyxml2::XMLElement* currentSpeed = fDocument->NewElement("CURRENT_SPEED");
-		currentSpeed->LinkEndChild(
-			fDocument->NewText(cpuInfo.fields["current_speed"].c_str()));
-		cpu->LinkEndChild(currentSpeed);
-#endif
+
 		tinyxml2::XMLElement* model = fDocument->NewElement("TYPE");
 		model->LinkEndChild(
 			fDocument->NewText(cpuInfo.fields["type"].c_str()));
@@ -582,59 +638,6 @@ Inventory::_AddCPUsInfo()
 		name->LinkEndChild(
 			fDocument->NewText(cpuInfo.fields["type"].c_str()));
 		cpu->LinkEndChild(name);
-#if 0
-		// TODO: GLPI wants "CORE" here
-		tinyxml2::XMLElement* cores = fDocument->NewElement("CORES");
-		cores->LinkEndChild(
-			fDocument->NewText(cpuInfo.fields["cores"].c_str()));
-		cpu->LinkEndChild(cores);
-#endif
-#if 0
-		tinyxml2::XMLElement* arch = fDocument->NewElement("CPUARCH");
-		arch->LinkEndChild(
-			fDocument->NewText(gComponents["OS"].fields["architecture"].c_str()));
-		cpu->LinkEndChild(arch);
-#endif
-#if 0
-		tinyxml2::XMLElement* dataWidth = fDocument->NewElement("DATA_WIDTH");
-		std::string dataWidthString = gComponents["CPU"].fields["width"];
-		if (dataWidthString.empty()) {
-			// TODO: This is not completely correct:
-			// We could have a 64 bit capable CPU on a 32 bit OS.
-			if (gComponents["OS"].fields["architecture"] == "x86_64")
-				dataWidthString = "64";
-			else
-				dataWidthString = "32";
-		}
-		dataWidth->LinkEndChild(
-			fDocument->NewText(dataWidthString.c_str()));
-		cpu->LinkEndChild(dataWidth);
-		// Not a copy/paste error: the fields are the same
-
-		tinyxml2::XMLElement* currentAddressWidth = fDocument->NewElement("CURRENT_ADDRESS_WIDTH");
-		currentAddressWidth->LinkEndChild(
-			fDocument->NewText(dataWidthString.c_str()));
-		cpu->LinkEndChild(currentAddressWidth);
-#endif
-#if 0
-		tinyxml2::XMLElement* cacheSize = fDocument->NewElement("L2CACHESIZE");
-		cacheSize->LinkEndChild(
-			fDocument->NewText(cpuInfo.fields["cache_size"].c_str()));
-		cpu->LinkEndChild(cacheSize);
-#endif
-#if 0
-		tinyxml2::XMLElement* logicalCpu = fDocument->NewElement("LOGICAL_CPUS");
-		logicalCpu->LinkEndChild(
-			fDocument->NewText(cpuInfo.fields["logical_cpus"].c_str()));
-		cpu->LinkEndChild(logicalCpu);
-#endif
-#if 0
-		tinyxml2::XMLElement* voltage = fDocument->NewElement("VOLTAGE");
-		voltage->LinkEndChild(
-			fDocument->NewText(cpuInfo.fields["voltage"].c_str()));
-		cpu->LinkEndChild(voltage);
-#endif
-
 
 	}
 	Logger::Log(LOG_DEBUG, "\tAdded CPUs Info!");
