@@ -36,23 +36,23 @@ private:
 	int Checksum() const;
 
 	void _AddAccountInfo();
-    void _AddBIOSInfo();
-    void _AddOperatingSystemInfo();
-    void _AddCPUsInfo();
-    void _AddStoragesInfo();
-    void _AddMemoriesInfo();
-    void _AddDrivesInfo();
-    void _AddHardwareInfo();
-    void _AddNetworksInfo();
-    void _AddProcessesInfo();
-    void _AddSoftwaresInfo();
-    void _AddUsersInfo();
-    void _AddVideosInfo();
-    void _AddMonitorsInfo();
+	void _AddBIOSInfo();
+	void _AddOperatingSystemInfo();
+	void _AddCPUsInfo();
+	void _AddStoragesInfo();
+	void _AddMemoriesInfo();
+	void _AddDrivesInfo();
+	void _AddHardwareInfo();
+	void _AddNetworksInfo();
+	void _AddProcessesInfo();
+	void _AddSoftwaresInfo();
+	void _AddUsersInfo();
+	void _AddVideosInfo();
+	void _AddMonitorsInfo();
 
-    bool _WriteProlog(tinyxml2::XMLDocument& document) const;
+	bool _WriteProlog(tinyxml2::XMLDocument& document) const;
 
-    tinyxml2::XMLDocument* fDocument;
-    tinyxml2::XMLElement* fContent;
+	tinyxml2::XMLDocument* fDocument;
+	tinyxml2::XMLElement* fContent;
 };
 
