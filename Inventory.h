@@ -1,17 +1,20 @@
 /*
- * Inventory.h
+ * InventoryFormatOCS.h
  *
- *  Created on: 11/lug/2013
+ *  Created on: 31/aug/2022
  *      Author: Stefano Ceccherini
  */
 
-#ifndef INVENTORY_H_
-#define INVENTORY_H_
+#pragma once
 
 #include <string>
 
+namespace tinyxml2 {
+	class XMLDocument;
+	class XMLElement;
+}
 
-class InventoryFormat;
+class Machine;
 class Inventory {
 public:
 	Inventory();
@@ -20,13 +23,36 @@ public:
 	bool Initialize();
 	void Clear();
 
+	std::string GenerateDeviceID() const;
+
 	bool Build(bool noSoftware = false);
 	bool Save(const char* fileName);
 	bool Send(const char* serverUrl);
+
+	std::string ToString();
 	void Print();
 
 private:
-	InventoryFormat* fFormat;
+	int Checksum() const;
+
+	void _AddAccountInfo();
+    void _AddBIOSInfo();
+    void _AddOperatingSystemInfo();
+    void _AddCPUsInfo();
+    void _AddStoragesInfo();
+    void _AddMemoriesInfo();
+    void _AddDrivesInfo();
+    void _AddHardwareInfo();
+    void _AddNetworksInfo();
+    void _AddProcessesInfo();
+    void _AddSoftwaresInfo();
+    void _AddUsersInfo();
+    void _AddVideosInfo();
+    void _AddMonitorsInfo();
+
+    bool _WriteProlog(tinyxml2::XMLDocument& document) const;
+
+    tinyxml2::XMLDocument* fDocument;
+    tinyxml2::XMLElement* fContent;
 };
 
-#endif /* INVENTORY_H_ */
