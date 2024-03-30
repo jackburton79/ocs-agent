@@ -204,7 +204,7 @@ Inventory::Send(const char* serverUrl)
 		Logger::LogFormat(LOG_DEBUG, "%s", requestHeader.ToString().c_str());
 		if (httpObject.Request(requestHeader, prologData, prologLength) != 0) {
 			delete[] prologData;
-			Logger::LogFormat(LOG_INFO, "InventoryFormatOCS::Send(): Failed to send prolog: %s",
+			Logger::LogFormat(LOG_INFO, "Inventory::Send(): Failed to send prolog: %s",
 						httpObject.ErrorString().c_str());
 			return false;
 		}
