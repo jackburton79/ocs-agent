@@ -149,7 +149,7 @@ Inventory::Send(const char* serverUrl)
 	URL inventoryUrl(serverUrl);
 
 	// Prepare prolog
-	Logger::LogFormat(LOG_INFO, "InventoryFormatOCS::Send(): server URL: %s", serverUrl);
+	Logger::LogFormat(LOG_INFO, "Inventory::Send(): server URL: %s", serverUrl);
 	tinyxml2::XMLDocument prolog;
 	_WriteProlog(prolog);
 	char* prologData = NULL;
@@ -200,7 +200,7 @@ Inventory::Send(const char* serverUrl)
 			: Agent::LegacyAgentString();
 		requestHeader.SetUserAgent(userAgentString);
 
-		Logger::Log(LOG_INFO, "InventoryFormatOCS::Send(): Prolog prepared!");
+		Logger::Log(LOG_INFO, "Inventory::Send(): Prolog prepared!");
 		Logger::LogFormat(LOG_DEBUG, "%s", requestHeader.ToString().c_str());
 		if (httpObject.Request(requestHeader, prologData, prologLength) != 0) {
 			delete[] prologData;
@@ -209,7 +209,7 @@ Inventory::Send(const char* serverUrl)
 			return false;
 		}
 
-		Logger::Log(LOG_INFO, "InventoryFormatOCS::Send(): Try to send prolog...");
+		Logger::Log(LOG_INFO, "Inventory::Send(): Try to send prolog...");
 		const HTTPResponseHeader& responseHeader = httpObject.LastResponse();
 		if (responseHeader.StatusCode() == HTTP_BAD_REQUEST) {
 			if (c == 0) {
@@ -279,7 +279,7 @@ Inventory::Send(const char* serverUrl)
 		std::cout << XML::ToString(document) << std::endl;
 #endif
 		std::string serverResponse = XML::GetElementText(document, "RESPONSE");
-		Logger::LogFormat(LOG_INFO, "InventoryFormatOCS::Send(): server replied %s", serverResponse.c_str());
+		Logger::LogFormat(LOG_INFO, "Inventory::Send(): server replied %s", serverResponse.c_str());
 		if (serverResponse == "SEND")
 			break;
 		Logger::LogFormat(LOG_ERR, "Server not ready to accept inventory: %s", serverResponse.c_str());
@@ -288,14 +288,14 @@ Inventory::Send(const char* serverUrl)
 
 	char* inventoryData = NULL;
 	size_t inventoryLength;
-	Logger::Log(LOG_INFO, "InventoryFormatOCS::Send(): Serializing XML inventory data... ");
+	Logger::Log(LOG_INFO, "Inventory::Send(): Serializing XML inventory data... ");
 	if (!XML::Serialize(*fDocument, inventoryData, inventoryLength)) {
 		Logger::Log(LOG_ERR, "Error while serializing XML data!");
 		return false;
 	}
 
 	if (compress) {
-		Logger::Log(LOG_INFO, "InventoryFormatOCS::Send(): Compressing inventory data... ");
+		Logger::Log(LOG_INFO, "Inventory::Send(): Compressing inventory data... ");
 		size_t compressedLength;
 		char* compressedData = NULL;
 		if (!ZLibCompressor::Compress(inventoryData, inventoryLength, compressedData, compressedLength)) {
@@ -357,7 +357,7 @@ Inventory::Send(const char* serverUrl)
 	}
 
 	if (httpObject.LastResponse().Value(HTTPContentType) == "application/xml") {
-		Logger::Log(LOG_INFO, "InventoryFormatOCS::Send(): Deserialize XML... ");
+		Logger::Log(LOG_INFO, "Inventory::Send(): Deserialize XML... ");
 		tinyxml2::XMLDocument reply;
 		bool deserialized = XML::Deserialize(resultData, contentLength, reply);
 		delete[] resultData;
@@ -370,9 +370,9 @@ Inventory::Send(const char* serverUrl)
 	}
 
 	if (statusOk)
-		Logger::Log(LOG_INFO, "InventoryFormatOCS::Send(): Inventory was accepted!");
+		Logger::Log(LOG_INFO, "Inventory::Send(): Inventory was accepted!");
 	else
-		Logger::Log(LOG_ERR, "InventoryFormatOCS::Send(): Inventory was rejected by server!");
+		Logger::Log(LOG_ERR, "Inventory::Send(): Inventory was rejected by server!");
 
 	return true;
 }
