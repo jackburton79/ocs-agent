@@ -428,30 +428,39 @@ void
 Inventory::_AddBIOSInfo()
 {
 	tinyxml2::XMLElement* bios = fDocument->NewElement("BIOS");
+	fContent->LinkEndChild(bios);
 
 	tinyxml2::XMLElement* assettag = fDocument->NewElement("ASSETTAG");
 	assettag->LinkEndChild(fDocument->NewText(gComponents["CHASSIS"].fields["asset_tag"].c_str()));
+	bios->LinkEndChild(assettag);
 
 	tinyxml2::XMLElement* bdate = fDocument->NewElement("BDATE");
 	bdate->LinkEndChild(fDocument->NewText(gComponents["BIOS"].fields["release_date"].c_str()));
+	bios->LinkEndChild(bdate);
 
 	tinyxml2::XMLElement* bmanufacturer = fDocument->NewElement("BMANUFACTURER");
 	bmanufacturer->LinkEndChild(fDocument->NewText(gComponents["BIOS"].fields["vendor"].c_str()));
+	bios->LinkEndChild(bmanufacturer);
 
 	tinyxml2::XMLElement* bversion = fDocument->NewElement("BVERSION");
 	bversion->LinkEndChild(fDocument->NewText(gComponents["BIOS"].fields["version"].c_str()));
+	bios->LinkEndChild(bversion);
 
 	tinyxml2::XMLElement* mmanufacturer = fDocument->NewElement("MMANUFACTURER");
 	mmanufacturer->LinkEndChild(fDocument->NewText(gComponents["BOARD"].fields["vendor"].c_str()));
+	bios->LinkEndChild(mmanufacturer);
 
 	tinyxml2::XMLElement* mSerial = fDocument->NewElement("MSN");
 	mSerial->LinkEndChild(fDocument->NewText(gComponents["BOARD"].fields["serial"].c_str()));
+	bios->LinkEndChild(mSerial);
 
 	tinyxml2::XMLElement* sManufacturer = fDocument->NewElement("SMANUFACTURER");
 	sManufacturer->LinkEndChild(fDocument->NewText(gComponents["SYSTEM"].fields["vendor"].c_str()));
+	bios->LinkEndChild(sManufacturer);
 
 	tinyxml2::XMLElement* systemModel = fDocument->NewElement("SMODEL");
 	systemModel->LinkEndChild(fDocument->NewText(gComponents["SYSTEM"].fields["name"].c_str()));
+	bios->LinkEndChild(systemModel);
 
 	// TODO: Move into backend(s)
 	// Some systems have this empty, or, like our MCP79s,
@@ -466,22 +475,11 @@ Inventory::_AddBIOSInfo()
 
 	tinyxml2::XMLElement* ssn = fDocument->NewElement("SSN");
 	ssn->LinkEndChild(fDocument->NewText(systemSerial.c_str()));
+	bios->LinkEndChild(ssn);
 
 	tinyxml2::XMLElement* type = fDocument->NewElement("TYPE");
 	type->LinkEndChild(fDocument->NewText(gComponents["CHASSIS"].fields["type"].c_str()));
-
-	bios->LinkEndChild(assettag);
-	bios->LinkEndChild(bdate);
-	bios->LinkEndChild(bmanufacturer);
-	bios->LinkEndChild(bversion);
-	bios->LinkEndChild(mmanufacturer);
-	bios->LinkEndChild(mSerial);
-	bios->LinkEndChild(sManufacturer);
-	bios->LinkEndChild(systemModel);
-	bios->LinkEndChild(ssn);
 	bios->LinkEndChild(type);
-
-	fContent->LinkEndChild(bios);
 
 	Logger::Log(LOG_DEBUG, "\tAdded BIOS Info!");
 }
@@ -586,6 +584,7 @@ Inventory::_AddCPUsInfo()
 			fDocument->NewText(cpuInfo.fields["type"].c_str()));
 		cpu->LinkEndChild(name);
 #if 0
+		// TODO: GLPI wants "CORE" here
 		tinyxml2::XMLElement* cores = fDocument->NewElement("CORES");
 		cores->LinkEndChild(
 			fDocument->NewText(cpuInfo.fields["cores"].c_str()));
