@@ -2,7 +2,7 @@
  * HTTPHeader.cpp
  *
  *  Created on: 23/lug/2013
- *  Copyright 2013-2014 Stefano Ceccherini (stefano.ceccherini@gmail.com)
+ *  Copyright 2013-2024 Stefano Ceccherini (stefano.ceccherini@gmail.com)
  */
 
 #include "HTTPDefines.h"
@@ -34,7 +34,7 @@ HTTPHeader::~HTTPHeader()
 }
 
 
-int
+size_t
 HTTPHeader::ContentLength() const
 {
 	std::map<std::string, std::string>::const_iterator i;
@@ -42,7 +42,7 @@ HTTPHeader::ContentLength() const
 	if (i == fValues.end())
 		return 0;
 
-	return ::strtol(i->second.c_str(), NULL, 10);
+	return ::strtoul(i->second.c_str(), NULL, 10);
 }
 
 
@@ -80,7 +80,7 @@ HTTPHeader::HasKey(const std::string& key) const
 
 
 void
-HTTPHeader::SetContentLength(int len)
+HTTPHeader::SetContentLength(size_t len)
 {
 	std::ostringstream stream;
 	stream << len;

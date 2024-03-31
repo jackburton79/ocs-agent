@@ -2,7 +2,7 @@
  * HTTPRequestHeader.cpp
  *
  *  Created on: 23/lug/2013
- *  Copyright 2013-2017 Stefano Ceccherini (stefano.ceccherini@gmail.com)
+ *  Copyright 2013-2024 Stefano Ceccherini (stefano.ceccherini@gmail.com)
  */
 
 #include "HTTPDefines.h"

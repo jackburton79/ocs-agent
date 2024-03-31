@@ -2,7 +2,7 @@
  * HTTPHeader.h
  *
  *  Created on: 23/lug/2013
- *  Copyright 2013-2014 Stefano Ceccherini (stefano.ceccherini@gmail.com)
+ *  Copyright 2013-2024 Stefano Ceccherini (stefano.ceccherini@gmail.com)
  */
 
 #ifndef HTTPHEADER_H_
@@ -23,9 +23,9 @@ public:
 	HTTPHeader(const HTTPHeader&);
 	virtual ~HTTPHeader();
 
-	int ContentLength() const;
+	size_t ContentLength() const;
 	bool HasContentLength() const;
-	void SetContentLength(int len);
+	void SetContentLength(size_t len);
 	
 	std::string ContentType() const;
 	bool HasContentType() const;

@@ -2,7 +2,7 @@
  * HTTP.h
  *
  *  Created on: 23/lug/2013
- *  Copyright 2013-2014 Stefano Ceccherini (stefano.ceccherini@gmail.com)
+ *  Copyright 2013-2024 Stefano Ceccherini (stefano.ceccherini@gmail.com)
  *
  *  HTTP Class.
  *  Interface roughly based on QT QHTTP class.
@@ -25,10 +25,9 @@ public:
 	~HTTP();
 
 	void Close();
-	void ClearPendingRequests();
 
 	int SetHost(const std::string& hostName);
-	
+
 	int Get(const std::string& path);
 	int Put(const std::string& path, const char* data, const size_t dataLength);
 	int Post(const std::string& path, const char* data, const size_t dataLength);
