@@ -241,8 +241,8 @@ Inventory::Send(const char* serverUrl)
 		size_t contentLength = ::strtol(responseHeader.Value(HTTPContentLength).c_str(), NULL, 10);
 		std::string contentType = responseHeader.Value(HTTPContentType);
 
-		Logger::LogFormat(LOG_INFO, "Got reply with content type: '%s', content length: %ul",
-			contentType.c_str(), contentLength);
+		Logger::LogFormat(LOG_INFO, "Got reply with content type: '%s', content length: %lu",
+			contentType.c_str(), static_cast<unsigned long>(contentLength));
 
 		char* resultData = new char[contentLength];
 		if (httpObject.Read(resultData, contentLength) < (int)contentLength) {
