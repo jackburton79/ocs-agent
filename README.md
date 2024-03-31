@@ -26,24 +26,26 @@ This is not the official OCSInventory NG agent, which can be found here: https:/
 
 Usage
 ===
-      -h, --help                         Print usage
-      -c, --conf <config_file>           Specify configuration file
-      -s, --server <server>              Specify OCSInventory server url
-                                         If the server needs authentication, use the standard syntax <user>:<password>@<host>
-      -l, --local <folder>               Don't send inventory, instead save a local copy in the specified file or folder
-          --stdout                       Don't send inventory, print it to stdout
-      -t, --tag <TAG>                    Specify tag. Will be ignored by server if a value already exists
-          --nosoftware                   Do not retrieve installed software
+    -h, --help                         Print usage
+    -c, --conf <config_file>           Specify configuration file
+    -s, --server <server>              Specify OCSInventory/GLPI server url
+                                       If the server needs authentication, use the standard syntax <user>:<password>@<host>
+        --format <format>              Specify the inventory format: FORMAT_OCS or FORMAT_GLPI
+    -l, --local <folder>               Save a local inventory in the specified file or folder
+        --stdout                       Print inventory to stdout
 
-          --agent-string <string>        Specify custom HTTP agent string
+    -t, --tag <TAG>                    Specify tag. Will be ignored by server if a value already exists
+        --nosoftware                   Do not retrieve installed software
 
-      -d, --daemonize                    Detach from running terminal
-      -w, --wait <s>                     Wait for the specified amount of seconds before building the inventory
+        --agent-string <string>        Specify custom HTTP agent string
 
-          --log <option>                 Specify error log output (STDERR / SYSLOG).
-                                         Default is standard error if attached to a terminal, otherwise syslog. 
-      -v, --verbose                      Verbose mode
-          --version                      Print version and exit
+    -d, --daemonize                    Detach from running terminal
+    -w, --wait <s>                     Wait for the specified amount of seconds before building the inventory
+
+    --logger <backend>                 Specify error log backend (STDERR / SYSLOG).
+                                       Default is standard error if attached to a terminal, otherwise syslog. 
+    -v, --verbose                      Verbose mode
+        --version                      Print version and exit
 
         --use-current-time-in-device-ID  Use current time in the device ID, instead of the BIOS Date.
                                          No need to use this option unless you know why you need it.
