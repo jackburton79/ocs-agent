@@ -12,7 +12,8 @@
 
 HTTPResponseHeader::HTTPResponseHeader()
 	:
-	fCode(0)
+	fCode(0),
+	fData(NULL)
 {
 }
 
@@ -83,6 +84,22 @@ HTTPResponseHeader::Clear()
 	HTTPHeader::Clear();
 	fCode = 0;
 	fText = "";
+	delete[] fData;
+	fData = NULL;
+}
+
+
+char*
+HTTPResponseHeader::Data() const
+{
+	return fData;
+}
+
+
+void
+HTTPResponseHeader::SetData(char* data)
+{
+	fData = data;
 }
 
 

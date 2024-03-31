@@ -202,6 +202,18 @@ HTTP::Request(const HTTPRequestHeader& header, const void* data, const size_t da
 		return -1;
 	}
 
+	if (fLastResponse.HasContentLength()) {
+		const size_t contentLength = fLastResponse.ContentLength();
+		// Read data
+		char* resultData = new char[contentLength];
+		int read = Read(resultData, contentLength);
+		if (read != (int)contentLength) {
+			fLastError = read;
+			delete[] resultData;
+			return fLastError;
+		}
+		fLastResponse.SetData(resultData);
+	}
 	return 0;
 }
 

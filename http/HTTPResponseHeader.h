@@ -27,12 +27,16 @@ public:
 	virtual std::string ToString() const;
 
 	virtual void Clear();
-	
+
+	char* Data() const;
+	void SetData(char* data);
+
 	HTTPResponseHeader& operator=(const HTTPResponseHeader& header);
 
 private:
 	std::string fText;
 	int fCode;
+	char* fData;
 };
 
 #endif /* HTTPRESPONSEHEADER_H_ */

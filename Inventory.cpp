@@ -238,19 +238,14 @@ Inventory::Send(const char* serverUrl)
 			return false;
 		}
 
-		size_t contentLength = ::strtol(responseHeader.Value(HTTPContentLength).c_str(), NULL, 10);
-		std::string contentType = responseHeader.Value(HTTPContentType);
+		std::string contentType = responseHeader.ContentType();
+		size_t contentLength = responseHeader.ContentLength();
 
 		Logger::LogFormat(LOG_INFO, "Got reply with content type: '%s', content length: %lu",
 			contentType.c_str(), static_cast<unsigned long>(contentLength));
 
-		char* resultData = new char[contentLength];
-		if (httpObject.Read(resultData, contentLength) < (int)contentLength) {
-			delete[] resultData;
-			Logger::LogFormat(LOG_ERR, "Inventory::Send(): failed to read reply: %s",
-				httpObject.ErrorString().c_str());
-			return false;
-		}
+		// responseHeader keeps the ownership
+		char* resultData = responseHeader.Data();
 
 		// TODO: OCS Inventory always use "application/x-compressed" but
 		// sends a non compressed XML if we didn't compress prolog
@@ -262,7 +257,6 @@ Inventory::Send(const char* serverUrl)
 			char* decompressedData = NULL;
 			size_t decompressedLength = 0;
 			bool uncompress = ZLibCompressor::Uncompress(resultData, contentLength, decompressedData, decompressedLength);
-			delete[] resultData;
 			if (!uncompress) {
 				Logger::Log(LOG_ERR, "failed to decompress data");
 				return false;
@@ -354,20 +348,13 @@ Inventory::Send(const char* serverUrl)
 	Logger::LogFormat(LOG_ERR, "Server replied %s", responseHeader2.StatusString().c_str());
 	Logger::LogFormat(LOG_ERR, "%s", responseHeader2.ToString().c_str());
 
-	size_t contentLength = ::strtol(responseHeader2.Value(HTTPContentLength).c_str(), NULL, 10);
-	char* resultData = new char[contentLength];
-	if (httpObject.Read(resultData, contentLength) < (int)contentLength) {
-		delete[] resultData;
-		Logger::LogFormat(LOG_ERR, "Inventory::Send(): failed to read response: %s",
-			httpObject.ErrorString().c_str());
-			return false;
-	}
+	size_t contentLength = responseHeader2.ContentLength();
+	char* resultData = responseHeader2.Data();
 
-	if (httpObject.LastResponse().Value(HTTPContentType) == "application/xml") {
+	if (responseHeader2.ContentType() == "application/xml") {
 		Logger::Log(LOG_INFO, "Inventory::Send(): Deserialize XML... ");
 		tinyxml2::XMLDocument reply;
 		bool deserialized = XML::Deserialize(resultData, contentLength, reply);
-		delete[] resultData;
 		if (!deserialized) {
 			Logger::Log(LOG_ERR, "failed to deserialize XML");
 			return false;
