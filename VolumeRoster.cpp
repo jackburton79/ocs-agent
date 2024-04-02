@@ -14,9 +14,8 @@
 
 VolumeRoster::VolumeRoster(const char* options)
 {
-	// TODO:
 	std::string string("export LC_ALL=C; ");
-	string.append("df -T ").append(options);
+	string.append("df -T -l").append(options);
 	CommandStreamBuffer df(string.c_str(), "r");
 	std::istream stream(&df);
 
@@ -36,7 +35,13 @@ VolumeRoster::VolumeRoster(const char* options)
 		iss >> info.type;
 
 		info.label = info.name;
-		fItems.push_back(info);
+		// TODO: we could use -x to exclude these filesystems,
+		// but some "df" version doesn't support it (i.e. busybox)
+		if (info.filesystem != "tmpfs" &&
+			info.filesystem != "efivarfs" &&
+			info.filesystem != "overlay") {
+			fItems.push_back(info);
+		}
 	}
 
 	Rewind();
