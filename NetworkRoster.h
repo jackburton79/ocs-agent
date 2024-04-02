@@ -9,7 +9,7 @@
 #define NETWORKROSTER_H_
 
 #include <netinet/in.h>
-#include <net/route.h>
+//#include <net/route.h>
 #include <string>
 #include <vector>
 
@@ -19,7 +19,7 @@ public:
 	NetworkRoster();
 	~NetworkRoster();
 
-	int CountInterfaces(int family = AF_INET);
+	int CountInterfaces(int family);
 	int GetNextInterface(unsigned int* cookie, NetworkInterface& interface);
 
 private:

@@ -41,7 +41,7 @@ UnameBackend::Run()
 	osInfo.fields["hostname"] = uName.nodename;
 	osInfo.fields["comments"] = uName.version;
 	osInfo.fields["release"] = uName.release;
-	osInfo.fields["domainname"] = uName.domainname;
+	//osInfo.fields["domainname"] = uName.domainname;
 	osInfo.fields["architecture"] = uName.machine;
 	osInfo.fields["kernelname"] = uName.sysname;
 
