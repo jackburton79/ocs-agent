@@ -2,3 +2,5 @@
 *.d
 *.xml
 ocsinventory-agent
+test/processors-info-test
+test/urltest
