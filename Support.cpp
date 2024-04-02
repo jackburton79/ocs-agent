@@ -124,12 +124,9 @@ CommandExists(const char* command)
 	std::string fullCommand;
 	fullCommand.append("type ").append(command).append(" > /dev/null 2>&1");
 
-	int result = -1;
 	int systemStatus = ::system(fullCommand.c_str());
-	if (systemStatus == 0)
-		result = WEXITSTATUS(systemStatus);
-		
-	return result == 0;
+
+	return systemStatus == 0;
 }
 
 
