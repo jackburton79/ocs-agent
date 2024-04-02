@@ -165,18 +165,23 @@ NetworkInterface::IPAddress() const
 std::string
 NetworkInterface::NetMask() const
 {
+#ifdef __linux__
 	struct ifreq ifr;
 	if (_DoRequest(SIOCGIFNETMASK, ifr) != 0)
 		return "";
 
 	struct sockaddr_in* ipaddr = (struct sockaddr_in*)&ifr.ifr_netmask;
 	return inet_ntoa(ipaddr->sin_addr);
+#else
+	return "";
+#endif
 }
 
 
 std::string
 NetworkInterface::Network() const
 {
+#ifdef __linux__
 	struct ifreq ifrNetMask;
 	if (_DoRequest(SIOCGIFNETMASK, ifrNetMask) != 0)
 		return "";
@@ -193,6 +198,9 @@ NetworkInterface::Network() const
 	networkAddress.s_addr = ipAddr->sin_addr.s_addr & netMask->sin_addr.s_addr;
 
 	return inet_ntoa(networkAddress);
+#else
+	return "";
+#endif
 }
 
 
@@ -247,6 +255,7 @@ NetworkInterface::Type() const
 std::string
 NetworkInterface::Speed() const
 {
+#ifdef __linux__
 	struct ifreq ifr;
 	struct ethtool_cmd edata;
 
@@ -257,13 +266,17 @@ NetworkInterface::Speed() const
 	if (_DoRequest(SIOCETHTOOL, ifr) != 0)
 		return "0";
 
-    return SpeedToString(&edata);
+	return SpeedToString(&edata);
+#else
+	return "";
+#endif
 }
 
 
 std::string
 NetworkInterface::SpeedWithUnit() const
 {
+#ifdef __linux__
 	struct ifreq ifr;
 	struct ethtool_cmd edata;
 
@@ -274,7 +287,10 @@ NetworkInterface::SpeedWithUnit() const
 	if (_DoRequest(SIOCETHTOOL, ifr) != 0)
 		return "0";
 
-    return SpeedToStringWithUnit(&edata);
+	return SpeedToStringWithUnit(&edata);
+#else
+	return "";
+#endif
 }
 
 
@@ -321,6 +337,7 @@ NetworkInterface::_DoRequest(int request, struct ifreq& ifr)  const
 }
 
 
+#ifdef __linux__
 const static int kBufSize = 8192;
 
 static bool
@@ -396,11 +413,13 @@ ReadRouteInfoFromSocket(int sockFd, char *bufPtr, int seqNum, int pId)
 
 	return msgLen;
 }
+#endif
 
 
 int
 NetworkInterface::_GetRoutes(std::list<route_info>& routeList) const
 {
+#ifdef __linux__
 	int sock = 0;
 	if ((sock = ::socket(PF_NETLINK, SOCK_DGRAM, NETLINK_ROUTE)) < 0)
 		return errno;
@@ -438,6 +457,6 @@ NetworkInterface::_GetRoutes(std::list<route_info>& routeList) const
 	}
 
 	::close(sock);
-
+#endif
 	return routeList.size();
 }

@@ -41,7 +41,10 @@ UnameBackend::Run()
 	osInfo.fields["hostname"] = uName.nodename;
 	osInfo.fields["comments"] = uName.version;
 	osInfo.fields["release"] = uName.release;
+	// TODO: maybe others ?
+#ifdef __linux__
 	osInfo.fields["domainname"] = uName.domainname;
+#endif
 	osInfo.fields["architecture"] = uName.machine;
 	osInfo.fields["kernelname"] = uName.sysname;
 
