@@ -16,10 +16,14 @@
 #include <unistd.h>
 
 #include <arpa/inet.h>
+
+#ifdef __linux__
 #include <linux/netlink.h>
 #include <linux/rtnetlink.h>
 #include <linux/ethtool.h>
 #include <linux/sockios.h>
+#endif
+
 #include <net/ethernet.h>
 #include <net/if.h>
 #include <netinet/in.h>
@@ -34,16 +38,22 @@
 static std::string
 SpeedToString(struct ethtool_cmd* edata)
 {
+#ifdef __linux__
 	int speed = ethtool_cmd_speed(edata);
 	if (speed == -1)
 		return "";
 	return int_to_string(speed);
+#else
+	return "";
+#endif
 }
 
 
 static std::string
 SpeedToStringWithUnit(struct ethtool_cmd* edata)
 {
+	std::string result = "";
+#ifdef __linux__
 	int speed = ethtool_cmd_speed(edata);
 	if (speed == -1)
 		return "";
@@ -61,7 +71,7 @@ SpeedToStringWithUnit(struct ethtool_cmd* edata)
 	if (count == "" && unit == "")
 		return "";
 
-	std::string result = "";
+
 	result.append(count).append(" ").append(unit);
 
 #if 0
@@ -75,7 +85,7 @@ SpeedToStringWithUnit(struct ethtool_cmd* edata)
 	if (duplex != "")
 		result.append(" ").append(duplex);
 #endif
-
+#endif
 	return result;
 }
 
@@ -109,6 +119,7 @@ NetworkInterface::Name() const
 std::string
 NetworkInterface::HardwareAddress() const
 {
+#ifdef __linux__
 	struct ifreq ifr;
 	if (_DoRequest(SIOCGIFHWADDR, ifr) != 0)
 		return "";
@@ -123,6 +134,9 @@ NetworkInterface::HardwareAddress() const
 	}
 
 	return stream.str();
+#else
+	return "";
+#endif
 }
 
 
