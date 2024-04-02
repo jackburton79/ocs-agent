@@ -10,6 +10,7 @@
 
 #include <netinet/in.h>
 #include <string>
+#include <sys/socket.h>
 #include <vector>
 
 class NetworkInterface;
