@@ -738,8 +738,9 @@ Inventory::_AddMemoriesInfo()
 void
 Inventory::_AddDrivesInfo()
 {
-	// Used "-l" to list only local fs
-	VolumeRoster reader("-l");
+	// "-l" to list only local fs
+	// and exclude tmpfs, efivarfs and overlay
+	VolumeRoster reader("-l -x tmpfs -x efivarfs -x overlay");
 	volume_info info;
 	while (reader.GetNext(info)) {
 		tinyxml2::XMLElement* drive = fDocument->NewElement("DRIVES");
