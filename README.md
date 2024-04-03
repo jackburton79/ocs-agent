@@ -5,6 +5,7 @@
 Lite inventory agent
 =====
 Small inventory agent compatible with [OCS Inventory NG](https://www.ocsinventory-ng.org) and [GLPI](https://glpi-project.org/).
+Builds and runs on linux and freebsd (and probably other unixes, too)
 
 History
 ===
