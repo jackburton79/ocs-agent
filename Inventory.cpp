@@ -99,11 +99,14 @@ Inventory::Build(bool noSoftware)
 		Logger::Log(LOG_WARNING, "No inventory format specified. Using lowest common denominator.");
 	}
 	try {
-		if (inventoryFormat == "FORMAT_GLPI") {
-			tinyxml2::XMLElement* versionClient = fDocument->NewElement("VERSIONCLIENT");
-			versionClient->LinkEndChild(fDocument->NewText("1.9.9"));
-			fContent->LinkEndChild(versionClient);
-		}
+		// GLPI refuses the inventory if this field is missing, ocsinventory doesn't
+		// care if it's present, so we always add it
+		// TODO: get the real version of the agent
+
+		tinyxml2::XMLElement* versionClient = fDocument->NewElement("VERSIONCLIENT");
+		versionClient->LinkEndChild(fDocument->NewText("1.9.9"));
+		fContent->LinkEndChild(versionClient);
+
 		_AddAccountInfo();
 		_AddBIOSInfo();
 		_AddOperatingSystemInfo();
