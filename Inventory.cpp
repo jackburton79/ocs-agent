@@ -5,9 +5,10 @@
  *      Author: Stefano Ceccherini
  */
 
-#include <Components.h>
 #include "Agent.h"
+#include "Components.h"
 #include "Configuration.h"
+#include "Inventory.h"
 #include "Logger.h"
 #include "NetworkInterface.h"
 #include "NetworkRoster.h"
@@ -29,7 +30,6 @@
 #include <memory>
 #include <unistd.h>
 
-#include "Inventory.h"
 #include "tinyxml2/tinyxml2.h"
 
 
@@ -104,7 +104,7 @@ Inventory::Build(bool noSoftware)
 		// TODO: get the real version of the agent
 
 		tinyxml2::XMLElement* versionClient = fDocument->NewElement("VERSIONCLIENT");
-		versionClient->LinkEndChild(fDocument->NewText("1.9.9"));
+		versionClient->LinkEndChild(fDocument->NewText(Agent::Version().c_str()));
 		fContent->LinkEndChild(versionClient);
 
 		_AddAccountInfo();
