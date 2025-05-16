@@ -116,14 +116,14 @@ Socket::Connect(const char* hostName, const int port)
 }
 
 
-int
+size_t
 Socket::Read(void* data, const size_t& length)
 {
 	return ::read(fFD, data, length);
 }
 
 
-int
+size_t
 Socket::Write(const void* data, const size_t& length)
 {
 	return ::write(fFD, data, length);

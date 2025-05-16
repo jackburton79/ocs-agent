@@ -29,8 +29,8 @@ public:
 
 	void SetOption(int level, int name, const void *value, socklen_t len);
 
-	virtual int Read(void* data, const size_t& length);
-	virtual int Write(const void* data, const size_t& length);
+	virtual size_t Read(void* data, const size_t& length);
+	virtual size_t Write(const void* data, const size_t& length);
 
 private:
 	int fFD;

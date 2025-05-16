@@ -134,7 +134,7 @@ HTTP::Post(const std::string& path, const char* data, const size_t dataLength)
 int
 HTTP::Read(void* data,  const size_t& length)
 {
-	if (fSocket->Read(data, length) != (int)length) {
+	if (fSocket->Read(data, length) != length) {
 		fLastError = errno;
 		return errno;
 	}
@@ -155,14 +155,13 @@ HTTP::Request(const HTTPRequestHeader& header, const void* data, const size_t da
 
 	std::string string = fCurrentRequest.ToString().append(CRLF);
 
-	if (fSocket->Write(string.c_str(), string.length())
-			!= (int)string.length()) {
+	if (fSocket->Write(string.c_str(), string.length()) != string.length()) {
 		fLastError = errno;
 		return errno;
 	}
 
 	if (data != NULL && dataLength != 0) {
-		if (fSocket->Write(data, dataLength) != (int)dataLength) {
+		if (fSocket->Write(data, dataLength) != dataLength) {
 			fLastError = errno;
 			return errno;
 		}
@@ -177,7 +176,7 @@ HTTP::Request(const HTTPRequestHeader& header, const void* data, const size_t da
 	}
 
 	int code;
-	::sscanf(replyString.c_str(), "HTTP/1.%*d %03d", (int*)&code);
+	::sscanf(replyString.c_str(), "HTTP/1.%*d %03d", &code);
 	try {
 		fLastResponse.Clear();
 		fLastResponse.SetStatusLine(code, replyString.c_str());
