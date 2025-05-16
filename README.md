@@ -1,5 +1,5 @@
 [![build](https://github.com/jackburton79/ocs-agent/actions/workflows/ccpp.yml/badge.svg)](https://github.com/jackburton79/ocs-agent/actions/workflows/ccpp.yml)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/6c35f5798f2341b3b1c9d2cfac43b8a3)](https://app.codacy.com/gh/jackburton79/ocs-agent?utm_source=github.com&utm_medium=referral&utm_content=jackburton79/ocs-agent&utm_campaign=Badge_Grade_Settings)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/6c35f5798f2341b3b1c9d2cfac43b8a3)](https://app.codacy.com/gh/jackburton79/inventory-agent?utm_source=github.com&utm_medium=referral&utm_content=jackburton79/inventory-agent&utm_campaign=Badge_Grade_Settings)
 [![CodeFactor](https://www.codefactor.io/repository/github/jackburton79/inventory-agent/badge)](https://www.codefactor.io/repository/github/jackburton79/inventory-agent)
 
 Lite inventory agent
