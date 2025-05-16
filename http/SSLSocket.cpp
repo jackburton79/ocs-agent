@@ -83,14 +83,14 @@ SSLSocket::Connect(const struct sockaddr *address, socklen_t addrLen)
 }
 
 
-int
+size_t
 SSLSocket::Read(void* data, const size_t& length)
 {
 	return SSL_read(fSSLConnection, data, length);
 }
 
 
-int
+size_t
 SSLSocket::Write(const void* data, const size_t& length)
 {
 	return SSL_write(fSSLConnection, data, length);
