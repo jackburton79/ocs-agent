@@ -12,7 +12,8 @@
 #include <string>
 
 #define CONF_AGENT_STRING "agent-string"
-#define CONF_NO_SOFTWARE "nosoftware"
+#define CONF_NO_SOFTWARE "no-software"
+#define CONF_NO_ASSETTAG "no-assettag"
 #define CONF_OUTPUT_STDOUT "stdout"
 #define CONF_WAIT_TIME "waittime"
 

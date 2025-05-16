@@ -426,9 +426,11 @@ Inventory::_AddBIOSInfo()
 	tinyxml2::XMLElement* bios = fDocument->NewElement("BIOS");
 	fContent->LinkEndChild(bios);
 
-	tinyxml2::XMLElement* assettag = fDocument->NewElement("ASSETTAG");
-	assettag->LinkEndChild(fDocument->NewText(gComponents["CHASSIS"].fields["asset_tag"].c_str()));
-	bios->LinkEndChild(assettag);
+	if (Configuration::Get()->KeyValue(CONF_NO_ASSETTAG) != CONF_VALUE_TRUE) {
+		tinyxml2::XMLElement* assettag = fDocument->NewElement("ASSETTAG");
+		assettag->LinkEndChild(fDocument->NewText(gComponents["CHASSIS"].fields["asset_tag"].c_str()));
+		bios->LinkEndChild(assettag);
+	}
 
 	tinyxml2::XMLElement* bdate = fDocument->NewElement("BDATE");
 	bdate->LinkEndChild(fDocument->NewText(gComponents["BIOS"].fields["release_date"].c_str()));

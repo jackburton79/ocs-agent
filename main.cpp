@@ -28,7 +28,9 @@ struct option sLongOptions[] = {
 		{ "stdout", no_argument, 0, 0 },
 		{ "format", required_argument, 0, 0 },
 		{ "tag", required_argument, 0, 't' },
-		{ "nosoftware", no_argument, 0, 0 },
+		{ "nosoftware", no_argument, 0, 0 }, // deprecated
+		{ "no-software", no_argument, 0, 0 },
+		{ "no-assettag", no_argument, 0, 0 },
 		{ "daemonize", no_argument, 0, 'd' },
 		{ "wait", required_argument, 0, 'w' },
 		{ "help", no_argument, 0, 'h' },
@@ -59,7 +61,9 @@ PrintHelpAndExit()
 	std::cout << "      --stdout                       Print inventory to stdout" << std::endl;
 	std::cout << std::endl;
 	std::cout << "  -t, --tag <TAG>                    Specify tag. Will be ignored by server if a value already exists" << std::endl;
-	std::cout << "      --nosoftware                   Do not retrieve installed software" << std::endl;
+	std::cout << "      --no-software                  Do not retrieve installed software" << std::endl;
+	std::cout << std::endl;
+	std::cout << "      --no-assettag                  Do not include asset tag in inventory" << std::endl;
 	std::cout << std::endl;
 	std::cout << "      --agent-string <string>        Specify custom HTTP agent string" << std::endl;
 	std::cout << std::endl;
@@ -156,15 +160,16 @@ HandleArgs(int argc, char **argv)
 			case 0:
 			{
 				std::string optName = sLongOptions[optIndex].name;
-				if (optName == "nosoftware")
-					config->SetVolatileKeyValue("nosoftware", "true");
+				if (optName == "nosoftware" || optName == "no-software")
+					config->SetVolatileKeyValue(CONF_NO_SOFTWARE, "true");
+				else if (optName == "no-assettag")
+					config->SetVolatileKeyValue(CONF_NO_ASSETTAG, "true");
 				else if (optName == "format") {
 					if (::strcasecmp(optarg, "FORMAT_OCS") == 0 ||
 						::strcasecmp(optarg, "FORMAT_GLPI") == 0) {
 						config->SetVolatileKeyValue("format", optarg);
 					}
-				}
-				else if (optName == "stdout" && !daemonize)
+				} else if (optName == "stdout" && !daemonize)
 					config->SetVolatileKeyValue("stdout", "true");
 				else if (optName == "use-current-time-in-device-ID")
 					config->SetUseCurrentTimeInDeviceID(true);
